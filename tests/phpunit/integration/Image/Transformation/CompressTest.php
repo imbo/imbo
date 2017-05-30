@@ -32,15 +32,16 @@ class CompressTest extends TransformationTests {
         $image->expects($this->once())->method('getMimeType')->will($this->returnValue('image/jpeg'));
 
         $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue(['level' => 50]));
-        $event->expects($this->at(1))->method('getArgument')->with('image')->will($this->returnValue($image));
 
         $imagick = new Imagick();
         $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
 
         $transformation = $this->getTransformation();
-        $transformation->setImagick($imagick);
-        $transformation->transform($event); // Set the correct level parameter
-        $transformation->compress($event); // Perform the actual compression
+        $transformation
+            ->setImagick($imagick)
+            ->setImage($image)
+            ->setEvent($event)
+            ->transform(['level' => 50]) // Set the correct level parameter
+            ->compress($event); // Perform the actual compression
     }
 }

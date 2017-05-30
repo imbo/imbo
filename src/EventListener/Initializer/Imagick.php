@@ -18,7 +18,7 @@ use Imbo\Image\Transformation\Transformation,
  * Imagick initializer
  *
  * This event listener initializer will inject the same Imagick instance into all the
- * transformation event listeners as well as the custom Imagick event listener.L
+ * transformation event listeners as well as the custom Imagick event listener.
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners

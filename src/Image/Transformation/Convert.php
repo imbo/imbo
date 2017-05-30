@@ -12,8 +12,6 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image,
     Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -24,45 +22,32 @@ use Imbo\Model\Image,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Convert extends Transformation implements ListenerInterface {
+class Convert extends Transformation {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.convert' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function transform(EventInterface $event) {
-        $image = $event->getArgument('image');
-        $params = $event->getArgument('params');
-
+    public function transform(array $params) {
         if (empty($params['type'])) {
             throw new TransformationException('Missing required parameter: type', 400);
         }
 
         $type = $params['type'];
 
-        if ($image->getExtension() === $type) {
+        if ($this->image->getExtension() === $type) {
             // The requested extension is the same as the image, no conversion is needed
             return;
         }
 
         try {
             $this->imagick->setImageFormat($type);
-            $mimeType = array_search($type, Image::$mimeTypes);
-
-            $image->setMimeType($mimeType)
-                  ->setExtension($type)
-                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $mimeType = array_search($type, Image::$mimeTypes);
+
+        $this->image->setMimeType($mimeType)
+                    ->setExtension($type)
+                    ->hasBeenTransformed(true);
     }
 }

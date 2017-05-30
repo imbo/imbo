@@ -33,13 +33,13 @@ class ConvertTest extends TransformationTests {
         $image->expects($this->once())->method('setExtension')->with('gif')->will($this->returnValue($image));
         $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(['type' => 'gif']));
-
         $imagick = new Imagick();
         $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
 
-        $this->getTransformation()->setImagick($imagick)->transform($event);
+        $this->getTransformation()
+            ->setEvent($this->createMock('Imbo\EventManager\Event'))
+            ->setImage($image)
+            ->setImagick($imagick)
+            ->transform(['type' => 'gif']);
     }
 }

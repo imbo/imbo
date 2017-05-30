@@ -44,7 +44,7 @@ Feature: Imbo provides an event listener that generates variations when adding i
         Given I specify "thumbnail:height=128,fit=inset" as transformation
         When I request the previously added image as a "png"
         Then the response status line is "200 OK"
-        And the "X-Imbo-ImageVariation" response header is "512x128"
+        And the "X-Imbo-ImageVariation" response header is "128x32"
         And the image width is "50"
 
     Scenario: Request an image with a maxSize and crop transformation

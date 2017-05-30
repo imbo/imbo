@@ -11,8 +11,7 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
+    Imbo\Image\InputSizeConstraint,
     Imagick,
     ImagickException,
     ImagickPixelException;
@@ -24,24 +23,11 @@ use Imbo\Exception\TransformationException,
  * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Image\Transformations
  */
-class AutoRotate extends Transformation implements ListenerInterface {
+class AutoRotate extends Transformation implements InputSizeConstraint {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.autorotate' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function transform(EventInterface $event) {
-        $image = $event->getArgument('image');
-
+    public function transform(array $params) {
         try {
             // Get orientation from exif data
             $orientation = $this->imagick->getImageOrientation();
@@ -91,8 +77,8 @@ class AutoRotate extends Transformation implements ListenerInterface {
                     if ($rotate % 180) {
                         $size = $this->imagick->getImageGeometry();
 
-                        $image->setWidth($size['width'])
-                              ->setHeight($size['height']);
+                        $this->image->setWidth($size['width'])
+                                    ->setHeight($size['height']);
                     }
                 }
 
@@ -107,7 +93,7 @@ class AutoRotate extends Transformation implements ListenerInterface {
                 if ($rotate || $flipHorizontally || $flipVertically) {
                     // Set the image orientation so it reflects the transformation that's been done
                     $this->imagick->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
-                    $image->hasBeenTransformed(true);
+                    $this->image->hasBeenTransformed(true);
                 }
             }
         } catch (ImagickException $e) {
@@ -115,5 +101,15 @@ class AutoRotate extends Transformation implements ListenerInterface {
         } catch (ImagickPixelException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMinimumInputSize(array $params, array $imageSize) {
+        // We don't have an imagick instance at this point in the flow, so we don't have any way to
+        // determine if the image should be rotated. Return false to signal that we can't make any
+        // assumptions on the input size from this point on.
+        return InputSizeConstraint::STOP_RESOLVING;
     }
 }

@@ -68,23 +68,18 @@ class ContrastTest extends \PHPUnit_Framework_TestCase {
      */
     public function testSetsTheCorrectContrast(array $params, $shouldTransform) {
         $image = $this->createMock('Imbo\Model\Image');
-        $event = $this->createMock('Imbo\EventManager\Event');
 
         $imagick = new \Imagick();
         $imagick->newImage(16, 16, '#fff');
 
-        $event->expects($this->at(0))->method('getArgument')->with('params')->will($this->returnValue($params));
-
         if ($shouldTransform) {
-            $event->expects($this->at(1))->method('getArgument')->with('image')->will($this->returnValue($image));
             $image->expects($this->once())->method('hasBeenTransformed')->with(true);
         } else {
             $image->expects($this->never())->method('hasBeenTransformed');
         }
 
-        $howMany = $shouldTransform ? $this->once() : $this->never();
-
+        $this->transformation->setImage($image);
         $this->transformation->setImagick($imagick);
-        $this->transformation->transform($event);
+        $this->transformation->transform($params);
     }
 }

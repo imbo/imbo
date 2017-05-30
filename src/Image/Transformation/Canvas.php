@@ -11,8 +11,7 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
+    Imbo\Image\InputSizeConstraint,
     Imagick,
     ImagickException,
     ImagickPixelException;
@@ -23,7 +22,7 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Canvas extends Transformation implements ListenerInterface {
+class Canvas extends Transformation implements InputSizeConstraint {
     /**
      * Canvas mode
      *
@@ -64,20 +63,8 @@ class Canvas extends Transformation implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.canvas' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event
-     */
-    public function transform(EventInterface $event) {
-        $image = $event->getArgument('image');
-        $params = $event->getArgument('params');
+    public function transform(array $params) {
+        $image = $this->image;
 
         $width  = !empty($params['width']) ? (int) $params['width'] : $image->getWidth();
         $height = !empty($params['height']) ? (int) $params['height'] : $image->getHeight();
@@ -147,16 +134,38 @@ class Canvas extends Transformation implements ListenerInterface {
                 $x,
                 $y
             );
-
-            // Store the new image
-            $size = $this->imagick->getImageGeometry();
-            $image->setWidth($size['width'])
-                  ->setHeight($size['height'])
-                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         } catch (ImagickPixelException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        // Store the new image
+        $size = $this->imagick->getImageGeometry();
+        $image->setWidth($size['width'])
+              ->setHeight($size['height'])
+              ->hasBeenTransformed(true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMinimumInputSize(array $params, array $imageSize) {
+        // Since we're modifying the input image in a way that alters the size and content,
+        // we can't make any further optimizations on the input size.
+        return InputSizeConstraint::STOP_RESOLVING;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function adjustParameters($ratio, array $parameters) {
+        foreach (['x', 'y', 'width', 'height'] as $param) {
+            if (isset($parameters[$param])) {
+                $parameters[$param] = round($parameters[$param] / $ratio);
+            }
+        }
+
+        return $parameters;
     }
 }

@@ -1,5 +1,4 @@
-<?php
-/**
+<?php /**
  * This file is part of the Imbo package
  *
  * (c) Christer Edvartsen <cogo@starzinger.net>
@@ -55,21 +54,11 @@ class HistogramTest extends TransformationTests {
         $image->expects($this->once())->method('setHeight')->will($this->returnValue($image));
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))
-              ->method('getArgument')
-              ->with('image')
-              ->will($this->returnValue($image));
-        $event->expects($this->at(1))
-              ->method('getArgument')
-              ->with('params')
-              ->will($this->returnValue([
-                  'scale' => $scale,
-              ]));
-
         $imagick = new Imagick();
         $imagick->readImageBlob($blob);
 
-        $this->getTransformation()->setImagick($imagick)->transform($event);
+        $this->getTransformation()->setImage($image)->setImagick($imagick)->transform([
+            'scale' => $scale,
+        ]);
     }
 }

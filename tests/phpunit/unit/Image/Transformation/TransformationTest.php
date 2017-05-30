@@ -71,5 +71,5 @@ class TransformationTest extends \PHPUnit_Framework_TestCase {
 }
 
 class TransformationImpl extends Transformation {
-    public function applyToImage(Image $image, array $params = []) {}
+    public function transform(array $params = []) {}
 }

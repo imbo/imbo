@@ -33,9 +33,6 @@ class StripTest extends TransformationTests {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->once())->method('getArgument')->with('image')->will($this->returnValue($image));
-
         $imagick = new Imagick();
         $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));
 
@@ -52,13 +49,7 @@ class StripTest extends TransformationTests {
             $this->fail('Image is missing EXIF data');
         }
 
-        // Need to create another Imagick instance here since the getImageProperties call above
-        // seems to store the properties, so subsequent calls to that method will return the same
-        // properties, even if a call to stripImage() has been made
-        $imagick = new Imagick();
-        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));
-
-        $this->getTransformation()->setImagick($imagick)->transform($event);
+        $this->getTransformation()->setImage($image)->setImagick($imagick)->transform([]);
 
         foreach ($imagick->getImageProperties() as $key => $value) {
             $this->assertStringStartsNotWith('exif', $key);

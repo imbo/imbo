@@ -12,8 +12,6 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Image\Transformation\Transformation,
     Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
     Imagick,
     ImagickException;
 
@@ -23,26 +21,16 @@ use Imbo\Image\Transformation\Transformation,
  * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image\Transformations
  */
-class Vignette extends Transformation implements ListenerInterface {
+class Vignette extends Transformation {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.vignette' => 'transform',
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function transform(EventInterface $event) {
-        $params = $event->getArgument('params');
+    public function transform(array $params) {
         $inner  = $this->formatColor(isset($params['inner']) ? $params['inner'] : 'none');
         $outer  = $this->formatColor(isset($params['outer']) ? $params['outer'] : '000');
         $scale  = (float) max(isset($params['scale']) ? $params['scale'] : 1.5, 1);
 
-        $image  = $event->getArgument('image');
+        $image  = $this->image;
         $width  = $image->getWidth();
         $height = $image->getHeight();
 
@@ -60,10 +48,10 @@ class Vignette extends Transformation implements ListenerInterface {
 
         try {
             $this->imagick->compositeImage($vignette, Imagick::COMPOSITE_MULTIPLY, 0, 0);
-
-            $image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $image->hasBeenTransformed(true);
     }
 }

@@ -44,16 +44,12 @@ class RotateTest extends TransformationTests {
         $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnValue($image));
         $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue([
-            'angle' => $angle,
-            'bg' => 'fff',
-        ]));
-
         $imagick = new Imagick();
         $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
 
-        $this->getTransformation()->setImagick($imagick)->transform($event);
+        $this->getTransformation()->setImage($image)->setImagick($imagick)->transform([
+            'angle' => $angle,
+            'bg' => 'fff',
+        ]);
     }
 }

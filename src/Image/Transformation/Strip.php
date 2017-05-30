@@ -11,8 +11,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -21,39 +19,23 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Strip extends Transformation implements ListenerInterface {
+class Strip extends Transformation {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.strip' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function transform(EventInterface $event) {
+    public function transform(array $params) {
         try {
             $this->imagick->stripImage();
-
-            // In newer versions of Imagick, it seems we need to clear and re-read
-            // the data to properly clear the properties
-            $version = $this->imagick->getVersion();
-            $version = preg_replace('#.*?(\d+\.\d+\.\d+).*#', '$1', $version['versionString']);
-
-            if (version_compare($version, '6.8.0') >= 0){
-                $data = $this->imagick->getImagesBlob();
-                $this->imagick->clear();
-                $this->imagick->readImageBlob($data);
-            }
-
-            $event->getArgument('image')->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        // In newer versions of Imagick, it seems we need to clear and re-read
+        // the data to properly clear the properties
+        $data = $this->imagick->getImageBlob();
+        $this->imagick->clear();
+        $this->imagick->readImageBlob($data);
+
+        $this->image->hasBeenTransformed(true);
     }
 }

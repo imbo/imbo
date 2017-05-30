@@ -55,14 +55,14 @@ class CropTest extends TransformationTests {
             $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
         }
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue($params));
-
         $blob = file_get_contents(FIXTURES_DIR . '/image.png');
         $imagick = new Imagick();
         $imagick->readImageBlob($blob);
 
-        $this->getTransformation()->setImagick($imagick)->transform($event);
+        $this->getTransformation()
+             ->setEvent($this->createMock('Imbo\EventManager\Event'))
+             ->setImagick($imagick)
+             ->setImage($image)
+             ->transform($params);
     }
 }

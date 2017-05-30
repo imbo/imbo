@@ -32,7 +32,6 @@ class Compress extends Transformation implements ListenerInterface {
      */
     public static function getSubscribedEvents() {
         return [
-            'image.transformation.compress' => 'transform',
             'image.transformed' => 'compress',
         ];
     }
@@ -47,7 +46,7 @@ class Compress extends Transformation implements ListenerInterface {
             return;
         }
 
-        $image = $event->getArgument('image');
+        $image = $this->image;
         $mimeType = $image->getMimeType();
 
         if ($mimeType === 'image/gif') {
@@ -61,20 +60,17 @@ class Compress extends Transformation implements ListenerInterface {
             // which usually results in a smaller file size, as for JPEG's, a high level means a
             // higher quality, resulting in a larger file size.
             $this->imagick->setImageCompressionQuality($this->level);
-            $image->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $image->hasBeenTransformed(true);
     }
 
     /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
+     * {@inheritdoc}
      */
-    public function transform(EventInterface $event) {
-        $params = $event->getArgument('params');
-
+    public function transform(array $params) {
         if (empty($params['level'])) {
             throw new TransformationException('Missing required parameter: level', 400);
         }
@@ -84,5 +80,7 @@ class Compress extends Transformation implements ListenerInterface {
         if ($this->level < 0 || $this->level > 100) {
             throw new TransformationException('level must be between 0 and 100', 400);
         }
+
+        return $this;
     }
 }

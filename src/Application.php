@@ -25,6 +25,7 @@ use Imbo\Http\Request\Request,
     Imbo\Storage\StorageInterface,
     Imbo\Http\Response\Formatter,
     Imbo\Resource\ResourceInterface,
+    Imbo\Image\TransformationManager,
     Imbo\EventListener\Initializer\InitializerInterface;
 
 /**
@@ -81,6 +82,15 @@ class Application {
         // Create a router based on the routes in the configuration and internal routes
         $router = new Router($config['routes']);
 
+        // Create a new image transformation manager
+        $transformationManager = new TransformationManager();
+
+        if (isset($config['transformations']) && !is_array($config['transformations'])) {
+            throw new InvalidArgumentException('The "transformations" configuration key must be specified as an array', 500);
+        } else if (isset($config['transformations']) && is_array($config['transformations'])) {
+            $transformationManager->addTransformations($config['transformations']);
+        }
+
         // Create the event manager and the event template
         $eventManager = new EventManager();
         $event = new Event();
@@ -92,6 +102,7 @@ class Application {
             'config' => $config,
             'manager' => $eventManager,
             'accessControl' => $accessControl,
+            'transformationManager' => $transformationManager,
         ]);
         $eventManager->setEventTemplate($event);
 
@@ -130,20 +141,26 @@ class Application {
             'Imbo\EventListener\DatabaseOperations',
             'Imbo\EventListener\StorageOperations',
             'Imbo\Image\ImagePreparation',
-            'Imbo\EventListener\ImageTransformer',
             'Imbo\EventListener\ResponseSender',
             'Imbo\EventListener\ResponseETag',
             'Imbo\EventListener\HttpCache',
+            'Imbo\Image\TransformationManager' => $transformationManager
         ];
 
         foreach ($eventListeners as $listener => $params) {
+            $name = $listener;
             if (is_string($params)) {
                 $listener = $params;
                 $params = [];
+                $name = $listener;
+            } else if ($params instanceof ListenerInterface) {
+                $listener = $params;
+                $params = [];
+                $name = get_class($listener);
             }
 
-            $eventManager->addEventHandler($listener, $listener, $params)
-                         ->addCallbacks($listener, $listener::getSubscribedEvents());
+            $eventManager->addEventHandler($name, $listener, $params)
+                         ->addCallbacks($name, $listener::getSubscribedEvents());
         }
 
         // Event listener initializers
@@ -164,6 +181,7 @@ class Application {
             }
 
             $eventManager->addInitializer($initializer);
+            $transformationManager->addInitializer($initializer);
         }
 
         // Listeners from configuration

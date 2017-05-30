@@ -51,18 +51,34 @@ class AutoRotateImageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers Imbo\EventListener\AutoRotateImage::autoRotate
      */
-    public function testTriggersAnEventForRotatingTheImage() {
+    public function testTriggersTransformationForRotating() {
         $image = $this->createMock('Imbo\Model\Image');
 
         $request = $this->createMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
 
-        $eventManager = $this->createMock('Imbo\EventManager\EventManager');
-        $eventManager->expects($this->once())->method('trigger')->with('image.transformation.autorotate', ['image' => $image]);
+        $autoRotate = $this->createMock('Imbo\Image\Transformation\Transformation');
+        $autoRotate
+            ->expects($this->once())
+            ->method('setImage')
+            ->with($image)
+            ->will($this->returnSelf());
+
+        $autoRotate
+            ->expects($this->once())
+            ->method('transform')
+            ->with([]);
+
+        $transformationManager = $this->createMock('Imbo\Image\TransformationManager');
+        $transformationManager
+            ->expects($this->once())
+            ->method('getTransformation')
+            ->with('autoRotate')
+            ->will($this->returnValue($autoRotate));
 
         $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
-        $event->expects($this->once())->method('getManager')->will($this->returnValue($eventManager));
+        $event->expects($this->once())->method('getTransformationManager')->will($this->returnValue($transformationManager));
 
         $this->listener->autoRotate($event);
     }

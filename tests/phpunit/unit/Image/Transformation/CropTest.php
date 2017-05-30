@@ -25,12 +25,9 @@ class CropTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Missing required parameter: width
      */
     public function testThrowsExceptionWhenWidthIsMissing() {
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($this->createMock('Imbo\Model\Image')));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(['height' => 123]));
-
         $transformation = new Crop();
-        $transformation->transform($event);
+        $transformation->setImage($this->createMock('Imbo\Model\Image'));
+        $transformation->transform(['height' => 123]);
     }
 
     /**
@@ -40,12 +37,9 @@ class CropTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Missing required parameter: height
      */
     public function testThrowsExceptionWhenHeightIsMissing() {
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($this->createMock('Imbo\Model\Image')));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue(['width' => 123]));
-
         $transformation = new Crop();
-        $transformation->transform($event);
+        $transformation->setImage($this->createMock('Imbo\Model\Image'));
+        $transformation->transform(['width' => 123]);
     }
 
     /**
@@ -82,12 +76,8 @@ class CropTest extends \PHPUnit_Framework_TestCase {
             $imagick->expects($this->never())->method('cropImage');
         }
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue($params));
-
         $crop = new Crop();
-        $crop->setImagick($imagick)->transform($event);
+        $crop->setImagick($imagick)->setImage($image)->transform($params);
     }
 
     /**
@@ -129,11 +119,7 @@ class CropTest extends \PHPUnit_Framework_TestCase {
             $imagick->expects($this->once())->method('cropImage');
         }
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue($params));
-
         $crop = new Crop();
-        $crop->setImagick($imagick)->transform($event);
+        $crop->setImagick($imagick)->setImage($image)->transform($params);
     }
 }

@@ -11,8 +11,7 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
+    Imbo\Image\InputSizeConstraint,
     Imbo\Model\Image,
     Imagick,
     ImagickPixel,
@@ -26,7 +25,7 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Border extends Transformation implements ListenerInterface {
+class Border extends Transformation implements InputSizeConstraint {
     /**
      * Color of the border
      *
@@ -58,21 +57,7 @@ class Border extends Transformation implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.border' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function transform(EventInterface $event) {
-        $image = $event->getArgument('image');
-        $params = $event->getArgument('params');
-
+    public function transform(array $params) {
         $color = !empty($params['color']) ? $this->formatColor($params['color']) : $this->color;
         $width = isset($params['width']) ? (int) $params['width'] : $this->width;
         $height = isset($params['height']) ? (int) $params['height'] : $this->height;
@@ -84,26 +69,26 @@ class Border extends Transformation implements ListenerInterface {
                 if ($this->imagick->getImageAlphaChannel() !== 0) {
                     // If we have an alpha channel and call `borderImage()`, Imagick will remove
                     // the alpha channel - if we have an alpha channel, use an alternative approach
-                    $this->expandImage($color, $width, $height, $image);
+                    $this->expandImage($color, $width, $height);
                 } else {
                     // If we don't have an alpha channel, use the more cost-efficient `borderImage()`
                     $this->imagick->borderImage($color, $width, $height);
                 }
             } else {
                 // Paint the border inside of the image, keeping the orignal width/height
-                $this->drawBorderInside($color, $width, $height, $image);
+                $this->drawBorderInside($color, $width, $height);
             }
-
-            $size = $this->imagick->getImageGeometry();
-
-            $image->setWidth($size['width'])
-                  ->setHeight($size['height'])
-                  ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         } catch (ImagickPixelException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $size = $this->imagick->getImageGeometry();
+
+        $this->image->setWidth($size['width'])
+                    ->setHeight($size['height'])
+                    ->hasBeenTransformed(true);
     }
 
     /**
@@ -113,11 +98,10 @@ class Border extends Transformation implements ListenerInterface {
      * @param string $color
      * @param integer $borderWidth
      * @param integer $borderHeight
-     * @param Image $image
      */
-    private function expandImage($color, $borderWidth, $borderHeight, Image $image) {
-        $imageWidth = $image->getWidth();
-        $imageHeight = $image->getHeight();
+    private function expandImage($color, $borderWidth, $borderHeight) {
+        $this->imageWidth = $this->image->getWidth();
+        $this->imageHeight = $this->image->getHeight();
 
         $original = clone $this->imagick;
 
@@ -125,12 +109,12 @@ class Border extends Transformation implements ListenerInterface {
         $this->imagick->clear();
 
         $this->imagick->newImage(
-            $imageWidth  + ($borderWidth  * 2),
-            $imageHeight + ($borderHeight * 2),
+            $this->imageWidth  + ($borderWidth  * 2),
+            $this->imageHeight + ($borderHeight * 2),
             $color
         );
         $this->imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_OPAQUE);
-        $this->imagick->setImageFormat($image->getExtension());
+        $this->imagick->setImageFormat($this->image->getExtension());
 
         $this->imagick->compositeImage(
             $original,
@@ -146,11 +130,10 @@ class Border extends Transformation implements ListenerInterface {
      * @param string $color
      * @param integer $borderWidth
      * @param integer $borderHeight
-     * @param Image $image
      */
-    private function drawBorderInside($color, $borderWidth, $borderHeight, Image $image) {
-        $imageWidth = $image->getWidth();
-        $imageHeight = $image->getHeight();
+    private function drawBorderInside($color, $borderWidth, $borderHeight) {
+        $this->imageWidth = $this->image->getWidth();
+        $this->imageHeight = $this->image->getHeight();
 
         $rect = new ImagickDraw();
         $rect->setStrokeColor($color);
@@ -158,18 +141,38 @@ class Border extends Transformation implements ListenerInterface {
         $rect->setStrokeAntialias(false);
 
         // Left
-        $rect->rectangle(0, 0, $borderWidth - 1, $imageHeight);
+        $rect->rectangle(0, 0, $borderWidth - 1, $this->imageHeight);
 
         // Right
-        $rect->rectangle($imageWidth - $borderWidth, 0, $imageWidth, $imageHeight);
+        $rect->rectangle($this->imageWidth - $borderWidth, 0, $this->imageWidth, $this->imageHeight);
 
         // Top
-        $rect->rectangle(0, 0, $imageWidth, $borderHeight - 1);
+        $rect->rectangle(0, 0, $this->imageWidth, $borderHeight - 1);
 
         // Bottom
-        $rect->rectangle(0, $imageHeight - $borderHeight, $imageWidth, $imageHeight);
+        $rect->rectangle(0, $this->imageHeight - $borderHeight, $this->imageWidth, $this->imageHeight);
 
         // Draw the border
         $this->imagick->drawImage($rect);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMinimumInputSize(array $params, array $imageSize) {
+        return InputSizeConstraint::NO_TRANSFORMATION;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function adjustParameters($ratio, array $parameters) {
+        foreach (['width', 'height'] as $param) {
+            if (isset($parameters[$param])) {
+                $parameters[$param] = round($parameters[$param] / $ratio);
+            }
+        }
+
+        return $parameters;
     }
 }

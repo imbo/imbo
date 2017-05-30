@@ -46,11 +46,7 @@ class WatermarkTest extends \PHPUnit_Framework_TestCase {
     public function testTransformThrowsExceptionIfNoImageSpecified() {
         $image = $this->createMock('Imbo\Model\Image');
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue([]));
-
-        $this->transformation->transform($event);
+        $this->transformation->setImage($image)->transform([]);
     }
 
     /**
@@ -59,8 +55,6 @@ class WatermarkTest extends \PHPUnit_Framework_TestCase {
      * @expectedExceptionMessage Watermark image not found
      */
     public function testThrowsExceptionIfSpecifiedImageIsNotFound() {
-        $image = $this->createMock('Imbo\Model\Image');
-
         $e = new StorageException('File not found', 404);
 
         $storage = $this->createMock('Imbo\Storage\StorageInterface');
@@ -73,14 +67,13 @@ class WatermarkTest extends \PHPUnit_Framework_TestCase {
         $request->expects($this->once())->method('getUser')->will($this->returnValue('someuser'));
 
         $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))->method('getArgument')->with('image')->will($this->returnValue($image));
-        $event->expects($this->at(1))->method('getArgument')->with('params')->will($this->returnValue([
-            'img' => 'foobar',
-        ]));
-        $event->expects($this->at(2))->method('getStorage')->will($this->returnValue($storage));
-        $event->expects($this->at(3))->method('getRequest')->will($this->returnValue($request));
+        $event->expects($this->once())->method('getStorage')->will($this->returnValue($storage));
+        $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
 
-        $this->transformation->transform($event);
+        $this->transformation
+            ->setImage($this->createMock('Imbo\Model\Image'))
+            ->setEvent($event)
+            ->transform(['img' => 'foobar']);
     }
 
 }

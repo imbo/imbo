@@ -11,8 +11,7 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
+    Imbo\Image\InputSizeConstraint,
     ImagickException;
 
 /**
@@ -21,34 +20,61 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Resize extends Transformation implements ListenerInterface {
+class Resize extends Transformation implements InputSizeConstraint {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.resize' => 'transform',
-        ];
+    public function transform(array $params) {
+        $size = $this->calculateSize($params, [
+            'width'  => $this->image->getWidth(),
+            'height' => $this->image->getHeight(),
+        ]);
+
+        // Fall back if there is no need to resize
+        if (!$size) {
+            return;
+        }
+
+        try {
+            $this->imagick->thumbnailImage($size['width'], $size['height']);
+        } catch (ImagickException $e) {
+            throw new TransformationException($e->getMessage(), 400, $e);
+        }
+
+        $newSize = $this->imagick->getImageGeometry();
+
+        $this->image->setWidth($newSize['width'])
+                    ->setHeight($newSize['height'])
+                    ->hasBeenTransformed(true);
     }
 
     /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
+     * {@inheritdoc}
      */
-    public function transform(EventInterface $event) {
-        $image = $event->getArgument('image');
-        $params = $event->getArgument('params');
+    public function getMinimumInputSize(array $params, array $imageSize) {
+        return $this->calculateSize($params, $imageSize) ?: InputSizeConstraint::NO_TRANSFORMATION;
+    }
 
+    /**
+     * Calculate output size of image
+     *
+     * @param array $params
+     * @param array $imageSize
+     * @return array
+     */
+    protected function calculateSize(array $params, array $imageSize) {
         if (empty($params['width']) && empty($params['height'])) {
-            throw new TransformationException('Missing both width and height. You need to specify at least one of them', 400);
+            throw new TransformationException(
+                'Missing both width and height. You need to specify at least one of them',
+                400
+            );
         }
 
         $width = !empty($params['width']) ? (int) $params['width'] : 0;
         $height = !empty($params['height']) ? (int) $params['height'] : 0;
 
-        $originalWidth = $image->getWidth();
-        $originalHeight = $image->getHeight();
+        $originalWidth = $imageSize['width'];
+        $originalHeight = $imageSize['height'];
 
         if ($width === $originalWidth && $height === $originalHeight) {
             // Resize params match the current image size, no need for any resizing
@@ -62,17 +88,6 @@ class Resize extends Transformation implements ListenerInterface {
             $width = ceil(($originalWidth / $originalHeight) * $height);
         }
 
-        try {
-            $this->imagick->setOption('jpeg:size', $width . 'x' . $height);
-            $this->imagick->thumbnailImage($width, $height);
-
-            $size = $this->imagick->getImageGeometry();
-
-            $image->setWidth($size['width'])
-                  ->setHeight($size['height'])
-                  ->hasBeenTransformed(true);
-        } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
-        }
+        return ['width' => $width, 'height' => $height];
     }
 }

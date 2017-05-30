@@ -127,6 +127,13 @@ interface EventInterface {
     function getManager();
 
     /**
+     * Get the image transformation manager
+     *
+     * @return TransformationManager
+     */
+    function getTransformationManager();
+
+    /**
      * Get the Imbo configuration
      *
      * @return array

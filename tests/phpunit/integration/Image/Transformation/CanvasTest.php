@@ -92,23 +92,13 @@ class CanvasTest extends TransformationTests {
         $image->expects($this->once())->method('setHeight')->with($resultingHeight)->will($this->returnValue($image));
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->at(0))
-              ->method('getArgument')
-              ->with('image')
-              ->will($this->returnValue($image));
-        $event->expects($this->at(1))
-              ->method('getArgument')
-              ->with('params')
-              ->will($this->returnValue([
-                  'width' => $width,
-                  'height' => $height,
-                  'mode' => $mode,
-              ]));
-
         $imagick = new Imagick();
         $imagick->readImageBlob($blob);
 
-        $this->getTransformation()->setImagick($imagick)->transform($event);
+        $this->getTransformation()->setImagick($imagick)->setImage($image)->transform([
+            'width' => $width,
+            'height' => $height,
+            'mode' => $mode,
+        ]);
     }
 }

@@ -11,8 +11,6 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
     ImagickException;
 
 /**
@@ -22,30 +20,17 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Transverse extends Transformation implements ListenerInterface {
+class Transverse extends Transformation {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformation.transverse' => 'transform',
-        ];
-    }
-
-    /**
-     * Transform the image
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function transform(EventInterface $event) {
+    public function transform(array $params) {
         try {
             $this->imagick->transverseImage();
-            $event->getArgument('image')
-                ->setHeight($this->imagick->getImageHeight())
-                ->setWidth($this->imagick->getImageWidth())
-                ->hasBeenTransformed(true);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
+
+        $this->image->hasBeenTransformed(true);
     }
 }
