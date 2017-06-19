@@ -9,6 +9,13 @@ If you did a :ref:`git clone <git-clone>` you could simply do a ``git pull`` to 
 
 From time to time Imbo will introduce new features or fix bugs that might require you to update the contents of the database you choose to use. This chapter will contain all information you need to keep your installation up to date. Each of the following sections include the necessary steps you need to execute when upgrading to the different versions.
 
+Imbo-2.3.0
+----------
+
+The following classes have been deprecated, and will be removed in Imbo-3.0.0:
+
+* ``Imbo\Image\Identifier\Generator\Md5``
+
 Imbo-2.0.0
 ----------
 
@@ -65,7 +72,7 @@ MySQL
     ALTER TABLE storage_images CHANGE `publicKey` `user` varchar(255) COLLATE utf8_danish_ci NOT NULL;
     ALTER TABLE storage_image_variations CHANGE `publicKey` `user` varchar(255) COLLATE utf8_danish_ci NOT NULL;
 
-.. note:: The ``imagevariations`` and ``storage_image_variations`` table might not be present in your database unless you previously upgraded to 1.2.4. In this case, skip the queries affecting those tables and instead follow the instructions specified in the :ref:`database-setup` section.
+.. note:: The ``imagevariations`` and ``storage_image_variations`` tables might not be present in your database unless you previously upgraded to 1.2.4. In this case, skip the queries affecting those tables and instead follow the instructions specified in the :ref:`database-setup` section.
 
 MongoDB
 ~~~~~~~

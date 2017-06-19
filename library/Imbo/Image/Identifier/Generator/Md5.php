@@ -21,6 +21,13 @@ use Imbo\Model\Image;
  */
 class Md5 implements GeneratorInterface {
     /**
+     * Class constructor
+     */
+    public function __construct() {
+        trigger_error(sprintf('"%s" is deprecated and will be removed in Imbo-3', __CLASS__), E_USER_DEPRECATED);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function generate(Image $image) {
