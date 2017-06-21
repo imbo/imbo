@@ -22,6 +22,10 @@ class Md5Test extends \PHPUnit_Framework_TestCase {
         $image = $this->getMock('Imbo\Model\Image');
         $image->expects($this->any())->method('getBlob')->will($this->returnValue('foobar'));
 
+        $this->setExpectedException(
+            'PHPUnit_Framework_Error_Deprecated',
+            '"Imbo\Image\Identifier\Generator\Md5" is deprecated and will be removed in Imbo-3'
+        );
         $generator = new Md5Generator();
 
         // Make sure it generates the same MD5 every time

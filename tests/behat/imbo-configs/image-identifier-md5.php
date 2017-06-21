@@ -13,6 +13,6 @@
  */
 return [
     'imageIdentifierGenerator' => function() {
-        return new Imbo\Image\Identifier\Generator\Md5();
+        return @new Imbo\Image\Identifier\Generator\Md5();
     }
 ];
