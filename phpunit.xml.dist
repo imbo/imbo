@@ -21,6 +21,11 @@
     <var name="BACKBLAZE_B2_APPLICATION_KEY" value="" />
     <var name="BACKBLAZE_B2_BUCKET" value="" />
     <var name="BACKBLAZE_B2_BUCKET_ID" value="" />
+
+    <!-- Cassandra tests - defaults to 127.0.0.1:9042
+      <var name="CASSANDRA_HOST" value="" />
+      <var name="CASSANDRA_PORT" value="" />
+    -->
   </php>
 
   <filter>
