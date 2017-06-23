@@ -1,7 +1,8 @@
 default:
     suites:
-        default:
+        mongodb_gridfs:
             paths: [%paths.base%/tests/behat/features]
+            contexts: [MongoDB_GridFS]
 
     extensions:
         Imbo\BehatApiExtension:

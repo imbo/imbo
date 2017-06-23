@@ -21,9 +21,15 @@ use Psr\Http\Message\RequestInterface;
 use Behat\Gherkin\Node\TableNode;
 use Assert\Assertion;
 use Micheh\Cache\CacheUtil;
+use MongoDB\Client as MongoClient;
 
 /**
- * Imbo Context
+ * Main Imbo feature context
+ *
+ * This is the main feature context for Imbos Behat tests. Suites need to implement their own
+ * feature context that extends this one, and which also implements the ImboFeatureContext
+ * interface. The feature context classes can also implement Behat-hooks that does setup / teardown
+ * type functionality.
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Functional tests
@@ -37,6 +43,7 @@ class FeatureContext extends ApiContext {
     const MIDDLEWARE_SIGN_REQUEST = 'imbo-behat-sign-request';
     const MIDDLEWARE_APPEND_ACCESS_TOKEN = 'imbo-behat-append-access-token';
     const MIDDLEWARE_HISTORY = 'imbo-behat-history';
+    const MIDDLEWARE_BEHAT_CONTEXT_CLASS = 'imbo-behat-context-class';
 
     /**
      * @var CacheUtil
@@ -127,14 +134,27 @@ class FeatureContext extends ApiContext {
      * Manipulate the handler stack of the client for all tests
      *
      * - Add the history middleware to record all request / responses in the $this->history array
+     * - Set the request header that informs Imbo which class is responsible for configuring the
+     *   database and storage adapters in the test
      *
      * {@inheritdoc}
+     *
+     * @throws RuntimeException
      */
     public function setClient(ClientInterface $client) {
-        $client->getConfig('handler')->push(
-            Middleware::history($this->history),
-            self::MIDDLEWARE_HISTORY
-        );
+        $handler = $client->getConfig('handler');
+        $handler->push(Middleware::history($this->history), self::MIDDLEWARE_HISTORY);
+        $handler->push(Middleware::mapRequest(function (RequestInterface $request) {
+            if (!$this instanceof ImboFeatureContext) {
+                throw new RuntimeException(sprintf(
+                    'The "%s" class must implement the "%s" interface',
+                    static::class,
+                    ImboFeatureContext::class
+                ));
+            }
+
+            return $request->withHeader('X-Behat-Context-Class', static::class);
+        }), self::MIDDLEWARE_BEHAT_CONTEXT_CLASS);
 
         return parent::setClient($client);
     }
@@ -187,17 +207,14 @@ class FeatureContext extends ApiContext {
     }
 
     /**
-     * Drop mongo test collection which stores information regarding images, and the images
-     * themselves
+     * Empty the image transformation cache directory along with the test database (mongodb)
      *
      * @param BeforeScenarioScope $scope
      *
      * @BeforeScenario
      * @codeCoverageIgnore
      */
-    public static function prepare(BeforeScenarioScope $scope) {
-        (new MongoDB\Client())->imbo_testing->drop();
-
+    static public function removeImageTransformationCache(BeforeScenarioScope $scope) {
         $cachePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'imbo-behat-image-transformation-cache';
 
         if (is_dir($cachePath)) {
@@ -596,8 +613,6 @@ class FeatureContext extends ApiContext {
             ));
         }
 
-        $mongoDB = (new MongoDB\Client())->imbo_testing;
-
         $fixtures = require $fixturePath;
 
         if (!is_array($fixtures)) {
@@ -606,6 +621,8 @@ class FeatureContext extends ApiContext {
                 $fixturePath
             ));
         }
+
+        $mongoDB = (new MongoClient())->imbo_testing;
 
         foreach ($fixtures as $collection => $data) {
             $mongoDB->$collection->drop();

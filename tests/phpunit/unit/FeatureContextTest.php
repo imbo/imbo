@@ -88,7 +88,7 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
         ]);
         $this->cacheUtil = $this->createMock('Micheh\Cache\CacheUtil');
 
-        $this->context = new FeatureContext($this->cacheUtil);
+        $this->context = new FeatureContextImplementation($this->cacheUtil);
         $this->context->setClient($this->client);
     }
 
@@ -111,7 +111,7 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
     public function testCanSetAnApiClient() {
         $handlerStack = $this->createMock('GuzzleHttp\HandlerStack');
         $handlerStack
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('push')
             ->with($this->isInstanceOf('Closure'), $this->isType('string'));
 
@@ -127,7 +127,7 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
             ->with('base_uri')
             ->willReturn('http://localhost:8080');
 
-        $context = new FeatureContext();
+        $context = new FeatureContextImplementation();
         $this->assertSame($context, $context->setClient($client));
     }
 
@@ -2982,4 +2982,12 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
             ->requestPath('/path')
             ->assertImageProperties('png');
     }
+}
+
+/**
+ * Mock implementation of a feature context
+ */
+class FeatureContextImplementation extends FeatureContext implements \ImboFeatureContext {
+    static function getDatabaseAdapter() {}
+    static function getStorageAdapter() {}
 }
