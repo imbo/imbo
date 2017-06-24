@@ -8,6 +8,8 @@
  * distributed with this source code.
  */
 
+namespace ImboBehatFeatureContext;
+
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Imbo\Database\MongoDB;
 use Imbo\Storage\GridFS;
@@ -19,7 +21,7 @@ use MongoDB\Client as MongoClient;
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Functional tests
  */
-class MongoDB_GridFS extends FeatureContext implements ImboFeatureContext {
+class MongoDB_GridFS extends MainFeatureContext implements FeatureContext {
     /**
      * The database name to use
      *

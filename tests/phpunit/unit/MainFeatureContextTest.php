@@ -10,7 +10,8 @@
 
 namespace ImboUnitTest;
 
-use FeatureContext;
+use ImboBehatFeatureContext\MainFeatureContext;
+use ImboBehatFeatureContext\FeatureContext;
 use Micheh\Cache\CacheUtil;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
@@ -23,13 +24,13 @@ use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 
 /**
- * @coversDefaultClass FeatureContext
+ * @coversDefaultClass ImboBehatFeatureContext\MainFeatureContext
  * @group unit
  * @group behat
  */
-class FeatureContextTest extends PHPUnit_Framework_TestCase {
+class MainFeatureContextTest extends PHPUnit_Framework_TestCase {
     /**
-     * @var FeatureContext
+     * @var MainFeatureContext
      */
     private $context;
 
@@ -88,7 +89,7 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
         ]);
         $this->cacheUtil = $this->createMock('Micheh\Cache\CacheUtil');
 
-        $this->context = new FeatureContextImplementation($this->cacheUtil);
+        $this->context = new MainFeatureContextImplementation($this->cacheUtil);
         $this->context->setClient($this->client);
     }
 
@@ -127,7 +128,7 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
             ->with('base_uri')
             ->willReturn('http://localhost:8080');
 
-        $context = new FeatureContextImplementation();
+        $context = new MainFeatureContextImplementation();
         $this->assertSame($context, $context->setClient($client));
     }
 
@@ -2987,7 +2988,7 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
 /**
  * Mock implementation of a feature context
  */
-class FeatureContextImplementation extends FeatureContext implements \ImboFeatureContext {
+class MainFeatureContextImplementation extends MainFeatureContext implements FeatureContext {
     static function getDatabaseAdapter() {}
     static function getStorageAdapter() {}
 }

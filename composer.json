@@ -64,7 +64,7 @@
     "psr-4": {
       "ImboUnitTest\\": "tests/phpunit/unit",
       "ImboIntegrationTest\\": "tests/phpunit/integration",
-      "": "tests/behat/features/bootstrap"
+      "ImboBehatFeatureContext\\": "tests/behat/features/bootstrap"
     }
   },
   "bin": [

@@ -8,6 +8,7 @@
  * distributed with this source code.
  */
 
+use ImboBehatFeatureContext\FeatureContext;
 use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
 use Imbo\Resource;
 
@@ -27,11 +28,11 @@ if (!class_exists($contextClass)) {
         'Specified Behat feature context class does not exist: "%s"',
         $contextClass
     ));
-} else if (($interfaces = class_implements($contextClass)) === false || !in_array(ImboFeatureContext::class, $interfaces)) {
+} else if (($interfaces = class_implements($contextClass)) === false || !in_array(FeatureContext::class, $interfaces)) {
     throw new RuntimeException(sprintf(
         'The "%s" class must implement the "%s" interface',
         $contextClass,
-        ImboFeatureContext::class
+        FeatureContext::class
     ));
 }
 
