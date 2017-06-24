@@ -10,11 +10,6 @@
 
 namespace ImboBehatFeatureContext;
 
-use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Imbo\Database\MongoDB;
-use Imbo\Storage\GridFS;
-use MongoDB\Client as MongoClient;
-
 /**
  * Imbo Context
  *
@@ -22,44 +17,6 @@ use MongoDB\Client as MongoClient;
  * @package Test suite\Functional tests
  */
 class MongoDB_GridFS extends MainFeatureContext implements FeatureContext {
-    /**
-     * The database name to use
-     *
-     * @var string
-     */
-    static private $databaseName = 'imbo_testing';
-
-    /**
-     * Drop mongo test collection which stores information regarding images, and the images
-     * themselves
-     *
-     * @BeforeScenario
-     *
-     * @param BeforeScenarioScope $scope
-     */
-    static public function dropTestDatabase(BeforeScenarioScope $scope) {
-        (new MongoClient())->{self::$databaseName}->drop();
-    }
-
-    /**
-     * Return a configured MongoDB database adapter
-     *
-     * @return MongoDB
-     */
-    static public function getDatabaseAdapter() {
-        return new MongoDB([
-            'databaseName' => self::$databaseName,
-        ]);
-    }
-
-    /**
-     * Return a configured GridFS storage adapter
-     *
-     * @return GridFS
-     */
-    static public function getStorageAdapter() {
-        return new GridFS([
-            'databaseName' => self::$databaseName,
-        ]);
-    }
+    use Database\MongoDB;
+    use Storage\GridFS;
 }
