@@ -5,6 +5,11 @@ default:
             contexts: [ImboBehatFeatureContext\FeatureContext]
             database: MongoDB
             storage: GridFS
+        mongodb_filesystem:
+            paths: [%paths.base%/tests/behat/features]
+            contexts: [ImboBehatFeatureContext\FeatureContext]
+            database: MongoDB
+            storage: Filesystem
 
     extensions:
         Imbo\BehatApiExtension:
