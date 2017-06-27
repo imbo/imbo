@@ -10,7 +10,6 @@
 
 namespace ImboUnitTest;
 
-use ImboBehatFeatureContext\MainFeatureContext;
 use ImboBehatFeatureContext\FeatureContext;
 use Micheh\Cache\CacheUtil;
 use GuzzleHttp\Client;
@@ -22,15 +21,16 @@ use GuzzleHttp\Psr7\Response;
 use PHPUnit_Framework_TestCase;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 
 /**
- * @coversDefaultClass ImboBehatFeatureContext\MainFeatureContext
+ * @coversDefaultClass ImboBehatFeatureContext\FeatureContext
  * @group unit
  * @group behat
  */
-class MainFeatureContextTest extends PHPUnit_Framework_TestCase {
+class FeatureContextTest extends PHPUnit_Framework_TestCase {
     /**
-     * @var MainFeatureContext
+     * @var FeatureContext
      */
     private $context;
 
@@ -89,7 +89,7 @@ class MainFeatureContextTest extends PHPUnit_Framework_TestCase {
         ]);
         $this->cacheUtil = $this->createMock('Micheh\Cache\CacheUtil');
 
-        $this->context = new MainFeatureContextImplementation($this->cacheUtil);
+        $this->context = new FeatureContext($this->cacheUtil);
         $this->context->setClient($this->client);
     }
 
@@ -128,7 +128,7 @@ class MainFeatureContextTest extends PHPUnit_Framework_TestCase {
             ->with('base_uri')
             ->willReturn('http://localhost:8080');
 
-        $context = new MainFeatureContextImplementation();
+        $context = new FeatureContext();
         $this->assertSame($context, $context->setClient($client));
     }
 
@@ -2983,12 +2983,50 @@ class MainFeatureContextTest extends PHPUnit_Framework_TestCase {
             ->requestPath('/path')
             ->assertImageProperties('png');
     }
-}
 
-/**
- * Mock implementation of a feature context
- */
-class MainFeatureContextImplementation extends MainFeatureContext implements FeatureContext {
-    static function getDatabaseAdapter() {}
-    static function getStorageAdapter() {}
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getSuiteSettings() {
+        return [
+            'invalid database' => [
+                'settings' => [
+                    'database' => 'Foobar',
+                    'storage' => 'GridFS',
+                ],
+                'expectedExceptionMessage' => 'Database test class "ImboBehatFeatureContext\DatabaseTest\Foobar" does not exist.',
+            ],
+            'invalid storage' => [
+                'settings' => [
+                    'database' => 'MongoDB',
+                    'storage' => 'Foobar',
+                ],
+                'expectedExceptionMessage' => 'Storage test class "ImboBehatFeatureContext\StorageTest\Foobar" does not exist.',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getSuiteSettings
+     * @covers ::setUpAdapters
+     * @expectedException InvalidArgumentException
+     * @param array $settings
+     * @param string $expectedExceptionMessage
+     */
+    public function testSetupAdaptersThrowsExceptionOnInvalidClassNames(array $settings, $expectedExceptionMessage) {
+        $suite = $this->createMock('Behat\Testwork\Suite\Suite');
+        $suite->expects($this->once())->method('getSettings')->willReturn($settings);
+
+        $environment = $this->createMock('Behat\Testwork\Environment\Environment');
+        $environment->expects($this->once())->method('getSuite')->willReturn($suite);
+
+        $this->expectExceptionMessage($expectedExceptionMessage);
+        FeatureContext::setUpAdapters(new BeforeScenarioScope(
+            $environment,
+            $this->createMock('Behat\Gherkin\Node\FeatureNode'),
+            $this->createMock('Behat\Gherkin\Node\ScenarioInterface')
+        ));
+    }
 }

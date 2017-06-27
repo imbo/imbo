@@ -17,23 +17,25 @@ use Imbo\Resource;
 // referred to in the X-Behat-Context-Class request header
 $defaultConfig = require __DIR__ . '/../../../config/config.default.php';
 
-if (empty($_SERVER['HTTP_X_BEHAT_CONTEXT_CLASS'])) {
-    throw new RuntimeException('Missing X-Behat-Context-Class request header');
+if (empty($_SERVER['HTTP_X_BEHAT_DATABASE_TEST'])) {
+    throw new RuntimeException('Missing X-Behat-Database-Test request header');
+} else if (empty($_SERVER['HTTP_X_BEHAT_STORAGE_TEST'])) {
+    throw new RuntimeException('Missing X-Behat-Storage-Test request header');
+} else if (empty($_SERVER['HTTP_X_BEHAT_DATABASE_TEST_CONFIG'])) {
+    throw new RuntimeException('Missing X-Behat-Database-Test-Config request header');
+} else if (empty($_SERVER['HTTP_X_BEHAT_STORAGE_TEST_CONFIG'])) {
+    throw new RuntimeException('Missing X-Behat-Storage-Test-Config request header');
 }
 
-$contextClass = $_SERVER['HTTP_X_BEHAT_CONTEXT_CLASS'];
+$databaseTest = $_SERVER['HTTP_X_BEHAT_DATABASE_TEST'];
+$storageTest = $_SERVER['HTTP_X_BEHAT_STORAGE_TEST'];
+$databaseConfig = json_decode(urldecode($_SERVER['HTTP_X_BEHAT_DATABASE_TEST_CONFIG']), true);
+$storageConfig = json_decode(urldecode($_SERVER['HTTP_X_BEHAT_STORAGE_TEST_CONFIG']), true);
 
-if (!class_exists($contextClass)) {
-    throw new RuntimeException(sprintf(
-        'Specified Behat feature context class does not exist: "%s"',
-        $contextClass
-    ));
-} else if (($interfaces = class_implements($contextClass)) === false || !in_array(FeatureContext::class, $interfaces)) {
-    throw new RuntimeException(sprintf(
-        'The "%s" class must implement the "%s" interface',
-        $contextClass,
-        FeatureContext::class
-    ));
+if (!is_array($databaseConfig)) {
+    throw new InvalidArgumentException('Invalid value for X-Behat-Database-Test-Config request header');
+} else if (!is_array($storageConfig)) {
+    throw new InvalidArgumentException('Invalid value for X-Behat-Storage-Test-Config request header');
 }
 
 // Default config for testing
@@ -67,8 +69,8 @@ $testConfig = [
         ]);
     },
 
-    'database' => $contextClass::getDatabaseAdapter(),
-    'storage' => $contextClass::getStorageAdapter(),
+    'database' => $databaseTest::getAdapter($databaseConfig),
+    'storage' => $storageTest::getAdapter($storageConfig),
 ];
 
 // Custom test config, if any, specified in the X-Imbo-Test-Config-File HTTP request header
