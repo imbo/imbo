@@ -10,6 +10,11 @@ default:
             contexts: [ImboBehatFeatureContext\FeatureContext]
             database: MongoDB
             storage: Filesystem
+        doctrine_sqlite_filesystem:
+            paths: [%paths.base%/tests/behat/features]
+            contexts: [ImboBehatFeatureContext\FeatureContext]
+            database: DoctrineSqlite
+            storage: Filesystem
 
     extensions:
         Imbo\BehatApiExtension:
