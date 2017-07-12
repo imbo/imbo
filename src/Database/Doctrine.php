@@ -414,8 +414,9 @@ class Doctrine implements DatabaseInterface {
      */
     public function getLastModified(array $users, $imageIdentifier = null) {
         $query = $this->getConnection()->createQueryBuilder();
-        $query->select('updated')
-              ->from($this->tableNames['imageinfo'], 'i');
+        $query->select('i.updated')
+              ->from($this->tableNames['imageinfo'], 'i')
+              ->orderBy('i.updated', 'DESC');
 
         // Filter on users
         $expr = $query->expr();
