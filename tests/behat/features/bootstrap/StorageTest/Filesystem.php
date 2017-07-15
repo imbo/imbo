@@ -24,7 +24,7 @@ class Filesystem implements AdapterTest {
     /**
      * {@inheritdoc}
      */
-    static public function setUp() {
+    static public function setUp(array $config) {
         // Generate directory for the files
         $dataDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'imbo_behat_test_storage';
 

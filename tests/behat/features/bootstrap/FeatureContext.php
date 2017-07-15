@@ -193,8 +193,8 @@ class FeatureContext extends ApiContext {
         self::$databaseTest = $database;
         self::$storageTest = $storage;
 
-        self::$databaseTestConfig = $database::setUp() ?: [];
-        self::$storageTestConfig = $storage::setUp() ?: [];
+        self::$databaseTestConfig = $database::setUp($suiteSettings) ?: [];
+        self::$storageTestConfig = $storage::setUp($suiteSettings) ?: [];
     }
 
     /**

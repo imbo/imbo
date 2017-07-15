@@ -23,9 +23,10 @@ interface AdapterTest {
      * be sent to the Imbo installation under test as a request header, and the configuration will
      * be fed back into the getAdapter method.
      *
+     * @param array $config Suite configuration from from behat.yml[.dist]
      * @return array
      */
-    static public function setUp();
+    static public function setUp(array $config);
 
     /**
      * Tear down the environment for the adapter that is being tested

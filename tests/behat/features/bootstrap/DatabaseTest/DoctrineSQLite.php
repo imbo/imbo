@@ -23,7 +23,7 @@ class DoctrineSQLite implements AdapterTest {
     /**
      * {@inheritdoc}
      */
-    static public function setUp() {
+    static public function setUp(array $config) {
         $path = tempnam(sys_get_temp_dir(), 'imbo_behat_test_database_doctrine_sqlite');
 
         // Create tmp tables

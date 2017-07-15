@@ -23,7 +23,7 @@ class MongoDB implements AdapterTest {
     /**
      * {@inheritdoc}
      */
-    static public function setUp() {
+    static public function setUp(array $config) {
         $databaseName = 'imbo_behat_test_database';
 
         self::removeDatabase($databaseName);

@@ -23,7 +23,7 @@ class GridFS implements AdapterTest {
     /**
      * {@inheritdoc}
      */
-    static public function setUp() {
+    static public function setUp(array $config) {
         $databaseName = 'imbo_behat_test_storage';
 
         self::removeDatabase($databaseName);
