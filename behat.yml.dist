@@ -15,6 +15,15 @@ default:
             contexts: [ImboBehatFeatureContext\FeatureContext]
             database: DoctrineSQLite
             storage: Filesystem
+        doctrine_mysql_filesystem:
+            paths: [%paths.base%/tests/behat/features]
+            contexts: [ImboBehatFeatureContext\FeatureContext]
+            database: DoctrineMySQL
+            database.hostname: localhost
+            database.database: imbo_test
+            database.username: imbo_test
+            database.password: imbo_test
+            storage: Filesystem
 
     extensions:
         Imbo\BehatApiExtension:

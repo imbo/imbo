@@ -22,12 +22,17 @@ branches:
 
 services:
   - mongodb
+  - mysql
 
 before_install:
   - pecl list
   - php -i
   - printf "\n" | pecl install --force mongodb
   - printf "\n" | pecl install imagick
+  - mysql -e "CREATE DATABASE IF NOT EXISTS imbo_test;" -u root
+  - mysql -e "CREATE USER imbo_test@localhost IDENTIFIED BY 'imbo_test';" -u root
+  - mysql -e "GRANT ALL PRIVILEGES ON imbo_test.* TO imbo_test@localhost;" -u root
+  - mysql -e "GRANT SUPER ON *.* TO 'imbo_test'@'localhost' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;" -u root
 
 before_script:
   - phpenv config-rm xdebug.ini
