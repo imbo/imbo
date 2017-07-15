@@ -9,7 +9,7 @@ Feature: Imbo provides a global images endpoint
         And "tests/phpunit/Fixtures/image.gif" exists for user "other-user"
         And "tests/phpunit/Fixtures/1024x256.png" exists for user "other-user"
 
-    Scenario: Fetch images without specifying any users
+    Scenario: Fetch images without specifying any users (all images)
         Given I use "publicKey" and "privateKey" for public and private keys
         And I include an access token in the query string
         When I request "/images.json"
@@ -20,13 +20,65 @@ Feature: Imbo provides a global images endpoint
             {
               "search":
               {
-                "hits": 0,
+                "hits": 4,
                 "page": 1,
                 "limit": 20,
-                "count": 0
+                "count": 4
               },
-
-              "images": "@arrayLength(0)"
+              "images": "@arrayLength(4)",
+              "images[0]":
+              {
+                "added": "@isDate()",
+                "updated": "@isDate()",
+                "checksum": "@regExp(/^[a-z0-9]{32}$/)",
+                "originalChecksum": "@regExp(/^[a-z0-9]{32}$/)",
+                "extension": "@regExp(/^(jpg|png|gif)$/)",
+                "size": "@variableType(int)",
+                "width": "@variableType(int)",
+                "height": "@variableType(int)",
+                "mime": "@regExp(#^image/(jpeg|gif|png)$#)",
+                "imageIdentifier": "@regExp(/^[a-zA-Z0-9-_]{12}$/)",
+                "user": "@regExp(/^(other-)?user$/)"
+              },
+              "images[1]": {
+                "added": "@isDate()",
+                "updated": "@isDate()",
+                "checksum": "@regExp(/^[a-z0-9]{32}$/)",
+                "originalChecksum": "@regExp(/^[a-z0-9]{32}$/)",
+                "extension": "@regExp(/^(jpg|png|gif)$/)",
+                "size": "@variableType(int)",
+                "width": "@variableType(int)",
+                "height": "@variableType(int)",
+                "mime": "@regExp(#^image/(jpeg|gif|png)$#)",
+                "imageIdentifier": "@regExp(/^[a-zA-Z0-9-_]{12}$/)",
+                "user": "@regExp(/^(other-)?user$/)"
+              },
+              "images[2]": {
+                "added": "@isDate()",
+                "updated": "@isDate()",
+                "checksum": "@regExp(/^[a-z0-9]{32}$/)",
+                "originalChecksum": "@regExp(/^[a-z0-9]{32}$/)",
+                "extension": "@regExp(/^(jpg|png|gif)$/)",
+                "size": "@variableType(int)",
+                "width": "@variableType(int)",
+                "height": "@variableType(int)",
+                "mime": "@regExp(#^image/(jpeg|gif|png)$#)",
+                "imageIdentifier": "@regExp(/^[a-zA-Z0-9-_]{12}$/)",
+                "user": "@regExp(/^(other-)?user$/)"
+              },
+              "images[3]": {
+                "added": "@isDate()",
+                "updated": "@isDate()",
+                "checksum": "@regExp(/^[a-z0-9]{32}$/)",
+                "originalChecksum": "@regExp(/^[a-z0-9]{32}$/)",
+                "extension": "@regExp(/^(jpg|png|gif)$/)",
+                "size": "@variableType(int)",
+                "width": "@variableType(int)",
+                "height": "@variableType(int)",
+                "mime": "@regExp(#^image/(jpeg|gif|png)$#)",
+                "imageIdentifier": "@regExp(/^[a-zA-Z0-9-_]{12}$/)",
+                "user": "@regExp(/^(other-)?user$/)"
+              }
             }
             """
 
@@ -133,6 +185,25 @@ Feature: Imbo provides a global images endpoint
               {
                 "code": 400,
                 "message": "Public key does not have access to the users: [foo, bar]",
+                "date": "@isDate()",
+                "imboErrorCode": 0
+              }
+            }
+            """
+
+    Scenario: Fetch all images when the publickey does not have access to specific users
+        Given I use "unpriviledged" and "privateKey" for public and private keys
+        And I include an access token in the query string
+        When I request "/images.json"
+        Then the response status line is "400 Public key does not have access to the users: [other-user]"
+        And the "Content-Type" response header is "application/json"
+        And the response body contains JSON:
+            """
+            {
+              "error":
+              {
+                "code": 400,
+                "message": "Public key does not have access to the users: [other-user]",
                 "date": "@isDate()",
                 "imboErrorCode": 0
               }
