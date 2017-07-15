@@ -635,6 +635,13 @@ class MongoDB implements DatabaseInterface {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getAllUsers() {
+        return $this->getImageCollection()->distinct('user');
+    }
+
+    /**
      * Fetch the image collection
      *
      * @return MongoCollection

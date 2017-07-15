@@ -630,6 +630,19 @@ class Doctrine implements DatabaseInterface {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getAllUsers() {
+        $query = $this->getConnection()->createQueryBuilder();
+        $query->select('DISTINCT(i.user)')
+              ->from($this->tableNames['imageinfo'], 'i');
+
+        return array_map(function($row) {
+            return $row['user'];
+        }, $query->execute()->fetchAll());
+    }
+
+    /**
      * Get the Doctrine connection
      *
      * @return Connection

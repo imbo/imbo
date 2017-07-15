@@ -225,4 +225,11 @@ interface DatabaseInterface {
      * @return boolean
      */
     function deleteShortUrls($user, $imageIdentifier, $shortUrlId = null);
+
+    /**
+     * Return a list of the users present in the database
+     *
+     * @return string[]
+     */
+    function getAllUsers();
 }
