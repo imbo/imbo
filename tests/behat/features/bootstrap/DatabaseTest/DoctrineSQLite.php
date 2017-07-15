@@ -19,7 +19,7 @@ use PDO;
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  */
-class DoctrineSqlite implements AdapterTest {
+class DoctrineSQLite implements AdapterTest {
     /**
      * {@inheritdoc}
      */

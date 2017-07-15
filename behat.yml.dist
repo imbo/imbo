@@ -13,7 +13,7 @@ default:
         doctrine_sqlite_filesystem:
             paths: [%paths.base%/tests/behat/features]
             contexts: [ImboBehatFeatureContext\FeatureContext]
-            database: DoctrineSqlite
+            database: DoctrineSQLite
             storage: Filesystem
 
     extensions:
