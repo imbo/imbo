@@ -10,13 +10,13 @@
 
 namespace ImboUnitTest\EventListener;
 
-use Imbo\EventListener\DatabaseOperations,
-    Imbo\EventManager\Event,
-    Imbo\Http\Response\Response,
-    DateTime;
+use Imbo\EventListener\DatabaseOperations;
+use Imbo\EventManager\Event;
+use Imbo\Http\Response\Response;
+use DateTime;
 
 /**
- * @covers Imbo\EventListener\DatabaseOperations
+ * @coversDefaultClass Imbo\EventListener\DatabaseOperations
  * @group unit
  * @group listeners
  * @group database
@@ -78,7 +78,7 @@ class DatabaseOperationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\DatabaseOperations::insertImage
+     * @covers ::insertImage
      */
     public function testCanInsertImage() {
         $this->image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
@@ -89,7 +89,7 @@ class DatabaseOperationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\DatabaseOperations::deleteImage
+     * @covers ::deleteImage
      */
     public function testCanDeleteImage() {
         $this->database->expects($this->once())->method('deleteImage')->with($this->user, $this->imageIdentifier);
@@ -98,7 +98,7 @@ class DatabaseOperationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\DatabaseOperations::loadImage
+     * @covers ::loadImage
      */
     public function testCanLoadImage() {
         $this->response->expects($this->any())->method('getModel')->will($this->returnValue($this->image));
@@ -108,7 +108,7 @@ class DatabaseOperationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\DatabaseOperations::deleteMetadata
+     * @covers ::deleteMetadata
      */
     public function testCanDeleteMetadata() {
         $this->database->expects($this->once())->method('deleteMetadata')->with($this->user, $this->imageIdentifier);
@@ -117,7 +117,7 @@ class DatabaseOperationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\DatabaseOperations::updateMetadata
+     * @covers ::updateMetadata
      */
     public function testCanUpdateMetadata() {
         $this->event->expects($this->once())->method('getArgument')->with('metadata')->will($this->returnValue(['key' => 'value']));
@@ -127,7 +127,7 @@ class DatabaseOperationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\DatabaseOperations::loadMetadata
+     * @covers ::loadMetadata
      */
     public function testCanLoadMetadata() {
         $date = new DateTime();
@@ -140,7 +140,7 @@ class DatabaseOperationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\DatabaseOperations::loadImages
+     * @covers ::loadImages
      */
     public function testCanLoadImages() {
         $images = [
@@ -225,7 +225,7 @@ class DatabaseOperationsTest extends ListenerTests {
 
 
     /**
-     * @covers Imbo\EventListener\DatabaseOperations::loadUser
+     * @covers ::loadUser
      */
     public function testCanLoadUser() {
         $date = new DateTime();
@@ -238,7 +238,7 @@ class DatabaseOperationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\DatabaseOperations::loadStats
+     * @covers ::loadStats
      */
     public function testCanLoadStats() {
         $this->database->expects($this->at(0))->method('getNumImages')->will($this->returnValue(1));
@@ -250,8 +250,8 @@ class DatabaseOperationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\DatabaseOperations::getImagesQuery
-     * @covers Imbo\EventListener\DatabaseOperations::setImagesQuery
+     * @covers ::getImagesQuery
+     * @covers ::setImagesQuery
      */
     public function testCanCreateItsOwnImagesQuery() {
         $query = $this->createMock('Imbo\Resource\Images\Query');
