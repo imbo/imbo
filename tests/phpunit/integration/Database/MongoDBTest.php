@@ -10,24 +10,49 @@
 
 namespace ImboIntegrationTest\Database;
 
-use Imbo\Database\MongoDB,
-    MongoDB\Client as MongoClient;
+use Imbo\Database\MongoDB;
+use MongoDB\Client as MongoClient;
 
 /**
  * @covers Imbo\Database\MongoDB
+ * @coversDefaultClass Imbo\Database\MongoDB
  * @group integration
  * @group database
  * @group mongo
  */
 class MongoDBTest extends DatabaseTests {
+    /**
+     * Name of the test database
+     *
+     * @var string
+     */
     protected $databaseName = 'imboIntegrationTestDatabase';
 
     /**
-     * @see ImboIntegrationTest\Database\DatabaseTests::getAdapter()
+     * {@inheritdoc}
      */
     protected function getAdapter() {
         return new MongoDB([
             'databaseName' => $this->databaseName,
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function insertImage(array $image) {
+        (new MongoClient)->selectCollection($this->databaseName, 'image')->insertOne([
+            'user'             => $image['user'],
+            'imageIdentifier'  => $image['imageIdentifier'],
+            'size'             => $image['size'],
+            'extension'        => $image['extension'],
+            'mime'             => $image['mime'],
+            'added'            => $image['added'],
+            'updated'          => $image['updated'],
+            'width'            => $image['width'],
+            'height'           => $image['height'],
+            'checksum'         => $image['checksum'],
+            'originalChecksum' => $image['originalChecksum'],
         ]);
     }
 
@@ -54,15 +79,14 @@ class MongoDBTest extends DatabaseTests {
      */
     public function tearDown() {
         if (class_exists('MongoDB\Client')) {
-            $client = new MongoClient();
-            $client->dropDatabase($this->databaseName);
+            (new MongoClient())->dropDatabase($this->databaseName);
         }
 
         parent::tearDown();
     }
 
     /**
-     * @covers Imbo\Database\MongoDB::getStatus
+     * @covers ::getStatus
      */
     public function testReturnsFalseWhenFetchingStatusAndTheHostnameIsNotCorrect() {
         $db = new MongoDB([
