@@ -636,7 +636,7 @@ Global images resource - ``/images``
 
 The global images resource is used to search for images across users, given that the public key has access to the images of these users.
 
-This resource is read only, and behaves in the same way as described in the `Get image collections` section of :ref:`images-resource`. In addition to the parameters specified for `Get image collections`, the following query parameter must be specified:
+This resource is read only, and behaves in the same way as described in the `Get image collections` section of :ref:`images-resource`. In addition to the parameters specified for `Get image collections`, the following query parameter can be specified:
 
 ``users[]``
     An array of users to get images for.
@@ -646,6 +646,8 @@ This resource is read only, and behaves in the same way as described in the `Get
     curl "http://imbo/images?users[]=foo&users[]=bar"
 
 results in a response with the exact same format as shown under `Get image collections`.
+
+If the ``users[]`` parameter is not set, the endpoint will return images from all users, granted that the public key has access to all users present in the database.
 
 .. _publickey-resource:
 
