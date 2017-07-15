@@ -10,20 +10,19 @@
 
 namespace Imbo\Database;
 
-use Imbo\Model\Image,
-    Imbo\Model\Images,
-    Imbo\Resource\Images\Query,
-    Imbo\Exception\DatabaseException,
-    Imbo\Exception\InvalidArgumentException,
-    Imbo\Exception\DuplicateImageIdentifierException,
-    Imbo\Exception,
-    Doctrine\DBAL\DriverManager,
-    Doctrine\DBAL\Connection,
-    Doctrine\DBAL\DBALException,
-    Doctrine\DBAL\Exception\UniqueConstraintViolationException,
-    PDO,
-    DateTime,
-    DateTimeZone;
+use Imbo\Model\Image;
+use Imbo\Model\Images;
+use Imbo\Resource\Images\Query;
+use Imbo\Exception\DatabaseException;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Exception\DuplicateImageIdentifierException;
+use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use PDO;
+use DateTime;
+use DateTimeZone;
 
 /**
  * Doctrine 2 database driver
@@ -240,16 +239,18 @@ class Doctrine implements DatabaseInterface {
         $qb = $this->getConnection()->createQueryBuilder();
         $qb->select('*')->from($this->tableNames['imageinfo'], 'i');
 
-        // Filter on users
-        $expr = $qb->expr();
-        $composite = $expr->orX();
+        if (!empty($users)) {
+            // Filter on users
+            $expr = $qb->expr();
+            $composite = $expr->orX();
 
-        foreach ($users as $i => $user) {
-            $composite->add($expr->eq('i.user', ':user' . $i));
-            $qb->setParameter(':user' . $i, $user);
+            foreach ($users as $i => $user) {
+                $composite->add($expr->eq('i.user', ':user' . $i));
+                $qb->setParameter(':user' . $i, $user);
+            }
+
+            $qb->where($composite);
         }
-
-        $qb->where($composite);
 
         if ($sort = $query->sort()) {
             // Fields valid for sorting
@@ -418,18 +419,19 @@ class Doctrine implements DatabaseInterface {
               ->from($this->tableNames['imageinfo'], 'i')
               ->orderBy('i.updated', 'DESC');
 
-        // Filter on users
-        $expr = $query->expr();
-        $composite = $expr->orX();
+        if (!empty($users)) {
+            $expr = $query->expr();
+            $composite = $expr->orX();
 
-        foreach ($users as $i => $user) {
-            $composite->add($expr->eq('i.user', ':user' . $i));
-            $query->setParameter(':user' . $i, $user);
+            foreach ($users as $i => $user) {
+                $composite->add($expr->eq('i.user', ':user' . $i));
+                $query->setParameter(':user' . $i, $user);
+            }
+
+            $query->where($composite);
         }
 
-        $query->where($composite);
-
-        if ($imageIdentifier) {
+        if ($imageIdentifier !== null) {
             $query->andWhere('i.imageIdentifier = :imageIdentifier')
                   ->setParameter(':imageIdentifier', $imageIdentifier);
         }
@@ -437,7 +439,7 @@ class Doctrine implements DatabaseInterface {
         $stmt = $query->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$row && $imageIdentifier) {
+        if (!$row && $imageIdentifier !== null) {
             throw new DatabaseException('Image not found', 404);
         } else if (!$row) {
             $row = ['updated' => time()];
