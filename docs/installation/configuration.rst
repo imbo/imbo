@@ -245,7 +245,7 @@ Here are some examples on how to use the Doctrine adapter in the configuration f
         // ...
 
         'database' => function() {
-            return new Imbo\Database\Doctrine([
+            return new \Imbo\Database\Doctrine([
                 'pdo' => new PDO('sqlite:/path/to/database'),
             ]);
         },
@@ -262,7 +262,7 @@ Here are some examples on how to use the Doctrine adapter in the configuration f
         // ...
 
         'database' => function() {
-            return new Imbo\Database\Doctrine([
+            return new \Imbo\Database\Doctrine([
                 'dbname'   => 'database',
                 'user'     => 'username',
                 'password' => 'password',
