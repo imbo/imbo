@@ -44,6 +44,13 @@ This tutorials simply aims at configuration which will most likely work on your 
 ```
 * To install all the packages, run `composer update`.
 * Create a symlink to a directory that your Apache webserver can access, in this case `public`:  `ln -s ./vendor/imbo/imbo/public/ public`.
+* Switch to the public directory and create a new file called `.htaccess` and put the following content in it:
+```
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule .* index.php
+```
+* Switch back to the instalation directory and create the necessary SQL tables by running this command and then the password: `mysql -u username -p database < ./vendor/imbo/imbo/setup/doctrine.mysql.sql` 
 * In your config directory, create a new file called `config.php` with the following content:
 ```php
 <?php
@@ -72,16 +79,51 @@ return [
 * When you now open your browser and enter the url configured to access the previously linked directory, you should see a JSON file like this:
 ```
 {
-site: "http://imbo.io",
-source: "https://github.com/imbo/imbo",
-issues: "https://github.com/imbo/imbo/issues",
-docs: "http://docs.imbo.io"
+    site: "http://imbo.io",
+    source: "https://github.com/imbo/imbo",
+    issues: "https://github.com/imbo/imbo/issues",
+    docs: "http://docs.imbo.io"
 }
 ```
 
 ### PHP Client
 
 Now that we have our server running, let's create a simple PHP client that uploads a file.
+
+* Create a new directory where you want to keep your PHP imbo client and switch into this directory.
+* Install composer if you haven't done already: `curl -s https://getcomposer.org/installer | php`
+* Run the following command to install the PHP imbo client `php composer.phar create-project imbo/imboclient`.
+* Create a new file called `index.php` with the following content:
+```php
+<?php
+
+require 'vendor/autoload.php';
+
+$client = ImboClient\ImboClient::factory([
+    'serverUrls' => ['http://imbo.your-server.com'],
+    'publicKey' => 'user',
+    'privateKey' => 'your-secret-private-key',
+    'user' => 'user',
+]);
+
+$status = $client->getServerStatus();
+
+print_r($status);
+```
+* You can then run the script in your browser or your console using `php index.php`.
+
+### Where to go from here
+
+* The imbo documentation [http://docs.imbo-project.org](http://docs.imbo-project.org)
+   * Make sure you read the section about [access control](http://docs.imbo-project.org/en/latest/installation/configuration.html#imbo-access-control-accesscontrol). While the simple array adaptar is simple, it has a few down sides.
+   * If you want to use MongoDB or another Doctrine based database, check the [database configuration](http://docs.imbo-project.org/en/latest/installation/configuration.html#database-configuration-database)
+   * Imbo supports various storage backends like Amazon S3, GridFS and even cusotm storage adapters. If you want to scale your image server, check the [storage configuration](http://docs.imbo-project.org/en/latest/installation/configuration.html#storage-configuration-storage).
+* There are several client libraries:
+   * [JavaScript](https://github.com/imbo/imboclient-js)
+   * [PHP](https://github.com/imbo/imboclient-php)
+   * [Python](https://github.com/imbo/imboclient-python)
+   * [Java](https://github.com/imbo/imboclient-java)
+   
 
 ## License
 Copyright (c) 2011-2016, Christer Edvartsen <cogo@starzinger.net>
