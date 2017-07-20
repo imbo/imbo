@@ -100,15 +100,21 @@ Now that we have our server running, let's create a simple PHP client that uploa
 require 'vendor/autoload.php';
 
 $client = ImboClient\ImboClient::factory([
-    'serverUrls' => ['http://imbo.your-server.com'],
+    'serverUrls' => ['https://images.ortic.com'],
     'publicKey' => 'user',
     'privateKey' => 'your-secret-private-key',
     'user' => 'user',
 ]);
 
-$status = $client->getServerStatus();
+// add image
+$imageContent = base64_decode('iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTM0A1t6AAAB6ElEQVQ4T32R3y9bYRzGz3+0SyEiCBnJKotsLnZ3JloizUJGGPNrNy4m2tM2hLNmixbDhd9dJJRhM0Z/7cLvcAgbbZWzDud933bP2Y4SEd88efN9nufzvXq5+I1hZzvULxA3rwymQlhgEWr1v7k+UDb6zl1PyFYLDVlYtBXCAosQlQZpB4xE52v/LLyiJ2Z2qmfhbBp8AGGBRYgKADDtQPaK8nJzTG5mwRx6lHRLCFEBkH129eAysns4VkpDAvuZTw+y7pRahQRgyuked+xxRlbF2K9KJj2+RwCABb093PrI63OpI+zjx83ZUHilgG4/SwhWy308sI3Rem65y0gks6Mmc/adDnLUZNA1PiHYqzxTkaye7nJu3m5UtkxTtjziL6IB/ZRNhzch2Ks8T9ls/fqhjJtz1skBC/Ua6Yr+PnmNwL70NHH+ye5Nt41+L7OWpL59nnynUAEAFnD3cpEjaUR4cbFQMWN6tNTfFI8x9SsTE2MIUQEABlj9uG+j9s+OhstpfrgxyyUU/95fUj+VESywCFEBWBx/D1g9YIS4xEZX28uTCcOPztyP1WkWQwqEBRbhp/YKAMC0g//jmRwQq54uOisPhorI2EMICyxCVBp08wATOtyd6bM63hSaDOkQFliEWo2Jx/8C+zo4rHMdsZ4AAAAASUVORK5CYII=');
+$response = $client->addImageFromString($imageContent);
+$imageIdentifier = $response['imageIdentifier'];
 
-print_r($status);
+// create short URL ID
+$imageUrl = $client->getImageUrl($imageIdentifier)->thumbnail()->desaturate()->jpg();
+$response = $client->generateShortUrl($imageUrl);
+echo 'You can view your thumbnail at http://imbo.your-server.com/s/' . $response['id'];
 ```
 * You can then run the script in your browser or your console using `php index.php`.
 
