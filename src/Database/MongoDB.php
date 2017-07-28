@@ -272,7 +272,7 @@ class MongoDB implements DatabaseInterface {
         $queryData = [];
 
         // Query data
-        if (!empty($users)) {
+        if ($users) {
             // Only filter on users if the array contains any values
             $queryData['user']['$in'] = $users;
         }
@@ -405,7 +405,7 @@ class MongoDB implements DatabaseInterface {
     public function getLastModified(array $users, $imageIdentifier = null) {
         $query = [];
 
-        if (!empty($users)) {
+        if ($users) {
             $query['user']['$in'] = $users;
         }
 

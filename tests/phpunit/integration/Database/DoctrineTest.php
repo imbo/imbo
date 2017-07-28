@@ -94,9 +94,11 @@ class DoctrineTest extends DatabaseTests {
         // Create tmp tables
         $this->pdo = new PDO(sprintf('sqlite:%s', $this->dbPath));
 
+        $sqlStatementsFile = sprintf('%s/setup/doctrine.sqlite.sql', PROJECT_ROOT);
+
         array_map(function($query) {
             $this->pdo->query($query);
-        }, explode("\n\n", file_get_contents(__DIR__ . '/../../../../setup/doctrine.sqlite.sql')));
+        }, explode("\n\n", file_get_contents($sqlStatementsFile)));
 
         parent::setUp();
     }

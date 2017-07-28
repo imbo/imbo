@@ -29,9 +29,11 @@ class DoctrineSQLite implements AdapterTest {
         // Create tmp tables
         $pdo = new PDO(sprintf('sqlite:%s', $path));
 
+        $sqlStatementsFile = sprintf('%s/setup/doctrine.sqlite.sql', $config['project_root']);
+
         array_map(function($query) use ($pdo) {
             $pdo->query($query);
-        }, explode("\n\n", file_get_contents(__DIR__ . '/../../../../../setup/doctrine.sqlite.sql')));
+        }, explode("\n\n", file_get_contents($sqlStatementsFile)));
 
         return ['path' => $path];
     }

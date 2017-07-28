@@ -33,9 +33,11 @@ class DoctrineMySQL implements AdapterTest {
             $config['database.username'], $config['database.password']
         );
 
+        $sqlStatementsFile = sprintf('%s/setup/doctrine.mysql.sql', $config['project_root']);
+
         array_map(function($query) use ($pdo) {
             $pdo->query($query);
-        }, explode("\n\n", file_get_contents(__DIR__ . '/../../../../../setup/doctrine.mysql.sql')));
+        }, explode("\n\n", file_get_contents($sqlStatementsFile)));
 
         return $config;
     }

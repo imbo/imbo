@@ -239,7 +239,7 @@ class Doctrine implements DatabaseInterface {
         $qb = $this->getConnection()->createQueryBuilder();
         $qb->select('*')->from($this->tableNames['imageinfo'], 'i');
 
-        if (!empty($users)) {
+        if ($users) {
             // Filter on users
             $expr = $qb->expr();
             $composite = $expr->orX();
@@ -417,7 +417,8 @@ class Doctrine implements DatabaseInterface {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('i.updated')
               ->from($this->tableNames['imageinfo'], 'i')
-              ->orderBy('i.updated', 'DESC');
+              ->orderBy('i.updated', 'DESC')
+              ->setMaxResults(1);
 
         if (!empty($users)) {
             $expr = $query->expr();
@@ -639,9 +640,7 @@ class Doctrine implements DatabaseInterface {
         $query->select('DISTINCT(i.user)')
               ->from($this->tableNames['imageinfo'], 'i');
 
-        return array_map(function($row) {
-            return $row['user'];
-        }, $query->execute()->fetchAll());
+        return array_column($query->execute()->fetchAll(), 'user');
     }
 
     /**
