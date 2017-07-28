@@ -16,6 +16,11 @@ Below are the changes you need to be aware of when upgrading to Imbo-3.0.0.
     :local:
     :depth: 2
 
+Global images endpoint returns images for all users
++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+If the ``users`` filter is excluded when making requests against the :ref:`global-images-resource` resource, images from all users will be returned if the public key used has access to **all** users in the result set.
+
 MD5 image identifier generator has been removed
 +++++++++++++++++++++++++++++++++++++++++++++++
 

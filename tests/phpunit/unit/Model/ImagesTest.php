@@ -11,13 +11,14 @@
 namespace ImboUnitTest\Model;
 
 use Imbo\Model\Images;
+use PHPUnit_Framework_TestCase;
 
 /**
- * @covers Imbo\Model\Images
+ * @coversDefaultClass Imbo\Model\Images
  * @group unit
  * @group models
  */
-class ImagesTest extends \PHPUnit_Framework_TestCase {
+class ImagesTest extends PHPUnit_Framework_TestCase {
     /**
      * @var Images
      */
@@ -31,15 +32,8 @@ class ImagesTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Tear down the model
-     */
-    public function tearDown() {
-        $this->model = null;
-    }
-
-    /**
-     * @covers Imbo\Model\Images::getImages
-     * @covers Imbo\Model\Images::setImages
+     * @covers ::getImages
+     * @covers ::setImages
      */
     public function testCanSetAndGetImages() {
         $images = [
@@ -53,8 +47,8 @@ class ImagesTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Images::setFields
-     * @covers Imbo\Model\Images::getFields
+     * @covers ::setFields
+     * @covers ::getFields
      */
     public function testCanSetAndGetFields() {
         $this->assertSame([], $this->model->getFields());
@@ -63,37 +57,37 @@ class ImagesTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Images::setHits
-     * @covers Imbo\Model\Images::getHits
+     * @covers ::setHits
+     * @covers ::getHits
      */
     public function testCanSetAndGetHits() {
-        $this->assertNull($this->model->getHits());
+        $this->assertSame(0, $this->model->getHits(), 'Default value has changed');
         $this->assertSame($this->model, $this->model->setHits(10));
         $this->assertSame(10, $this->model->getHits());
     }
 
     /**
-     * @covers Imbo\Model\Images::setPage
-     * @covers Imbo\Model\Images::getPage
+     * @covers ::setPage
+     * @covers ::getPage
      */
     public function testCanSetAndGetPage() {
-        $this->assertNull($this->model->getPage());
+        $this->assertSame(1, $this->model->getPage(), 'Default value has changed');
         $this->assertSame($this->model, $this->model->setPage(10));
         $this->assertSame(10, $this->model->getPage());
     }
 
     /**
-     * @covers Imbo\Model\Images::setLimit
-     * @covers Imbo\Model\Images::getLimit
+     * @covers ::setLimit
+     * @covers ::getLimit
      */
     public function testCanSetAndGetLimit() {
-        $this->assertNull($this->model->getLimit());
+        $this->assertSame(20, $this->model->getLimit(), 'Default value has changed');
         $this->assertSame($this->model, $this->model->setLimit(10));
         $this->assertSame(10, $this->model->getLimit());
     }
 
     /**
-     * @covers Imbo\Model\Images::getCount
+     * @covers ::getCount
      */
     public function testCanCountImages() {
         $this->assertSame(0, $this->model->getCount());
@@ -107,7 +101,7 @@ class ImagesTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Images::getData
+     * @covers ::getData
      */
     public function testGetData() {
         $images = [

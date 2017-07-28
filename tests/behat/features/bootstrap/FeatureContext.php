@@ -8,10 +8,13 @@
  * distributed with this source code.
  */
 
+namespace ImboBehatFeatureContext;
+
 use Imbo\BehatApiExtension\Context\ApiContext;
 use Imbo\BehatApiExtension\ArrayContainsComparator;
 use Imbo\BehatApiExtension\Exception\AssertionFailedException;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Uri;
@@ -21,9 +24,16 @@ use Psr\Http\Message\RequestInterface;
 use Behat\Gherkin\Node\TableNode;
 use Assert\Assertion;
 use Micheh\Cache\CacheUtil;
+use MongoDB\Client as MongoClient;
+use RuntimeException;
+use InvalidArgumentException;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
+use Imagick;
+use ImagickException;
 
 /**
- * Imbo Context
+ * Imbo feature context
  *
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Functional tests
@@ -37,6 +47,7 @@ class FeatureContext extends ApiContext {
     const MIDDLEWARE_SIGN_REQUEST = 'imbo-behat-sign-request';
     const MIDDLEWARE_APPEND_ACCESS_TOKEN = 'imbo-behat-append-access-token';
     const MIDDLEWARE_HISTORY = 'imbo-behat-history';
+    const MIDDLEWARE_BEHAT_CONTEXT_CLASS = 'imbo-behat-context-class';
 
     /**
      * @var CacheUtil
@@ -109,6 +120,34 @@ class FeatureContext extends ApiContext {
     private $authenticationHandlerIsActive = false;
 
     /**
+     * FQCN of the database adapter test class
+     *
+     * @var string
+     */
+    static private $databaseTest;
+
+    /**
+     * FQCN of the storage adapter test class
+     *
+     * @var string
+     */
+    static private $storageTest;
+
+    /**
+     * Configuration for the database adapter test
+     *
+     * @var array
+     */
+    static private $databaseTestConfig;
+
+    /**
+     * Configuration for the storage adapter test
+     *
+     * @var array
+     */
+    static private $storageTestConfig;
+
+    /**
      * Class constructor
      *
      * @param CacheUtil $cacheUtil
@@ -124,17 +163,76 @@ class FeatureContext extends ApiContext {
     }
 
     /**
+     * Set up adapters for the suite
+     *
+     * @BeforeScenario
+     *
+     * @param BeforeScenarioScope $scope
+     * @throws InvalidArgumentException
+     */
+    static public function setUpAdapters(BeforeScenarioScope $scope) {
+        // Fetch settings for the suite as defined in behat.yml[.dist]
+        $suiteSettings = $scope->getSuite()->getSettings();
+
+        // Generate FQCNs for the adapter tests
+        $database = sprintf('%s\DatabaseTest\%s', __NAMESPACE__, $suiteSettings['database']);
+        $storage = sprintf('%s\StorageTest\%s', __NAMESPACE__, $suiteSettings['storage']);
+
+        if (!class_exists($database)) {
+            throw new InvalidArgumentException(sprintf(
+                'Database test class "%s" does not exist.',
+                $database)
+            );
+        } else if (!class_exists($storage)) {
+            throw new InvalidArgumentException(sprintf(
+                'Storage test class "%s" does not exist.',
+                $storage
+            ));
+        }
+
+        self::$databaseTest = $database;
+        self::$storageTest = $storage;
+
+        self::$databaseTestConfig = $database::setUp($suiteSettings) ?: [];
+        self::$storageTestConfig = $storage::setUp($suiteSettings) ?: [];
+    }
+
+    /**
+     * Tear down adapters for the suite
+     *
+     * @AfterScenario
+     *
+     * @param AfterScenarioScope $scope
+     */
+    static public function tearDownAdapters(AfterScenarioScope $scope) {
+        $database = self::$databaseTest;
+        $storage = self::$storageTest;
+
+        $database::tearDown(self::$databaseTestConfig);
+        $storage::tearDown(self::$storageTestConfig);
+    }
+
+    /**
      * Manipulate the handler stack of the client for all tests
      *
      * - Add the history middleware to record all request / responses in the $this->history array
+     * - Set the request header that informs Imbo which class is responsible for configuring the
+     *   database and storage adapters in the test
      *
      * {@inheritdoc}
+     *
+     * @throws RuntimeException
      */
     public function setClient(ClientInterface $client) {
-        $client->getConfig('handler')->push(
-            Middleware::history($this->history),
-            self::MIDDLEWARE_HISTORY
-        );
+        $handler = $client->getConfig('handler');
+        $handler->push(Middleware::history($this->history), self::MIDDLEWARE_HISTORY);
+        $handler->push(Middleware::mapRequest(function (RequestInterface $request) {
+            return $request
+                ->withHeader('X-Behat-Database-Test', self::$databaseTest)
+                ->withHeader('X-Behat-Storage-Test', self::$storageTest)
+                ->withHeader('X-Behat-Database-Test-Config', urlencode(json_encode(self::$databaseTestConfig)))
+                ->withHeader('X-Behat-Storage-Test-Config', urlencode(json_encode(self::$storageTestConfig)));
+        }), self::MIDDLEWARE_BEHAT_CONTEXT_CLASS);
 
         return parent::setClient($client);
     }
@@ -187,17 +285,14 @@ class FeatureContext extends ApiContext {
     }
 
     /**
-     * Drop mongo test collection which stores information regarding images, and the images
-     * themselves
+     * Empty the image transformation cache directory along with the test database (mongodb)
      *
      * @param BeforeScenarioScope $scope
      *
      * @BeforeScenario
      * @codeCoverageIgnore
      */
-    public static function prepare(BeforeScenarioScope $scope) {
-        (new MongoDB\Client())->imbo_testing->drop();
-
+    static public function removeImageTransformationCache(BeforeScenarioScope $scope) {
         $cachePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'imbo-behat-image-transformation-cache';
 
         if (is_dir($cachePath)) {
@@ -596,8 +691,6 @@ class FeatureContext extends ApiContext {
             ));
         }
 
-        $mongoDB = (new MongoDB\Client())->imbo_testing;
-
         $fixtures = require $fixturePath;
 
         if (!is_array($fixtures)) {
@@ -606,6 +699,8 @@ class FeatureContext extends ApiContext {
                 $fixturePath
             ));
         }
+
+        $mongoDB = (new MongoClient())->imbo_testing;
 
         foreach ($fixtures as $collection => $data) {
             $mongoDB->$collection->drop();

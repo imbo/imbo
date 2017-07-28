@@ -10,7 +10,7 @@
 
 namespace ImboUnitTest;
 
-use FeatureContext;
+use ImboBehatFeatureContext\FeatureContext;
 use Micheh\Cache\CacheUtil;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
@@ -21,9 +21,10 @@ use GuzzleHttp\Psr7\Response;
 use PHPUnit_Framework_TestCase;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 
 /**
- * @coversDefaultClass FeatureContext
+ * @coversDefaultClass ImboBehatFeatureContext\FeatureContext
  * @group unit
  * @group behat
  */
@@ -111,7 +112,7 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
     public function testCanSetAnApiClient() {
         $handlerStack = $this->createMock('GuzzleHttp\HandlerStack');
         $handlerStack
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('push')
             ->with($this->isInstanceOf('Closure'), $this->isType('string'));
 
@@ -2981,5 +2982,51 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
         $this->context
             ->requestPath('/path')
             ->assertImageProperties('png');
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array[]
+     */
+    public function getSuiteSettings() {
+        return [
+            'invalid database' => [
+                'settings' => [
+                    'database' => 'Foobar',
+                    'storage' => 'GridFS',
+                ],
+                'expectedExceptionMessage' => 'Database test class "ImboBehatFeatureContext\DatabaseTest\Foobar" does not exist.',
+            ],
+            'invalid storage' => [
+                'settings' => [
+                    'database' => 'MongoDB',
+                    'storage' => 'Foobar',
+                ],
+                'expectedExceptionMessage' => 'Storage test class "ImboBehatFeatureContext\StorageTest\Foobar" does not exist.',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getSuiteSettings
+     * @covers ::setUpAdapters
+     * @expectedException InvalidArgumentException
+     * @param array $settings
+     * @param string $expectedExceptionMessage
+     */
+    public function testSetupAdaptersThrowsExceptionOnInvalidClassNames(array $settings, $expectedExceptionMessage) {
+        $suite = $this->createMock('Behat\Testwork\Suite\Suite');
+        $suite->expects($this->once())->method('getSettings')->willReturn($settings);
+
+        $environment = $this->createMock('Behat\Testwork\Environment\Environment');
+        $environment->expects($this->once())->method('getSuite')->willReturn($suite);
+
+        $this->expectExceptionMessage($expectedExceptionMessage);
+        FeatureContext::setUpAdapters(new BeforeScenarioScope(
+            $environment,
+            $this->createMock('Behat\Gherkin\Node\FeatureNode'),
+            $this->createMock('Behat\Gherkin\Node\ScenarioInterface')
+        ));
     }
 }

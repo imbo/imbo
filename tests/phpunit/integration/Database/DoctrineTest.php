@@ -10,23 +10,33 @@
 
 namespace ImboIntegrationTest\Database;
 
-use Imbo\Database\Doctrine,
-    PDO;
+use Imbo\Database\Doctrine;
+use PDO;
 
 /**
  * @covers Imbo\Database\Doctrine
+ * @coversDefaultClass Imbo\Database\Doctrine
  * @group integration
  * @group database
  * @group doctrine
  */
 class DoctrineTest extends DatabaseTests {
     /**
+     * Path to the SQLite database
+     *
      * @var string
      */
     private $dbPath;
 
     /**
-     * @see ImboIntegrationTest\Database\DatabaseTests::getAdapter()
+     * Database connection
+     *
+     * @var PDO
+     */
+    private $pdo;
+
+    /**
+     * {@inheritdoc}
      */
     protected function getAdapter() {
         return new Doctrine([
@@ -35,6 +45,37 @@ class DoctrineTest extends DatabaseTests {
         ]);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function insertImage(array $image) {
+        $stmt = $this->pdo->prepare("
+            INSERT INTO imageinfo (
+                user, imageIdentifier, size, extension, mime, added, updated, width, height,
+                checksum, originalChecksum
+            ) VALUES (
+                :user, :imageIdentifier, :size, :extension, :mime, :added, :updated, :width,
+                :height, :checksum, :originalChecksum
+            )
+        ");
+        $stmt->execute([
+            ':user'             => $image['user'],
+            ':imageIdentifier'  => $image['imageIdentifier'],
+            ':size'             => $image['size'],
+            ':extension'        => $image['extension'],
+            ':mime'             => $image['mime'],
+            ':added'            => $image['added'],
+            ':updated'          => $image['updated'],
+            ':width'            => $image['width'],
+            ':height'           => $image['height'],
+            ':checksum'         => $image['checksum'],
+            ':originalChecksum' => $image['originalChecksum'],
+        ]);
+    }
+
+    /**
+     * Create the necessary tables for testing
+     */
     public function setUp() {
         if (!extension_loaded('PDO')) {
             $this->markTestSkipped('PDO is required to run this test');
@@ -51,49 +92,13 @@ class DoctrineTest extends DatabaseTests {
         $this->dbPath = tempnam(sys_get_temp_dir(), 'imbo-integration-test');
 
         // Create tmp tables
-        $pdo = new PDO(sprintf('sqlite:%s', $this->dbPath));
-        $pdo->query("
-            CREATE TABLE IF NOT EXISTS imageinfo (
-                id INTEGER PRIMARY KEY NOT NULL,
-                user TEXT NOT NULL,
-                imageIdentifier TEXT NOT NULL,
-                size INTEGER NOT NULL,
-                extension TEXT NOT NULL,
-                mime TEXT NOT NULL,
-                added INTEGER NOT NULL,
-                updated INTEGER NOT NULL,
-                width INTEGER NOT NULL,
-                height INTEGER NOT NULL,
-                checksum TEXT NOT NULL,
-                originalChecksum TEXT NOT NULL,
-                UNIQUE (user,imageIdentifier)
-            )
-        ");
-        $pdo->query("
-            CREATE TABLE IF NOT EXISTS metadata (
-                id INTEGER PRIMARY KEY NOT NULL,
-                imageId KEY INTEGER NOT NULL,
-                tagName TEXT NOT NULL,
-                tagValue TEXT NOT NULL
-            )
-        ");
-        $pdo->query("
-            CREATE TABLE IF NOT EXISTS shorturl (
-                shortUrlId TEXT PRIMARY KEY NOT NULL,
-                user TEXT NOT NULL,
-                imageIdentifier TEXT NOT NULL,
-                extension TEXT,
-                query TEXT NOT NULL
-            )
-        ");
-        $pdo->query("
-            CREATE INDEX shorturlparams ON shorturl (
-                user,
-                imageIdentifier,
-                extension,
-                query
-            )
-        ");
+        $this->pdo = new PDO(sprintf('sqlite:%s', $this->dbPath));
+
+        $sqlStatementsFile = sprintf('%s/setup/doctrine.sqlite.sql', PROJECT_ROOT);
+
+        array_map(function($query) {
+            $this->pdo->query($query);
+        }, explode("\n\n", file_get_contents($sqlStatementsFile)));
 
         parent::setUp();
     }

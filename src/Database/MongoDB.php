@@ -15,6 +15,7 @@ use Imbo\Model\Image,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
     Imbo\Exception\DuplicateImageIdentifierException,
+    Imbo\Exception\InvalidArgumentException,
     Imbo\Helpers\BSONToArray,
     MongoDB\Client as MongoClient,
     MongoDB\Driver\Manager,
@@ -268,9 +269,13 @@ class MongoDB implements DatabaseInterface {
     public function getImages(array $users, Query $query, Images $model) {
         // Initialize return value
         $images = [];
+        $queryData = [];
 
         // Query data
-        $queryData = ['user' => ['$in' => $users]];
+        if ($users) {
+            // Only filter on users if the array contains any values
+            $queryData['user']['$in'] = $users;
+        }
 
         $from = $query->from();
         $to = $query->to();
@@ -398,16 +403,17 @@ class MongoDB implements DatabaseInterface {
      * {@inheritdoc}
      */
     public function getLastModified(array $users, $imageIdentifier = null) {
+        $query = [];
+
+        if ($users) {
+            $query['user']['$in'] = $users;
+        }
+
+        if ($imageIdentifier !== null) {
+            $query['imageIdentifier'] = $imageIdentifier;
+        }
+
         try {
-            // Query on the user
-            $query = ['user' => ['$in' => $users]];
-
-            if ($imageIdentifier) {
-                // We want information about a single image. Add the identifier to the query
-                $query['imageIdentifier'] = $imageIdentifier;
-            }
-
-            // Find a document
             $data = $this->getImageCollection()->findOne($query, [
                 'sort' => [
                     'updated' => -1,
@@ -420,7 +426,7 @@ class MongoDB implements DatabaseInterface {
             throw new DatabaseException('Unable to fetch image data', 500, $e);
         }
 
-        if ($data === null && $imageIdentifier) {
+        if ($data === null && $imageIdentifier !== null) {
             throw new DatabaseException('Image not found', 404);
         } else if ($data === null) {
             $data = ['updated' => time()];
@@ -632,6 +638,13 @@ class MongoDB implements DatabaseInterface {
         }
 
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAllUsers() {
+        return $this->getImageCollection()->distinct('user');
     }
 
     /**

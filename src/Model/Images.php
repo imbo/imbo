@@ -36,21 +36,21 @@ class Images implements ModelInterface {
      *
      * @var int
      */
-    private $hits;
+    private $hits = 0;
 
     /**
      * Limit the number of images
      *
      * @var int
      */
-    private $limit;
+    private $limit = 20;
 
     /**
      * The page number
      *
      * @var int
      */
-    private $page;
+    private $page = 1;
 
     /**
      * Set the array of images

@@ -1,9 +1,33 @@
 default:
-    autoload:
-        '': %paths.base%/tests/behat/features/bootstrap
     suites:
-        default:
+        mongodb_gridfs:
+            project_root: %paths.base%
             paths: [%paths.base%/tests/behat/features]
+            contexts: [ImboBehatFeatureContext\FeatureContext]
+            database: MongoDB
+            storage: GridFS
+        mongodb_filesystem:
+            project_root: %paths.base%
+            paths: [%paths.base%/tests/behat/features]
+            contexts: [ImboBehatFeatureContext\FeatureContext]
+            database: MongoDB
+            storage: Filesystem
+        doctrine_sqlite_filesystem:
+            project_root: %paths.base%
+            paths: [%paths.base%/tests/behat/features]
+            contexts: [ImboBehatFeatureContext\FeatureContext]
+            database: DoctrineSQLite
+            storage: Filesystem
+        doctrine_mysql_filesystem:
+            project_root: %paths.base%
+            paths: [%paths.base%/tests/behat/features]
+            contexts: [ImboBehatFeatureContext\FeatureContext]
+            database: DoctrineMySQL
+            database.hostname: localhost
+            database.database: imbo_test
+            database.username: imbo_test
+            database.password: imbo_test
+            storage: Filesystem
 
     extensions:
         Imbo\BehatApiExtension:

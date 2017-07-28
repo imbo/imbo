@@ -235,10 +235,6 @@ class DatabaseOperations implements ListenerInterface {
             $users = $event->getArgument('users');
         } else {
             $users = $event->getRequest()->getUsers();
-
-            if (!is_array($users)) {
-                $users = [];
-            }
         }
 
         $response = $event->getResponse();
