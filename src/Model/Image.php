@@ -20,17 +20,6 @@ use DateTime;
  */
 class Image implements ModelInterface {
     /**
-     * Supported mime types and the correct file extensions
-     *
-     * @var array
-     */
-    static public $mimeTypes = [
-        'image/png'  => 'png',
-        'image/jpeg' => 'jpg',
-        'image/gif'  => 'gif',
-    ];
-
-    /**
      * Mapping for some mime types
      *
      * @var array
