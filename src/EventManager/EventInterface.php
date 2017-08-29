@@ -134,6 +134,13 @@ interface EventInterface {
     function getTransformationManager();
 
     /**
+     * Get the image loader manager
+     *
+     * @return LoaderManager
+     */
+    function getLoaderManager();
+
+    /**
      * Get the Imbo configuration
      *
      * @return array

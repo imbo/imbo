@@ -14,6 +14,7 @@ use Imbo\EventManager\EventInterface,
     Imbo\EventListener\ListenerInterface,
     Imbo\Image\Identifier\Generator\GeneratorInterface,
     Imbo\Exception\ImageException,
+    Imbo\Exception\LoaderException,
     Imbo\Exception,
     Imbo\Model\Image,
     Imagick,
@@ -71,11 +72,14 @@ class ImagePreparation implements ListenerInterface {
         $invalidImageException->setImboErrorCode(Exception::IMAGE_INVALID_IMAGE);
 
         try {
-            $imagick = $event->getLoaderManager()->load($imageBlob);
-            $size = $imagick->getImageGeometry();
+            $imagick = $event->getLoaderManager()->load($mime, $imageBlob);
+
+            if ($imagick) {
+                $size = $imagick->getImageGeometry();
+            }
         } catch (ImagickException $e) {
             throw $invalidImageException;
-        } catch (Exception $e) {
+        } catch (LoaderException $e) {
             throw $invalidImageException;
         }
 
