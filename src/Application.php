@@ -27,6 +27,7 @@ use Imbo\Http\Request\Request,
     Imbo\Resource\ResourceInterface,
     Imbo\Image\TransformationManager,
     Imbo\EventListener\Initializer\InitializerInterface;
+use Imbo\Image\LoaderManager;
 
 /**
  * Imbo application
@@ -91,6 +92,15 @@ class Application {
             $transformationManager->addTransformations($config['transformations']);
         }
 
+        // Create a loader manager and register any loaders
+        $loaderManager = new LoaderManager();
+
+        if (isset($config['loaders']) && !is_array($config['loaders'])) {
+            throw new InvalidArgumentException('The "loaders" configuration key must be specified as an array', 500);
+        } else if (isset($config['loaders']) && is_array($config['loaders'])) {
+            $loaderManager->addLoaders($config['loaders']);
+        }
+
         // Create the event manager and the event template
         $eventManager = new EventManager();
         $event = new Event();
@@ -103,6 +113,7 @@ class Application {
             'manager' => $eventManager,
             'accessControl' => $accessControl,
             'transformationManager' => $transformationManager,
+            'loaderManager' => $loaderManager,
         ]);
         $eventManager->setEventTemplate($event);
 

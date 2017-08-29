@@ -163,6 +163,13 @@ class Event implements EventInterface {
     /**
      * {@inheritdoc}
      */
+    public function getLoaderManager() {
+        return $this->getArgument('transformationManager');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getConfig() {
         return $this->getArgument('config');
     }
