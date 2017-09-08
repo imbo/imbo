@@ -160,31 +160,6 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Get mime types and whether or not they are supported
-     *
-     * @return array
-     */
-    public function getSupportedMimeTypes() {
-        return [
-            ['image/png', true],
-            ['image/x-png', true],
-            ['image/jpeg', true],
-            ['image/x-jpeg', true],
-            ['image/gif', true],
-            ['image/x-gif', true],
-            ['image/jpg', false],
-        ];
-    }
-
-    /**
-     * @covers Imbo\Model\Image::supportedMimeType
-     * @dataProvider getSupportedMimeTypes
-     */
-    public function testCanInformAboutSupportedMimeType($type, $result) {
-        $this->assertSame($result, Image::supportedMimeType($type));
-    }
-
-    /**
      * Get mime types and file extensions
      *
      * @return array
