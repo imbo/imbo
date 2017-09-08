@@ -27,6 +27,8 @@ class Simple implements LoaderInterface {
     }
 
     public function load($blob) {
-        return new Imagick($blob);
+        $imagick = new \Imagick();
+        $imagick->readImageBlob($blob);
+        return $imagick;
     }
 }
