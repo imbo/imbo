@@ -253,14 +253,19 @@ class ResponseFormatter implements ListenerInterface {
         // If we are dealing with an image we want to trigger an event that handles a possible
         // conversion
         if ($model instanceof Model\Image) {
+            $outputConverterManager = $event->getOutputConverterManager();
             $eventManager = $event->getManager();
-            $transformationManager = $event->getTransformationManager();
 
-            if ($this->extensionsToMimeType[$this->formatter] !== $model->getMimeType()) {
-                $transformationManager
-                    ->getTransformation('convert')
-                    ->setImage($model)
-                    ->transform(['type' => $this->formatter]);
+            if (
+                ($model->getExtension() !== $this->formatter) &&
+                ($outputConverterManager->getMimetypeFromExtension($this->formatter) !== $model->getMimeType()) &&
+                $outputConverterManager->supportsExtension($this->formatter))
+            {
+                // need to get imagick instance here...
+                // $imagick = new \Imagick();
+                // $imagick->readImageblob($model->getBlob());
+                $imagick = null;
+                $outputConverterManager->convert($imagick, $model, $this->formatter);
             }
 
             // Finished transforming the image
