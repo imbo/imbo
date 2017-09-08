@@ -23,7 +23,7 @@ use Imbo\Exception\InvalidArgumentException;
  * if the image is determined to be invalid or damaged.
  *
  * @author Mats Lindh <mats@lindh.no>
- * @package Exceptions
+ * @package Image
  */
 class LoaderManager {
     protected $loaders = [];
