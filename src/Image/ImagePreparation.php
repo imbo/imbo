@@ -91,10 +91,12 @@ class ImagePreparation implements ListenerInterface {
             throw $e;
         }
 
+        $outputConverterManager = $event->getOutputConverterManager();
+
         // Store relevant information in the image instance and attach it to the request
         $image = new Image();
         $image->setMimeType($mime)
-              ->setExtension(Image::getFileExtension($mime))
+              ->setExtension($outputConverterManager->getExtensionFromMimetype($mime))
               ->setBlob($imageBlob)
               ->setWidth($size['width'])
               ->setHeight($size['height'])
