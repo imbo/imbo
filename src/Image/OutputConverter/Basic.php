@@ -26,7 +26,7 @@ class Basic implements OutputConverterInterface {
             ],
             [
                 'mime' => 'image/jpeg',
-                'extension' => ['jpeg', 'jpg'],
+                'extension' => ['jpg', 'jpeg'],
                 'callback' => [$this, 'convert'],
             ],
             [
