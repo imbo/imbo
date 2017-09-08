@@ -159,30 +159,6 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame('identifier', $this->image->getImageIdentifier());
     }
 
-    /**
-     * Get mime types and file extensions
-     *
-     * @return array
-     */
-    public function getFileExtensions() {
-        return [
-            ['image/png', 'png'],
-            ['image/jpeg', 'jpg'],
-            ['image/gif', 'gif'],
-            ['image/x-png', 'png'],
-            ['image/x-jpeg', 'jpg'],
-            ['image/x-gif', 'gif'],
-            ['image/jpg', false],
-        ];
-    }
-
-    /**
-     * @covers Imbo\Model\Image::getFileExtension
-     * @dataProvider getFileExtensions
-     */
-    public function testCanGetAFileExtensionBasedOnAMimeType($type, $extension) {
-        $this->assertSame($extension, Image::getFileExtension($type));
-    }
 
     /**
      * @covers Imbo\Model\Image::hasBeenTransformed
@@ -199,30 +175,6 @@ class ImageTest extends \PHPUnit_Framework_TestCase {
         $checksum = md5(__FILE__);
         $this->assertSame($this->image, $this->image->setOriginalChecksum($checksum));
         $this->assertSame($checksum, $this->image->getOriginalChecksum());
-    }
-
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getMimeTypes() {
-        return [
-            ['image/jpeg', 'image/jpeg'],
-            ['image/png', 'image/png'],
-            ['image/gif', 'image/gif'],
-            ['image/x-jpeg', 'image/jpeg'],
-            ['image/x-png', 'image/png'],
-            ['image/x-gif', 'image/gif'],
-        ];
-    }
-
-    /**
-     * @dataProvider getMimeTypes
-     */
-    public function testSetsTheCorrectMimeTypeWhenAMappedOneIsUsed($set, $get) {
-        $this->image->setMimeType($set);
-        $this->assertSame($get, $this->image->getMimeType());
     }
 
     /**

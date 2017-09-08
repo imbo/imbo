@@ -32,6 +32,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
     private $headers;
     private $imageIdentifierGenerator;
     private $loaderManager;
+    private $outputConverterManager;
     private $imagickLoader;
 
     /**
@@ -49,6 +50,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
             $imagick->readImageBlob($data);
             return $imagick;
         };
+        $this->outputConverterManager = $this->createMock('Imbo\Image\OutputConverterManager');
         $this->response->headers = $this->headers;
         $this->imageIdentifierGenerator = $this->createMock('Imbo\Image\Identifier\Generator\GeneratorInterface');
         $this->config = ['imageIdentifierGenerator' => $this->imageIdentifierGenerator];
@@ -57,6 +59,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
         $this->event->expects($this->any())->method('getConfig')->will($this->returnValue($this->config));
         $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
         $this->event->expects($this->any())->method('getLoaderManager')->will($this->returnValue($this->loaderManager));
+        $this->event->expects($this->any())->method('getOutputConverterManager')->will($this->returnValue($this->outputConverterManager));
 
         $this->prepare = new ImagePreparation();
     }

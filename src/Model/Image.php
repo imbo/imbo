@@ -444,21 +444,4 @@ class Image implements ModelInterface {
             'hasBeenTransformed' => $this->hasBeenTransformed(),
         ];
     }
-
-    /**
-     * Get the file extension mapped to a mime type
-     *
-     * @param string $mime The mime type. For instance "image/png"
-     * @return boolean|string The extension (without the leading dot) on success or boolean false
-     *                        if the mime type is not supported.
-     */
-    static public function getFileExtension($mime) {
-        return "png";
-
-        if (isset(self::$mimeTypeMapping[$mime])) {
-            $mime = self::$mimeTypeMapping[$mime];
-        }
-
-        return isset(self::$mimeTypes[$mime]) ? self::$mimeTypes[$mime] : false;
-    }
 }
