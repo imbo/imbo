@@ -26,8 +26,9 @@ use Imbo\Http\Request\Request,
     Imbo\Http\Response\Formatter,
     Imbo\Resource\ResourceInterface,
     Imbo\Image\TransformationManager,
-    Imbo\EventListener\Initializer\InitializerInterface;
-use Imbo\Image\LoaderManager;
+    Imbo\EventListener\Initializer\InitializerInterface,
+    Imbo\Image\LoaderManager,
+    Imbo\Image\OutputConverterManager;
 
 /**
  * Imbo application
@@ -101,6 +102,15 @@ class Application {
             $loaderManager->addLoaders($config['loaders']);
         }
 
+        // Create a output conversion manager and register any converters
+        $outputConverterManager = new OutputConverterManager();
+
+        if (isset($config['outputConverters']) && !is_array($config['outputConverters'])) {
+            throw new InvalidArgumentException('The "outputConverters" configuration key must be specified as an array', 500);
+        } else if (isset($config['outputConverters']) && is_array($config['outputConverters'])) {
+            $outputConverterManager->addConverters($config['outputConverters']);
+        }
+
         // Create the event manager and the event template
         $eventManager = new EventManager();
         $event = new Event();
@@ -114,6 +124,7 @@ class Application {
             'accessControl' => $accessControl,
             'transformationManager' => $transformationManager,
             'loaderManager' => $loaderManager,
+            'outputConverterManager' => $outputConverterManager,
         ]);
         $eventManager->setEventTemplate($event);
 
