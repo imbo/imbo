@@ -44,9 +44,9 @@ class Convert extends Transformation {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
 
-        $mimeType = array_search($type, Image::$mimeTypes);
+        $outputConverterManager = $this->event->getOutputConverterManager();
 
-        $this->image->setMimeType($mimeType)
+        $this->image->setMimeType($outputConverterManager->getMimetypeFromExtension($type))
                     ->setExtension($type)
                     ->hasBeenTransformed(true);
     }
