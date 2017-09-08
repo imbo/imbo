@@ -71,8 +71,9 @@ class ShortUrls implements ResourceInterface {
         }
 
         $extension = isset($image['extension']) ? strtolower($image['extension']) : null;
+        $outputConverterManager = $event->getOutputConverterManager();
 
-        if ($extension !== null && !in_array($extension, ImageModel::$mimeTypes)) {
+        if ($extension !== null && !$outputConverterManager->supportsExtension($extension)) {
             throw new InvalidArgumentException('Extension provided is not a recognized format', 400);
         }
 

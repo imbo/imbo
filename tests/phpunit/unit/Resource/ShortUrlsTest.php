@@ -27,6 +27,7 @@ class ShortUrlsTest extends ResourceTests {
     private $response;
     private $database;
     private $event;
+    private $outputConverterManager;
 
     /**
      * {@inheritdoc}
@@ -44,10 +45,13 @@ class ShortUrlsTest extends ResourceTests {
         $this->response = $this->createMock('Imbo\Http\Response\Response');
         $this->database = $this->createMock('Imbo\Database\DatabaseInterface');
         $this->event = $this->createMock('Imbo\EventManager\Event');
+        $this->outputConverterManager = $this->createMock('Imbo\Image\OutputConverterManager');
+        $this->outputConverterManager->expects($this->any())->method('supportsExtension')->will($this->returnCallback(function ($ext) { return $ext == 'gif'; }));
 
         $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
+        $this->event->expects($this->any())->method('getOutputConverterManager')->will($this->returnValue($this->outputConverterManager));
     }
 
     /**
@@ -134,6 +138,9 @@ class ShortUrlsTest extends ResourceTests {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"user": "user", "imageIdentifier": "id", "extension": "foo"}'));
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
+
+        $this->outputConverterManager->expects($this->any())->method('supportsExtension')->will($this->returnValue(false));
+
         $this->getNewResource()->createShortUrl($this->event);
     }
 
