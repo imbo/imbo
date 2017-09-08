@@ -338,7 +338,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
      */
     public function testTriggersAConversionTransformationIfNeededWhenTheModelIsAnImage() {
         $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->exactly(2))->method('getMimeType')->will($this->returnValue('image/jpeg'));
+        $image->expects($this->any())->method('getMimeType')->will($this->returnValue('image/jpeg'));
         $image->expects($this->once())->method('getBlob')->will($this->returnValue('image blob'));
 
         $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
@@ -350,18 +350,11 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
                      ->method('trigger')
                      ->with('image.transformed', ['image' => $image]);
 
-        $convert = $this->createMock('Imbo\Image\Transformation\Convert');
-        $convert->expects($this->once())->method('setImage')->will($this->returnSelf());
-        $convert->expects($this->once())->method('transform')->with(['type' => 'png']);
+        $outputConverterManager = $this->createMock('Imbo\Image\OutputConverterManager');
+        $this->event->expects($this->any())->method('getOutputConverterManager')->will($this->returnValue($outputConverterManager));
+        $outputConverterManager->expects($this->any())->method('supportsExtension')->will($this->returnValue(true));
+        $outputConverterManager->expects($this->atLeastOnce())->method('convert');
 
-        $transformationManager = $this->createMock('Imbo\Image\TransformationManager');
-        $transformationManager
-            ->expects($this->once())
-            ->method('getTransformation')
-            ->with('convert')
-            ->will($this->returnValue($convert));
-
-        $this->event->expects($this->once())->method('getTransformationManager')->will($this->returnValue($transformationManager));
         $this->event->expects($this->once())->method('getManager')->will($this->returnValue($eventManager));
 
         $this->responseFormatter->format($this->event);
@@ -372,7 +365,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
      */
     public function testDoesNotTriggerAnImageConversionWhenTheImageHasTheCorrectMimeType() {
         $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->at(0))->method('getMimeType')->will($this->returnValue('image/jpeg'));
+        $image->expects($this->any())->method('getMimeType')->will($this->returnValue('image/jpeg'));
 
         $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
         $this->response->headers = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
@@ -382,6 +375,12 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $eventManager->expects($this->once())
                      ->method('trigger')
                      ->with('image.transformed', ['image' => $image]);
+
+        $outputConverterManager = $this->createMock('Imbo\Image\OutputConverterManager');
+        $this->event->expects($this->any())->method('getOutputConverterManager')->will($this->returnValue($outputConverterManager));
+        $outputConverterManager->expects($this->any())->method('getMimetypeFromExtension')->will($this->returnValue('image/jpeg'));
+        $outputConverterManager->expects($this->never())->method('supportsExtension');
+        $outputConverterManager->expects($this->never())->method('convert');
 
         $this->event->expects($this->once())->method('getManager')->will($this->returnValue($eventManager));
 
