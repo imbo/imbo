@@ -67,8 +67,7 @@ class OutputConverterManager {
                     $this->convertersByMimetype[$mime] = [];
                 }
 
-                if (!isset($this->mimetypeToExtension[$mime]))
-                {
+                if (!isset($this->mimetypeToExtension[$mime])) {
                     $this->mimetypeToExtension[$mime] = $extensions[0];
                 }
 
@@ -80,8 +79,7 @@ class OutputConverterManager {
                     $this->convertersByExtension[$extension] = [];
                 }
 
-                if (!isset($this->extensionToMimetype[$extension]))
-                {
+                if (!isset($this->extensionToMimetype[$extension])) {
                     $this->extensionToMimetype[$extension] = $mimes[0];
                 }
 
