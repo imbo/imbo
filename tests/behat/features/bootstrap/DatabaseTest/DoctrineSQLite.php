@@ -30,10 +30,7 @@ class DoctrineSQLite implements AdapterTest {
         $pdo = new PDO(sprintf('sqlite:%s', $path));
 
         $sqlStatementsFile = sprintf('%s/setup/doctrine.sqlite.sql', $config['project_root']);
-
-        array_map(function($query) use ($pdo) {
-            $pdo->query($query);
-        }, explode("\n\n", file_get_contents($sqlStatementsFile)));
+        $pdo->exec(file_get_contents($sqlStatementsFile));
 
         return ['path' => $path];
     }
