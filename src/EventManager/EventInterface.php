@@ -14,7 +14,10 @@ use Imbo\Http\Request\Request,
     Imbo\Http\Response\Response,
     Imbo\Database\DatabaseInterface,
     Imbo\Auth\AccessControl\Adapter\AdapterInterface as AccessControlInterface,
-    Imbo\Storage\StorageInterface;
+    Imbo\Storage\StorageInterface,
+    Imbo\Image\OutputConverterManager,
+    Imbo\Image\TransformationManager,
+    Imbo\Image\LoaderManager;
 
 /**
  * Event interface
@@ -132,6 +135,13 @@ interface EventInterface {
      * @return TransformationManager
      */
     function getTransformationManager();
+
+    /**
+     * Get the image output converter manager
+     *
+     * @return OutputConverterManager
+     */
+    function getOutputConverterManager();
 
     /**
      * Get the image loader manager

@@ -170,6 +170,13 @@ class Event implements EventInterface {
     /**
      * {@inheritdoc}
      */
+    public function getOutputConverterManager() {
+        return $this->getArgument('outputConverterManager');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getConfig() {
         return $this->getArgument('config');
     }
