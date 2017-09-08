@@ -93,7 +93,7 @@ class OutputConverterManager {
     public function convert($imagick, $image, $extension, $mime = null) {
         if ($this->supportsExtension($extension)) {
             foreach ($this->convertersByExtension[$extension] as $converter) {
-                $result = $converter['callback']($imagick, $image, $extension, $mime);
+                $result = $converter($imagick, $image, $extension, $mime);
 
                 if ($result) {
                     $image->setMimeType($this->getMimetypeFromExtension($extension));
@@ -104,7 +104,7 @@ class OutputConverterManager {
 
         if ($mime && isset($this->convertersByMimetype[$mime])) {
             foreach ($this->convertersByMimetype[$mime] as $converter) {
-                $result = $converter['callback']($imagick, $image, $extension, $mime);
+                $result = $converter($imagick, $image, $extension, $mime);
 
                 if ($result) {
                     $image->setMimeType($mime);
