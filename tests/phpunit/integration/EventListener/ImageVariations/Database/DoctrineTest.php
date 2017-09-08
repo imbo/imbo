@@ -74,7 +74,7 @@ class DoctrineTest extends DatabaseTests {
      * Remove the database file
      */
     public function tearDown() {
-        unlink($this->dbPath);
+        @unlink($this->dbPath);
         parent::tearDown();
     }
 }
