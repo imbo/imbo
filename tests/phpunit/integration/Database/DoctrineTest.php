@@ -96,10 +96,7 @@ class DoctrineTest extends DatabaseTests {
 
         $sqlStatementsFile = sprintf('%s/setup/doctrine.sqlite.sql', PROJECT_ROOT);
 
-        array_map(function($query) {
-            $this->pdo->query($query);
-        }, explode("\n\n", file_get_contents($sqlStatementsFile)));
-
+        $this->pdo->exec(file_get_contents($sqlStatementsFile));
         parent::setUp();
     }
 
@@ -107,7 +104,7 @@ class DoctrineTest extends DatabaseTests {
      * Remove the database file
      */
     public function tearDown() {
-        unlink($this->dbPath);
+        @unlink($this->dbPath);
         parent::tearDown();
     }
 }
