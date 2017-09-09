@@ -344,6 +344,9 @@ $defaultConfig = [
 
         // Imagick-specific event listener for the built in image transformations
         'imagick' => 'Imbo\EventListener\Imagick',
+
+        // Pluggable output conversion
+        'outputConverter' => 'Imbo\EventListener\OutputConverterManagerImagick',
     ],
 
     /**
