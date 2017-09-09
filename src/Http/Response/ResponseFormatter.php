@@ -261,11 +261,7 @@ class ResponseFormatter implements ListenerInterface {
                 ($outputConverterManager->getMimetypeFromExtension($this->formatter) !== $model->getMimeType()) &&
                 $outputConverterManager->supportsExtension($this->formatter))
             {
-                // need to get imagick instance here...
-                // $imagick = new \Imagick();
-                // $imagick->readImageblob($model->getBlob());
-                $imagick = null;
-                $outputConverterManager->convert($imagick, $model, $this->formatter);
+                $outputConverterManager->convert($model, $this->formatter);
             }
 
             // Finished transforming the image
