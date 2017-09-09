@@ -9,15 +9,14 @@
  */
 
 namespace Imbo\Image\Loader;
-use Imbo\Image\Loader\LoaderInterface;
 
 /**
- * Simple image loader / fallback image loader
+ * Basic image loader / fallback image loader
  *
  * @author Mats Lindh <mats@lindh.no>
  * @package Image\Loaders
  */
-class Simple implements LoaderInterface {
+class Basic implements LoaderInterface {
     public function getMimeTypeCallbacks() {
         return [
             'image/png' => [$this, 'load'],
