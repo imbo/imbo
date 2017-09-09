@@ -22,7 +22,7 @@ use Imbo\EventManager\EventInterface;
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
  */
-class Imagick implements ListenerInterface {
+class Imagick implements ListenerInterface, ImagickAware {
     /**
      * Imagick instance that is injected by an initializer
      *
@@ -36,7 +36,7 @@ class Imagick implements ListenerInterface {
      * @param \Imagick $imagick An Imagick instance
      * @return self
      */
-    public function setImagick($imagick) {
+    public function setImagick(\Imagick $imagick) {
         $this->imagick = $imagick;
 
         return $this;
