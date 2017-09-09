@@ -30,6 +30,7 @@ class OutputConverterManager {
     protected $convertersByExtension = [];
     protected $extensionToMimetype = [];
     protected $mimetypeToExtension = [];
+    protected $imagick;
 
     public function addConverters(array $converters) {
         foreach ($converters as $converter) {
@@ -88,12 +89,12 @@ class OutputConverterManager {
         }
     }
 
-    public function convert($imagick, $image, $extension, $mime = null) {
+    public function convert($image, $extension, $mime = null) {
         if ($this->supportsExtension($extension)) {
             foreach ($this->convertersByExtension[$extension] as $converter) {
-                $result = $converter($imagick, $image, $extension, $mime);
+                $result = $converter($this->imagick, $image, $extension, $mime);
 
-                if ($result) {
+                if ($result !== false) {
                     $image->setMimeType($this->getMimetypeFromExtension($extension));
                     return true;
                 }
@@ -102,9 +103,9 @@ class OutputConverterManager {
 
         if ($mime && isset($this->convertersByMimetype[$mime])) {
             foreach ($this->convertersByMimetype[$mime] as $converter) {
-                $result = $converter($imagick, $image, $extension, $mime);
+                $result = $converter($this->imagick, $image, $extension, $mime);
 
-                if ($result) {
+                if ($result !== false) {
                     $image->setMimeType($mime);
                     return true;
                 }
@@ -132,5 +133,9 @@ class OutputConverterManager {
 
     public function supportsExtension($extension) {
         return !empty($this->convertersByExtension[$extension]);
+    }
+
+    public function setImagick(\Imagick $imagick) {
+        $this->imagick = $imagick;
     }
 }
