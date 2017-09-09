@@ -11,7 +11,7 @@
 namespace Imbo\EventListener\Initializer;
 
 use Imbo\Image\Transformation\Transformation,
-    Imbo\EventListener\Imagick as ImagickListener,
+    Imbo\EventListener\ImagickAware,
     Imbo\EventListener\ListenerInterface;
 
 /**
@@ -51,7 +51,7 @@ class Imagick implements InitializerInterface {
      * @param ListenerInterface $listener An event listener
      */
     public function initialize(ListenerInterface $listener) {
-        if ($listener instanceof ImagickListener || $listener instanceof Transformation) {
+        if ($listener instanceof ImagickAware) {
             $listener->setImagick($this->imagick);
         }
     }
