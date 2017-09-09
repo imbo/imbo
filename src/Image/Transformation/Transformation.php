@@ -14,7 +14,8 @@ use Imagick,
     Imbo\Model\Image,
     Imbo\EventManager\Event,
     Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface;
+    Imbo\EventManager\EventInterface,
+    Imbo\EventListener\ImagickAware;
 
 /**
  * Abstract transformation
@@ -22,7 +23,7 @@ use Imagick,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-abstract class Transformation implements ListenerInterface {
+abstract class Transformation implements ListenerInterface, ImagickAware {
     /**
      * Imagick instance
      *
