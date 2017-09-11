@@ -35,3 +35,20 @@ Feature: Imbo allows plugins for loading new file types
     And the "X-Imbo-Originalheight" response header is "640"
     And the "X-Imbo-Originalmimetype" response header is "image/tiff"
     And the "X-Imbo-Originalwidth" response header is "437"
+
+  Scenario: Add an 'image' that isn't supported by imagick
+    Given the request body contains "tests/behat/Fixtures/foobar.txt"
+    And I use "publicKey" and "privateKey" for public and private keys
+    And I sign the request
+    When I request "/users/user/images" using HTTP "POST"
+    Then the response status line is "201 Created"
+    And the "Content-Type" response header is "application/json"
+    And the response body contains JSON:
+          """
+          {
+              "imageIdentifier": "@regExp(/^[a-zA-Z0-9_-]+$/)",
+              "width": 300,
+              "height": 300,
+              "extension": "txt"
+          }
+          """
