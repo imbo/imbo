@@ -346,7 +346,7 @@ $defaultConfig = [
         'imagick' => 'Imbo\EventListener\Imagick',
 
         // Pluggable output conversion
-        'outputConverter' => 'Imbo\EventListener\OutputConverterManagerImagick',
+        'outputConverter' => 'Imbo\EventListener\LoaderOutputConverterImagick',
     ],
 
     /**
@@ -440,18 +440,41 @@ $defaultConfig = [
     /**
      * Custom format loaders.
      *
-     * A loader must implement Image\Loader\LoaderInterface and return an Imagick instance.
+     * A loader must implement Image\Loader\LoaderInterface. The callback method will receive the
+     * current Imagick instance and the binary blob of the uploaded file.
+     *
+     * An implementation must define a `getMimeTypeCallback` method and return an array with metadata
+     * about at least one loader. The array keys is the mime type that the callback supports. You can
+     * use the same callback for multiple formats if necessary by returning multiple, similar entries
+     * with varying mime types.
+     *
+     * See Image\Loader\Basic for the default fallback loader as an example.
+     *
+     *      public function getMimeTypeCallbacks() {
+     *          return [
+     *              'image/png' => [
+     *                  'extension' => 'png',
+     *                  'callback' => [$this, 'load'],
+     *              ],
+     *          ];
+     *     }
      */
-    'loaders' => [
-    ],
+    'loaders' => [],
 
     /**
      * Custom output converters.
      *
      * An output converter must implement Image\OutputConverter\OutputConverterInstance.
+     *
+     * An output plugin work similar to what a Loader plugin does, and configure the current Imagick
+     * instance to return the requested image format. If the Imagick instance is updated, the plugin
+     * has to call `$image->hasBeenTransformed(true)` to tell Imbo that the content inside the
+     * imagick instance has changed.
+     *
+     * If your plugin returns binary data directly instead, call `$image->setBlob()` instead and _don't_
+     * set `$image->hasBeenTransformed` as you've handled the conversion to binary data yourself.
      */
-    'outputConverters' => [
-    ],
+    'outputConverters' => [],
 ];
 
 // Keep all external configuration separate
