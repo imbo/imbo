@@ -135,6 +135,14 @@ class OutputConverterManager {
         return isset($this->mimetypeToExtension[$mimetype]) ? $this->mimetypeToExtension[$mimetype] : null;
     }
 
+    public function getMimetypeToExtensionMap() {
+        return $this->mimetypeToExtension;
+    }
+
+    public function getExtensionToMimetypeMap() {
+        return $this->extensionToMimetype;
+    }
+
     public function supportsExtension($extension) {
         return !empty($this->convertersByExtension[$extension]);
     }
