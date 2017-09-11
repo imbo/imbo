@@ -13,6 +13,7 @@ namespace Imbo\Image;
 use Imbo\EventManager\EventInterface,
     Imbo\Image\Loader\LoaderInterface;
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Exception\LoaderException;
 
 /**
  * Loader manager. This class manages loading of images by calling out to
@@ -27,9 +28,14 @@ use Imbo\Exception\InvalidArgumentException;
  */
 class LoaderManager {
     protected $loaders = [];
+    protected $mimetypeToExtension = [];
 
     public function addLoaders(array $loaders) {
         foreach ($loaders as $loader) {
+            if (is_string($loader)) {
+                $loader = new $loader();
+            }
+
             if (!$loader instanceof LoaderInterface) {
                 $name = is_object($loader) ? get_class($loader) : (string) $loader;
                 throw new InvalidArgumentException('Given loader (' . $name . ') does not implement LoaderInterface', 500);
@@ -40,11 +46,20 @@ class LoaderManager {
     }
 
     public function registerLoader(LoaderInterface $loader) {
-        foreach ($loader->getMimeTypeCallbacks() as $mime => $callback) {
+        foreach ($loader->getMimeTypeCallbacks() as $mime => $definition) {
             if (!isset($this->loaders[$mime])) {
                 $this->loaders[$mime] = [];
             }
 
+            if (!isset($definition['callback'], $definition['extension'])) {
+                throw new LoaderException('Registered loader (' . $mime . ') is missing \'callback\' or \'extension\' in its definition array', 500);
+            }
+
+            if (!isset($this->mimetypeToExtension[$mime])) {
+                $this->mimetypeToExtension[$mime] = $definition['extension'];
+            }
+
+            $callback = $definition['callback'];
             $this->loaders[$mime][] = $callback;
         }
     }
@@ -63,5 +78,9 @@ class LoaderManager {
         }
 
         return null;
+    }
+
+    public function getExtensionFromMimetype($mimeType) {
+        return isset($this->mimetypeToExtension[$mimeType]) ? $this->mimetypeToExtension[$mimeType] : null;
     }
 }
