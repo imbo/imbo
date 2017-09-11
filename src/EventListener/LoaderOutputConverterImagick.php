@@ -10,17 +10,15 @@
 
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerInterface;
+use Imbo\EventManager\EventInterface;
 
 /**
- * Add the current Imagick instance to the active OutputConverterManager
+ * Add the current Imagick instance to the active LoaderManager and OutputConverterManager
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
+ * @author Mats Lindh <mats@lindh.no>
  * @package Event\Listeners
  */
-class OutputConverterManagerImagick implements ListenerInterface, ImagickAware {
+class LoaderOutputConverterImagick implements ListenerInterface, ImagickAware {
     protected $imagick;
 
     /**
@@ -28,7 +26,7 @@ class OutputConverterManagerImagick implements ListenerInterface, ImagickAware {
      */
     public static function getSubscribedEvents() {
         return [
-            'image.loaded' => ['populateImagickInstance'],
+            'imbo.initialized' => ['populateImagickInstance'],
         ];
     }
 
@@ -40,6 +38,7 @@ class OutputConverterManagerImagick implements ListenerInterface, ImagickAware {
     }
 
     public function populateImagickInstance(EventInterface $event) {
+        $event->getLoaderManager()->setImagick($this->imagick);
         $event->getOutputConverterManager()->setImagick($this->imagick);
     }
 }
