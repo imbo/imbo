@@ -34,8 +34,7 @@ class Basic implements LoaderInterface {
         ];
     }
 
-    public function load($blob) {
-        $imagick = new \Imagick();
+    public function load($imagick, $blob) {
         $imagick->readImageBlob($blob);
         return $imagick;
     }
