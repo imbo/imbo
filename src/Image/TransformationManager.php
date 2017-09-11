@@ -46,6 +46,11 @@ class TransformationManager implements ListenerInterface {
     protected $initializers = [];
 
     /**
+     * Track if the manager has attempted to apply transformations.
+     */
+    protected $transformationsApplied = false;
+
+    /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
@@ -173,6 +178,8 @@ class TransformationManager implements ListenerInterface {
                 );
             }
         }
+
+        $this->transformationsApplied = true;
     }
 
     /**
@@ -350,5 +357,14 @@ class TransformationManager implements ListenerInterface {
             ->setImage($event->getResponse()->getModel())
             ->setEvent($event)
             ->transform($params);
+    }
+
+    /**
+     * Check whether the manager has attempted to apply transformations (i.e. transformations are present in the pipeline).
+     *
+     * @return boolean Whether transformations has been triggered
+     */
+    public function hasAppliedTransformations() {
+        return $this->transformationsApplied;
     }
 }
