@@ -177,9 +177,9 @@ class TransformationManager implements ListenerInterface {
                     $event
                 );
             }
-        }
 
-        $this->transformationsApplied = true;
+            $this->transformationsApplied = true;
+        }
     }
 
     /**
