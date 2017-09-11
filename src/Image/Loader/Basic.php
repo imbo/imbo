@@ -19,9 +19,18 @@ namespace Imbo\Image\Loader;
 class Basic implements LoaderInterface {
     public function getMimeTypeCallbacks() {
         return [
-            'image/png' => [$this, 'load'],
-            'image/jpeg' => [$this, 'load'],
-            'image/gif' => [$this, 'load'],
+            'image/png' => [
+                'extension' => 'png',
+                'callback' => [$this, 'load'],
+            ],
+            'image/jpeg' => [
+                'extension' => 'jpg',
+                'callback' => [$this, 'load'],
+            ],
+            'image/gif' => [
+                'extension' => 'gif',
+                'callback' => [$this, 'load'],
+            ],
         ];
     }
 
