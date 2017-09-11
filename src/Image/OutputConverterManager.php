@@ -34,9 +34,13 @@ class OutputConverterManager {
 
     public function addConverters(array $converters) {
         foreach ($converters as $converter) {
+            if (is_string($converter)) {
+                $converter = new $converter();
+            }
+
             if (!$converter instanceof OutputConverterInterface) {
                 $name = is_object($converter) ? get_class($converter) : (string) $converter;
-                throw new InvalidArgumentException('Given converter (' . $converter . ') does not implement OutputConverterInterface', 500);
+                throw new InvalidArgumentException('Given converter (' . $name . ') does not implement OutputConverterInterface', 500);
             }
 
             $this->registerConverter($converter);
