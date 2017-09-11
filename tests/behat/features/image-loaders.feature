@@ -3,8 +3,10 @@ Feature: Imbo allows plugins for loading new file types
   As an HTTP Client
   I want to make requests against the image endpoint
 
-  Scenario: Add an image
+  Background:
     Given Imbo uses the "image-loaders.php" configuration
+
+  Scenario: Add an image
     Given the request body contains "tests/phpunit/Fixtures/nasa_sts-64.tif"
     And I use "publicKey" and "privateKey" for public and private keys
     And I sign the request
