@@ -45,9 +45,8 @@ class ResponseFormatter implements ListenerInterface {
      */
     private $extensionsToMimeType = [
         'json' => 'application/json',
-        'gif'  => 'image/gif',
-        'jpg'  => 'image/jpeg',
-        'png'  => 'image/png',
+
+        // Image extensions are added on invocation
     ];
 
     /**
@@ -58,9 +57,8 @@ class ResponseFormatter implements ListenerInterface {
      */
     private $supportedTypes = [
         'application/json' => 'json',
-        'image/gif'        => 'gif',
-        'image/png'        => 'png',
-        'image/jpeg'       => 'jpg',
+
+        // Image mimetypes are added on invocation
     ];
 
     /**
@@ -86,9 +84,7 @@ class ResponseFormatter implements ListenerInterface {
      */
     private $modelTypes = [
         'image' => [
-            'image/jpeg',
-            'image/png',
-            'image/gif',
+            // Supported image formats are populated from the output converter
         ],
     ];
 
@@ -155,23 +151,31 @@ class ResponseFormatter implements ListenerInterface {
         $config = $event->getConfig();
         $contentNegotiateImages = $config['contentNegotiateImages'];
         $model = $response->getModel();
+        $outputConverterManager = $event->getOutputConverterManager();
+        $supportedTypes = array_merge($this->supportedTypes, $outputConverterManager->getMimetypeToExtensionMap());
+        $extensionsToMimeType = array_merge($this->extensionsToMimeType, $outputConverterManager->getExtensionToMimetypeMap());
+
+        // Populate the supported image types for this event
+        $this->modelTypes['image'] = $outputConverterManager->getSupportedMimetypes();
 
         if (!$extension && !$contentNegotiateImages && $model instanceof Model\Image) {
             // Configuration is telling us not to use content negotiation for images,
             // instead we want to use the original format of the image
-            $mime = $model->getMimeType();
-            $formatter = $this->supportedTypes[$mime];
+            $formatter = $model->getExtension();
         } else if ($extension && !($model instanceof Model\Error && ($routeName === 'image' || $routeName === 'globalshorturl'))) {
             // The user agent wants a specific type. Skip content negotiation completely, but not
             // if the request is against the image resource (or the global short url resource), and
             // ended up as an error, because then Imbo would try to render the error as an image.
             $mime = $this->defaultMimeType;
 
-            if (isset($this->extensionsToMimeType[$extension])) {
-                $mime = $this->extensionsToMimeType[$extension];
+            if (isset($extensionsToMimeType[$extension])) {
+                $mime = $extensionsToMimeType[$extension];
+            } else if ($model instanceof Model\Image) {
+                // If the request is for an image, but we don't support the extension - give a 404 like the old router did.
+                throw new Exception\RuntimeException('Not Found', 404);
             }
 
-            $formatter = $this->supportedTypes[$mime];
+            $formatter = $supportedTypes[$mime];
         } else {
             // Set Vary to Accept since we are doing content negotiation based on Accept
             $response->setVary('Accept', false);
@@ -208,7 +212,16 @@ class ResponseFormatter implements ListenerInterface {
                     $types = array_filter($types, function($type) use ($original) {
                         return $type !== $original;
                     });
-                    array_unshift($types, $original);
+
+                    // if the current pipeline hasn't performed any transformations, we can output the original format, even if it's not supported as a output converter.
+                    // otherwise, if we support the original format, we use it
+                    if (
+                        !$event->getTransformationManager()->hasAppliedTransformations() ||
+                        $outputConverterManager->supportsExtension($model->getExtension())
+                    ) {
+                        array_unshift($types, $original);
+                        $supportedTypes[$original] = $model->getExtension();
+                    }
                 }
             }
 
@@ -216,7 +229,7 @@ class ResponseFormatter implements ListenerInterface {
                 if (($q = $this->contentNegotiation->isAcceptable($mime, $acceptableTypes)) && ($q > $maxQ)) {
                     $maxQ = $q;
                     $match = true;
-                    $formatter = $this->supportedTypes[$mime];
+                    $formatter = $supportedTypes[$mime];
                 }
             }
 
@@ -227,7 +240,7 @@ class ResponseFormatter implements ListenerInterface {
             } else if (!$match) {
                 // There was no match but we don't want to be an ass about it. Send a response
                 // anyway (allowed according to RFC2616, section 10.4.7)
-                $formatter = $this->supportedTypes[$this->defaultMimeType];
+                $formatter = $supportedTypes[$this->defaultMimeType];
             }
         }
 
