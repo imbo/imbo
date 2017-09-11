@@ -13,6 +13,8 @@
  */
 return [
     'loaders' => [
+        'Imbo\Image\Loader\Text',
         'Imbo\Image\Loader\Tiff',
     ],
+    'rethrowFinalException' => true,
 ];
