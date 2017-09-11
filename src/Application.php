@@ -289,6 +289,8 @@ class Application {
                          ->addCallbacks($name, $resource::getSubscribedEvents());
         }
 
+        $eventManager->trigger('imbo.initialized');
+
         try {
             // Route the request
             $router->route($request);
