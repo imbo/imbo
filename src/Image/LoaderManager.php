@@ -29,6 +29,11 @@ use Imbo\Exception\LoaderException;
 class LoaderManager {
     protected $loaders = [];
     protected $mimetypeToExtension = [];
+    protected $imagick;
+
+    public function setImagick(\Imagick $imagick) {
+        $this->imagick = $imagick;
+    }
 
     public function addLoaders(array $loaders) {
         foreach ($loaders as $loader) {
@@ -70,7 +75,7 @@ class LoaderManager {
         }
 
         foreach ($this->loaders[$mime] as $callback) {
-            $imagick = $callback($blob);
+            $imagick = $callback($this->imagick, $blob);
 
             if ($imagick) {
                 return $imagick;
