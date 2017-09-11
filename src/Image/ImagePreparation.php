@@ -71,6 +71,7 @@ class ImagePreparation implements ListenerInterface {
         $invalidImageException = new ImageException('Invalid image', 415);
         $invalidImageException->setImboErrorCode(Exception::IMAGE_INVALID_IMAGE);
 
+        // Attempt to load the image through one of the registered loaders
         try {
             $imagick = $event->getLoaderManager()->load($mime, $imageBlob);
 
