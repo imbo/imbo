@@ -436,6 +436,22 @@ $defaultConfig = [
      * @var string
      */
     'indexRedirect' => null,
+
+    /**
+     * Custom format loaders.
+     *
+     * A loader must implement Image\Loader\LoaderInterface and return an Imagick instance.
+     */
+    'loaders' => [
+    ],
+
+    /**
+     * Custom output converters.
+     *
+     * An output converter must implement Image\OutputConverter\OutputConverterInstance.
+     */
+    'outputConverters' => [
+    ],
 ];
 
 // Keep all external configuration separate
