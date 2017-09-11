@@ -20,13 +20,13 @@ class Basic implements OutputConverterInterface {
     public function getSupportedFormatsWithCallbacks() {
         return [
             [
-                'mime' => 'image/png',
-                'extension' => 'png',
+                'mime' => 'image/jpeg',
+                'extension' => ['jpg', 'jpeg'],
                 'callback' => [$this, 'convert'],
             ],
             [
-                'mime' => 'image/jpeg',
-                'extension' => ['jpg', 'jpeg'],
+                'mime' => 'image/png',
+                'extension' => 'png',
                 'callback' => [$this, 'convert'],
             ],
             [
@@ -43,5 +43,7 @@ class Basic implements OutputConverterInterface {
         } catch (ImagickException $e) {
             throw new OutputConversionException($e->getMessage(), 400, $e);
         }
+
+        $image->hasBeenTransformed(true);
     }
 }
