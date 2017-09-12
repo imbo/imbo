@@ -37,7 +37,7 @@ Feature: Imbo allows plugins for loading new file types
     And the "X-Imbo-Originalwidth" response header is "437"
 
   Scenario: Add an 'image' that isn't supported by imagick
-    Given the request body contains "tests/behat/Fixtures/foobar.txt"
+    Given the request body contains "tests/behat/fixtures/foobar.txt"
     And I use "publicKey" and "privateKey" for public and private keys
     And I sign the request
     When I request "/users/user/images" using HTTP "POST"
