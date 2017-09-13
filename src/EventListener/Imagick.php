@@ -31,10 +31,7 @@ class Imagick implements ListenerInterface, ImagickAware {
     private $imagick;
 
     /**
-     * Set the local \Imagick property
-     *
-     * @param \Imagick $imagick An Imagick instance
-     * @return self
+     * {@inheritdoc}
      */
     public function setImagick(\Imagick $imagick) {
         $this->imagick = $imagick;

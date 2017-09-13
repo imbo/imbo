@@ -17,6 +17,9 @@ namespace Imbo\Image\Loader;
  * @package Image\Loaders
  */
 class Tiff implements LoaderInterface {
+    /**
+     * {@inheritdoc}
+     */
     public function getMimeTypeCallbacks() {
         return [
             'image/tiff' => [
@@ -26,8 +29,16 @@ class Tiff implements LoaderInterface {
         ];
     }
 
+    /**
+     * Load the image
+     *
+     * @param Imagick $imagick
+     * @param string $blob
+     * @return Imagick
+     */
     public function load($imagick, $blob) {
         $imagick->readImageBlob($blob);
+
         return $imagick;
     }
 }

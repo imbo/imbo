@@ -19,6 +19,9 @@ use Imbo\EventManager\EventInterface;
  * @package Event\Listeners
  */
 class LoaderOutputConverterImagick implements ListenerInterface, ImagickAware {
+    /**
+     * @var \Imagick
+     */
     protected $imagick;
 
     /**
@@ -35,8 +38,15 @@ class LoaderOutputConverterImagick implements ListenerInterface, ImagickAware {
      */
     public function setImagick(\Imagick $imagick) {
         $this->imagick = $imagick;
+
+        return $this;
     }
 
+    /**
+     * Set the Imagick instance in the loader manager and the output converter manager
+     *
+     * @param EventInterface $event
+     */
     public function populateImagickInstance(EventInterface $event) {
         $event->getLoaderManager()->setImagick($this->imagick);
         $event->getOutputConverterManager()->setImagick($this->imagick);
