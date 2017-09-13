@@ -10,18 +10,20 @@
 
 namespace Imbo\Image;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Image\Loader\LoaderInterface;
+use Imbo\EventManager\EventInterface;
+use Imbo\Image\Loader\LoaderInterface;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\LoaderException;
 
 /**
- * Loader manager. This class manages loading of images by calling out to
- * registered plugins to actually load the image.
+ * Loader manager
  *
- * A plugin should return an Imagick instance with the loaded image content,
- * null if it does not support the image for any reason, or throw a LoaderException
- * if the image is determined to be invalid or damaged.
+ * This class manages loading of images by calling out to registered plugins to actually load the
+ * image.
+ *
+ * A plugin should return an Imagick instance with the loaded image content, null if it does not
+ * support the image for any reason, or throw a LoaderException if the image is determined to be
+ * invalid or damaged.
  *
  * @author Mats Lindh <mats@lindh.no>
  * @package Image

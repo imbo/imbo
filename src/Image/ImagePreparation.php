@@ -66,8 +66,8 @@ class ImagePreparation implements ListenerInterface {
             $mime = Image::$mimeTypeMapping[$mime];
         }
 
-        // The loader for the format determined that the image was borked
-        // We set up the image here since we're catching multiple exceptions below
+        // The loader for the format determined that the image was borked. We set up the image
+        // exception here since we're catching multiple exceptions below
         $invalidImageException = new ImageException('Invalid image', 415);
         $invalidImageException->setImboErrorCode(Exception::IMAGE_INVALID_IMAGE);
 

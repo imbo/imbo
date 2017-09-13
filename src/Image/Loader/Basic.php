@@ -10,6 +10,8 @@
 
 namespace Imbo\Image\Loader;
 
+use Imagick;
+
 /**
  * Basic image loader / fallback image loader
  *
@@ -17,6 +19,9 @@ namespace Imbo\Image\Loader;
  * @package Image\Loaders
  */
 class Basic implements LoaderInterface {
+    /**
+     * {@inheritdoc}
+     */
     public function getMimeTypeCallbacks() {
         return [
             'image/png' => [
@@ -34,8 +39,16 @@ class Basic implements LoaderInterface {
         ];
     }
 
-    public function load($imagick, $blob) {
+    /**
+     * Load the given image
+     *
+     * @param Imagick $imagick
+     * @param string $blob
+     * @return Imagick
+     */
+    public function load(Imagick $imagick, $blob) {
         $imagick->readImageBlob($blob);
+
         return $imagick;
     }
 }
