@@ -899,10 +899,6 @@ class FeatureContext extends ApiContext {
      * @When I request the previously added image as a :extension using HTTP :method
      */
     public function requestPreviouslyAddedImageAsType($extension, $method = 'GET') {
-        if (!in_array($extension, ['gif', 'png', 'jpg', 'webp'])) {
-            throw new InvalidArgumentException(sprintf('Invalid extension: "%s".', $extension));
-        }
-
         $image = $this->getUserAndImageIdentifierOfPreviouslyAddedImage();
         $path = sprintf('/users/%s/images/%s', $image['user'], $image['imageIdentifier']);
 
