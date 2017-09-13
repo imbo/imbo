@@ -13,6 +13,6 @@
  */
 return [
     'outputConverters' => [
-        'Imbo\Image\OutputConverter\Webp',
+        'Imbo\Image\OutputConverter\Bmp',
     ],
 ];
