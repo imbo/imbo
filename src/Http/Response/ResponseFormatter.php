@@ -272,8 +272,8 @@ class ResponseFormatter implements ListenerInterface {
             if (
                 ($model->getExtension() !== $this->formatter) &&
                 ($outputConverterManager->getMimetypeFromExtension($this->formatter) !== $model->getMimeType()) &&
-                $outputConverterManager->supportsExtension($this->formatter))
-            {
+                $outputConverterManager->supportsExtension($this->formatter)
+            ) {
                 $outputConverterManager->convert($model, $this->formatter);
             }
 
