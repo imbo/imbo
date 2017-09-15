@@ -46,7 +46,7 @@ class Convert extends Transformation {
 
         $outputConverterManager = $this->event->getOutputConverterManager();
 
-        $this->image->setMimeType($outputConverterManager->getMimetypeFromExtension($type))
+        $this->image->setMimeType($outputConverterManager->getMimeTypeFromExtension($type))
                     ->setExtension($type)
                     ->hasBeenTransformed(true);
     }

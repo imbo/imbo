@@ -152,11 +152,11 @@ class ResponseFormatter implements ListenerInterface {
         $contentNegotiateImages = $config['contentNegotiateImages'];
         $model = $response->getModel();
         $outputConverterManager = $event->getOutputConverterManager();
-        $supportedTypes = array_merge($this->supportedTypes, $outputConverterManager->getMimetypeToExtensionMap());
-        $extensionsToMimeType = array_merge($this->extensionsToMimeType, $outputConverterManager->getExtensionToMimetypeMap());
+        $supportedTypes = array_merge($this->supportedTypes, $outputConverterManager->getMimeTypeToExtensionMap());
+        $extensionsToMimeType = array_merge($this->extensionsToMimeType, $outputConverterManager->getExtensionToMimeTypeMap());
 
         // Populate the supported image types for this event
-        $this->modelTypes['image'] = $outputConverterManager->getSupportedMimetypes();
+        $this->modelTypes['image'] = $outputConverterManager->getSupportedMimeTypes();
 
         if (!$extension && !$contentNegotiateImages && $model instanceof Model\Image) {
             // Configuration is telling us not to use content negotiation for images,
@@ -271,7 +271,7 @@ class ResponseFormatter implements ListenerInterface {
 
             if (
                 ($model->getExtension() !== $this->formatter) &&
-                ($outputConverterManager->getMimetypeFromExtension($this->formatter) !== $model->getMimeType()) &&
+                ($outputConverterManager->getMimeTypeFromExtension($this->formatter) !== $model->getMimeType()) &&
                 $outputConverterManager->supportsExtension($this->formatter)
             ) {
                 $outputConverterManager->convert($model, $this->formatter);
