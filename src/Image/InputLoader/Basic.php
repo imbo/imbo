@@ -10,7 +10,7 @@
 
 namespace Imbo\Image\InputLoader;
 
-use Imagick;
+use \Imagick;
 
 /**
  * Basic image loader / fallback image loader
@@ -22,20 +22,12 @@ class Basic implements InputLoaderInterface {
     /**
      * {@inheritdoc}
      */
-    public function getMimeTypeCallbacks() {
+    public function getSupportedMimeTypes() {
         return [
-            'image/png' => [
-                'extension' => 'png',
-                'callback' => [$this, 'load'],
-            ],
-            'image/jpeg' => [
-                'extension' => 'jpg',
-                'callback' => [$this, 'load'],
-            ],
-            'image/gif' => [
-                'extension' => 'gif',
-                'callback' => [$this, 'load'],
-            ],
+            'image/png' => 'png',
+            'image/jpeg' => 'jpg',
+            'image/gif' => 'gif',
+            'image/tiff' => 'tif',
         ];
     }
 
@@ -46,7 +38,7 @@ class Basic implements InputLoaderInterface {
      * @param string $blob
      * @return Imagick
      */
-    public function load(Imagick $imagick, $blob) {
+    public function load(Imagick $imagick, $blob, $mimeType) {
         $imagick->readImageBlob($blob);
 
         return $imagick;

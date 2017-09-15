@@ -14,7 +14,6 @@
 return [
     'inputLoaders' => [
         'Imbo\Image\InputLoader\Text',
-        'Imbo\Image\InputLoader\Tiff',
     ],
     'rethrowFinalException' => true,
 ];

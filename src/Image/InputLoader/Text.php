@@ -24,23 +24,16 @@ class Text implements InputLoaderInterface {
     /**
      * {@inheritdoc}
      */
-    public function getMimeTypeCallbacks() {
+    public function getSupportedMimeTypes() {
         return [
-            'text/plain' => [
-                'extension' => 'txt',
-                'callback' => [$this, 'load'],
-            ],
+            'text/plain' => 'txt',
         ];
     }
 
     /**
-     * Load the image
-     *
-     * @param Imagick $imagick
-     * @param string $blob
-     * @return Imagick
+     * {@inheritdoc}
      */
-    public function load(Imagick $imagick, $blob) {
+    public function load(Imagick $imagick, $blob, $mimeType) {
         $im = imagecreatetruecolor(300, 300);
         $textColor = imagecolorallocate($im, 0x00, 0x00, 0x00);
         $backgroundColor = imagecolorallocate($im, 0xff, 0xff, 0xff);
