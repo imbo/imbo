@@ -10,6 +10,8 @@
 
 namespace Imbo\Image\InputLoader;
 
+use \Imagick;
+
 /**
  * Loader interface
  *
@@ -20,16 +22,22 @@ interface InputLoaderInterface {
     /**
      * Get mime types supported by the loader
      *
-     * Each element in the returned array represents a supported image format, and the keys are the
-     * mime types of the image, and the values are an array with two keys:
-     *
-     *  - extension: file extension
-     *  - callback: callable responsible for loading the image. The callable will receive two
-     *              parameters:
-     *               - \Imagick $imagick: The Imagick instance
-     *               - string $blob: The image blob itself
+     * Each element in the returned array represents a supported image format, with the
+     * mime types as the key and the extension as the value.
      *
      * @return array[]
      */
-    function getMimeTypeCallbacks();
+    function getSupportedMimeTypes();
+
+    /**
+     * Load data from a blob in a specific format into the provided Imagick instance.
+     *
+     * Return false on failure.
+     *
+     * @param Imagick $imagick Imagick instance to populate with rasterized image data
+     * @param string $blob The file being loaded as a binary blob
+     * @param string $mimeType The determined mime type of the file. Will match one of the mime types specified in `getSupportedMimeTypes()`.
+     * @return null|boolean|Imagick
+     */
+    function load(Imagick $imagick, $blob, $mimeType);
 }
