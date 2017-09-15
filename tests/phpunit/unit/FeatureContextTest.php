@@ -1069,15 +1069,6 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers ::requestPreviouslyAddedImageAsType
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid extension: "jpeg".
-     */
-    public function testThrowsExceptionWhenTryingToFetchPreviouslyAddedImageWithInvalidExtension() {
-        $this->context->requestPreviouslyAddedImageAsType('jpeg');
-    }
-
-    /**
      * @covers ::makeSameRequest
      * @expectedException RuntimeException
      * @expectedExceptionMessage No request has been made yet.
