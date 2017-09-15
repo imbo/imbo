@@ -12,8 +12,7 @@ namespace Imbo\Image;
 
 use Imbo\Image\InputLoader\InputLoaderInterface,
     Imbo\Exception\InvalidArgumentException,
-    Imbo\Exception\LoaderException,
-    \Imagick;
+    Imagick;
 
 /**
  * Loader manager
@@ -33,10 +32,20 @@ class InputLoaderManager {
     protected $mimeTypeToExtension = [];
     protected $imagick;
 
-    public function setImagick(\Imagick $imagick) {
+    /**
+     * Set imagick instance to pass on to loaders. This is usually populated by a dedicated event listener.
+     *
+     * @param Imagick $imagick
+     */
+    public function setImagick(Imagick $imagick) {
         $this->imagick = $imagick;
     }
 
+    /**
+     * Add a list of input loaders to the manager.
+     *
+     * @param array<InputLoaderInterface> $loaders A list of loaders to add to the manager.
+     */
     public function addLoaders(array $loaders) {
         foreach ($loaders as $loader) {
             if (is_string($loader)) {
@@ -52,6 +61,11 @@ class InputLoaderManager {
         }
     }
 
+    /**
+     * Register a specific input loader for the manager to use.
+     *
+     * @param InputLoaderInterface $loader InputLoader to register
+     */
     public function registerLoader(InputLoaderInterface $loader) {
         foreach ($loader->getSupportedMimeTypes() as $mime => $extensions) {
             if (!isset($this->loaders[$mime])) {
@@ -74,6 +88,13 @@ class InputLoaderManager {
         }
     }
 
+    /**
+     * Load a binary blob as an image.
+     *
+     * @param string $mime Mime type of the binary blob
+     * @param string $blob Binary data to load / rasterize
+     * @return bool|null|Imagick Returns false if all the registered loaders was unable to load the blob
+     */
     public function load($mime, $blob) {
         if (!isset($this->loaders[$mime])) {
             return null;
@@ -90,6 +111,12 @@ class InputLoaderManager {
         return false;
     }
 
+    /**
+     * Get the extension associated with a specific mime type by the loader modules.
+     *
+     * @param string $mimeType
+     * @return string|null The extension used for the mime type or null if the mime type is unknown
+     */
     public function getExtensionFromMimeType($mimeType) {
         return isset($this->mimeTypeToExtension[$mimeType]) ? $this->mimeTypeToExtension[$mimeType][0] : null;
     }
