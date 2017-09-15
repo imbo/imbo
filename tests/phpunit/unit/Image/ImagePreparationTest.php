@@ -44,7 +44,7 @@ class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
         $this->event = $this->createMock('Imbo\EventManager\Event');
         $this->database = $this->createMock('Imbo\Database\DatabaseInterface');
         $this->headers = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
-        $this->loaderManager = $this->createMock('Imbo\Image\LoaderManager');
+        $this->loaderManager = $this->createMock('Imbo\Image\InputLoaderManager');
         $this->imagickLoader = function ($mime, $data) {
             $imagick = new \Imagick();
             $imagick->readImageBlob($data);

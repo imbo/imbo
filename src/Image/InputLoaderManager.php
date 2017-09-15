@@ -10,10 +10,9 @@
 
 namespace Imbo\Image;
 
-use Imbo\EventManager\EventInterface;
-use Imbo\Image\Loader\LoaderInterface;
-use Imbo\Exception\InvalidArgumentException;
-use Imbo\Exception\LoaderException;
+use Imbo\Image\InputLoader\InputLoaderInterface,
+    Imbo\Exception\InvalidArgumentException,
+    Imbo\Exception\LoaderException;
 
 /**
  * Loader manager
@@ -28,7 +27,7 @@ use Imbo\Exception\LoaderException;
  * @author Mats Lindh <mats@lindh.no>
  * @package Image
  */
-class LoaderManager {
+class InputLoaderManager {
     protected $loaders = [];
     protected $mimetypeToExtension = [];
     protected $imagick;
@@ -43,7 +42,7 @@ class LoaderManager {
                 $loader = new $loader();
             }
 
-            if (!$loader instanceof LoaderInterface) {
+            if (!$loader instanceof InputLoaderInterface) {
                 $name = is_object($loader) ? get_class($loader) : (string) $loader;
                 throw new InvalidArgumentException('Given loader (' . $name . ') does not implement LoaderInterface', 500);
             }
@@ -52,7 +51,7 @@ class LoaderManager {
         }
     }
 
-    public function registerLoader(LoaderInterface $loader) {
+    public function registerLoader(InputLoaderInterface $loader) {
         foreach ($loader->getMimeTypeCallbacks() as $mime => $definition) {
             if (!isset($this->loaders[$mime])) {
                 $this->loaders[$mime] = [];

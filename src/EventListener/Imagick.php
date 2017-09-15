@@ -94,7 +94,7 @@ class Imagick implements ListenerInterface, ImagickAware {
         }
 
         // Inject the image blob
-        $event->getLoaderManager()->load($image->getMimeType(), $image->getBlob());
+        $event->getInputLoaderManager()->load($image->getMimeType(), $image->getBlob());
 
         // If we have specified a size hint, check if we have a different input size
         // than the original and set the ratio as an argument for any other listeners

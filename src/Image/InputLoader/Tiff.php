@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\Image\Loader;
+namespace Imbo\Image\InputLoader;
 
 /**
  * TIFF image loader
@@ -16,7 +16,7 @@ namespace Imbo\Image\Loader;
  * @author Mats Lindh <mats@lindh.no>
  * @package Image\Loaders
  */
-class Tiff implements LoaderInterface {
+class Tiff implements InputLoaderInterface {
     /**
      * {@inheritdoc}
      */

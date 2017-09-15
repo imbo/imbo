@@ -48,7 +48,7 @@ class LoaderOutputConverterImagick implements ListenerInterface, ImagickAware {
      * @param EventInterface $event
      */
     public function populateImagickInstance(EventInterface $event) {
-        $event->getLoaderManager()->setImagick($this->imagick);
+        $event->getInputLoaderManager()->setImagick($this->imagick);
         $event->getOutputConverterManager()->setImagick($this->imagick);
     }
 }

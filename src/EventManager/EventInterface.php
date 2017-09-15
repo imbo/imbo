@@ -17,7 +17,7 @@ use Imbo\Http\Request\Request,
     Imbo\Storage\StorageInterface,
     Imbo\Image\OutputConverterManager,
     Imbo\Image\TransformationManager,
-    Imbo\Image\LoaderManager;
+    Imbo\Image\InputLoaderManager;
 
 /**
  * Event interface
@@ -146,9 +146,9 @@ interface EventInterface {
     /**
      * Get the image loader manager
      *
-     * @return LoaderManager
+     * @return InputLoaderManager
      */
-    function getLoaderManager();
+    function getInputLoaderManager();
 
     /**
      * Get the Imbo configuration
