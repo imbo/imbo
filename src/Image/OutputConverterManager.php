@@ -10,10 +10,9 @@
 
 namespace Imbo\Image;
 
-use Imbo\EventManager\EventInterface;
-use Imbo\Image\Loader\LoaderInterface;
-use Imbo\Exception\InvalidArgumentException;
-use Imbo\Image\OutputConverter\OutputConverterInterface;
+use Imbo\Exception\InvalidArgumentException,
+    Imbo\Image\OutputConverter\OutputConverterInterface,
+    \Imagick;
 
 /**
  * Output converter manager
@@ -27,10 +26,10 @@ use Imbo\Image\OutputConverter\OutputConverterInterface;
  * @package Image
  */
 class OutputConverterManager {
-    protected $convertersByMimetype = [];
+    protected $convertersByMimeType = [];
     protected $convertersByExtension = [];
-    protected $extensionToMimetype = [];
-    protected $mimetypeToExtension = [];
+    protected $extensionToMimeType = [];
+    protected $mimeTypeToExtension = [];
     protected $imagick;
 
     public function addConverters(array $converters) {
@@ -49,46 +48,31 @@ class OutputConverterManager {
     }
 
     public function registerConverter(OutputConverterInterface $converter) {
-        foreach ($converter->getSupportedFormatsWithCallbacks() as $formatEntry) {
-            if (!is_array($formatEntry) || !isset($formatEntry['mime'], $formatEntry['extension'], $formatEntry['callback'])) {
-                throw new InvalidArgumentException('Output converted returned invalid converter definition ("mime", "extension", and "callback") ' .
-                                                   'must be defined for each supported format. Got "' . json_encode($formatEntry) . '"', 500);
-            }
-
-            $mimes = $formatEntry['mime'];
-            $extensions = $formatEntry['extension'];
-
-            // Since a converter can register the same callback for multiple mime types or extensions, we iterate over the values here.
-            if (!is_array($mimes)) {
-                $mimes = [$mimes];
-            }
-
+        foreach ($converter->getSupportedMimeTypes() as $mimeType => $extensions) {
             if (!is_array($extensions)) {
                 $extensions = [$extensions];
             }
 
-            foreach ($mimes as $mime) {
-                if (!isset($this->convertersByMimetype[$mime])) {
-                    $this->convertersByMimetype[$mime] = [];
-                }
-
-                if (!isset($this->mimetypeToExtension[$mime])) {
-                    $this->mimetypeToExtension[$mime] = $extensions[0];
-                }
-
-                $this->convertersByMimetype[$mime][] = $formatEntry['callback'];
+            if (!isset($this->convertersByMimeType[$mimeType])) {
+                $this->convertersByMimeType[$mimeType] = [];
             }
+
+            if (!isset($this->mimeTypeToExtension[$mimeType])) {
+                $this->mimeTypeToExtension[$mimeType] = $extensions[0];
+            }
+
+            $this->convertersByMimeType[$mimeType][] = $converter;
 
             foreach ($extensions as $extension) {
                 if (!isset($this->convertersByExtension[$extension])) {
                     $this->convertersByExtension[$extension] = [];
                 }
 
-                if (!isset($this->extensionToMimetype[$extension])) {
-                    $this->extensionToMimetype[$extension] = $mimes[0];
+                if (!isset($this->extensionToMimeType[$extension])) {
+                    $this->extensionToMimeType[$extension] = $mimeType;
                 }
 
-                $this->convertersByExtension[$extension][] = $formatEntry['callback'];
+                $this->convertersByExtension[$extension][] = $converter;
             }
         }
     }
@@ -96,17 +80,17 @@ class OutputConverterManager {
     public function convert($image, $extension, $mime = null) {
         if ($this->supportsExtension($extension)) {
             foreach ($this->convertersByExtension[$extension] as $converter) {
-                $result = $converter($this->imagick, $image, $extension, $mime);
+                $result = $converter->convert($this->imagick, $image, $extension, $mime);
 
                 if ($result !== false) {
-                    $image->setMimeType($this->getMimetypeFromExtension($extension));
+                    $image->setMimeType($this->getMimeTypeFromExtension($extension));
                     return true;
                 }
             }
         }
 
-        if ($mime && isset($this->convertersByMimetype[$mime])) {
-            foreach ($this->convertersByMimetype[$mime] as $converter) {
+        if ($mime && isset($this->convertersByMimeType[$mime])) {
+            foreach ($this->convertersByMimeType[$mime] as $converter) {
                 $result = $converter($this->imagick, $image, $extension, $mime);
 
                 if ($result !== false) {
@@ -123,31 +107,31 @@ class OutputConverterManager {
         return array_keys($this->convertersByExtension);
     }
 
-    public function getSupportedMimetypes() {
-        return array_keys($this->convertersByMimetype);
+    public function getSupportedMimeTypes() {
+        return array_keys($this->convertersByMimeType);
     }
 
-    public function getMimetypeFromExtension($extension) {
-        return isset($this->extensionToMimetype[$extension]) ? $this->extensionToMimetype[$extension] : null;
+    public function getMimeTypeFromExtension($extension) {
+        return isset($this->extensionToMimeType[$extension]) ? $this->extensionToMimeType[$extension] : null;
     }
 
-    public function getExtensionFromMimetype($mimetype) {
-        return isset($this->mimetypeToExtension[$mimetype]) ? $this->mimetypeToExtension[$mimetype] : null;
+    public function getExtensionFromMimeType($mimetype) {
+        return isset($this->mimeTypeToExtension[$mimetype]) ? $this->mimeTypeToExtension[$mimetype] : null;
     }
 
-    public function getMimetypeToExtensionMap() {
-        return $this->mimetypeToExtension;
+    public function getMimeTypeToExtensionMap() {
+        return $this->mimeTypeToExtension;
     }
 
-    public function getExtensionToMimetypeMap() {
-        return $this->extensionToMimetype;
+    public function getExtensionToMimeTypeMap() {
+        return $this->extensionToMimeType;
     }
 
     public function supportsExtension($extension) {
         return !empty($this->convertersByExtension[$extension]);
     }
 
-    public function setImagick(\Imagick $imagick) {
+    public function setImagick(Imagick $imagick) {
         $this->imagick = $imagick;
     }
 }
