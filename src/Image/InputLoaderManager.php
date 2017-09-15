@@ -12,7 +12,8 @@ namespace Imbo\Image;
 
 use Imbo\Image\InputLoader\InputLoaderInterface,
     Imbo\Exception\InvalidArgumentException,
-    Imbo\Exception\LoaderException;
+    Imbo\Exception\LoaderException,
+    \Imagick;
 
 /**
  * Loader manager
@@ -29,7 +30,7 @@ use Imbo\Image\InputLoader\InputLoaderInterface,
  */
 class InputLoaderManager {
     protected $loaders = [];
-    protected $mimetypeToExtension = [];
+    protected $mimeTypeToExtension = [];
     protected $imagick;
 
     public function setImagick(\Imagick $imagick) {
@@ -52,21 +53,24 @@ class InputLoaderManager {
     }
 
     public function registerLoader(InputLoaderInterface $loader) {
-        foreach ($loader->getMimeTypeCallbacks() as $mime => $definition) {
+        foreach ($loader->getSupportedMimeTypes() as $mime => $extensions) {
             if (!isset($this->loaders[$mime])) {
                 $this->loaders[$mime] = [];
             }
 
-            if (!isset($definition['callback'], $definition['extension'])) {
-                throw new LoaderException('Registered loader (' . $mime . ') is missing \'callback\' or \'extension\' in its definition array', 500);
+            if (!isset($this->mimeTypeToExtension[$mime])) {
+                $this->mimeTypeToExtension[$mime] = [];
             }
 
-            if (!isset($this->mimetypeToExtension[$mime])) {
-                $this->mimetypeToExtension[$mime] = $definition['extension'];
+            if (!is_array($extensions)) {
+                $extensions = [$extensions];
             }
 
-            $callback = $definition['callback'];
-            $this->loaders[$mime][] = $callback;
+            foreach ($extensions as $extension) {
+                $this->mimeTypeToExtension[$mime][] = $extension;
+            }
+
+            $this->loaders[$mime][] = $loader;
         }
     }
 
@@ -75,18 +79,18 @@ class InputLoaderManager {
             return null;
         }
 
-        foreach ($this->loaders[$mime] as $callback) {
-            $imagick = $callback($this->imagick, $blob);
+        foreach ($this->loaders[$mime] as $loader) {
+            $state = $loader->load($this->imagick, $blob, $mime);
 
-            if ($imagick) {
-                return $imagick;
+            if ($state !== false) {
+                return $state;
             }
         }
 
-        return null;
+        return false;
     }
 
-    public function getExtensionFromMimetype($mimeType) {
-        return isset($this->mimetypeToExtension[$mimeType]) ? $this->mimetypeToExtension[$mimeType] : null;
+    public function getExtensionFromMimeType($mimeType) {
+        return isset($this->mimeTypeToExtension[$mimeType]) ? $this->mimeTypeToExtension[$mimeType][0] : null;
     }
 }
