@@ -17,17 +17,19 @@ namespace Imbo\Image\OutputConverter;
  * @package Image\OutputConverters
  */
 class Webp implements OutputConverterInterface {
-    public function getSupportedFormatsWithCallbacks() {
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedMimeTypes() {
         return [
-            [
-                'mime' => 'image/webp',
-                'extension' => ['webp'],
-                'callback' => [$this, 'convert'],
-            ],
+            'image/webp' => 'webp',
         ];
     }
 
-    public function convert($imagick, $image, $extension, $mime = null) {
+    /**
+     * {@inheritdoc}
+     */
+    public function convert($imagick, $image, $extension, $mime) {
         try {
             $imagick->setImageFormat($extension);
         } catch (ImagickException $e) {

@@ -17,17 +17,13 @@ namespace Imbo\Image\OutputConverter;
  * @package Image\OutputConverters
  */
 class Bmp implements OutputConverterInterface {
-    public function getSupportedFormatsWithCallbacks() {
+    public function getSupportedMimeTypes() {
         return [
-            [
-                'mime' => 'image/bmp',
-                'extension' => ['bmp'],
-                'callback' => [$this, 'convert'],
-            ],
+            'image/bmp' => 'bmp',
         ];
     }
 
-    public function convert($imagick, $image, $extension, $mime = null) {
+    public function convert($imagick, $image, $extension, $mime) {
         try {
             $imagick->setImageFormat($extension);
         } catch (ImagickException $e) {

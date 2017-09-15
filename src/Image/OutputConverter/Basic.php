@@ -17,27 +17,21 @@ namespace Imbo\Image\OutputConverter;
  * @package Image\OutputConverters
  */
 class Basic implements OutputConverterInterface {
-    public function getSupportedFormatsWithCallbacks() {
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedMimeTypes() {
         return [
-            [
-                'mime' => 'image/jpeg',
-                'extension' => ['jpg', 'jpeg'],
-                'callback' => [$this, 'convert'],
-            ],
-            [
-                'mime' => 'image/png',
-                'extension' => 'png',
-                'callback' => [$this, 'convert'],
-            ],
-            [
-                'mime' => 'image/gif',
-                'extension' => 'gif',
-                'callback' => [$this, 'convert'],
-            ],
+            'image/jpeg' => ['jpg', 'jpeg'],
+            'image/png' => 'png',
+            'image/gif' => 'gif',
         ];
     }
 
-    public function convert($imagick, $image, $extension, $mime = null) {
+    /**
+     * {@inheritdoc}
+     */
+    public function convert($imagick, $image, $extension, $mimeType) {
         try {
             $imagick->setImageFormat($extension);
         } catch (ImagickException $e) {
