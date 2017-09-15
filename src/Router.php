@@ -42,7 +42,7 @@ class Router {
      * @var array
      */
     private $routes = [
-        'image'          => '#^/users/(?<user>[a-z0-9_-]{1,})/images/(?<imageIdentifier>[A-Za-z0-9_-]{1,255})(\.(?<extension>.*))?$#',
+        'image'          => '#^/users/(?<user>[a-z0-9_-]{1,})/images/(?<imageIdentifier>[A-Za-z0-9_-]{1,255})(\.(?<extension>[^/]*))?$#',
         'globalshorturl' => '#^/s/(?<shortUrlId>[a-zA-Z0-9]{7})$#',
         'status'         => '#^/status(/|(\.(?<extension>json)))?$#',
         'images'         => '#^/users/(?<user>[a-z0-9_-]{1,})/images(/|(\.(?<extension>json)))?$#',
