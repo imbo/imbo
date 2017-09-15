@@ -35,6 +35,8 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
     private $request;
     private $response;
     private $event;
+    private $outputConverterManager;
+    private $transformationManager;
 
     /**
      * Set up the response formatter
@@ -56,6 +58,33 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
             'contentNegotiation' => $this->contentNegotiation,
         ]);
         $this->responseFormatter->setFormatter('format');
+
+        $defaultSupported = [];
+
+        foreach ($this->getOriginalMimeTypes() as $type) {
+            $defaultSupported[$type[0]] = $type[1];
+        }
+
+        $this->outputConverterManager = $this->createMock('Imbo\Image\OutputConverterManager');
+        $this->outputConverterManager->method('getMimetypeToExtensionMap')->will($this->returnValue($defaultSupported));
+        $this->outputConverterManager->method('getExtensionToMimetypeMap')->will($this->returnValue(array_flip($defaultSupported)));
+        $this->outputConverterManager->method('getSupportedMimetypes')->will($this->returnValue(array_keys($defaultSupported)));
+        $this->outputConverterManager->method('getSupportedExtensions')->will($this->returnValue(array_values($defaultSupported)));
+        $this->outputConverterManager->method('supportsExtension')->will($this->returnCallback(function ($ext) use ($defaultSupported) {
+            return in_array($ext, $defaultSupported);
+        }));
+        $this->outputConverterManager->method('getMimetypeFromExtension')->will($this->returnCallback(function ($ext) use ($defaultSupported) {
+            return array_search($ext, $defaultSupported) ?: null;
+        }));
+        $this->outputConverterManager->method('getExtensionFromMimetype')->will($this->returnCallback(function ($ext) use ($defaultSupported) {
+            return isset($defaultSupported[$ext]) ? $defaultSupported[$ext] : null;
+        }));
+
+        $this->event->expects($this->any())->method('getOutputConverterManager')->will($this->returnValue($this->outputConverterManager));
+
+        $this->transformationManager = $this->createMock('Imbo\Image\TransformationManager');
+        $this->transformationManager->method('hasAppliedTransformations')->will($this->returnValue(true));
+        $this->event->expects($this->any())->method('getTransformationManager')->will($this->returnValue($this->transformationManager));
     }
 
     /**
@@ -251,6 +280,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         // expected when the object used is a mock
         $image = new Image();
         $image->setMimeType($originalMimeType);
+        $image->setExtension($expectedFormatter);
 
         $requestHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
         $requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('image/*'));
@@ -272,6 +302,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         // expected when the object used is a mock
         $image = new Image();
         $image->setMimeType($originalMimeType);
+        $image->setExtension($expectedFormatter);
 
         $requestHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
         $this->request->headers = $requestHeaders;
@@ -283,6 +314,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
         $event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
         $event->expects($this->any())->method('getConfig')->will($this->returnValue(['contentNegotiateImages' => false]));
+        $event->expects($this->any())->method('getOutputConverterManager')->will($this->returnValue($this->outputConverterManager));
 
         $this->responseFormatter->negotiate($event);
         $this->assertSame($expectedFormatter, $this->responseFormatter->getFormatter());
@@ -350,10 +382,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
                      ->method('trigger')
                      ->with('image.transformed', ['image' => $image]);
 
-        $outputConverterManager = $this->createMock('Imbo\Image\OutputConverterManager');
-        $this->event->expects($this->any())->method('getOutputConverterManager')->will($this->returnValue($outputConverterManager));
-        $outputConverterManager->expects($this->any())->method('supportsExtension')->will($this->returnValue(true));
-        $outputConverterManager->expects($this->atLeastOnce())->method('convert');
+        $this->outputConverterManager->expects($this->atLeastOnce())->method('convert');
 
         $this->event->expects($this->once())->method('getManager')->will($this->returnValue($eventManager));
 
@@ -376,11 +405,7 @@ class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
                      ->method('trigger')
                      ->with('image.transformed', ['image' => $image]);
 
-        $outputConverterManager = $this->createMock('Imbo\Image\OutputConverterManager');
-        $this->event->expects($this->any())->method('getOutputConverterManager')->will($this->returnValue($outputConverterManager));
-        $outputConverterManager->expects($this->any())->method('getMimetypeFromExtension')->will($this->returnValue('image/jpeg'));
-        $outputConverterManager->expects($this->never())->method('supportsExtension');
-        $outputConverterManager->expects($this->never())->method('convert');
+        $this->outputConverterManager->expects($this->never())->method('convert');
 
         $this->event->expects($this->once())->method('getManager')->will($this->returnValue($eventManager));
 
