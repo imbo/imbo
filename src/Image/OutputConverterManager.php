@@ -27,10 +27,29 @@ use Imbo\Exception\InvalidArgumentException,
  * @package Image
  */
 class OutputConverterManager {
+    /**
+     * @var array Registered converters by their mime type
+     */
     protected $convertersByMimeType = [];
+
+    /**
+     * @var array Registered converters by the extensions they support
+     */
     protected $convertersByExtension = [];
+
+    /**
+     * @var array Extensions mapped to their associated mime types
+     */
     protected $extensionToMimeType = [];
+
+    /**
+     * @var array Mime types mapped to their extensions
+     */
     protected $mimeTypeToExtension = [];
+
+    /**
+     * @var Imagick The imagick instance given to a converter for configuration or to get the current image
+     */
     protected $imagick;
 
     /**

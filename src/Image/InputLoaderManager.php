@@ -28,8 +28,19 @@ use Imbo\Image\InputLoader\InputLoaderInterface,
  * @package Image
  */
 class InputLoaderManager {
+    /**
+     * @var array Registered loaders for a given mime type
+     */
     protected $loaders = [];
+
+    /**
+     * @var array Mime type mapped to the extensions the loaders support for the mime type
+     */
     protected $mimeTypeToExtension = [];
+
+    /**
+     * @var Imagick The imagick instance that a loader should insert its data into
+     */
     protected $imagick;
 
     /**
