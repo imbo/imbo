@@ -216,7 +216,7 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
     /**
      * @covers ::setImboConfigHeader
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessageRegExp |Configuration file "foobar" does not exist in the ".*?/imbo-configs" directory\.|
+     * @expectedExceptionMessageRegExp |Configuration file "foobar" does not exist in the ".*?[\\/]imbo-configs" directory\.|
      */
     public function testSettingConfigHeaderFailsWithNonExistingFile() {
         $this->context->setImboConfigHeader('foobar');
@@ -560,7 +560,7 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
     /**
      * @covers ::primeDatabase
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessageRegExp |Fixture file "foobar.php" does not exist in ".*?/tests/behat/fixtures"\.|
+     * @expectedExceptionMessageRegExp |Fixture file "foobar.php" does not exist in ".*?[\\/]tests[\\/]behat[\\/]fixtures"\.|
      */
     public function testThrowsExceptionWhenPrimingDatabaseWithScriptThatDoesNotExist() {
         $this->context->primeDatabase('foobar.php');
@@ -1250,7 +1250,7 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
     /**
      * @covers ::requestImageResourceForLocalImage
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessageRegExp |Image URL for image with path ".*?/tests/phpunit/Fixtures/image1\.png" can not be found\.|
+     * @expectedExceptionMessageRegExp |Image URL for image with path ".*?[\\/]tests[\\/]phpunit[\\/]Fixtures[\\/]image1\.png" can not be found\.|
      */
     public function testThrowsExceptionWhenTryingToRequestImageUsingLocalPathAndImageDoesNotExistInImbo() {
         $this->context->requestImageResourceForLocalImage(FIXTURES_DIR . '/image1.png');
@@ -2950,7 +2950,7 @@ class FeatureContextTest extends PHPUnit_Framework_TestCase {
     /**
      * @covers ::assertImageProperties
      * @expectedException RuntimeException
-     * @expectedExceptionMessage Imagick could not read response body: "no decode delegate for this image format
+     * @expectedExceptionMessage Imagick could not read response body:
      */
     public function testThrowsExceptionWhenAssertingImagePropertiesAndResponseDoesNotContainAValidImage() {
         $this->mockHandler->append(new Response(200, [], 'foobar'));

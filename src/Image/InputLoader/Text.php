@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\Image\Loader;
+namespace Imbo\Image\InputLoader;
 
 use Imagick;
 
@@ -20,7 +20,7 @@ use Imagick;
  * @author Mats Lindh <mats@lindh.no>
  * @package Image\Loaders
  */
-class Text implements LoaderInterface {
+class Text implements InputLoaderInterface {
     /**
      * {@inheritdoc}
      */

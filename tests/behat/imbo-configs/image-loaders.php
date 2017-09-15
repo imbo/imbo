@@ -12,9 +12,9 @@
  * Add custom image loaders for testing
  */
 return [
-    'loaders' => [
-        'Imbo\Image\Loader\Text',
-        'Imbo\Image\Loader\Tiff',
+    'inputLoaders' => [
+        'Imbo\Image\InputLoader\Text',
+        'Imbo\Image\InputLoader\Tiff',
     ],
     'rethrowFinalException' => true,
 ];

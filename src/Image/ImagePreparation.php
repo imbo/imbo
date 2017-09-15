@@ -73,7 +73,7 @@ class ImagePreparation implements ListenerInterface {
 
         // Attempt to load the image through one of the registered loaders
         try {
-            $imagick = $event->getLoaderManager()->load($mime, $imageBlob);
+            $imagick = $event->getInputLoaderManager()->load($mime, $imageBlob);
 
             if ($imagick) {
                 $size = $imagick->getImageGeometry();
@@ -95,7 +95,7 @@ class ImagePreparation implements ListenerInterface {
         // Store relevant information in the image instance and attach it to the request
         $image = new Image();
         $image->setMimeType($mime)
-              ->setExtension($event->getLoaderManager()->getExtensionFromMimetype($mime))
+              ->setExtension($event->getInputLoaderManager()->getExtensionFromMimetype($mime))
               ->setBlob($imageBlob)
               ->setWidth($size['width'])
               ->setHeight($size['height'])

@@ -440,7 +440,7 @@ $defaultConfig = [
     /**
      * Custom format loaders
      *
-     * A loader must implement Imbo\Image\Loader\LoaderInterface. The callback method will receive
+     * A loader must implement Imbo\Image\InputLoader\InputLoaderInterface. The callback method will receive
      * the current Imagick instance and the binary blob of the uploaded file.
      *
      * An implementation must define a `getMimeTypeCallback()` method and return an array with
@@ -459,7 +459,7 @@ $defaultConfig = [
      *          ];
      *     }
      */
-    'loaders' => [],
+    'inputLoaders' => [],
 
     /**
      * Custom output converters

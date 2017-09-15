@@ -8,7 +8,7 @@
  * distributed with this source code.
  */
 
-namespace Imbo\Image\Loader;
+namespace Imbo\Image\InputLoader;
 
 /**
  * Loader interface
@@ -16,7 +16,7 @@ namespace Imbo\Image\Loader;
  * @author Mats Lindh <mats@lindh.no>
  * @package Loaders
  */
-interface LoaderInterface {
+interface InputLoaderInterface {
     /**
      * Get mime types supported by the loader
      *
