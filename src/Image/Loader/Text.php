@@ -10,6 +10,8 @@
 
 namespace Imbo\Image\Loader;
 
+use Imagick;
+
 /**
  * Text .. image .. loader. Renders text to a 300x300 texture.
  *
@@ -19,6 +21,9 @@ namespace Imbo\Image\Loader;
  * @package Image\Loaders
  */
 class Text implements LoaderInterface {
+    /**
+     * {@inheritdoc}
+     */
     public function getMimeTypeCallbacks() {
         return [
             'text/plain' => [
@@ -28,7 +33,14 @@ class Text implements LoaderInterface {
         ];
     }
 
-    public function load($imagick, $blob) {
+    /**
+     * Load the image
+     *
+     * @param Imagick $imagick
+     * @param string $blob
+     * @return Imagick
+     */
+    public function load(Imagick $imagick, $blob) {
         $im = imagecreatetruecolor(300, 300);
         $textColor = imagecolorallocate($im, 0x00, 0x00, 0x00);
         $backgroundColor = imagecolorallocate($im, 0xff, 0xff, 0xff);
@@ -42,6 +54,7 @@ class Text implements LoaderInterface {
         ob_end_clean();
 
         $imagick->readImageBlob($image_data);
+
         return $imagick;
     }
 }

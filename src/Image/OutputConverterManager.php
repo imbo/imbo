@@ -10,14 +10,15 @@
 
 namespace Imbo\Image;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Image\Loader\LoaderInterface;
+use Imbo\EventManager\EventInterface;
+use Imbo\Image\Loader\LoaderInterface;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Image\OutputConverter\OutputConverterInterface;
 
 /**
- * Output converter manager. This class manages converting images to the requested output format
- * through registered plugins.
+ * Output converter manager
+ *
+ * This class manages converting images to the requested output format through registered plugins.
  *
  * A plugin should update the given model to reflect the new state. By calling `setBlob`, the plugin
  * can update the actual binary data returned to the client.
@@ -49,10 +50,9 @@ class OutputConverterManager {
 
     public function registerConverter(OutputConverterInterface $converter) {
         foreach ($converter->getSupportedFormatsWithCallbacks() as $formatEntry) {
-            if (!is_array($formatEntry) || !isset($formatEntry['mime'], $formatEntry['extension'], $formatEntry['callback']))
-            {
-                throw new InvalidArgumentException('Output converted returned invalid converter definition (\'mime\', \'extension\', and \'callback\') ' .
-                                                   'must be defined for each supported format. Got \'' . json_encode($formatEntry) . '\'', 500);
+            if (!is_array($formatEntry) || !isset($formatEntry['mime'], $formatEntry['extension'], $formatEntry['callback'])) {
+                throw new InvalidArgumentException('Output converted returned invalid converter definition ("mime", "extension", and "callback") ' .
+                                                   'must be defined for each supported format. Got "' . json_encode($formatEntry) . '"', 500);
             }
 
             $mimes = $formatEntry['mime'];
