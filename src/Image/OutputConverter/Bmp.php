@@ -10,6 +10,7 @@
 
 namespace Imbo\Image\OutputConverter;
 
+use Imbo\Exception\OutputConverterException;
 use Imbo\Model\Image;
 use Imagick;
 use ImagickException;
@@ -37,7 +38,7 @@ class Bmp implements OutputConverterInterface {
         try {
             $imagick->setImageFormat($extension);
         } catch (ImagickException $e) {
-            throw new OutputConversionException($e->getMessage(), 400, $e);
+            throw new OutputConverterException($e->getMessage(), 400, $e);
         }
 
         $image->hasBeenTransformed(true);
