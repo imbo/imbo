@@ -56,6 +56,7 @@ class OutputConverterManager {
      * Add a list of converters to the available output converters.
      *
      * @param array $converters A list of objects or object names (strings) implementing `OutputConverterInterface`.
+     * @return self
      */
     public function addConverters(array $converters) {
         foreach ($converters as $converter) {
@@ -70,12 +71,15 @@ class OutputConverterManager {
 
             $this->registerConverter($converter);
         }
+
+        return $this;
     }
 
     /**
      * Register a single output converter with the manager to make it available inside Imbo.
      *
      * @param OutputConverterInterface $converter The converter to register
+     * @return self
      */
     public function registerConverter(OutputConverterInterface $converter) {
         foreach ($converter->getSupportedMimeTypes() as $mimeType => $extensions) {
@@ -105,6 +109,8 @@ class OutputConverterManager {
                 $this->convertersByExtension[$extension][] = $converter;
             }
         }
+
+        return $this;
     }
 
     /**
@@ -211,8 +217,11 @@ class OutputConverterManager {
      * Set the imagick instance that will be configured for output or used to get raw data to perform a conversion.
      *
      * @param Imagick $imagick
+     * @return self
      */
     public function setImagick(Imagick $imagick) {
         $this->imagick = $imagick;
+
+        return $this;
     }
 }
