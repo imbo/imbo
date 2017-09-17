@@ -55,7 +55,7 @@ class InputLoaderManager {
     /**
      * Add a list of input loaders to the manager.
      *
-     * @param array<InputLoaderInterface> $loaders A list of loaders to add to the manager.
+     * @param array<InputLoaderInterface|string> $loaders A list of loaders to add to the manager.
      */
     public function addLoaders(array $loaders) {
         foreach ($loaders as $loader) {

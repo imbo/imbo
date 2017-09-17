@@ -94,15 +94,15 @@ class Application {
         }
 
         // Create a loader manager and register any loaders
-        $loaderManager = new InputLoaderManager();
+        $inputLoaderManager = new InputLoaderManager();
 
         if (isset($config['inputLoaders']) && !is_array($config['inputLoaders'])) {
             throw new InvalidArgumentException('The "inputLoaders" configuration key must be specified as an array', 500);
         } else if (isset($config['inputLoaders']) && is_array($config['inputLoaders'])) {
-            $loaderManager->addLoaders($config['inputLoaders']);
+            $inputLoaderManager->addLoaders($config['inputLoaders']);
         }
 
-        $loaderManager->registerLoader(new Image\InputLoader\Basic());
+        $inputLoaderManager->registerLoader(new Image\InputLoader\Basic());
 
         // Create a output conversion manager and register any converters
         $outputConverterManager = new OutputConverterManager();
@@ -127,7 +127,7 @@ class Application {
             'manager' => $eventManager,
             'accessControl' => $accessControl,
             'transformationManager' => $transformationManager,
-            'inputLoaderManager' => $loaderManager,
+            'inputLoaderManager' => $inputLoaderManager,
             'outputConverterManager' => $outputConverterManager,
         ]);
         $eventManager->setEventTemplate($event);

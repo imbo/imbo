@@ -13,7 +13,7 @@ namespace Imbo\Image;
 use Imbo\Exception\InvalidArgumentException,
     Imbo\Image\OutputConverter\OutputConverterInterface,
     Imbo\Model\Image,
-    \Imagick;
+    Imagick;
 
 /**
  * Output converter manager
@@ -115,7 +115,7 @@ class OutputConverterManager {
      * @param string $mime Mime type we should look up the converter from, if available
      * @return bool|null Returns true if it we were able to convert or null if we failed
      */
-    public function convert($image, $extension, $mime = null) {
+    public function convert(Image $image, $extension, $mime = null) {
         if ($this->supportsExtension($extension)) {
             foreach ($this->convertersByExtension[$extension] as $converter) {
                 $result = $converter->convert($this->imagick, $image, $extension, $mime);

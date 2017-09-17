@@ -47,6 +47,8 @@ class TransformationManager implements ListenerInterface {
 
     /**
      * Track if the manager has attempted to apply transformations.
+     *
+     * @var boolean
      */
     protected $transformationsApplied = false;
 

@@ -10,10 +10,10 @@
 
 namespace Imbo\Image\InputLoader;
 
-use \Imagick;
+use Imagick;
 
 /**
- * Loader interface
+ * Input loader interface
  *
  * @author Mats Lindh <mats@lindh.no>
  * @package Loaders
@@ -22,10 +22,10 @@ interface InputLoaderInterface {
     /**
      * Get mime types supported by the loader
      *
-     * Each element in the returned array represents a supported image format, with the
-     * mime types as the key and the extension as the value.
+     * Each element in the returned array represents a supported image format, with the mime types
+     * as the key and the extension as the value.
      *
-     * @return array[]
+     * @return array
      */
     function getSupportedMimeTypes();
 
