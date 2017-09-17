@@ -47,15 +47,19 @@ class InputLoaderManager {
      * Set imagick instance to pass on to loaders. This is usually populated by a dedicated event listener.
      *
      * @param Imagick $imagick
+     * @return self
      */
     public function setImagick(Imagick $imagick) {
         $this->imagick = $imagick;
+
+        return $this;
     }
 
     /**
      * Add a list of input loaders to the manager.
      *
      * @param array<InputLoaderInterface|string> $loaders A list of loaders to add to the manager.
+     * @return self
      */
     public function addLoaders(array $loaders) {
         foreach ($loaders as $loader) {
@@ -70,12 +74,15 @@ class InputLoaderManager {
 
             $this->registerLoader($loader);
         }
+
+        return $this;
     }
 
     /**
      * Register a specific input loader for the manager to use.
      *
      * @param InputLoaderInterface $loader InputLoader to register
+     * @return self
      */
     public function registerLoader(InputLoaderInterface $loader) {
         foreach ($loader->getSupportedMimeTypes() as $mime => $extensions) {
@@ -97,6 +104,8 @@ class InputLoaderManager {
 
             $this->loaders[$mime][] = $loader;
         }
+
+        return $this;
     }
 
     /**
