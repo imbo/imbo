@@ -445,9 +445,11 @@ $defaultConfig = [
      * See the Imbo\Image\InputLoader\Basic input loader for the default fallback loader as an
      * example.
      *
-     * @var Imbo\Image\InputLoader\InputLoaderInterface[]
+     * @var Imbo\Image\InputLoader\InputLoaderInterface[]|string[]
      */
-    'inputLoaders' => [],
+    'inputLoaders' => [
+        'basic' => Image\InputLoader\Basic::class,
+    ],
 
     /**
      * Custom output converters
@@ -463,9 +465,11 @@ $defaultConfig = [
      * _don't_ call `$image->hasBeenTransformed(true)` as you've handled the conversion to binary
      * data yourself.
      *
-     * @var Imbo\Image\OutputConverter\OutputConverterInterface[]
+     * @var Imbo\Image\OutputConverter\OutputConverterInterface[]|string[]
      */
-    'outputConverters' => [],
+    'outputConverters' => [
+        'basic' => Image\OutputConverter\Basic::class,
+    ],
 ];
 
 // Keep all external configuration separate
