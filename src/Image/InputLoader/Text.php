@@ -47,7 +47,5 @@ class Text implements InputLoaderInterface {
         ob_end_clean();
 
         $imagick->readImageBlob($image_data);
-
-        return $imagick;
     }
 }

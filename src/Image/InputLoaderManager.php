@@ -104,7 +104,9 @@ class InputLoaderManager {
      *
      * @param string $mime Mime type of the binary blob
      * @param string $blob Binary data to load / rasterize
-     * @return bool|null|Imagick Returns false if all the registered loaders was unable to load the blob
+     * @return boolean|null|Imagick Returns false if all the registered loaders was unable to load
+     *                              the blob. If any of the loaders ends up with a result other than
+     *                              false, the imagick instance will be returned.
      */
     public function load($mime, $blob) {
         if (!isset($this->loaders[$mime])) {
@@ -112,10 +114,13 @@ class InputLoaderManager {
         }
 
         foreach ($this->loaders[$mime] as $loader) {
-            $state = $loader->load($this->imagick, $blob, $mime);
+            $result = $loader->load($this->imagick, $blob, $mime);
 
-            if ($state !== false) {
-                return $state;
+            // If the result is false, let the loop continue to try more loaders, if they exist. If
+            // the result is anything else, return the imagick instance as this means that the
+            // loader managed to load the image
+            if ($result !== false) {
+                return $this->imagick;
             }
         }
 
