@@ -84,9 +84,11 @@ class Imagick implements ListenerInterface, ImagickAware {
         }
 
         $shouldOptimize = $jpegSizeHintEnabled && !$event->hasArgument('skipOptimization');
+
         if ($shouldOptimize && $eventName === 'image.loaded') {
             // See if we can hint to imagick that we expect a smaller output
             $minSize = $event->getTransformationManager()->getMinimumImageInputSize($event);
+
             if ($minSize) {
                 $inputSize = $minSize['width'] . 'x' . $minSize['height'];
                 $this->imagick->setOption('jpeg:size', $inputSize);
