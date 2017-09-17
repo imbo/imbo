@@ -102,8 +102,6 @@ class Application {
             $inputLoaderManager->addLoaders($config['inputLoaders']);
         }
 
-        $inputLoaderManager->registerLoader(new Image\InputLoader\Basic());
-
         // Create a output conversion manager and register any converters
         $outputConverterManager = new OutputConverterManager();
 
@@ -112,8 +110,6 @@ class Application {
         } else if (isset($config['outputConverters']) && is_array($config['outputConverters'])) {
             $outputConverterManager->addConverters($config['outputConverters']);
         }
-
-        $outputConverterManager->registerConverter(new Image\OutputConverter\Basic());
 
         // Create the event manager and the event template
         $eventManager = new EventManager();

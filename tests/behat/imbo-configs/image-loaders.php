@@ -13,7 +13,7 @@
  */
 return [
     'inputLoaders' => [
-        'Imbo\Image\InputLoader\Text',
+        'text' => 'Imbo\Image\InputLoader\Text',
     ],
     'rethrowFinalException' => true,
 ];
