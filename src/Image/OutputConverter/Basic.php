@@ -10,6 +10,10 @@
 
 namespace Imbo\Image\OutputConverter;
 
+use Imbo\Model\Image;
+use Imagick;
+use ImagickException;
+
 /**
  * Basic output converter that supports gif/png/jpg.
  *
@@ -31,7 +35,7 @@ class Basic implements OutputConverterInterface {
     /**
      * {@inheritdoc}
      */
-    public function convert($imagick, $image, $extension, $mimeType) {
+    public function convert(Imagick $imagick, Image $image, $extension, $mimeType) {
         try {
             $imagick->setImageFormat($extension);
         } catch (ImagickException $e) {

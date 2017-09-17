@@ -10,8 +10,8 @@
 
 namespace Imbo\Image\OutputConverter;
 
-use Imbo\Image,
-    \Imagick;
+use Imbo\Model\Image;
+use Imagick;
 
 /**
  * Loader interface
@@ -41,5 +41,5 @@ interface OutputConverterInterface {
      * @param string $mimeType Mime type of the file being output.
      * @return null|boolean|Imagick
      */
-    function convert($imagick, $image, $extension, $mimeType);
+    function convert(Imagick $imagick, Image $image, $extension, $mimeType);
 }

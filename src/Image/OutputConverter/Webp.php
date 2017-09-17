@@ -10,6 +10,10 @@
 
 namespace Imbo\Image\OutputConverter;
 
+use Imbo\Model\Image;
+use Imagick;
+use ImagickException;
+
 /**
  * Output converter for outputting Webp
  *
@@ -29,7 +33,7 @@ class Webp implements OutputConverterInterface {
     /**
      * {@inheritdoc}
      */
-    public function convert($imagick, $image, $extension, $mime) {
+    public function convert(Imagick $imagick, Image $image, $extension, $mime) {
         try {
             $imagick->setImageFormat($extension);
         } catch (ImagickException $e) {

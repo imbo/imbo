@@ -10,7 +10,7 @@
 
 namespace Imbo\Image\InputLoader;
 
-use \Imagick;
+use Imagick;
 
 /**
  * Basic image loader / fallback image loader
@@ -32,11 +32,7 @@ class Basic implements InputLoaderInterface {
     }
 
     /**
-     * Load the given image
-     *
-     * @param Imagick $imagick
-     * @param string $blob
-     * @return Imagick
+     * {@inheritdoc}
      */
     public function load(Imagick $imagick, $blob, $mimeType) {
         $imagick->readImageBlob($blob);
