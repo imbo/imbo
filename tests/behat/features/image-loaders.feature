@@ -52,3 +52,22 @@ Feature: Imbo allows plugins for loading new file types
               "extension": "txt"
           }
           """
+
+  Scenario: Add an image with several loaders for same mime type and a null loader
+    Given Imbo uses the "image-loaders-fallback.php" configuration
+    Given the request body contains "tests/behat/fixtures/faces.jpg"
+    And I use "publicKey" and "privateKey" for public and private keys
+    And I sign the request
+    When I request "/users/user/images" using HTTP "POST"
+    Then the response status line is "201 Created"
+    And the "Content-Type" response header is "application/json"
+    And the response body contains JSON:
+          """
+          {
+              "imageIdentifier": "@regExp(/^[a-zA-Z0-9_-]+$/)",
+              "width": 300,
+              "height": 300,
+              "extension": "jpg"
+          }
+          """
+
