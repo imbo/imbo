@@ -47,7 +47,6 @@ class Text implements InputLoaderInterface {
     }
 }
 
-
 /**
  * Add custom image loaders for testing
  */
