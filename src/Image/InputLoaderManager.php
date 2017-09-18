@@ -102,7 +102,7 @@ class InputLoaderManager {
                 $this->mimeTypeToExtension[$mime][] = $extension;
             }
 
-            $this->loaders[$mime][] = $loader;
+            array_unshift($this->loaders[$mime], $loader);
         }
 
         return $this;
