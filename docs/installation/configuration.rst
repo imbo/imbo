@@ -1105,6 +1105,69 @@ The index resource (:ref:`index-resource`) simply lists some URLs related to the
         // ...
     ];
 
+.. _configuration-inputloader:
+
+Input loaders - ``inputLoaders``
+--------------------------------------------
+
+The ``inputLoaders`` configuration element is an associative array of input loaders. The values in the array must be strings representing a FQCN of an input loader, or an instance of an input loader. In both cases the class specified must implement the ``Imbo\Image\InputLoader\InputLoaderInterface`` interface.
+
+The default configuration includes a "basic" input loader, that supports the following image types:
+
+- ``image/png``
+- ``image/jpeg``
+- ``image/gif``
+- ``image/tiff``
+
+To add more input loaders, simply specify them in the configuration file:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'inputLoaders' => [
+            'custom-loader' => My\Custom\Loader::class,
+            'another-custom-loader' => new My\Other\Custom\Loader(),
+        ],
+
+        // ...
+    ];
+
+The keys in the array are not used for anything in Imbo, but enables you to override default settings. The basic input loader uses the ``basic`` key as seen in the default configuration file.
+
+.. _configuration-outputconverters:
+
+Output converters - ``outputConverters``
+--------------------------------------------
+
+The ``outputConverters`` configuration element is an associative array of output converters. The values in the array must be strings representing a FQCN of an output converter, or an instance of an output converter. In both cases the class specified must implement the ``Imbo\Image\OutputConverter\OutputConverterInterface`` interface.
+
+The default configuration includes a "basic" output converter, that supports the following image types:
+
+- ``image/png``
+- ``image/jpeg``
+- ``image/gif``
+
+To add more output converters, simply specify them in the configuration file:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'outputConverters' => [
+            'custom-converter' => My\Custom\Converter::class,
+            'another-custom-converter' => new My\Other\Custom\Converter(),
+        ],
+
+        // ...
+    ];
+
+The keys in the array are not used for anything in Imbo, but enables you to override default settings. The basic output converter uses the ``basic`` key as seen in the default configuration file.
+
 .. _SHA-256: https://en.wikipedia.org/wiki/SHA-2
 .. _openssl_random_pseudo_bytes: https://php.net/openssl_random_pseudo_bytes
 .. _MongoDB PECL extension: https://pecl.php.net/package/mongodb

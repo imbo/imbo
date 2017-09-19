@@ -10,11 +10,12 @@
 
 namespace ImboUnitTest\Image;
 
-use Imbo\Image\InputLoader\Basic,
-    Imbo\Image\InputLoader\InputLoaderInterface,
-    Imbo\Image\InputLoaderManager,
-    PHPUnit_Framework_TestCase,
-    stdClass;
+use Imbo\Image\InputLoader\Basic;
+use Imbo\Image\InputLoader\Text;
+use Imbo\Image\InputLoader\InputLoaderInterface;
+use Imbo\Image\InputLoaderManager;
+use PHPUnit_Framework_TestCase;
+use stdClass;
 
 /**
  * @coversDefaultClass Imbo\Image\InputLoaderManager
@@ -55,6 +56,7 @@ class InputLoaderManagerTest extends PHPUnit_Framework_TestCase {
     public function testCanAddLoadersAsStrings() {
         $this->assertSame($this->manager, $this->manager->addLoaders([
             new Basic(),
+            Text::class
         ]));
     }
 
@@ -65,11 +67,13 @@ class InputLoaderManagerTest extends PHPUnit_Framework_TestCase {
     public function testCanGetExtensionFromMimeType() {
         $this->manager->addLoaders([
             new Basic(),
+            new Text(),
         ]);
         $this->assertSame('jpg', $this->manager->getExtensionFromMimeType('image/jpeg'));
         $this->assertSame('png', $this->manager->getExtensionFromMimeType('image/png'));
         $this->assertSame('gif', $this->manager->getExtensionFromMimeType('image/gif'));
         $this->assertSame('tif', $this->manager->getExtensionFromMimeType('image/tiff'));
+        $this->assertSame('txt', $this->manager->getExtensionFromMimeType('text/plain'));
     }
 
     /**
@@ -100,8 +104,8 @@ class InputLoaderManagerTest extends PHPUnit_Framework_TestCase {
                 ->will($this->returnValue(null));
 
         $this->manager->setImagick($imagick)
-                      ->registerLoader($loader2)
-                      ->registerLoader($loader1);
+                      ->registerLoader($loader1)
+                      ->registerLoader($loader2);
 
         $this->assertSame(
             $imagick,

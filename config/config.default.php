@@ -438,9 +438,9 @@ $defaultConfig = [
     'indexRedirect' => null,
 
     /**
-     * Custom format loaders
+     * Input loaders
      *
-     * Each loader must implement Imbo\Image\InputLoader\InputLoaderInterface.
+     * Each input loader must implement Imbo\Image\InputLoader\InputLoaderInterface.
      *
      * See the Imbo\Image\InputLoader\Basic input loader for the default fallback loader as an
      * example.
