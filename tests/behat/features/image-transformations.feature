@@ -32,6 +32,7 @@ Feature: Imbo enables dynamic transformations of images
             | border:mode=inline,width=4,height=5          | 599   | 417    |
             | canvas                                       | 599   | 417    |
             | canvas:width=700,height=600                  | 700   | 600    |
+            | clip                                         | 599   | 417    |
             | contrast                                     | 599   | 417    |
             | contrast:sharpen:-1                          | 599   | 417    |
             | contrast:sharpen:1                           | 599   | 417    |
