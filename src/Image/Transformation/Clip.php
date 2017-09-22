@@ -29,6 +29,11 @@ class Clip extends Transformation {
             $this->imagick->clipImage();
             $this->imagick->setImageAlphaChannel(\Imagick::ALPHACHANNEL_OPAQUE);
         } catch (ImagickException $e) {
+            // NoClipPathDefined - the image doesn't have a clip path, but this isn't an fatal error.
+            if ($e->getCode() == 410) {
+                return;
+            }
+
             throw new TransformationException($e->getMessage(), 400, $e);
         }
 
