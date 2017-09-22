@@ -203,6 +203,7 @@ $defaultConfig = [
         'blur' => 'Imbo\Image\Transformation\Blur',
         'border' => 'Imbo\Image\Transformation\Border',
         'canvas' => 'Imbo\Image\Transformation\Canvas',
+        'clip' => 'Imbo\Image\Transformation\Clip',
         'compress' => 'Imbo\Image\Transformation\Compress',
         'contrast' => 'Imbo\Image\Transformation\Contrast',
         'convert' => 'Imbo\Image\Transformation\Convert',
