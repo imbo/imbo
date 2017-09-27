@@ -39,7 +39,7 @@ class EightbimMetadataTest extends ListenerTests {
         return $this->listener;
     }
 
-    public function testCanFilterData() {
+    public function testCanExtractMetadata() {
         $user = 'user';
         $imageIdentifier = 'imageIdentifier';
         $blob = file_get_contents(FIXTURES_DIR . '/jpeg-with-multiple-paths.jpg');
