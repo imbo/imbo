@@ -28,7 +28,7 @@ Imbo access control - ``accessControl``
 
 Imbo catalogs stored images under a ``user``. To add an image to a given user, you need a public and private key pair. This pair is used to sign requests to Imbo's API and ensures that the API can't be accessed without knowing the private key.
 
-Multiple public keys can be given access to a user, and you can also configure a public key to have access to several users. It's important to note that a ``user`` doesn't have to be created in any way - as long as a public key is defined to have access to a given user, you're ready to start adding images.
+Multiple public keys can be given access to a user, and you can also configure a public key to have access to several users. It's important to note that a ``user`` does not have to be created in any way - as long as a public key is defined to have access to a given user, you're ready to start adding images.
 
 Public keys can be configured to have varying degrees of access. For instance, you might want one public key for write operations (such as adding and deleting images) and a different public key for read operations (such as viewing images and applying transformations to them). Access is defined on a ``resource`` basis - which basically translates to an API endpoint and an HTTP method. To retrieve an image, for instance, you would give access to the ``image.get`` resource.
 
@@ -630,7 +630,7 @@ Since HTTP headers can be spoofed, Imbo does not trust these proxy headers by de
 Authentication protocol - ``authentication``
 --------------------------------------------
 
-Imbo generates access tokens and authentication signatures based on the incoming URL, and includes the protocol (by default). This can sometimes be problematic, for instance when Imbo is behind a load balancer which doesn't send ``X-Forwarded-Proto`` header, or if you want to use protocol-less image URLs on the client side (``//imbo.host/users/some-user/images/img``).
+Imbo generates access tokens and authentication signatures based on the incoming URL, and includes the protocol (by default). This can sometimes be problematic, for instance when Imbo is behind a load balancer which does not send ``X-Forwarded-Proto`` header, or if you want to use protocol-less image URLs on the client side (``//imbo.host/users/some-user/images/img``).
 
 Setting the ``protocol`` option under ``authentication`` allows you to control how Imbo's authentication should behave. The option has the following possible values:
 
