@@ -23,7 +23,7 @@ use Imbo\EventManager\EventInterface,
  * @author Mats Lindh <mats@lindh.no>
  * @package Event\Listeners
  */
-class EightbimMetadata implements ListenerInterface {
+class EightbimMetadata implements ListenerInterface, ImagickAware {
     /**
      * @var \Imagick
      */
@@ -39,7 +39,8 @@ class EightbimMetadata implements ListenerInterface {
     /**
      * Set the Imagick instance to be used - the instance will be cloned to avoid polluting the existing imagick object.
      *
-     * @param $imagick
+     * @param \Imagick $imagick
+     * @return null
      */
     public function setImagick(\Imagick $imagick) {
         $this->imagick = clone $imagick;
@@ -68,12 +69,11 @@ class EightbimMetadata implements ListenerInterface {
         $image = $event->getRequest()->getImage();
 
         // This can be replaced with ImagickAware and clone $imagick when the ImagickAware patch has been merged
-        $imagick = new \Imagick();
-        $imagick->readImageBlob($image->getBlob());
+        $this->imagick->readImageBlob($image->getBlob());
 
         // Get 8BIM-properties from image - this seems to be the best way to get the identifiers with path names in a raw format
-        $imagick->setImageFormat('8bimtext');
-        $data = $imagick->getImageBlob();
+        $this->imagick->setImageFormat('8bimtext');
+        $data = $this->imagick->getImageBlob();
 
         // Find paths - all paths are located in identifiers 2000 through 2997
         preg_match_all('/^8BIM#2(\d{3})#(.+?)=/m', $data, $matches);
