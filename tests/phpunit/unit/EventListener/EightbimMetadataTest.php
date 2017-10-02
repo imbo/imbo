@@ -13,16 +13,22 @@ namespace ImboUnitTest\EventListener;
 use Imbo\EventListener\EightbimMetadata;
 
 /**
- * @covers Imbo\EventListener\ExifMetadata
+ * @covers Imbo\EventListener\EightbimMetadata
  * @group unit
  * @group listeners
  */
 class EightbimMetadataTest extends ListenerTests {
     /**
+     * @var EightbimMetadata
+     */
+    protected $listener;
+
+    /**
      * Set up the listener
      */
     public function setUp() {
         $this->listener = new EightbimMetadata();
+        $this->listener->setImagick(new \Imagick());
     }
 
     /**
@@ -61,8 +67,7 @@ class EightbimMetadataTest extends ListenerTests {
         $event->expects($this->exactly(2))->method('getRequest')->will($this->returnValue($request));
         $event->expects($this->once())->method('getDatabase')->will($this->returnValue($database));
 
-        $listener = new EightbimMetadata();
-        $listener->populate($event);
-        $listener->save($event);
+        $this->listener->populate($event);
+        $this->listener->save($event);
     }
 }
