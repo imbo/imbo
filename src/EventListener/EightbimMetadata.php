@@ -16,7 +16,7 @@ use Imbo\EventManager\EventInterface,
     Imbo\Exception\DatabaseException;
 
 /**
- * 8bim metadata event listener
+ * 8BIM metadata event listener
  *
  * This listener will look for properties stored in the image, and store certain metadata (at the moment, the available clipping paths) in Imbo.
  *
@@ -59,7 +59,7 @@ class EightbimMetadata implements ListenerInterface {
     }
 
     /**
-     * Read 8bim data from incoming image
+     * Read 8BIM data from incoming image
      *
      * @param EventInterface $event The triggered event
      * @return array
@@ -79,7 +79,7 @@ class EightbimMetadata implements ListenerInterface {
         preg_match_all('/^8BIM#2(\d{3})#(.+?)=/m', $data, $matches);
 
         if ($matches) {
-            // Order the paths by their ids in the 8bim format
+            // Order the paths by their ids in the 8BIM format
             $paths = [];
 
             foreach ($matches[1] as $idx => $pathId) {
