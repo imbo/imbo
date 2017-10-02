@@ -9,7 +9,7 @@
  */
 
 /**
- * Enable the EXIF metadata listener
+ * Enable the 8BIM metadata listener
  */
 return [
     'eventListeners' => [
