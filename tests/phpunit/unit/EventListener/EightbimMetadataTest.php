@@ -13,7 +13,7 @@ namespace ImboUnitTest\EventListener;
 use Imbo\EventListener\EightbimMetadata;
 
 /**
- * @covers Imbo\EventListener\EightbimMetadata
+ * @covers EightbimMetadata
  * @group unit
  * @group listeners
  */
@@ -45,6 +45,10 @@ class EightbimMetadataTest extends ListenerTests {
         return $this->listener;
     }
 
+    /**
+     * @covers EightbimMetadata::populate
+     * @covers EightbimMetadata::save
+     */
     public function testCanExtractMetadata() {
         $user = 'user';
         $imageIdentifier = 'imageIdentifier';
