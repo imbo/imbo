@@ -73,7 +73,6 @@ class Clip extends Transformation {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
 
-
         $this->image->hasBeenTransformed(true);
     }
 }
