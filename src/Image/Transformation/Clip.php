@@ -63,7 +63,10 @@ class Clip extends Transformation {
             // NoClipPathDefined - the image doesn't have a clipping path, but this isn't a fatal error.
             if ($e->getCode() == 410) {
                 // but we need to reset the alpha channel mode in case someone else is doing something with it
-                $this->imagick->setImageAlphaChannel($currentAlphaChannelMode);
+                if ($currentAlphaChannelMode) {
+                    $this->imagick->setImageAlphaChannel($currentAlphaChannelMode);
+                }
+
                 return;
             }
 
