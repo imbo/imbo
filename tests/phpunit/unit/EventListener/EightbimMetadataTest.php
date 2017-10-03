@@ -11,9 +11,10 @@
 namespace ImboUnitTest\EventListener;
 
 use Imbo\EventListener\EightbimMetadata;
+use Imbo\Exception\DatabaseException;
 
 /**
- * @covers Imbo\EventListener\EightbimMetadata
+ * @coversDefaultClass Imbo\EventListener\EightbimMetadata
  * @group unit
  * @group listeners
  */
@@ -46,21 +47,23 @@ class EightbimMetadataTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\EightbimMetadata::populate
-     * @covers Imbo\EventListener\EightbimMetadata::save
+     * @covers ::populate
+     * @covers ::save
      */
     public function testCanExtractMetadata() {
         $user = 'user';
         $imageIdentifier = 'imageIdentifier';
         $blob = file_get_contents(FIXTURES_DIR . '/jpeg-with-multiple-paths.jpg');
 
-        $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue($blob));
+        $image = $this->createConfiguredMock('Imbo\Model\Image', [
+            'getImageIdentifier' => $imageIdentifier,
+            'getBlob' => $blob,
+        ]);
 
-        $request = $this->createMock('Imbo\Http\Request\Request');
-        $request->expects($this->once())->method('getUser')->will($this->returnValue($user));
-        $request->expects($this->any())->method('getImage')->will($this->returnValue($image));
+        $request = $this->createConfiguredMock('Imbo\Http\Request\Request', [
+            'getUser' => $user,
+            'getImage' => $image,
+        ]);
 
         $database = $this->createMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('updateMetadata')->with($user, $imageIdentifier, [
@@ -75,6 +78,58 @@ class EightbimMetadataTest extends ListenerTests {
         $this->assertInternalType('array', $addedPaths);
         $this->assertEquals($addedPaths, ['paths' => ['House', 'Panda']]);
 
+        $this->listener->save($event);
+    }
+
+    /**
+     * @covers ::save
+     */
+    public function testReturnsEarlyOnMissingProperties() {
+        $event = $this->createMock('Imbo\EventManager\Event');
+        $event->expects($this->never())->method('getRequest');
+        $this->assertNull($this->listener->save($event), 'Did not expect method to return anything');
+    }
+
+    /**
+     * @covers ::save
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Could not store 8BIM-metadata
+     * @expectedExceptionCode 500
+     */
+    public function testDeletesImageWhenStoringMetadataFails() {
+        $user = 'user';
+        $imageIdentifier = 'imageIdentifier';
+        $blob = file_get_contents(FIXTURES_DIR . '/jpeg-with-multiple-paths.jpg');
+
+        $image = $this->createConfiguredMock('Imbo\Model\Image', [
+            'getImageIdentifier' => $imageIdentifier,
+            'getBlob' => $blob,
+        ]);
+
+        $request = $this->createConfiguredMock('Imbo\Http\Request\Request', [
+            'getUser' => $user,
+            'getImage' => $image,
+        ]);
+
+        $database = $this->createMock('Imbo\Database\DatabaseInterface');
+        $database
+            ->expects($this->once())
+            ->method('updateMetadata')
+            ->with($user, $imageIdentifier, [
+                'paths' => ['House', 'Panda'],
+            ])
+            ->willThrowException(new DatabaseException('No can do'));
+        $database
+            ->expects($this->once())
+            ->method('deleteImage')
+            ->with($user, $imageIdentifier);
+
+        $event = $this->createConfiguredMock('Imbo\EventManager\Event', [
+            'getRequest' => $request,
+            'getDatabase' => $database,
+        ]);
+
+        $this->listener->populate($event);
         $this->listener->save($event);
     }
 }
