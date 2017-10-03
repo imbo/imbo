@@ -10,12 +10,13 @@
 
 namespace ImboUnitTest\Image\Transformation;
 
-use Imbo\Exception\InvalidArgumentException,
-    Imbo\Image\Transformation\Clip,
-    Imbo\Model\Image;
+use Imbo\Image\Transformation\Clip,
+    Imbo\Model\Image,
+    Imagick,
+    ImagickException;
 
 /**
- * @covers Clip
+ * @coversDefaultClass Imbo\Image\Transformation\Clip
  * @group unit
  * @group transformations
  */
@@ -33,7 +34,7 @@ class ClipTest extends \PHPUnit_Framework_TestCase {
     /**
      * Imagick instance for testing
      *
-     * @var \Imagick
+     * @var Imagick
      */
     private $imagick;
 
@@ -62,7 +63,7 @@ class ClipTest extends \PHPUnit_Framework_TestCase {
         $this->transformation->setEvent($event);
         $this->transformation->setImage($this->image);
 
-        $this->imagick = new \Imagick();
+        $this->imagick = new Imagick();
         $this->imagick->readImageBlob($blob);
         $this->transformation->setImagick($this->imagick);
     }
@@ -75,23 +76,25 @@ class ClipTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Clip::transform
-     * @expectedException InvalidArgumentException
+     * @covers ::transform
+     * @expectedException Imbo\Exception\InvalidArgumentException
      * @expectedExceptionMessageRegExp #clipping path .* not found#
+     * @expectedExceptionCode 400
+     *
      */
     public function testExceptionIfMissingNamedPath() {
         $this->transformation->transform(['name' => 'foo']);
     }
 
     /**
-     * @covers Clip::transform
+     * @covers ::transform
      */
     public function testNoExceptionIfMissingNamedPathButIgnoreSet() {
         $this->transformation->transform(['name' => 'foo', 'ignoreUnknownPath' => '']);
     }
 
     /**
-     * @covers Clip::transform
+     * @covers ::transform
      */
     public function testTransformationHappensWithMatchingPath() {
         $this->image->expects($this->atLeastOnce())->method('hasBeenTransformed')->with(true);
@@ -99,7 +102,7 @@ class ClipTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Clip::transform
+     * @covers ::transform
      */
     public function testTransformationHappensWithoutExplicitPath() {
         $this->image->expects($this->atLeastOnce())->method('hasBeenTransformed')->with(true);
@@ -107,7 +110,7 @@ class ClipTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers Clip::transform
+     * @covers ::transform
      */
     public function testTransformationDoesntHappenWhenNoPathIsPresent() {
         $this->imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.jpg'));
@@ -116,4 +119,59 @@ class ClipTest extends \PHPUnit_Framework_TestCase {
         $this->transformation->transform([]);
     }
 
+    /**
+     * @covers ::transform
+     */
+    public function testWillResetAlphaChannelWhenTheImageDoesNotHaveAClippingPath() {
+        $imagick = $this->createMock('Imagick');
+        $imagick
+            ->expects($this->once())
+            ->method('getImageAlphaChannel')
+            ->willReturn(Imagick::ALPHACHANNEL_COPY);
+
+        $imagick
+            ->expects($this->exactly(2))
+            ->method('setImageAlphaChannel')
+            ->withConsecutive(
+                [Imagick::ALPHACHANNEL_TRANSPARENT],
+                [Imagick::ALPHACHANNEL_COPY] // Reset to the one fetched above
+            );
+
+        $imagick
+            ->expects($this->once())
+            ->method('clipImage')
+            ->willThrowException(new ImagickException('some error', 410));
+
+        $this->transformation
+            ->setImagick($imagick)
+            ->transform([]);
+    }
+
+    /**
+     * @covers ::transform
+     * @expectedException Imbo\Exception\TransformationException
+     * @expectedExceptionMessage Some error
+     * @expectedExceptionCode 400
+     */
+    public function testThrowsExceptionWhenImagickFailsWithAFatalError() {
+        $imagick = $this->createMock('Imagick');
+        $imagick
+            ->expects($this->once())
+            ->method('getImageAlphaChannel')
+            ->willReturn(Imagick::ALPHACHANNEL_COPY);
+
+        $imagick
+            ->expects($this->once())
+            ->method('setImageAlphaChannel')
+            ->withConsecutive([Imagick::ALPHACHANNEL_TRANSPARENT]);
+
+        $imagick
+            ->expects($this->once())
+            ->method('clipImage')
+            ->willThrowException(new ImagickException('Some error'));
+
+        $this->transformation
+            ->setImagick($imagick)
+            ->transform([]);
+    }
 }
