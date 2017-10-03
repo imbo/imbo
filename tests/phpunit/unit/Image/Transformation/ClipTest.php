@@ -163,7 +163,7 @@ class ClipTest extends \PHPUnit_Framework_TestCase {
         $imagick
             ->expects($this->once())
             ->method('setImageAlphaChannel')
-            ->withConsecutive([Imagick::ALPHACHANNEL_TRANSPARENT]);
+            ->with(Imagick::ALPHACHANNEL_TRANSPARENT);
 
         $imagick
             ->expects($this->once())
