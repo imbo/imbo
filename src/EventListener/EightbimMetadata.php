@@ -18,7 +18,8 @@ use Imbo\EventManager\EventInterface,
 /**
  * 8BIM metadata event listener
  *
- * This listener will look for properties stored in the image, and store certain metadata (at the moment, the available clipping paths) in Imbo.
+ * This listener will look for properties stored in the image, and store certain metadata (at the
+ * moment, the available clipping paths) in Imbo.
  *
  * @author Mats Lindh <mats@lindh.no>
  * @package Event\Listeners
@@ -37,7 +38,8 @@ class EightbimMetadata implements ListenerInterface, ImagickAware {
     protected $properties = [];
 
     /**
-     * Set the Imagick instance to be used - the instance will be cloned to avoid polluting the existing imagick object.
+     * Set the Imagick instance to be used - the instance will be cloned to avoid polluting the
+     * existing imagick object.
      *
      * @param \Imagick $imagick
      * @return null
@@ -66,12 +68,12 @@ class EightbimMetadata implements ListenerInterface, ImagickAware {
      * @return array
      */
     public function populate(EventInterface $event) {
+        // Read the image
         $image = $event->getRequest()->getImage();
-
-        // This can be replaced with ImagickAware and clone $imagick when the ImagickAware patch has been merged
         $this->imagick->readImageBlob($image->getBlob());
 
-        // Get 8BIM-properties from image - this seems to be the best way to get the identifiers with path names in a raw format
+        // Get 8BIM-properties from image - this seems to be the best way to get the identifiers
+        // with path names in a raw format
         $this->imagick->setImageFormat('8bimtext');
         $data = $this->imagick->getImageBlob();
 
@@ -112,11 +114,7 @@ class EightbimMetadata implements ListenerInterface, ImagickAware {
         $imageIdentifier = $request->getImage()->getImageIdentifier();
 
         try {
-            $database->updateMetadata(
-                $user,
-                $imageIdentifier,
-                $this->properties
-            );
+            $database->updateMetadata($user, $imageIdentifier, $this->properties);
         } catch (DatabaseException $e) {
             $database->deleteImage($user, $imageIdentifier);
 
