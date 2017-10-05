@@ -304,6 +304,42 @@ This transformation will convert the image into a histogram of the image itself,
 * ``t[]=histogram:scale=2``
 * ``t[]=histogram:red=f00,green=0f0,blue=00f``
 
+.. _icc-transformation:
+
+Apply an ICC color profile - ``t[]=icc``
+----------------------------------------
+
+Adds an ICC color profile to the image, enforcing the given profile for the next steps in the processing chain until output or another ``icc`` transformation is applied.
+
+This transformation requires explicit configuration and is not enabled by default, since you have to register the color profiles you want to make available and their aliases.
+
+To enable the transformation add it in your local configuration file:
+
+.. code-block:: php
+
+    'transformations' => [
+        'icc' => function () {
+            return new Image\Transformation\Icc([
+                'default' => '/path/to/sRGB_v4_ICC_preference.icc',
+                'srgb' => '/path/to/sRGB_v4_ICC_preference.icc',
+            ]);
+        },
+    ],
+
+The profile given under the key ``default`` will be applied if no specific profile is requested (i.e. if ``icc`` is added without a ``name`` argument.)
+
+The most common ICC profiles can be downloaded directly from `the ICC's page for sRGB profiles <http://www.color.org/srgbprofiles.xalter>`_, or from `Adobe and their ICC profiles download page <https://www.adobe.com/support/downloads/iccprofiles/iccprofiles_win.html>`_.
+
+**Parameters:**
+
+``name``
+    The name of the profile to apply as defined in the configuration file when adding the transformation.
+
+**Examples:**
+
+* ``t[]=icc``
+* ``t[]=icc:name=srgb``
+
 .. _levels-transformation:
 
 Adjust levels of the image - ``t[]=level``
