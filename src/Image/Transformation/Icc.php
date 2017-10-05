@@ -11,7 +11,9 @@
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\ConfigurationException,
-    Imbo\Exception\InvalidArgumentException;
+    Imbo\Exception\InvalidArgumentException,
+    Imbo\Exception\TransformationException,
+    \ImagickException;
 
 /**
  * Transformation for applying ICC profiles to an image.
@@ -46,11 +48,17 @@ class Icc extends Transformation {
         $file = empty($params['name']) ? $this->profiles['default'] : $this->profiles[$params['name']];
 
         if (!file_exists($file)) {
-            throw new ConfigurationException('Could not load ICC profile referenced by "' . $params['name'] . '": ' . $file, 500);
+            throw new ConfigurationException('Could not load ICC profile referenced by "' . (!empty($params['name']) ? $params['name'] : 'default') . '": ' . $file, 500);
         }
 
         $iccProfile = file_get_contents($file);
-        $this->imagick->profileImage('icc', $iccProfile);
+
+        try {
+            $this->imagick->profileImage('icc', $iccProfile);
+        } catch (ImagickException $e) {
+            throw new TransformationException($e->getMessage(), 400, $e);
+        }
+
         $this->image->hasBeenTransformed(true);
     }
 }
