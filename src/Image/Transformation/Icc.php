@@ -10,9 +10,15 @@
 
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\ConfigurationException;
-use Imbo\Exception\InvalidArgumentException;
+use Imbo\Exception\ConfigurationException,
+    Imbo\Exception\InvalidArgumentException;
 
+/**
+ * Transformation for applying ICC profiles to an image.
+ *
+ * @author Mats Lindh <mats@lindh.no>
+ * @package Image\Transformations
+ */
 class Icc extends Transformation {
     /**
      * @var array
