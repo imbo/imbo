@@ -18,6 +18,23 @@ use Imbo\Exception\ConfigurationException,
 /**
  * Transformation for applying ICC profiles to an image.
  *
+ * The transformation is not enabled by default, but can be added to the
+ * list of transformations in your custom configuration. The transformation
+ * requires a list of key => .icc-file pairs, and exposes these profiles
+ * through the `name` parameter given for the transformation.
+ *
+ * The `default` key in the array is used if no profile name is given when
+ * the transformation is invoked.
+ *
+ *      'transformations' => [
+ *          'icc' => function () {
+ *              return new Image\Transformation\Icc([
+ *                  'default' => '/path/to/imbo/data/profiles/sRGB_v4_ICC_preference.icc',
+ *                  'srgb' => '/path/to/imbo/data/profiles/sRGB_v4_ICC_preference.icc',
+ *              ]);
+ *          },
+ *      ],
+ *
  * @author Mats Lindh <mats@lindh.no>
  * @package Image\Transformations
  */
