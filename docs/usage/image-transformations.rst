@@ -339,13 +339,13 @@ The most common ICC profiles can be downloaded directly from `the ICC's page for
 
 **Parameters:**
 
-``name``
+``profile``
     The name of the profile to apply as defined in the configuration file when adding the transformation.
 
 **Examples:**
 
 * ``t[]=icc``
-* ``t[]=icc:name=srgb``
+* ``t[]=icc:profile=srgb``
 
 .. _levels-transformation:
 
