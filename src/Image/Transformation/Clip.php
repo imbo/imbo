@@ -27,8 +27,8 @@ class Clip extends Transformation {
     public function transform(array $params) {
         $pathName = null;
 
-        if (!empty($params['name'])) {
-            $pathName = $params['name'];
+        if (!empty($params['path'])) {
+            $pathName = $params['path'];
 
             $metadata = $this->event->getDatabase()->getMetadata(
                 $this->image->getUser(),

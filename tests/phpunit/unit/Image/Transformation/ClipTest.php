@@ -83,14 +83,14 @@ class ClipTest extends \PHPUnit_Framework_TestCase {
      *
      */
     public function testExceptionIfMissingNamedPath() {
-        $this->transformation->transform(['name' => 'foo']);
+        $this->transformation->transform(['path' => 'foo']);
     }
 
     /**
      * @covers ::transform
      */
     public function testNoExceptionIfMissingNamedPathButIgnoreSet() {
-        $this->transformation->transform(['name' => 'foo', 'ignoreUnknownPath' => '']);
+        $this->transformation->transform(['path' => 'foo', 'ignoreUnknownPath' => '']);
     }
 
     /**
@@ -98,7 +98,7 @@ class ClipTest extends \PHPUnit_Framework_TestCase {
      */
     public function testTransformationHappensWithMatchingPath() {
         $this->image->expects($this->atLeastOnce())->method('hasBeenTransformed')->with(true);
-        $this->transformation->transform(['name' => 'Panda']);
+        $this->transformation->transform(['path' => 'Panda']);
     }
 
     /**
