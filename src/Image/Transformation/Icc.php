@@ -20,9 +20,9 @@ use Imbo\Exception\ConfigurationException,
  *
  * The transformation is not enabled by default, but can be added to the list of transformations in
  * your custom configuration. The transformation requires a list of key => .icc-file pairs, and
- * exposes these profiles through the `name` parameter given for the transformation.
+ * exposes these profiles through the `profile` parameter given for the transformation.
  *
- * The `default` key in the array is used if no profile name is given when
+ * The `default` key in the array is used if no profile is given when
  * the transformation is invoked.
  *
  *      'transformations' => [
@@ -47,8 +47,8 @@ class Icc extends Transformation {
      * Class constructor
      *
      * @param array $profiles An associative array where the keys are profile names that can be used
-     *                        with the `name` parameter for the transformation, and the values are
-     *                        paths to the profiles themselves.
+     *                        with the `profile` parameter for the transformation, and the values
+     *                        are paths to the profiles themselves.
      */
     public function __construct($profiles) {
         if (!is_array($profiles)) {
@@ -62,16 +62,16 @@ class Icc extends Transformation {
      * {@inheritdoc}
      */
     public function transform(array $params) {
-        if (empty($params['name']) && empty($this->profiles['default'])) {
-            throw new InvalidArgumentException('No name given for ICC profile to use and no profile assigned to the "default" name.', 400);
-        } else if (!empty($params['name']) && empty($this->profiles[$params['name']])) {
-            throw new InvalidArgumentException('The given ICC profile alias ("' . $params['name'] . '") is unknown to the server.', 400);
+        if (empty($params['profile']) && empty($this->profiles['default'])) {
+            throw new InvalidArgumentException('No profile name given for which ICC profile to use and no profile is assigned to the "default" name.', 400);
+        } else if (!empty($params['profile']) && empty($this->profiles[$params['profile']])) {
+            throw new InvalidArgumentException('The given ICC profile name ("' . $params['profile'] . '") is unknown to the server.', 400);
         }
 
-        $file = empty($params['name']) ? $this->profiles['default'] : $this->profiles[$params['name']];
+        $file = empty($params['profile']) ? $this->profiles['default'] : $this->profiles[$params['profile']];
 
         if (!file_exists($file)) {
-            throw new ConfigurationException('Could not load ICC profile referenced by "' . (!empty($params['name']) ? $params['name'] : 'default') . '": ' . $file, 500);
+            throw new ConfigurationException('Could not load ICC profile referenced by "' . (!empty($params['profile']) ? $params['profile'] : 'default') . '": ' . $file, 500);
         }
 
         $iccProfile = file_get_contents($file);

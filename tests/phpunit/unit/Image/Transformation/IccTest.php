@@ -60,7 +60,7 @@ class IccTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers ::transform
      * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessageRegExp #No name given for ICC profile to use and no profile#
+     * @expectedExceptionMessage No profile name given for which ICC profile to use and no profile is assigned to the "default" name.
      * @expectedExceptionCode 400
      *
      */
@@ -72,12 +72,12 @@ class IccTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers ::transform
      * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessageRegExp #The given ICC profile alias.*is unknown#
+     * @expectedExceptionMessage The given ICC profile name ("foo") is unknown to the server.
      * @expectedExceptionCode 400
      */
     public function testExceptionWithInvalidName() {
         $transformation = new Icc([]);
-        $transformation->transform(['name' => 'foo']);
+        $transformation->transform(['profile' => 'foo']);
     }
 
     /**
@@ -91,7 +91,7 @@ class IccTest extends \PHPUnit_Framework_TestCase {
         $transformation->setImage($this->image);
         $this->image->expects($this->atLeastOnce())->method('hasBeenTransformed')->with(true);
 
-        $transformation->transform(['name' => 'foo']);
+        $transformation->transform(['profile' => 'foo']);
     }
 
     /**
@@ -112,6 +112,7 @@ class IccTest extends \PHPUnit_Framework_TestCase {
     /**
      * @covers ::transform
      * @expectedException Imbo\Exception\TransformationException
+     * @expectedExceptionMessage Some error
      * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenImagickFailsWithAFatalError() {
