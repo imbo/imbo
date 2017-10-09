@@ -95,6 +95,7 @@ class IccTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers ::__construct
      * @covers ::transform
      */
     public function testTransformationHappensWithDefaultKey() {
@@ -126,6 +127,33 @@ class IccTest extends \PHPUnit_Framework_TestCase {
 
         $transformation
             ->setImagick($imagick)
+            ->transform([]);
+    }
+
+    /**
+     * @covers ::__construct
+     * @expectedException Imbo\Exception\ConfigurationException
+     * @expectedExceptionMessage Imbo\Image\Transformation\Icc requires an array with name => profile file (.icc) mappings when created.
+     * @expectedExceptionCode 500
+     */
+    public function testThrowsExceptionWhenConstructingWithWrongType() {
+        new Icc('/some/path');
+    }
+
+    /**
+     * @covers ::transform
+     * @expectedException Imbo\Exception\ConfigurationException
+     * @expectedExceptionMessageRegExp /Could not load ICC profile referenced by "default": .*\/foo\/bar.icc/
+     * @expectedExceptionCode 500
+     */
+    public function testThrowsExceptionWhenInvalidPathIsUsed() {
+        $transformation = new Icc([
+            'default' => DATA_DIR . '/foo/bar.icc',
+        ]);
+
+        $transformation
+            ->setImagick($this->imagick)
+            ->setImage($this->image)
             ->transform([]);
     }
 }
