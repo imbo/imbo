@@ -13,22 +13,21 @@ namespace Imbo\Image\Transformation;
 use Imbo\Exception\ConfigurationException,
     Imbo\Exception\InvalidArgumentException,
     Imbo\Exception\TransformationException,
-    \ImagickException;
+    ImagickException;
 
 /**
  * Transformation for applying ICC profiles to an image.
  *
- * The transformation is not enabled by default, but can be added to the
- * list of transformations in your custom configuration. The transformation
- * requires a list of key => .icc-file pairs, and exposes these profiles
- * through the `name` parameter given for the transformation.
+ * The transformation is not enabled by default, but can be added to the list of transformations in
+ * your custom configuration. The transformation requires a list of key => .icc-file pairs, and
+ * exposes these profiles through the `name` parameter given for the transformation.
  *
  * The `default` key in the array is used if no profile name is given when
  * the transformation is invoked.
  *
  *      'transformations' => [
  *          'icc' => function () {
- *              return new Image\Transformation\Icc([
+ *              return new Imbo\Image\Transformation\Icc([
  *                  'default' => '/path/to/imbo/data/profiles/sRGB_v4_ICC_preference.icc',
  *                  'srgb' => '/path/to/imbo/data/profiles/sRGB_v4_ICC_preference.icc',
  *              ]);
@@ -44,6 +43,13 @@ class Icc extends Transformation {
      */
     protected $profiles;
 
+    /**
+     * Class constructor
+     *
+     * @param array $profiles An associative array where the keys are profile names that can be used
+     *                        with the `name` parameter for the transformation, and the values are
+     *                        paths to the profiles themselves.
+     */
     public function __construct($profiles) {
         if (!is_array($profiles)) {
             throw new ConfigurationException(get_class() . ' requires an array with name => profile file (.icc) mappings when created.', 500);
