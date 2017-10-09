@@ -317,14 +317,21 @@ To enable the transformation add it in your local configuration file:
 
 .. code-block:: php
 
-    'transformations' => [
-        'icc' => function () {
-            return new Image\Transformation\Icc([
-                'default' => '/path/to/sRGB_v4_ICC_preference.icc',
-                'srgb' => '/path/to/sRGB_v4_ICC_preference.icc',
-            ]);
-        },
-    ],
+    <?php
+    return [
+        // ...
+
+        'transformations' => [
+            'icc' => function () {
+                return new Imbo\Image\Transformation\Icc([
+                    'default' => '/path/to/sRGB_v4_ICC_preference.icc',
+                    'srgb' => '/path/to/sRGB_v4_ICC_preference.icc',
+                ]);
+            },
+        ],
+
+        // ...
+    ];
 
 The profile given under the key ``default`` will be applied if no specific profile is requested (i.e. if ``icc`` is added without a ``name`` argument.)
 
