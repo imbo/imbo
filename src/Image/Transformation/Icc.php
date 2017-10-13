@@ -79,7 +79,20 @@ class Icc extends Transformation {
         try {
             $this->imagick->profileImage('icc', $iccProfile);
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            // Detect if there's a mismatch between the embedded profile and the color space in the image
+            if ($e->getCode() == 465) {
+                try {
+                    // strip the existing profile, relying in color space to be correct
+                    $this->imagick->profileImage('*', null);
+
+                    // try to apply the profile again
+                    $this->imagick->profileImage('icc', $iccProfile);
+                } catch (ImagickException $e) {
+                    throw new TransformationException($e->getMessage(), 400, $e);
+                }
+            } else {
+                throw new TransformationException($e->getMessage(), 400, $e);
+            }
         }
 
         $this->image->hasBeenTransformed(true);
