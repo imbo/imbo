@@ -31,20 +31,15 @@
     "guzzlehttp/psr7": "^1.3"
   },
   "require-dev": {
-    "mikey179/vfsStream": "^1.5.0",
-    "phpunit/phpunit": "^5.6",
-    "behat/behat": "^3.2",
-    "phploc/phploc": "^3.0",
-    "sebastian/phpcpd": "^2.0",
-    "phpmd/phpmd": "^2.4",
+    "mikey179/vfsStream": "^1.6",
+    "phpunit/phpunit": "^5.7",
+    "behat/behat": "^3.4",
     "mongodb/mongodb": "^1.1",
-    "squizlabs/php_codesniffer": "^2.7",
-    "imbo/imbo-phpcs-standard": "^1.4",
-    "phpdocumentor/phpdocumentor": "^2.9",
-    "cwhite92/b2-sdk-php": "^1.2",
+    "cwhite92/b2-sdk-php": "^1.3",
     "imbo/behat-api-extension": "^2.0",
     "doctrine/dbal": "^2.5",
-    "aws/aws-sdk-php": "^3.19",
+    "doctrine/inflector": "^1.1",
+    "aws/aws-sdk-php": "^3.36",
     "micheh/psr7-cache": "^0.5"
   },
   "suggest": {
@@ -85,23 +80,6 @@
     "test": [
       "@test-phpunit",
       "@test-behat"
-    ],
-    "qa-phploc": "vendor/bin/phploc --log-csv build/logs/phploc.csv --log-xml build/logs/phploc.xml src",
-    "qa-phpcpd": "vendor/bin/phpcpd --log-pmd build/logs/pmd-cpd.xml src",
-    "qa-phpmd-xml": "vendor/bin/phpmd src xml phpmd.xml --reportfile build/logs/pmd.xml",
-    "qa-phpmd-html": "vendor/bin/phpmd src html phpmd.xml --reportfile build/logs/pmd.html",
-    "qa-phpmd": [
-      "@qa-phpmd-xml",
-      "@qa-phpmd-html"
-    ],
-    "qa-phpcs": "vendor/bin/phpcs --report=checkstyle --report-file=build/logs/checkstyle.xml --standard=vendor/imbo/imbo-phpcs-standard/src src",
-    "qa-phpdoc": "vendor/bin/phpdoc -d src -t build/docs",
-    "qa": [
-      "@qa-phploc",
-      "@qa-phpcpd",
-      "@qa-phpmd",
-      "@qa-phpcs",
-      "@qa-phpdoc"
     ],
     "docs": [
       "cd docs; make spelling",
