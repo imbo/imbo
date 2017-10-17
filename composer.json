@@ -33,7 +33,7 @@
   "require-dev": {
     "mikey179/vfsStream": "^1.6",
     "phpunit/phpunit": "^5.7",
-    "behat/behat": "^3.2",
+    "behat/behat": "^3.4",
     "mongodb/mongodb": "^1.1",
     "cwhite92/b2-sdk-php": "^1.2",
     "imbo/behat-api-extension": "^2.0",
