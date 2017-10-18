@@ -24,7 +24,8 @@ class ImageTransformationLimiterTest extends \PHPUnit_Framework_TestCase {
      * @covers Imbo\EventListener\ImageTransformationLimiter::setTransformationLimit
      */
     public function testLimitsTransformationCount() {
-        $listener = new ImageTransformationLimiter(['limit' => 2]);
+        $limit = 2;
+        $listener = new ImageTransformationLimiter(['limit' => $limit]);
 
         $request = $this->createMock('Imbo\Http\Request\Request');
 
@@ -34,7 +35,13 @@ class ImageTransformationLimiterTest extends \PHPUnit_Framework_TestCase {
         $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($request));
 
-        $this->setExpectedException('Imbo\Exception\ResourceException', '', 403);
+        $this->expectException('Imbo\Exception\ResourceException');
+        $this->expectExceptionMessage(sprintf(
+            'Too many transformations applied to resource. The limit is %d transformations.',
+            $limit
+        ));
+        $this->expectExceptionCode(403);
+
         $listener->checkTransformationCount($event);
     }
 
