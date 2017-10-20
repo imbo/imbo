@@ -667,7 +667,7 @@ This transformation can be used to apply a watermark on top of the original imag
     Height of the watermark image in pixels. If omitted the height of ``<img>`` will be used.
 
 ``position``
-    The placement of the watermark image. ``top-left``, ``top-right``, ``bottom-left``, ``bottom-right`` and ``center`` are available values. Defaults to ``top-left``.
+    The placement of the watermark image. ``top-left``, ``top-right``, ``bottom-left``, ``bottom-right``, ``bottom``, ``top``, ``left``, ``right`` and ``center`` are available values. Defaults to ``top-left``.
 
 ``x``
     Number of pixels in the X-axis the watermark image should be offset from the original position (defined by the ``position`` parameter). Supports negative numbers. Defaults to ``0``
