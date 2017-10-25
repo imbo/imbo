@@ -129,10 +129,10 @@ class InputLoaderManager {
             // the result is anything else, return the imagick instance as this means that the
             // loader managed to load the image
             if ($result !== false) {
-                // Convert images from that are CMYK _without_ a profile explicitly to sRGB
+                // Convert images that are CMYK without an explicit profile to SRGB
                 $iccProfiles = $this->imagick->getImageProfiles('icc', false);
 
-                if (!$iccProfiles && ($this->imagick->getImageColorspace() === \Imagick::COLORSPACE_CMYK)) {
+                if (!$iccProfiles && ($this->imagick->getImageColorspace() === Imagick::COLORSPACE_CMYK)) {
                     $iccCMYK = file_get_contents(__DIR__ . '/../../data/profiles/argyllcms_cmyk.icm');
                     $this->imagick->profileImage('icc', $iccCMYK);
 
