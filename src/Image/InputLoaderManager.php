@@ -129,6 +129,19 @@ class InputLoaderManager {
             // the result is anything else, return the imagick instance as this means that the
             // loader managed to load the image
             if ($result !== false) {
+                // Convert images from that are CMYK _without_ a profile explicitly to sRGB
+                $iccProfiles = $this->imagick->getImageProfiles('icc', false);
+
+                if (!$iccProfiles && ($this->imagick->getImageColorspace() === \Imagick::COLORSPACE_CMYK)) {
+                    $icc_cmyk = file_get_contents(__DIR__ . '/../../data/profiles/argyllcms_cmyk.icm');
+                    $this->imagick->profileImage('icc', $icc_cmyk);
+
+                    $iccSRGB = file_get_contents(__DIR__ . '/../../data/profiles/sRGB_v4_ICC_preference.icc');
+                    $this->imagick->profileImage('icc', $iccSRGB);
+
+                    $this->imagick->setImageColorSpace(Imagick::COLORSPACE_RGB);
+                }
+
                 return $this->imagick;
             }
         }
