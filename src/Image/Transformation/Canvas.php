@@ -84,8 +84,10 @@ class Canvas extends Transformation implements InputSizeConstraint {
             $this->imagick->setImageFormat($original->getImageFormat());
             $this->imagick->setImageColorspace($original->getImageColorspace());
 
-            $existingWidth = $original->getImageGeometry()['width'];
-            $existingHeight = $original->getImageGeometry()['height'];
+            $originalGeometry = $original->getImageGeometry();
+
+            $existingWidth = $originalGeometry['width'];
+            $existingHeight = $originalGeometry['height'];
 
             if ($existingWidth > $width || $existingHeight > $height) {
                 // The existing image is bigger than the canvas and needs to be cropped
