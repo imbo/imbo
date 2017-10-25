@@ -1,0 +1,17 @@
+Re: [Lcms-user] free fallback CMYK profile
+From: Graeme Gill <graeme@ar...> - 2014-08-25 03:22:13
+ jcupitt@... wrote:
+
+> Can anyone point me to a reasonable, freely-licenced CMYK profile?
+
+Hi,
+	I'm happy to offer a public domain one based on a chemical
+proof measurement set, which is a pretty clean, well behaved
+CMYK response. The B2A table conversions are setup for an
+sRGB source.
+
+You can find it here <http://www.argyllcms.com/cmyk.icm>;
+
+I'll include it with future ArgyllCMS releases.
+
+Graeme Gill.
