@@ -139,7 +139,7 @@ class InputLoaderManager {
                     $iccSRGB = file_get_contents(__DIR__ . '/../../data/profiles/sRGB_v4_ICC_preference.icc');
                     $this->imagick->profileImage('icc', $iccSRGB);
 
-                    $this->imagick->setImageColorSpace(Imagick::COLORSPACE_RGB);
+                    $this->imagick->setImageColorSpace(Imagick::COLORSPACE_SRGB);
                 }
 
                 return $this->imagick;
