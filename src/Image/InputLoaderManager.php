@@ -133,8 +133,8 @@ class InputLoaderManager {
                 $iccProfiles = $this->imagick->getImageProfiles('icc', false);
 
                 if (!$iccProfiles && ($this->imagick->getImageColorspace() === \Imagick::COLORSPACE_CMYK)) {
-                    $icc_cmyk = file_get_contents(__DIR__ . '/../../data/profiles/argyllcms_cmyk.icm');
-                    $this->imagick->profileImage('icc', $icc_cmyk);
+                    $iccCMYK = file_get_contents(__DIR__ . '/../../data/profiles/argyllcms_cmyk.icm');
+                    $this->imagick->profileImage('icc', $iccCMYK);
 
                     $iccSRGB = file_get_contents(__DIR__ . '/../../data/profiles/sRGB_v4_ICC_preference.icc');
                     $this->imagick->profileImage('icc', $iccSRGB);
