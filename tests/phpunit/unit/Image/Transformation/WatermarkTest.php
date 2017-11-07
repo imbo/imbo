@@ -10,15 +10,16 @@
 
 namespace ImboUnitTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Watermark,
-    Imbo\Exception\StorageException;
+use Imbo\Image\Transformation\Watermark;
+use Imbo\Exception\StorageException;
+use PHPUnit_Framework_TestCase;
 
 /**
- * @covers Imbo\Image\Transformation\Watermark
+ * @coversDefaultClass Imbo\Image\Transformation\Watermark
  * @group unit
  * @group transformations
  */
-class WatermarkTest extends \PHPUnit_Framework_TestCase {
+class WatermarkTest extends PHPUnit_Framework_TestCase {
     /**
      * @var Watermark
      */
@@ -32,13 +33,7 @@ class WatermarkTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Tear down the transformation
-     */
-    public function tearDown() {
-        $this->transformation = null;
-    }
-
-    /**
+     * @covers ::transform
      * @expectedException Imbo\Exception\TransformationException
      * @expectedExceptionCode 400
      * @expectedExceptionMessage You must specify an image identifier to use for the watermark
@@ -50,6 +45,7 @@ class WatermarkTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers ::transform
      * @expectedException Imbo\Exception\TransformationException
      * @expectedExceptionCode 400
      * @expectedExceptionMessage Watermark image not found
