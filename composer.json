@@ -96,6 +96,6 @@
       "cd docs; make spelling",
       "cd docs; make html"
     ],
-    "start-httpd-for-behat-tests": "php -S localhost:8080 -t ./public tests/behat/router.php > build/logs/httpd.log 2>&1 &"
+    "dev": "php -S localhost:8080 -t ./public tests/behat/router.php > build/logs/httpd.log 2>&1 &"
   }
 }
