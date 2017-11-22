@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Storage;
 
-use Imbo\Storage\GridFS,
-    MongoDB\Client;
+use Imbo\Storage\GridFS;
+use MongoDB\Client;
 
 /**
  * @covers Imbo\Storage\GridFS

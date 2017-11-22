@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Convert,
-    Imagick;
+use Imbo\Image\Transformation\Convert;
+use Imagick;
 
 /**
  * @covers Imbo\Image\Transformation\Convert

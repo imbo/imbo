@@ -10,13 +10,13 @@
 
 namespace ImboUnitTest\EventListener;
 
-use Imbo\EventListener\ImageVariations,
-    Imbo\Exception\DatabaseException,
-    Imbo\Exception\StorageException,
-    Imbo\Exception\TransformationException,
-    Imbo\Image\TransformationManager,
-    Imbo\EventListener\Initializer\Imagick as ImagickInitializer,
-    DateTime;
+use Imbo\EventListener\ImageVariations;
+use Imbo\Exception\DatabaseException;
+use Imbo\Exception\StorageException;
+use Imbo\Exception\TransformationException;
+use Imbo\Image\TransformationManager;
+use Imbo\EventListener\Initializer\Imagick as ImagickInitializer;
+use DateTime;
 
 /**
  * @covers Imbo\EventListener\ImageVariations

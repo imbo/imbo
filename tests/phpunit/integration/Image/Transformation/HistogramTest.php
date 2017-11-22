@@ -9,8 +9,8 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Histogram,
-    Imagick;
+use Imbo\Image\Transformation\Histogram;
+use Imagick;
 
 /**
  * @covers Imbo\Image\Transformation\Histogram

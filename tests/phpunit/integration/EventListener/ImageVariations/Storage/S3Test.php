@@ -10,9 +10,9 @@
 
 namespace ImboIntegrationTest\EventListener\ImageVariations\Storage;
 
-use Imbo\EventListener\ImageVariations\Storage\S3,
-    ImboIntegrationTest\Storage\S3Test as S3TestMain,
-    Aws\S3\S3Client;
+use Imbo\EventListener\ImageVariations\Storage\S3;
+use ImboIntegrationTest\Storage\S3Test as S3TestMain;
+use Aws\S3\S3Client;
 
 /**
  * @covers Imbo\EventListener\ImageVariations\Storage\S3

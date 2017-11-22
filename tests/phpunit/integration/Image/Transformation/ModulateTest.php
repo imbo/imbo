@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Modulate,
-    Imagick;
+use Imbo\Image\Transformation\Modulate;
+use Imagick;
 
 /**
  * @covers Imbo\Image\Transformation\Modulate

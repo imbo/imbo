@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Storage;
 
-use Imbo\Storage\S3,
-    Aws\S3\S3Client;
+use Imbo\Storage\S3;
+use Aws\S3\S3Client;
 
 /**
  * @covers Imbo\Storage\S3

@@ -10,9 +10,9 @@
 
 namespace ImboUnitTest\EventListener;
 
-use Imbo\EventListener\StorageOperations,
-    Imbo\Exception\StorageException,
-    DateTime;
+use Imbo\EventListener\StorageOperations;
+use Imbo\Exception\StorageException;
+use DateTime;
 
 /**
  * @covers Imbo\EventListener\StorageOperations

@@ -116,6 +116,7 @@ class ImagePreparationTest extends TestCase {
      * @expectedException Imbo\Exception\ImageException
      * @expectedExceptionMessage Invalid image
      * @expectedExceptionCode 415
+     * @group imagick
      */
     public function testThrowsExceptionWhenImageIsBroken() {
         $filePath = FIXTURES_DIR . '/broken-image.jpg';
@@ -130,6 +131,7 @@ class ImagePreparationTest extends TestCase {
      * @expectedException Imbo\Exception\ImageException
      * @expectedExceptionMessage Invalid image
      * @expectedExceptionCode 415
+     * @group imagick
      */
     public function testThrowsExceptionWhenImageIsSlightlyBroken() {
         $filePath = FIXTURES_DIR . '/slightly-broken-image.png';

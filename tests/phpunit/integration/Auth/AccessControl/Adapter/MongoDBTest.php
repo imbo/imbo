@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Auth\AccessControl\Adapter;
 
-use Imbo\Auth\AccessControl\Adapter\MongoDB,
-    MongoDB\Client as MongoClient;
+use Imbo\Auth\AccessControl\Adapter\MongoDB;
+use MongoDB\Client as MongoClient;
 
 /**
  * @covers Imbo\Auth\AccessControl\Adapter\MongoDB

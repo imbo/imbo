@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Thumbnail,
-    Imagick;
+use Imbo\Image\Transformation\Thumbnail;
+use Imagick;
 
 /**
  * @covers Imbo\Image\Transformation\Thumbnail

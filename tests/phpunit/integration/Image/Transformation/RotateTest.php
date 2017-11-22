@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Rotate,
-    Imagick;
+use Imbo\Image\Transformation\Rotate;
+use Imagick;
 
 /**
  * @covers Imbo\Image\Transformation\Rotate

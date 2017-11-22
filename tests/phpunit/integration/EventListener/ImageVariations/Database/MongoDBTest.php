@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\EventListener\ImageVariations\Database;
 
-use Imbo\EventListener\ImageVariations\Database\MongoDB,
-    MongoDB\Client as MongoClient;
+use Imbo\EventListener\ImageVariations\Database\MongoDB;
+use MongoDB\Client as MongoClient;
 
 /**
  * @covers Imbo\EventListener\ImageVariations\Database\MongoDB

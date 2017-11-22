@@ -10,9 +10,9 @@
 
 namespace ImboIntegrationTest\Storage;
 
-use Imbo\Storage\B2,
-    ChrisWhite\B2\Client,
-    ChrisWhite\B2\Exceptions\NotFoundException;
+use Imbo\Storage\B2;
+use ChrisWhite\B2\Client;
+use ChrisWhite\B2\Exceptions\NotFoundException;
 
 /**
  * @covers Imbo\Storage\B2

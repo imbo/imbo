@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\MaxSize,
-    Imagick;
+use Imbo\Image\Transformation\MaxSize;
+use Imagick;
 
 /**
  * @covers Imbo\Image\Transformation\MaxSize

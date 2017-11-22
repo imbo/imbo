@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Vignette,
-    Imagick;
+use Imbo\Image\Transformation\Vignette;
+use Imagick;
 
 /**
  * @covers Imbo\Image\Transformation\Vignette

@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Transverse,
-    Imagick;
+use Imbo\Image\Transformation\Transverse;
+use Imagick;
 
 /**
  * @covers Imbo\Image\Transformation\Transverse
