@@ -42,7 +42,7 @@ or
 
 For the tests to run you need to have an HTTPD running that hosts the Imbo installation. A composer script has been created for this purpose:
 
-    composer start-httpd-for-behat-tests
+    composer run dev
 
 which simply executes:
 
