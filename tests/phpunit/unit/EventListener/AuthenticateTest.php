@@ -336,7 +336,9 @@ class AuthenticateTest extends ListenerTests {
      */
     public function testApprovesSignaturesWhenConfigurationForcesProtocol($serverUrl, $protocol, $authHeader, $shouldMatch, $signature, $timestamp) {
         if (!$shouldMatch) {
-            $this->setExpectedException('Imbo\Exception\RuntimeException', 'Signature mismatch', 400);
+            $this->expectException('Imbo\Exception\RuntimeException');
+            $this->expectExceptionMessage('Signature mismatch');
+            $this->expectExceptionCode(400);
         }
 
         $this->accessControl->expects($this->once())->method('getPrivateKey')->will($this->returnValue('key'));

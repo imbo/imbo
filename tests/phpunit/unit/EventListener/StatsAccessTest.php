@@ -150,7 +150,9 @@ class StatsAccessTest extends ListenerTests {
         ]);
 
         if (!$hasAccess) {
-            $this->setExpectedException('Imbo\Exception\RuntimeException', 'Access denied', 403);
+            $this->expectException('Imbo\Exception\RuntimeException');
+            $this->expectExceptionMessage('Access denied');
+            $this->expectExceptionCode(403);
         }
 
         $listener->checkAccess($this->event);
