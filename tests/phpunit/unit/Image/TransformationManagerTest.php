@@ -47,15 +47,6 @@ class TransformationManagerTest extends TestCase {
         $this->image->expects($this->any())->method('getHeight')->will($this->returnValue(900));
     }
 
-    public function tearDown() {
-        $this->manager = null;
-        $this->request = null;
-        $this->response = null;
-        $this->event = null;
-        $this->query = null;
-        $this->image = null;
-    }
-
     /**
      * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
      */

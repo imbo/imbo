@@ -33,13 +33,6 @@ class RequestTest extends TestCase {
     }
 
     /**
-     * Tear down the request
-     */
-    public function tearDown() {
-        $this->request = null;
-    }
-
-    /**
      * @covers Imbo\Http\Request\Request::getTransformations
      */
     public function testGetTransformationsWithNoTransformationsPresent() {

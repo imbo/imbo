@@ -34,13 +34,6 @@ class ImageTest extends TestCase {
     }
 
     /**
-     * Tear down the model
-     */
-    public function tearDown() {
-        $this->image = null;
-    }
-
-    /**
      * @covers Imbo\Model\Image::setMetadata
      * @covers Imbo\Model\Image::getMetadata
      */

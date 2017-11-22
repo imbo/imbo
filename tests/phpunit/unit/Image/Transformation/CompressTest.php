@@ -32,13 +32,6 @@ class CompressTest extends TestCase {
     }
 
     /**
-     * Tear down the transformation
-     */
-    public function tearDown() {
-        $this->transformation = null;
-    }
-
-    /**
      * @expectedException Imbo\Exception\TransformationException
      * @expectedExceptionMessage Missing required parameter: level
      * @expectedExceptionCode 400

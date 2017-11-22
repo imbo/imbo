@@ -36,13 +36,6 @@ class ResponseTest extends TestCase {
     }
 
     /**
-     * Tear down the response
-     */
-    public function tearDown() {
-        $this->response = null;
-    }
-
-    /**
      * @covers Imbo\Http\Response\Response::setModel
      * @covers Imbo\Http\Response\Response::getModel
      */

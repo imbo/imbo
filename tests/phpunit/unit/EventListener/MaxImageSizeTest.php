@@ -31,13 +31,6 @@ class MaxImageSizeTest extends ListenerTests {
     }
 
     /**
-     * Tear down the listener
-     */
-    public function tearDown() {
-        $this->listener = null;
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function getListener() {

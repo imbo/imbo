@@ -39,13 +39,6 @@ class GeneratePrivateKeyTest extends TestCase {
     }
 
     /**
-     * Tear down the command
-     */
-    public function tearDown() {
-        $this->command = null;
-    }
-
-    /**
      * @covers Imbo\CliCommand\GeneratePrivateKey::execute
      */
     public function testCanGenerateAPrivateKey() {

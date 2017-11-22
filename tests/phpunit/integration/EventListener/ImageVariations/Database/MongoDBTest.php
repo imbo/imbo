@@ -39,8 +39,7 @@ class MongoDBTest extends DatabaseTests {
             $this->markTestSkipped('pecl/mongodb >= 1.1.3 is required to run this test');
         }
 
-        $client = new MongoClient();
-        $client->dropDatabase($this->databaseName);
+        (new MongoClient())->dropDatabase($this->databaseName);
 
         parent::setUp();
     }
@@ -50,8 +49,7 @@ class MongoDBTest extends DatabaseTests {
      */
     public function tearDown() {
         if (class_exists('MongoDB\Client')) {
-            $client = new MongoClient();
-            $client->dropDatabase($this->databaseName);
+            (new MongoClient())->dropDatabase($this->databaseName);
         }
 
         parent::tearDown();

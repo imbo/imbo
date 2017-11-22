@@ -31,13 +31,6 @@ class CliCommandTest extends TestCase {
         $this->command = $this->getMockBuilder('Imbo\CliCommand\CliCommand')->disableOriginalConstructor()->getMockForAbstractClass();
     }
 
-    /**
-     * Tear down the command
-     */
-    public function tearDown() {
-        $this->command = null;
-    }
-
     public function testCanSetAndGetConfiguration() {
         $config = ['some' => 'config'];
         $this->command->setConfig($config);

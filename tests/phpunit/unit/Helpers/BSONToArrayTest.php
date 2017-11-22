@@ -34,13 +34,6 @@ class BSONToArrayTest extends TestCase {
     }
 
     /**
-     * Tear down the helper
-     */
-    public function tearDown() {
-        $this->helper = null;
-    }
-
-    /**
      * Get different values to test
      *
      * @return array[]

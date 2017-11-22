@@ -49,16 +49,6 @@ class IndexTest extends ResourceTests {
     }
 
     /**
-     * Tear down the resource
-     */
-    public function tearDown() {
-        $this->resource = null;
-        $this->request = null;
-        $this->response = null;
-        $this->event = null;
-    }
-
-    /**
      * @covers Imbo\Resource\Index::get
      */
     public function testSupportsHttpGet() {

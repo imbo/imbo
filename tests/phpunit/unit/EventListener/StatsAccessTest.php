@@ -50,15 +50,6 @@ class StatsAccessTest extends ListenerTests {
     }
 
     /**
-     * Tear down the listener
-     */
-    public function tearDown() {
-        $this->request = null;
-        $this->event = null;
-        $this->listener = null;
-    }
-
-    /**
      * @expectedException Imbo\Exception\RuntimeException
      * @expectedExceptionMessage Access denied
      * @expectedExceptionCode 403

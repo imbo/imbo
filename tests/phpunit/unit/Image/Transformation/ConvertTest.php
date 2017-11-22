@@ -32,13 +32,6 @@ class ConvertTest extends TestCase {
     }
 
     /**
-     * Tear down the transformation instance
-     */
-    public function tearDown() {
-        $this->transformation = null;
-    }
-
-    /**
      * @covers Imbo\Image\Transformation\Convert::transform
      */
     public function testWillNotConvertImageIfNotNeeded() {

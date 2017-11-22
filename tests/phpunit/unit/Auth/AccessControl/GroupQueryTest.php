@@ -32,13 +32,6 @@ class GroupQueryTest extends TestCase {
     }
 
     /**
-     * Tear down
-     */
-    public function tearDown() {
-        $this->application = null;
-    }
-
-    /**
      * @covers Imbo\Auth\AccessControl\AbstractQuery::limit
      */
     public function testSetAndGetLimit() {

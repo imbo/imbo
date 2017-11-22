@@ -35,13 +35,6 @@ class ErrorTest extends TestCase {
     }
 
     /**
-     * Tear down the model
-     */
-    public function tearDown() {
-        $this->model = null;
-    }
-
-    /**
      * @covers Imbo\Model\Error::getHttpCode
      * @covers Imbo\Model\Error::setHttpCode
      */

@@ -72,18 +72,6 @@ class ImageTransformationCacheTest extends ListenerTests {
     }
 
     /**
-     * Tear down the listener
-     */
-    public function tearDown() {
-        $this->query = null;
-        $this->request = null;
-        $this->response = null;
-        $this->event = null;
-        $this->listener = null;
-        $this->cacheDir = null;
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function getListener() {

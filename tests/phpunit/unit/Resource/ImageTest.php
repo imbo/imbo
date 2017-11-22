@@ -57,18 +57,6 @@ class ImageTest extends ResourceTests {
     }
 
     /**
-     * Tear down the resource
-     */
-    public function tearDown() {
-        $this->resource = null;
-        $this->response = null;
-        $this->database = null;
-        $this->storage = null;
-        $this->event = null;
-        $this->manager = null;
-    }
-
-    /**
      * @covers Imbo\Resource\Image::deleteImage
      */
     public function testSupportsHttpDelete() {

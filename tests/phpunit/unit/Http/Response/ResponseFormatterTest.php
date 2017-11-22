@@ -89,19 +89,6 @@ class ResponseFormatterTest extends TestCase {
     }
 
     /**
-     * Tear down the response
-     */
-    public function tearDown() {
-        $this->responseFormatter = null;
-        $this->formatters = [];
-        $this->contentNegotiation = null;
-        $this->formatter = null;
-        $this->request = null;
-        $this->response = null;
-        $this->event = null;
-    }
-
-    /**
      * @covers Imbo\Http\Response\ResponseFormatter::getSubscribedEvents
      */
     public function testReturnsACorrectEventSubscription() {

@@ -35,13 +35,6 @@ class ApplicationTest extends TestCase {
     }
 
     /**
-     * Tear down the application
-     */
-    public function tearDown() {
-        $this->application = null;
-    }
-
-    /**
      * @expectedException Imbo\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid database adapter
      * @expectedExceptionCode 500

@@ -32,13 +32,6 @@ class ContentNegotiationTest extends TestCase {
     }
 
     /**
-     * Tear down
-     */
-    public function tearDown() {
-        $this->cn = null;
-    }
-
-    /**
      * @return array[]
      */
     public function getIsAcceptableData() {

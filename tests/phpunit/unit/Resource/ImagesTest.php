@@ -66,20 +66,6 @@ class ImagesTest extends ResourceTests {
     }
 
     /**
-     * Tear down the resource
-     */
-    public function tearDown() {
-        $this->resource = null;
-        $this->response = null;
-        $this->database = null;
-        $this->storage = null;
-        $this->event = null;
-        $this->manager = null;
-        $this->imageIdentifierGenerator = null;
-        $this->config = null;
-    }
-
-    /**
      * @covers Imbo\Resource\Images::addImage
      */
     public function testSupportsHttpPost() {

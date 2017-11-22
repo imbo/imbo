@@ -35,14 +35,6 @@ class ImagickTest extends TestCase {
     }
 
     /**
-     * Tear down the listener
-     */
-    public function tearDown() {
-        $this->imagick = null;
-        $this->initializer = null;
-    }
-
-    /**
      * Data provider
      *
      * @return array[]

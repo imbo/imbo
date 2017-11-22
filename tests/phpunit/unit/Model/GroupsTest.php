@@ -32,13 +32,6 @@ class GroupsTest extends TestCase {
     }
 
     /**
-     * Tear down the model
-     */
-    public function tearDown() {
-        $this->model = null;
-    }
-
-    /**
      * @covers Imbo\Model\Groups::getGroups
      * @covers Imbo\Model\Groups::setGroups
      */

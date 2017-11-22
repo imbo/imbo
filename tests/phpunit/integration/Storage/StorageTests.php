@@ -82,13 +82,6 @@ abstract class StorageTests extends TestCase {
         $this->driver = $this->getDriver();
     }
 
-    /**
-     * Tear down
-     */
-    public function tearDown() {
-        $this->driver = null;
-    }
-
     public function testStoreAndGetImage() {
         $this->assertTrue(
             $this->driver->store($this->user, $this->imageIdentifier, $this->imageData),

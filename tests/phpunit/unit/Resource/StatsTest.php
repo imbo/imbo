@@ -49,16 +49,6 @@ class StatsTest extends ResourceTests {
     }
 
     /**
-     * Tear down the resource
-     */
-    public function tearDown() {
-        $this->resource = null;
-        $this->response = null;
-        $this->event = null;
-        $this->eventManager = null;
-    }
-
-    /**
      * @covers Imbo\Resource\Stats::get
      */
     public function testTriggersTheCorrectEvent() {

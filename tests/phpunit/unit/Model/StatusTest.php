@@ -33,13 +33,6 @@ class StatusTest extends TestCase {
     }
 
     /**
-     * Tear down the model
-     */
-    public function tearDown() {
-        $this->model = null;
-    }
-
-    /**
      * @covers Imbo\Model\Status::getDate
      * @covers Imbo\Model\Status::setDate
      */

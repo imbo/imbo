@@ -36,13 +36,6 @@ class EventTest extends TestCase {
         $this->event = new Event();
     }
 
-    /**
-     * Set up the event instance
-     */
-    public function tearDown() {
-        $this->event = null;
-    }
-
     public function getArguments() {
         return [
             'request' => [

@@ -55,17 +55,6 @@ class GlobalShortUrlTest extends ResourceTests {
     }
 
     /**
-     * Tear down the resource
-     */
-    public function tearDown() {
-        $this->resource = null;
-        $this->response = null;
-        $this->database = null;
-        $this->event = null;
-        $this->manager = null;
-    }
-
-    /**
      * @covers Imbo\Resource\GlobalShortUrl::getImage
      */
     public function testCanTriggerAnImageGetEventWhenRequestedWithAValidShortUrl() {

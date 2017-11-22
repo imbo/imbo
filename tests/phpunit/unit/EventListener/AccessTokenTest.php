@@ -60,18 +60,6 @@ class AccessTokenTest extends ListenerTests {
     }
 
     /**
-     * Tear down the listener
-     */
-    public function tearDown() {
-        $this->query = null;
-        $this->request = null;
-        $this->response = null;
-        $this->responseHeaders = null;
-        $this->event = null;
-        $this->listener = null;
-    }
-
-    /**
      * @expectedException Imbo\Exception\RuntimeException
      * @expectedExceptionMessage Incorrect access token
      * @expectedExceptionCode 400

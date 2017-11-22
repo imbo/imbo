@@ -32,13 +32,6 @@ class QueryTest extends TestCase {
     }
 
     /**
-     * Tear down the query
-     */
-    public function tearDown() {
-        $this->query = null;
-    }
-
-    /**
      * @covers Imbo\Resource\Images\Query::page
      */
     public function testPage() {

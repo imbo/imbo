@@ -47,16 +47,6 @@ class ImagickTest extends ListenerTests {
     }
 
     /**
-     * Tear down the listener
-     */
-    public function tearDown() {
-        $this->request = null;
-        $this->response = null;
-        $this->event = null;
-        $this->listener = null;
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function getListener() {

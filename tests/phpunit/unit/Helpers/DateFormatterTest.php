@@ -34,13 +34,6 @@ class DateFormatterTest extends TestCase {
     }
 
     /**
-     * Tear down the helper
-     */
-    public function tearDown() {
-        $this->helper = null;
-    }
-
-    /**
      * Get different datetimes
      *
      * @return array[]

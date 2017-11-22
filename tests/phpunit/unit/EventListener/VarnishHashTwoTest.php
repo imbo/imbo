@@ -53,17 +53,6 @@ class VarnishHashTwoTest extends ListenerTests {
     }
 
     /**
-     * Tear down the listener
-     */
-    public function tearDown() {
-        $this->request = null;
-        $this->response = null;
-        $this->responseHeaders = null;
-        $this->event = null;
-        $this->listener = null;
-    }
-
-    /**
      * @covers Imbo\EventListener\VarnishHashTwo::addHeader
      */
     public function testCanSendAHashTwoHeader() {

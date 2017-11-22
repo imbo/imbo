@@ -38,13 +38,6 @@ abstract class DatabaseTests extends TestCase {
     }
 
     /**
-     * Tear down
-     */
-    public function tearDown() {
-        $this->adapter = null;
-    }
-
-    /**
      * Data provider
      *
      * @return array[]

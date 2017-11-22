@@ -41,15 +41,6 @@ class EventManagerTest extends TestCase {
     }
 
     /**
-     * Tear down the event manager
-     */
-    public function tearDown() {
-        $this->request = null;
-        $this->event = null;
-        $this->manager = null;
-    }
-
-    /**
      * @covers Imbo\EventManager\EventManager::addEventHandler
      * @covers Imbo\EventManager\EventManager::addCallbacks
      * @covers Imbo\EventManager\EventManager::trigger

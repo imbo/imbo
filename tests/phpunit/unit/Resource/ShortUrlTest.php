@@ -54,18 +54,6 @@ class ShortUrlTest extends ResourceTests {
     }
 
     /**
-     * Tear down the resource
-     */
-    public function tearDown() {
-        $this->resource = null;
-        $this->request = null;
-        $this->response = null;
-        $this->database = null;
-        $this->route = null;
-        $this->event = null;
-    }
-
-    /**
      * @expectedException Imbo\Exception\ResourceException
      * @expectedExceptionMessage ShortURL not found
      * @expectedExceptionCode 404
