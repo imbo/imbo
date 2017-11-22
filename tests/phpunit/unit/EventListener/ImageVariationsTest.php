@@ -289,7 +289,7 @@ class ImageVariationsTest extends ListenerTests {
 
     /**
      * @covers Imbo\EventListener\ImageVariations::chooseVariation
-     * @expectedException PHPUnit_Framework_Error
+     * @expectedException PHPUnit\Framework\Error\Error
      * @expectedExceptionMessage Image variation storage is not in sync with the image variation database
      */
     public function testTriggersWarningIfVariationFoundInDbButNotStorage() {
@@ -396,7 +396,7 @@ class ImageVariationsTest extends ListenerTests {
 
     /**
      * @covers Imbo\EventListener\ImageVariations::deleteVariations
-     * @expectedException PHPUnit_Framework_Error
+     * @expectedException PHPUnit\Framework\Error\Error
      * @expectedExceptionMessage Could not delete image variation metadata for user (imgid)
      */
     public function testTriggersWarningOnFailedDeleteFromDatabase() {
@@ -410,7 +410,7 @@ class ImageVariationsTest extends ListenerTests {
 
     /**
      * @covers Imbo\EventListener\ImageVariations::deleteVariations
-     * @expectedException PHPUnit_Framework_Error
+     * @expectedException PHPUnit\Framework\Error\Error
      * @expectedExceptionMessage Could not delete image variations from storage for user (imgid)
      */
     public function testTriggersWarningOnFailedDeleteFromStorage() {
@@ -547,7 +547,7 @@ class ImageVariationsTest extends ListenerTests {
 
     /**
      * @covers Imbo\EventListener\ImageVariations::generateVariations
-     * @expectedException PHPUnit_Framework_Error
+     * @expectedException PHPUnit\Framework\Error\Error
      * @expectedExceptionMessage Could not generate image variation for user (imgid), width: 512
      */
     public function testGenerateVariationsTriggersWarningOnTransformationException() {
@@ -567,7 +567,7 @@ class ImageVariationsTest extends ListenerTests {
 
     /**
      * @covers Imbo\EventListener\ImageVariations::generateVariations
-     * @expectedException PHPUnit_Framework_Error
+     * @expectedException PHPUnit\Framework\Error\Error
      * @expectedExceptionMessage Could not store image variation for user (imgid), width: 512
      */
     public function testGenerateVariationsTriggersWarningOnStorageException() {
@@ -582,7 +582,7 @@ class ImageVariationsTest extends ListenerTests {
 
     /**
      * @covers Imbo\EventListener\ImageVariations::generateVariations
-     * @expectedException PHPUnit_Framework_Error
+     * @expectedException PHPUnit\Framework\Error\Error
      * @expectedExceptionMessage Could not store image variation metadata for user (imgid), width: 512
      */
     public function testGenerateVariationsTriggersWarningOnDatabaseException() {

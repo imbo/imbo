@@ -111,7 +111,8 @@ class CropTest extends TestCase {
         $image->expects($this->any())->method('getHeight')->will($this->returnValue($originalHeight));
 
         if ($errRegex) {
-            $this->setExpectedExceptionRegExp('Imbo\Exception\TransformationException', $errRegex);
+            $this->expectException('Imbo\Exception\TransformationException');
+            $this->expectExceptionMessageRegExp($errRegex);
             $imagick->expects($this->never())->method('cropImage');
         } else {
             $image->expects($this->once())->method('setWidth')->will($this->returnSelf());
