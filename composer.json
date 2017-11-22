@@ -35,8 +35,6 @@
     "phpunit/phpunit": "^6.4",
     "behat/behat": "^3.4",
     "phploc/phploc": "^4.0",
-    "sebastian/phpcpd": "^3.0",
-    "phpmd/phpmd": "^2.6",
     "mongodb/mongodb": "^1.1",
     "squizlabs/php_codesniffer": "^3.1",
     "imbo/imbo-phpcs-standard": "^1.4",
@@ -87,19 +85,10 @@
       "@test-behat"
     ],
     "qa-phploc": "vendor/bin/phploc --log-csv build/logs/phploc.csv --log-xml build/logs/phploc.xml src",
-    "qa-phpcpd": "vendor/bin/phpcpd --log-pmd build/logs/pmd-cpd.xml src",
-    "qa-phpmd-xml": "vendor/bin/phpmd src xml phpmd.xml --reportfile build/logs/pmd.xml",
-    "qa-phpmd-html": "vendor/bin/phpmd src html phpmd.xml --reportfile build/logs/pmd.html",
-    "qa-phpmd": [
-      "@qa-phpmd-xml",
-      "@qa-phpmd-html"
-    ],
     "qa-phpcs": "vendor/bin/phpcs --report=checkstyle --report-file=build/logs/checkstyle.xml --standard=vendor/imbo/imbo-phpcs-standard/src src",
     "qa-phpdoc": "vendor/bin/phpdoc -d src -t build/docs",
     "qa": [
       "@qa-phploc",
-      "@qa-phpcpd",
-      "@qa-phpmd",
       "@qa-phpcs",
       "@qa-phpdoc"
     ],
