@@ -15,12 +15,12 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\CliApplication
+ * @coversDefaultClass Imbo\CliApplication
  * @group unit-cli
  */
 class CliApplicationTest extends TestCase {
     /**
-     * @covers Imbo\CliApplication::__construct
+     * @covers ::__construct
      */
     public function testAddsCommands() {
         $application = new CliApplication();

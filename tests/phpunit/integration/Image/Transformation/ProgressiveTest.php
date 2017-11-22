@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Progressive,
-    Imagick;
+use Imbo\Image\Transformation\Progressive;
+use Imagick;
 
 /**
  * @covers Imbo\Image\Transformation\Progressive

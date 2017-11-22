@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\EventListener\ImageVariations\Storage;
 
-use Imbo\EventListener\ImageVariations\Storage\GridFS,
-    MongoDB\Client;
+use Imbo\EventListener\ImageVariations\Storage\GridFS;
+use MongoDB\Client;
 
 /**
  * @covers Imbo\EventListener\ImageVariations\Storage\GridFS

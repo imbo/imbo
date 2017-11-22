@@ -10,10 +10,10 @@
 
 namespace ImboUnitTest\Resource;
 
-use Imbo\Resource\Images,
-    Imbo\Exception\DuplicateImageIdentifierException,
-    DateTime,
-    DateTimeZone;
+use Imbo\Resource\Images;
+use Imbo\Exception\DuplicateImageIdentifierException;
+use DateTime;
+use DateTimeZone;
 
 /**
  * @covers Imbo\Resource\Images

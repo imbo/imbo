@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\FlipHorizontally,
-    Imagick;
+use Imbo\Image\Transformation\FlipHorizontally;
+use Imagick;
 
 /**
  * @covers Imbo\Image\Transformation\FlipHorizontally

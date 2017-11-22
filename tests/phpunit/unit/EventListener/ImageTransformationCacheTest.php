@@ -10,9 +10,9 @@
 
 namespace ImboUnitTest\EventListener;
 
-use Imbo\EventListener\ImageTransformationCache,
-    org\bovigo\vfs\vfsStream,
-    org\bovigo\vfs\vfsStreamDirectory;
+use Imbo\EventListener\ImageTransformationCache;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
 
 /**
  * @covers Imbo\EventListener\ImageTransformationCache

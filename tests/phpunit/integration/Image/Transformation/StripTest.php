@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Strip,
-    Imagick;
+use Imbo\Image\Transformation\Strip;
+use Imagick;
 
 /**
  * @covers Imbo\Image\Transformation\Strip

@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\EventListener\ImageVariations\Database;
 
-use Imbo\EventListener\ImageVariations\Database\Doctrine,
-    PDO;
+use Imbo\EventListener\ImageVariations\Database\Doctrine;
+use PDO;
 
 /**
  * @covers Imbo\EventListener\ImageVariations\Database\Doctrine

@@ -10,9 +10,9 @@
 
 namespace ImboUnitTest\Resource;
 
-use Imbo\Resource\User,
-    DateTime,
-    DateTimeZone;
+use Imbo\Resource\User;
+use DateTime;
+use DateTimeZone;
 
 /**
  * @covers Imbo\Resource\User

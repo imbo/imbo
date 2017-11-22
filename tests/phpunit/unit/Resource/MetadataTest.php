@@ -10,9 +10,9 @@
 
 namespace ImboUnitTest\Resource;
 
-use Imbo\Resource\Metadata,
-    DateTime,
-    DateTimeZone;
+use Imbo\Resource\Metadata;
+use DateTime;
+use DateTimeZone;
 
 /**
  * @covers Imbo\Resource\Metadata

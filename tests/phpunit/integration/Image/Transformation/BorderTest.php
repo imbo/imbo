@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Border,
-    Imagick;
+use Imbo\Image\Transformation\Border;
+use Imagick;
 
 /**
  * @covers Imbo\Image\Transformation\Border

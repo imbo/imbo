@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Resize,
-    Imagick;
+use Imbo\Image\Transformation\Resize;
+use Imagick;
 
 /**
  * @covers Imbo\Image\Transformation\Resize

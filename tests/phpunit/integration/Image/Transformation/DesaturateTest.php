@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Desaturate,
-    Imagick;
+use Imbo\Image\Transformation\Desaturate;
+use Imagick;
 
 /**
  * @covers Imbo\Image\Transformation\Desaturate

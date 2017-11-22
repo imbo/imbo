@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Canvas,
-    Imagick;
+use Imbo\Image\Transformation\Canvas;
+use Imagick;
 
 /**
  * @covers Imbo\Image\Transformation\Canvas

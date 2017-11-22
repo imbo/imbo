@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Sepia,
-    Imagick;
+use Imbo\Image\Transformation\Sepia;
+use Imagick;
 
 /**
  * @covers Imbo\Image\Transformation\Sepia

@@ -10,8 +10,8 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Crop,
-    Imagick;
+use Imbo\Image\Transformation\Crop;
+use Imagick;
 
 /**
  * @covers Imbo\Image\Transformation\Crop
