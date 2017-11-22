@@ -32,13 +32,6 @@ class GroupTest extends TestCase {
     }
 
     /**
-     * Tear down the model
-     */
-    public function tearDown() {
-        $this->model = null;
-    }
-
-    /**
      * @covers Imbo\Model\Group::getName
      * @covers Imbo\Model\Group::setName
      */

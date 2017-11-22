@@ -32,13 +32,6 @@ class ModulateTest extends TestCase {
     }
 
     /**
-     * Tear down the transformation instance
-     */
-    public function tearDown() {
-        $this->transformation = null;
-    }
-
-    /**
      * Data provider
      *
      * @return array[]

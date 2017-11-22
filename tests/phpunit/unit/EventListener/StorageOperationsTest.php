@@ -50,17 +50,6 @@ class StorageOperationsTest extends ListenerTests {
     }
 
     /**
-     * Tear down the listener
-     */
-    public function tearDown() {
-        $this->listener = null;
-        $this->request = null;
-        $this->response = null;
-        $this->storage = null;
-        $this->event = null;
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function getListener() {

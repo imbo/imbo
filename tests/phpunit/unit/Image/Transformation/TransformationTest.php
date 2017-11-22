@@ -35,13 +35,6 @@ class TransformationTest extends TestCase {
     }
 
     /**
-     * Tear down the transformation instance
-     */
-    public function tearDown() {
-        $this->transformation = null;
-    }
-
-    /**
      * Get different colors and their formatted version
      *
      * @return array[]

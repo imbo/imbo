@@ -66,20 +66,6 @@ class ImagePreparationTest extends TestCase {
     }
 
     /**
-     * Tear down the image prepration instance
-     */
-    public function tearDown() {
-        $this->imageIdentifierGenerator = null;
-        $this->database = null;
-        $this->response = null;
-        $this->prepare = null;
-        $this->headers = null;
-        $this->request = null;
-        $this->config = null;
-        $this->event = null;
-    }
-
-    /**
      * @covers Imbo\Image\ImagePreparation::getSubscribedEvents
      */
     public function testReturnsACorrectDefinition() {

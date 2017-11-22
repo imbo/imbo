@@ -37,13 +37,6 @@ abstract class StorageTests extends TestCase {
         $this->adapter = $this->getAdapter();
     }
 
-    /**
-     * Tear down
-     */
-    public function tearDown() {
-        $this->adapter = null;
-    }
-
     public function testCanStoreAndFetchImageVariations() {
         $key = 'key';
         $id  = 'imageId';

@@ -52,13 +52,6 @@ class IccTest extends TestCase {
     }
 
     /**
-     * Tear down the transformation instance
-     */
-    public function tearDown() {
-        $this->transformation = null;
-    }
-
-    /**
      * @covers ::transform
      * @expectedException Imbo\Exception\InvalidArgumentException
      * @expectedExceptionMessage No profile name given for which ICC profile to use and no profile is assigned to the "default" name.

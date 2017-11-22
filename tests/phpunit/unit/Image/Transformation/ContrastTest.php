@@ -31,13 +31,6 @@ class ContrastTest extends TestCase {
         $this->transformation = new Contrast();
     }
 
-    /**
-     * Tear down the transformation instance
-     */
-    public function tearDown() {
-        $this->transformation = null;
-    }
-
     public function getContrastParams() {
         $imagick = new \Imagick();
         if (is_callable([$imagick, 'getQuantumRange'])) {

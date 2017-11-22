@@ -35,13 +35,6 @@ abstract class AdapterTests extends TestCase {
         $this->adapter = $this->getAdapter();
     }
 
-    /**
-     * Tear down
-     */
-    public function tearDown() {
-        $this->adapter = null;
-    }
-
     public function testReturnsEmptyArrayWhenThereIsNoGroups() {
         $model = $this->createMock('Imbo\Model\Groups');
         $model->expects($this->once())->method('setHits')->with(0);

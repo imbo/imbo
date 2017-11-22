@@ -32,13 +32,6 @@ class StatsTest extends TestCase {
     }
 
     /**
-     * Tear down the model
-     */
-    public function tearDown() {
-        $this->model = null;
-    }
-
-    /**
      * Get stats data
      *
      * @return array[]

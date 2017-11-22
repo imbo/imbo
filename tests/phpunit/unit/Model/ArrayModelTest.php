@@ -32,13 +32,6 @@ class ArrayModelTest extends TestCase {
     }
 
     /**
-     * Tear down the model
-     */
-    public function tearDown() {
-        $this->model = null;
-    }
-
-    /**
      * @covers Imbo\Model\ArrayModel::getData
      * @covers Imbo\Model\ArrayModel::setData
      */

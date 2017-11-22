@@ -51,14 +51,6 @@ class AddPublicKeyTest extends TestCase {
     }
 
     /**
-     * Tear down the command
-     */
-    public function tearDown() {
-        $this->command = null;
-        $this->adapter = null;
-    }
-
-    /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage Invalid access control adapter
      * @covers Imbo\CliCommand\AddPublicKey::getAclAdapter

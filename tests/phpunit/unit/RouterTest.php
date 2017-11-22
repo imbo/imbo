@@ -37,14 +37,6 @@ class RouterTest extends TestCase {
     }
 
     /**
-     * Tear down the router instance
-     */
-    public function tearDown() {
-        $this->router = null;
-        $this->request = null;
-    }
-
-    /**
      * @expectedException Imbo\Exception\RuntimeException
      * @expectedExceptionMessage I'm a teapot
      * @expectedExceptionCode 418

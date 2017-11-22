@@ -108,13 +108,6 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * Tear down the listener
-     */
-    public function tearDown() {
-        $this->listener = null;
-    }
-
-    /**
      * @covers Imbo\EventListener\ImageVariations::__construct
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Scale factor must be below 1

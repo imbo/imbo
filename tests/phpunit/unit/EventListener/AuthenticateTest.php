@@ -72,18 +72,6 @@ class AuthenticateTest extends ListenerTests {
     }
 
     /**
-     * Tear down the listener
-     */
-    public function tearDown() {
-        $this->request = null;
-        $this->response = null;
-        $this->event = null;
-        $this->query = null;
-        $this->headers = null;
-        $this->listener = null;
-    }
-
-    /**
      * @covers Imbo\EventListener\Authenticate::authenticate
      * @expectedException Imbo\Exception\RuntimeException
      * @expectedExceptionMessage Missing authentication timestamp

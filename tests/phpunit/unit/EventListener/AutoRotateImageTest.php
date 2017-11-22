@@ -32,13 +32,6 @@ class AutoRotateImageTest extends TestCase {
     }
 
     /**
-     * Tear down the listener
-     */
-    public function tearDown() {
-        $this->listener = null;
-    }
-
-    /**
      * @covers Imbo\EventListener\AutoRotateImage::getSubscribedEvents
      */
     public function testReturnsCorrectSubscriptionData() {

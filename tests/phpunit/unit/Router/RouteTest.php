@@ -32,13 +32,6 @@ class RouteTest extends TestCase {
     }
 
     /**
-     * Tear down the router instance
-     */
-    public function tearDown() {
-        $this->route = null;
-    }
-
-    /**
      * @covers Imbo\Router\Route::__toString
      */
     public function testReturnsNullWhenNameIsNotSet() {

@@ -55,17 +55,6 @@ class ShortUrlsTest extends ResourceTests {
     }
 
     /**
-     * Tear down the resource
-     */
-    public function tearDown() {
-        $this->resource = null;
-        $this->request = null;
-        $this->response = null;
-        $this->database = null;
-        $this->event = null;
-    }
-
-    /**
      * @expectedException Imbo\Exception\InvalidArgumentException
      * @expectedExceptionMessage Missing JSON data
      * @expectedExceptionCode 400

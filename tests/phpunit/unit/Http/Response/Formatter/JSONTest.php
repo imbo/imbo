@@ -39,14 +39,6 @@ class JSONTest extends TestCase {
     }
 
     /**
-     * Tear down the formatter
-     */
-    public function tearDown() {
-        $this->dateFormatter;
-        $this->formatter = null;
-    }
-
-    /**
      * @covers Imbo\Http\Response\Formatter\JSON::getContentType
      */
     public function testReturnsCurrectContentType() {

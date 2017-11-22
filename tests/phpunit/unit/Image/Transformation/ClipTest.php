@@ -70,13 +70,6 @@ class ClipTest extends TestCase {
     }
 
     /**
-     * Tear down the transformation instance
-     */
-    public function tearDown() {
-        $this->transformation = null;
-    }
-
-    /**
      * @covers ::transform
      * @expectedException Imbo\Exception\InvalidArgumentException
      * @expectedExceptionMessageRegExp #clipping path .* not found#

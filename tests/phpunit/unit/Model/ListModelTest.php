@@ -32,13 +32,6 @@ class ListModelTest extends TestCase {
     }
 
     /**
-     * Tear down the model
-     */
-    public function tearDown() {
-        $this->model = null;
-    }
-
-    /**
      * @covers Imbo\Model\ListModel::setList
      * @covers Imbo\Model\ListModel::getList
      */

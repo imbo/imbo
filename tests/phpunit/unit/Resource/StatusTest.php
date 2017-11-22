@@ -51,17 +51,6 @@ class StatusTest extends ResourceTests {
     }
 
     /**
-     * Tear down the resource
-     */
-    public function tearDown() {
-        $this->resource = null;
-        $this->response = null;
-        $this->database = null;
-        $this->storage = null;
-        $this->event = null;
-    }
-
-    /**
      * @covers Imbo\Resource\Status::get
      */
     public function testSetsCorrectStatusCodeAndErrorMessageWhenDatabaseFails() {

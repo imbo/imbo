@@ -32,13 +32,6 @@ class AccessRulesTest extends TestCase {
     }
 
     /**
-     * Tear down the model
-     */
-    public function tearDown() {
-        $this->model = null;
-    }
-
-    /**
      * @covers Imbo\Model\AccessRules::getRules
      * @covers Imbo\Model\AccessRules::setRules
      * @covers Imbo\Model\AccessRules::getData
