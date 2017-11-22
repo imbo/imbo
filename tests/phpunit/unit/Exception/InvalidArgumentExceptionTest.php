@@ -11,13 +11,14 @@
 namespace ImboUnitTest\Exception;
 
 use Imbo\Exception\InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Exception\InvalidArgumentException
  * @group unit
  * @group exceptions
  */
-class InvalidArgumentExceptionTest extends \PHPUnit_Framework_TestCase {
+class InvalidArgumentExceptionTest extends TestCase {
     /**
      * Fetch imbo error codes
      *

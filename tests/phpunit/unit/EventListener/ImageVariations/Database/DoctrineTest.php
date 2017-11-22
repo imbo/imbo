@@ -11,6 +11,7 @@
 namespace ImboUnitTest\EventListener\ImageVariations\Database;
 
 use Imbo\EventListener\ImageVariations\Database\Doctrine;
+use PHPUnit\Framework\TestCase;
 use PDO;
 
 /**
@@ -19,7 +20,7 @@ use PDO;
  * @group database
  * @group doctrine
  */
-class DoctrineTest extends \PHPUnit_Framework_TestCase {
+class DoctrineTest extends TestCase {
     /**
      * @covers Imbo\EventListener\ImageVariations\Database\Doctrine::__construct
      * @expectedException Imbo\Exception\InvalidArgumentException

@@ -10,12 +10,13 @@
 
 namespace ImboUnitTest\Http\Response;
 
-use Imbo\Http\Response\ResponseFormatter,
-    Imbo\Http\ContentNegotiation,
-    Imbo\Model\Error,
-    Imbo\Model\Image,
-    Imbo\Router\Route,
-    Symfony\Component\HttpFoundation\ParameterBag;
+use Imbo\Http\Response\ResponseFormatter;
+use Imbo\Http\ContentNegotiation;
+use Imbo\Model\Error;
+use Imbo\Model\Image;
+use Imbo\Router\Route;
+use Symfony\Component\HttpFoundation\ParameterBag;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Http\Response\ResponseFormatter
@@ -23,7 +24,7 @@ use Imbo\Http\Response\ResponseFormatter,
  * @group http
  * @group formatters
  */
-class ResponseFormatterTest extends \PHPUnit_Framework_TestCase {
+class ResponseFormatterTest extends TestCase {
     /**
      * @var ResponseFormatter
      */

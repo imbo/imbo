@@ -10,9 +10,10 @@
 
 namespace ImboUnitTest\EventListener\ImageVariations\Storage;
 
-use Imbo\EventListener\ImageVariations\Storage\Filesystem,
-    org\bovigo\vfs\vfsStream,
-    org\bovigo\vfs\vfsStreamWrapper;
+use Imbo\EventListener\ImageVariations\Storage\Filesystem;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamWrapper;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\EventListener\ImageVariations\Storage\Filesystem
@@ -20,7 +21,7 @@ use Imbo\EventListener\ImageVariations\Storage\Filesystem,
  * @group storage
  * @group filesystem
  */
-class FilesystemTest extends \PHPUnit_Framework_TestCase {
+class FilesystemTest extends TestCase {
     /**
      * Setup method
      */

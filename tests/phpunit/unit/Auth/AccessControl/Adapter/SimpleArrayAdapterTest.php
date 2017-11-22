@@ -10,15 +10,16 @@
 
 namespace ImboUnitTest\Auth\AccessControl\Adapter;
 
-use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
-    Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter,
-    Imbo\Resource;
+use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
+use Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter;
+use Imbo\Resource;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter
  * @group unit
  */
-class SimpleArrayAdapterTest extends \PHPUnit_Framework_TestCase {
+class SimpleArrayAdapterTest extends TestCase {
     /**
      * @dataProvider getAuthConfig
      */

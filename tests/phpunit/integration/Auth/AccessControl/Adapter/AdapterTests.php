@@ -10,10 +10,12 @@
 
 namespace ImboIntegrationTest\Auth\AccessControl\Adapter;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * @group integration
  */
-abstract class AdapterTests extends \PHPUnit_Framework_TestCase {
+abstract class AdapterTests extends TestCase {
     /**
      * @var Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface
      */

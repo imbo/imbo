@@ -10,17 +10,18 @@
 
 namespace ImboUnitTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Clip,
-    Imbo\Model\Image,
-    Imagick,
-    ImagickException;
+use Imbo\Image\Transformation\Clip;
+use Imbo\Model\Image;
+use Imagick;
+use ImagickException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Clip
  * @group unit
  * @group transformations
  */
-class ClipTest extends \PHPUnit_Framework_TestCase {
+class ClipTest extends TestCase {
     /**
      * @var Clip
      */

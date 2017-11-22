@@ -11,13 +11,14 @@
 namespace ImboUnitTest\EventManager;
 
 use Imbo\EventManager\PriorityQueue;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\EventManager\PriorityQueue
  * @group unit
  * @group eventmanager
  */
-class PriorityQueueTest extends \PHPUnit_Framework_TestCase {
+class PriorityQueueTest extends TestCase {
     /**
      * @var PriorityQueue
      */

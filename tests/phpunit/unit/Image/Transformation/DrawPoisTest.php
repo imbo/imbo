@@ -13,13 +13,14 @@ namespace ImboUnitTest\Image\Transformation;
 use Imbo\Http\Response\Response;
 use Imbo\Image\Transformation\DrawPois;
 use Imbo\Model\Image;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Image\Transformation\DrawPois
  * @group unit
  * @group transformations
  */
-class DrawPoisTest extends \PHPUnit_Framework_TestCase {
+class DrawPoisTest extends TestCase {
     /**
      * @covers Imbo\Image\Transformation\DrawPois::transform
      */

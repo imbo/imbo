@@ -11,13 +11,14 @@
 namespace ImboUnitTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Convert;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Image\Transformation\Convert
  * @group unit
  * @group transformations
  */
-class ConvertTest extends \PHPUnit_Framework_TestCase {
+class ConvertTest extends TestCase {
     /**
      * @var Convert
      */

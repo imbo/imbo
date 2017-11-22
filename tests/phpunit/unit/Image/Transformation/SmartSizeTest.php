@@ -13,13 +13,14 @@ namespace ImboUnitTest\Image\Transformation;
 use Imbo\Http\Response\Response;
 use Imbo\Image\Transformation\SmartSize;
 use Imbo\Model\Image;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Image\Transformation\SmartSize
  * @group unit
  * @group transformations
  */
-class SmartSizeTest extends \PHPUnit_Framework_TestCase {
+class SmartSizeTest extends TestCase {
     /**
      * Fetch different valid smart size crop arguments and expected results
      *

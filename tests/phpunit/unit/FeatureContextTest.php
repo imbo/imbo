@@ -18,17 +18,17 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use PHPUnit_Framework_TestCase;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass ImboBehatFeatureContext\FeatureContext
  * @group unit
  * @group behat
  */
-class FeatureContextTest extends PHPUnit_Framework_TestCase {
+class FeatureContextTest extends TestCase {
     /**
      * @var FeatureContext
      */

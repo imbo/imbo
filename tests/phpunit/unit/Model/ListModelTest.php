@@ -11,13 +11,14 @@
 namespace ImboUnitTest\Model;
 
 use Imbo\Model\ListModel;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Model\ListModel
  * @group unit
  * @group models
  */
-class ListModelTest extends \PHPUnit_Framework_TestCase {
+class ListModelTest extends TestCase {
     /**
      * @var ListModel
      */

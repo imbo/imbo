@@ -12,13 +12,14 @@ namespace ImboUnitTest\Image\Transformation;
 
 use Imagick;
 use Imbo\Image\Transformation\AutoRotate;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Image\Transformation\AutoRotate
  * @group unit
  * @group transformations
  */
-class AutoRotateTest extends \PHPUnit_Framework_TestCase {
+class AutoRotateTest extends TestCase {
     /**
      * @covers Imbo\Image\Transformation\AutoRotate::transform
      */

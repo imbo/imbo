@@ -10,15 +10,16 @@
 
 namespace ImboUnitTest\Model;
 
-use Imbo\Model\Status,
-    DateTime;
+use Imbo\Model\Status;
+use DateTime;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Model\Status
  * @group unit
  * @group models
  */
-class StatusTest extends \PHPUnit_Framework_TestCase {
+class StatusTest extends TestCase {
     /**
      * @var Status
      */

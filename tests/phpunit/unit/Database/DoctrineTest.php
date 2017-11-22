@@ -10,11 +10,12 @@
 
 namespace ImboUnitTest\Database;
 
-use Imbo\Database\Doctrine,
-    Doctrine\DBAL\Connection,
-    Doctrine\DBAL\DBALException,
-    PDOException,
-    ReflectionMethod;
+use Imbo\Database\Doctrine;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
+use PDOException;
+use ReflectionMethod;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Database\Doctrine
@@ -22,7 +23,7 @@ use Imbo\Database\Doctrine,
  * @group database
  * @group doctrine
  */
-class DoctrineTest extends \PHPUnit_Framework_TestCase {
+class DoctrineTest extends TestCase {
     /**
      * @var Doctrine
      */

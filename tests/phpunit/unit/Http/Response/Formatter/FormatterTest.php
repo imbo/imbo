@@ -11,6 +11,7 @@
 namespace ImboUnitTest\Http\Response\Formatter;
 
 use Imbo\Http\Response\Formatter\JSON;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Http\Response\Formatter\Formatter
@@ -18,7 +19,7 @@ use Imbo\Http\Response\Formatter\JSON;
  * @group http
  * @group formatters
  */
-class FormatterTest extends \PHPUnit_Framework_TestCase {
+class FormatterTest extends TestCase {
     /**
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @expectedException Imbo\Exception\InvalidArgumentException

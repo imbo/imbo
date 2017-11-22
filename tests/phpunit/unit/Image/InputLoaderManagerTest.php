@@ -10,16 +10,16 @@
 
 namespace ImboUnitTest\Image;
 
-use Imbo\Image\InputLoader\Basic,
-    Imbo\Image\InputLoader\InputLoaderInterface,
-    Imbo\Image\InputLoaderManager,
-    PHPUnit_Framework_TestCase,
-    stdClass;
+use Imbo\Image\InputLoader\Basic;
+use Imbo\Image\InputLoader\InputLoaderInterface;
+use Imbo\Image\InputLoaderManager;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 /**
  * @coversDefaultClass Imbo\Image\InputLoaderManager
  */
-class InputLoaderManagerTest extends PHPUnit_Framework_TestCase {
+class InputLoaderManagerTest extends TestCase {
     /**
      * @var InputLoaderManager
      */

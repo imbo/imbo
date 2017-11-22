@@ -10,17 +10,18 @@
 
 namespace ImboUnitTest;
 
-use Imbo\Application,
-    Imbo\Version,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\Http\Request\Request,
-    Imbo\Resource\ResourceInterface;
+use Imbo\Application;
+use Imbo\Version;
+use Imbo\EventListener\ListenerInterface;
+use Imbo\Http\Request\Request;
+use Imbo\Resource\ResourceInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Application
  * @group unit
  */
-class ApplicationTest extends \PHPUnit_Framework_TestCase {
+class ApplicationTest extends TestCase {
     /**
      * @var Application
      */

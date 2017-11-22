@@ -11,13 +11,14 @@
 namespace ImboUnitTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Modulate;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Image\Transformation\Modulate
  * @group unit
  * @group transformations
  */
-class ModulateTest extends \PHPUnit_Framework_TestCase {
+class ModulateTest extends TestCase {
     /**
      * @var Modulate
      */

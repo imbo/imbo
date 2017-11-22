@@ -10,15 +10,16 @@
 
 namespace ImboUnitTest\Model;
 
-use Imbo\Model\User,
-    DateTime;
+use Imbo\Model\User;
+use DateTime;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Model\User
  * @group unit
  * @group models
  */
-class UserTest extends \PHPUnit_Framework_TestCase {
+class UserTest extends TestCase {
     /**
      * @var User
      */

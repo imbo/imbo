@@ -11,13 +11,14 @@
 namespace ImboUnitTest\Resource\Images;
 
 use Imbo\Resource\Images\Query;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Resource\Images\Query
  * @group unit
  * @group resources
  */
-class QueryTest extends \PHPUnit_Framework_TestCase {
+class QueryTest extends TestCase {
     /**
      * @var Query
      */

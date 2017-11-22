@@ -16,14 +16,14 @@ use Imbo\Image\OutputConverter\Basic;
 use Imbo\Image\OutputConverter\Bmp;
 use Imbo\Image\OutputConverter\Webp;
 use Imbo\Image\OutputConverter\OutputConverterInterface;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Imagick;
 use stdClass;
 
 /**
  * @coversDefaultClass Imbo\Image\OutputConverterManager
  */
-class OutputConverterManagerTest extends PHPUnit_Framework_TestCase {
+class OutputConverterManagerTest extends TestCase {
     /**
      * @var OutputConverterManager
      */

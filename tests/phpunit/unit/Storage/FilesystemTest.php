@@ -10,17 +10,18 @@
 
 namespace ImboUnitTest\Storage;
 
-use Imbo\Storage\Filesystem,
-    org\bovigo\vfs\vfsStream,
-    org\bovigo\vfs\vfsStreamWrapper,
-    Imbo\Exception\ConfigurationException;
+use Imbo\Storage\Filesystem;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamWrapper;
+use Imbo\Exception\ConfigurationException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Storage\Filesystem
  * @group unit
  * @group storage
  */
-class FilesystemTest extends \PHPUnit_Framework_TestCase {
+class FilesystemTest extends TestCase {
     /**
      * User that can be used in tests
      *

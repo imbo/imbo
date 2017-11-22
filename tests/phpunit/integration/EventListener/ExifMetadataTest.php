@@ -10,15 +10,16 @@
 
 namespace ImboIntegrationTest\EventListener;
 
-use Imbo\EventListener\ExifMetadata,
-    Imbo\Model\Image;
+use Imbo\EventListener\ExifMetadata;
+use Imbo\Model\Image;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\EventListener\ExifMetadata
  * @group integration
  * @group listeners
  */
-class ExifMetadataTest extends \PHPUnit_Framework_TestCase {
+class ExifMetadataTest extends TestCase {
     /**
      * @covers Imbo\EventListener\ExifMetadata::__construct
      * @covers Imbo\EventListener\ExifMetadata::populate

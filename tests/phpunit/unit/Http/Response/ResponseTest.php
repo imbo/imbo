@@ -10,18 +10,19 @@
 
 namespace ImboUnitTest\Http\Response;
 
-use Imbo\Http\Response\Response,
-    Imbo\Exception,
-    Imbo\Exception\RuntimeException,
-    DateTime,
-    DateTimeZone;
+use Imbo\Http\Response\Response;
+use Imbo\Exception;
+use Imbo\Exception\RuntimeException;
+use DateTime;
+use DateTimeZone;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Http\Response\Response
  * @group unit
  * @group http
  */
-class ResponseTest extends \PHPUnit_Framework_TestCase {
+class ResponseTest extends TestCase {
     /**
      * @var Response
      */

@@ -11,12 +11,13 @@
 namespace ImboUnitTest;
 
 use Imbo\Resource;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Resource
  * @group unit
  */
-class ResourceTest extends \PHPUnit_Framework_TestCase {
+class ResourceTest extends TestCase {
     public function testMethodsReturnsArrays() {
         $this->assertInternalType('array', Resource::getReadOnlyResources());
         $this->assertInternalType('array', Resource::getReadWriteResources());

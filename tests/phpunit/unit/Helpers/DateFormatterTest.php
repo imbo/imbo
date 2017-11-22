@@ -10,16 +10,17 @@
 
 namespace ImboUnitTest;
 
-use Imbo\Helpers\DateFormatter,
-    DateTime,
-    DateTimeZone;
+use Imbo\Helpers\DateFormatter;
+use DateTime;
+use DateTimeZone;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Helpers\DateFormatter
  * @group unit
  * @group helpers
  */
-class DateFormatterTest extends \PHPUnit_Framework_TestCase {
+class DateFormatterTest extends TestCase {
     /**
      * @var DateFormatter
      */

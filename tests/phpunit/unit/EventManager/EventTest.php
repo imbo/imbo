@@ -10,19 +10,20 @@
 
 namespace ImboUnitTest\EventManager;
 
-use Imbo\EventManager\Event,
-    Imbo\EventManager\EventManagerInterface,
-    Imbo\Http\Request\Request,
-    Imbo\Http\Response\Response,
-    Imbo\Database\DatabaseInterface,
-    Imbo\Storage\StorageInterface;
+use Imbo\EventManager\Event;
+use Imbo\EventManager\EventManagerInterface;
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+use Imbo\Database\DatabaseInterface;
+use Imbo\Storage\StorageInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\EventManager\Event
  * @group unit
  * @group eventmanager
  */
-class EventTest extends \PHPUnit_Framework_TestCase {
+class EventTest extends TestCase {
     /**
      * @var Event
      */

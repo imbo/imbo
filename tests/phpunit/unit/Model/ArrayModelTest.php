@@ -11,13 +11,14 @@
 namespace ImboUnitTest\Model;
 
 use Imbo\Model\ArrayModel;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Model\ArrayModel
  * @group unit
  * @group models
  */
-class ArrayModelTest extends \PHPUnit_Framework_TestCase {
+class ArrayModelTest extends TestCase {
     /**
      * @var ArrayModel
      */

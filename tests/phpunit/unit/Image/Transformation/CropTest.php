@@ -11,13 +11,14 @@
 namespace ImboUnitTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Crop;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Image\Transformation\Crop
  * @group unit
  * @group transformations
  */
-class CropTest extends \PHPUnit_Framework_TestCase {
+class CropTest extends TestCase {
     /**
      * @covers Imbo\Image\Transformation\Crop::transform
      * @expectedException Imbo\Exception\TransformationException

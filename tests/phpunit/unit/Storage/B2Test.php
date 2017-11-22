@@ -10,15 +10,16 @@
 
 namespace ImboUnitTest\Storage;
 
-use Imbo\Exception\ConfigurationException,
-    Imbo\Storage\B2;
+use Imbo\Exception\ConfigurationException;
+use Imbo\Storage\B2;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Storage\B2
  * @group unit
  * @group storage
  */
-class B2Test extends \PHPUnit_Framework_TestCase {
+class B2Test extends TestCase {
     /**
      * Test that we don't get an exception with required parameters present
      */

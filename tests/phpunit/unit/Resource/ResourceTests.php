@@ -10,14 +10,15 @@
 
 namespace ImboUnitTest\Resource;
 
-use ReflectionClass,
-    ReflectionMethod;
+use ReflectionClass;
+use ReflectionMethod;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @group unit
  * @group resources
  */
-abstract class ResourceTests extends \PHPUnit_Framework_TestCase {
+abstract class ResourceTests extends TestCase {
     /**
      * Return a resource that can be tested
      *

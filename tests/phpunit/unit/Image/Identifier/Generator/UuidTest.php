@@ -10,14 +10,15 @@
 
 namespace ImboUnitTest\Image\Identifier\Generator;
 
-use Imbo\Image\Identifier\Generator\Uuid as UuidGenerator,
-    ImagickException;
+use Imbo\Image\Identifier\Generator\Uuid as UuidGenerator;
+use ImagickException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Image\Identifier\Generator\Uuid
  * @group unit
  */
-class UuidTest extends \PHPUnit_Framework_TestCase {
+class UuidTest extends TestCase {
     public function testGeneratesUniqueUuidV4() {
         $image = $this->createMock('Imbo\Model\Image');
         $generator = new UuidGenerator();
