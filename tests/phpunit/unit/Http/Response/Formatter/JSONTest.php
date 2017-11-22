@@ -10,8 +10,9 @@
 
 namespace ImboUnitTest\Http\Response\Formatter;
 
-use Imbo\Http\Response\Formatter\JSON,
-    DateTime;
+use Imbo\Http\Response\Formatter\JSON;
+use DateTime;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Http\Response\Formatter\JSON
@@ -19,7 +20,7 @@ use Imbo\Http\Response\Formatter\JSON,
  * @group http
  * @group formatters
  */
-class JSONTest extends \PHPUnit_Framework_TestCase {
+class JSONTest extends TestCase {
     /**
      * @var JSON
      */

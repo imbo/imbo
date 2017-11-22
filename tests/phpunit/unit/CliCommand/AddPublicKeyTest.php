@@ -10,18 +10,19 @@
 
 namespace ImboUnitTest\CliCommand;
 
-use Imbo\CliCommand\AddPublicKey,
-    Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
-    Imbo\Resource,
-    Symfony\Component\Console\Application,
-    Symfony\Component\Console\Tester\CommandTester;
+use Imbo\CliCommand\AddPublicKey;
+use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
+use Imbo\Resource;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandTester;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\CliCommand\AddPublicKey
  * @group unit-cli
  * @group cli-commands
  */
-class AddPublicKeyTest extends \PHPUnit_Framework_TestCase {
+class AddPublicKeyTest extends TestCase {
     /**
      * @var Imbo\CliCommand\AddPublicKey
      */

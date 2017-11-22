@@ -11,13 +11,14 @@
 namespace ImboUnitTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Compress;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Image\Transformation\Compress
  * @group unit
  * @group transformations
  */
-class CompressTest extends \PHPUnit_Framework_TestCase {
+class CompressTest extends TestCase {
     /**
      * @var Compress
      */

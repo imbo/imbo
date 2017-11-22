@@ -11,13 +11,14 @@
 namespace ImboIntegrationTest\EventListener;
 
 use Imbo\EventListener\ImageTransformationLimiter;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\EventListener\ImageTransformationLimiter
  * @group integration
  * @group listeners
  */
-class ImageTransformationLimiterTest extends \PHPUnit_Framework_TestCase {
+class ImageTransformationLimiterTest extends TestCase {
     /**
      * @covers Imbo\EventListener\ImageTransformationLimiter::__construct
      * @covers Imbo\EventListener\ImageTransformationLimiter::checkTransformationCount

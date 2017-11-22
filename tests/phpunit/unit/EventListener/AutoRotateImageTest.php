@@ -11,13 +11,14 @@
 namespace ImboUnitTest\EventListener;
 
 use Imbo\EventListener\AutoRotateImage;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\EventListener\AutoRotateImage
  * @group unit
  * @group listeners
  */
-class AutoRotateImageTest extends \PHPUnit_Framework_TestCase {
+class AutoRotateImageTest extends TestCase {
     /**
      * @var AutoRotateImage
      */

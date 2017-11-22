@@ -11,13 +11,14 @@
 namespace ImboUnitTest\Http;
 
 use Imbo\Http\ContentNegotiation;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Http\ContentNegotiation
  * @group unit
  * @group http
  */
-class ContentNegotiationTest extends \PHPUnit_Framework_TestCase {
+class ContentNegotiationTest extends TestCase {
     /**
      * @var ContentNegotiation
      */

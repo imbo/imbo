@@ -10,17 +10,18 @@
 
 namespace ImboUnitTest\Model;
 
-use Imbo\Model\Error,
-    Imbo\Exception\RuntimeException,
-    Imbo\Exception,
-    DateTime;
+use Imbo\Model\Error;
+use Imbo\Exception\RuntimeException;
+use Imbo\Exception;
+use DateTime;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Model\Error
  * @group unit
  * @group models
  */
-class ErrorTest extends \PHPUnit_Framework_TestCase {
+class ErrorTest extends TestCase {
     /**
      * @var Error
      */

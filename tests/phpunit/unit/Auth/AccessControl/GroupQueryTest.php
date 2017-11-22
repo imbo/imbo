@@ -11,13 +11,14 @@
 namespace ImboUnitTest\Auth\AccessControl;
 
 use Imbo\Auth\AccessControl\GroupQuery;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Auth\AccessControl\GroupQuery
  * @covers Imbo\Auth\AccessControl\AbstractQuery
  * @group unit
  */
-class GroupQueryTest extends \PHPUnit_Framework_TestCase {
+class GroupQueryTest extends TestCase {
     /**
      * @var GroupQuery
      */

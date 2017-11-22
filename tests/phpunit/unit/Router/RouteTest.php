@@ -11,13 +11,14 @@
 namespace ImboUnitTest\Router;
 
 use Imbo\Router\Route;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Router\Route
  * @group unit
  * @group router
  */
-class RouteTest extends \PHPUnit_Framework_TestCase {
+class RouteTest extends TestCase {
     /**
      * @var Route
      */

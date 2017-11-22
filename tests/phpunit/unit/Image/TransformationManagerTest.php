@@ -10,15 +10,16 @@
 
 namespace ImboUnitTest\Image;
 
-use Imbo\Image\TransformationManager,
-    Imbo\Http\Request\Request,
-    Symfony\Component\HttpFoundation\ParameterBag;
+use Imbo\Image\TransformationManager;
+use Imbo\Http\Request\Request;
+use Symfony\Component\HttpFoundation\ParameterBag;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Image\TransformationManager
  * @group unit
  */
-class TransformationManagerTest extends \PHPUnit_Framework_TestCase {
+class TransformationManagerTest extends TestCase {
     protected $manager;
     protected $request;
     protected $response;

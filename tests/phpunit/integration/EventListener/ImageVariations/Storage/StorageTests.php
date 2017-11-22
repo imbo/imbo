@@ -11,12 +11,13 @@
 namespace ImboIntegrationTest\EventListener\ImageVariations\Storage;
 
 use Imbo\EventListener\ImageVariations\Storage\StorageInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @group integration
  * @group storage
  */
-abstract class StorageTests extends \PHPUnit_Framework_TestCase {
+abstract class StorageTests extends TestCase {
     /**
      * @var StorageInterface
      */

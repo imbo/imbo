@@ -11,12 +11,12 @@
 namespace ImboUnitTest\Image\InputLoader;
 
 use Imbo\Image\InputLoader\Basic;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Image\InputLoader\Basic
  */
-class BasicTest extends PHPUnit_Framework_TestCase {
+class BasicTest extends TestCase {
     /**
      * @var Basic
      */

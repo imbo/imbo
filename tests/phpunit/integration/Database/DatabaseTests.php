@@ -16,13 +16,13 @@ use Imbo\Resource\Images\Query;
 use Imbo\Database\Doctrine;
 use DateTime;
 use DateTimeZone;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @group integration
  * @group database
  */
-abstract class DatabaseTests extends PHPUnit_Framework_TestCase {
+abstract class DatabaseTests extends TestCase {
     /**
      * @var Imbo\Database\DatabaseInterface
      */

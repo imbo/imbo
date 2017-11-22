@@ -10,15 +10,16 @@
 
 namespace ImboUnitTest\Http\Request;
 
-use Imbo\Http\Request\Request,
-    Imbo\Router\Route;
+use Imbo\Http\Request\Request;
+use Imbo\Router\Route;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Http\Request\Request
  * @group unit
  * @group http
  */
-class RequestTest extends \PHPUnit_Framework_TestCase {
+class RequestTest extends TestCase {
     /**
      * @var Request
      */

@@ -11,13 +11,14 @@
 namespace ImboUnitTest\Model;
 
 use Imbo\Model\Groups;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Model\Groups
  * @group unit
  * @group models
  */
-class GroupsTest extends \PHPUnit_Framework_TestCase {
+class GroupsTest extends TestCase {
     /**
      * @var Groups
      */

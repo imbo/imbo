@@ -12,14 +12,14 @@ namespace ImboUnitTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Watermark;
 use Imbo\Exception\StorageException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Watermark
  * @group unit
  * @group transformations
  */
-class WatermarkTest extends PHPUnit_Framework_TestCase {
+class WatermarkTest extends TestCase {
     /**
      * @var Watermark
      */

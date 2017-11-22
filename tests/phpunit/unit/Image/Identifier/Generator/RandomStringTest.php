@@ -10,14 +10,15 @@
 
 namespace ImboUnitTest\Image\Identifier\Generator;
 
-use Imbo\Image\Identifier\Generator\RandomString as RandomStringGenerator,
-    ImagickException;
+use Imbo\Image\Identifier\Generator\RandomString as RandomStringGenerator;
+use ImagickException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Image\Identifier\Generator\RandomString
  * @group unit
  */
-class RandomStringTest extends \PHPUnit_Framework_TestCase {
+class RandomStringTest extends TestCase {
     public function testGeneratesUniqueStrings() {
         $stringLength = 15;
 

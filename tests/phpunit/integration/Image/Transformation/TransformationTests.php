@@ -10,11 +10,13 @@
 
 namespace ImboIntegrationTest\Image\Transformation;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * @group integration
  * @group transformations
  */
-abstract class TransformationTests extends \PHPUnit_Framework_TestCase {
+abstract class TransformationTests extends TestCase {
     /**
      * Get the transformation to test
      *

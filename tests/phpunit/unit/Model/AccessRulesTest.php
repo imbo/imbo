@@ -11,13 +11,14 @@
 namespace ImboUnitTest\Model;
 
 use Imbo\Model\AccessRules;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Model\AccessRules
  * @group unit
  * @group models
  */
-class AccessRulesTest extends \PHPUnit_Framework_TestCase {
+class AccessRulesTest extends TestCase {
     /**
      * @var AccessRules
      */

@@ -10,16 +10,17 @@
 
 namespace ImboUnitTest\Model;
 
-use Imbo\Model\Image,
-    Imbo\Image\Transformation\Transformation,
-    DateTime;
+use Imbo\Model\Image;
+use Imbo\Image\Transformation\Transformation;
+use DateTime;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Model\Image
  * @group unit
  * @group models
  */
-class ImageTest extends \PHPUnit_Framework_TestCase {
+class ImageTest extends TestCase {
     /**
      * @var Image
      */

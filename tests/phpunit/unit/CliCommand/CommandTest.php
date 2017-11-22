@@ -11,13 +11,14 @@
 namespace ImboUnitTest\CliCommand;
 
 use Imbo\CliCommand\CliCommand;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\CliCommand\CliCommand
  * @group unit-cli
  * @group cli-commands
  */
-class CliCommandTest extends \PHPUnit_Framework_TestCase {
+class CliCommandTest extends TestCase {
     /**
      * @var Imbo\CliCommand\CliCommand
      */

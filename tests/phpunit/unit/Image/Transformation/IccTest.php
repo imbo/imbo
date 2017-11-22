@@ -10,17 +10,18 @@
 
 namespace ImboUnitTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Icc,
-    Imbo\Model\Image,
-    Imagick,
-    ImagickException;
+use Imbo\Image\Transformation\Icc;
+use Imbo\Model\Image;
+use Imagick;
+use ImagickException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Icc
  * @group unit
  * @group transformations
  */
-class IccTest extends \PHPUnit_Framework_TestCase {
+class IccTest extends TestCase {
     /**
      * @var Icc
      */

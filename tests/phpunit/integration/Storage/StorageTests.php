@@ -11,12 +11,13 @@
 namespace ImboIntegrationTest\Storage;
 
 use DateTime;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @group integration
  * @group storage
  */
-abstract class StorageTests extends \PHPUnit_Framework_TestCase {
+abstract class StorageTests extends TestCase {
     /**
      * @var Imbo\Storage\StorageInterface
      */

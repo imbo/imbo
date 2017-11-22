@@ -11,14 +11,14 @@
 namespace ImboUnitTest\Model;
 
 use Imbo\Model\Images;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Model\Images
  * @group unit
  * @group models
  */
-class ImagesTest extends PHPUnit_Framework_TestCase {
+class ImagesTest extends TestCase {
     /**
      * @var Images
      */

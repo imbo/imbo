@@ -11,13 +11,13 @@
 namespace ImboUnitTest\Image\OutputConverter;
 
 use Imbo\Image\OutputConverter\Webp;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use ImagickException;
 
 /**
  * @coversDefaultClass Imbo\Image\OutputConverter\Webp
  */
-class WebpTest extends PHPUnit_Framework_TestCase {
+class WebpTest extends TestCase {
     /**
      * @var Webp
      */

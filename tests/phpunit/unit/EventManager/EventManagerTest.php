@@ -10,17 +10,18 @@
 
 namespace ImboUnitTest\EventManager;
 
-use Imbo\EventManager\EventManager,
-    Imbo\EventManager\Event,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventListener\Initializer\InitializerInterface;
+use Imbo\EventManager\EventManager;
+use Imbo\EventManager\Event;
+use Imbo\EventListener\ListenerInterface;
+use Imbo\EventListener\Initializer\InitializerInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\EventManager\EventManager
  * @group unit
  * @group eventmanager
  */
-class EventManagerTest extends \PHPUnit_Framework_TestCase {
+class EventManagerTest extends TestCase {
     /**
      * @var EventManager
      */

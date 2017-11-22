@@ -11,13 +11,14 @@
 namespace ImboUnitTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Contrast;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Image\Transformation\Contrast
  * @group unit
  * @group transformations
  */
-class ContrastTest extends \PHPUnit_Framework_TestCase {
+class ContrastTest extends TestCase {
     /**
      * @var Contrast
      */

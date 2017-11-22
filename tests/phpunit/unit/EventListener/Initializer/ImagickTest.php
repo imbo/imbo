@@ -11,13 +11,14 @@
 namespace ImboUnitTest\EventListener\Initializer;
 
 use Imbo\EventListener\Initializer\Imagick;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\EventListener\Initializer\Imagick
  * @group unit
  * @group listeners
  */
-class ImagickTest extends \PHPUnit_Framework_TestCase {
+class ImagickTest extends TestCase {
     /**
      * @var Imagick
      */

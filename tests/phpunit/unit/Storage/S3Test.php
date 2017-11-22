@@ -10,15 +10,16 @@
 
 namespace ImboUnitTest\Storage;
 
-use Imbo\Exception\ConfigurationException,
-    Imbo\Storage\S3;
+use Imbo\Exception\ConfigurationException;
+use Imbo\Storage\S3;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Storage\S3
  * @group unit
  * @group storage
  */
-class S3Test extends \PHPUnit_Framework_TestCase {
+class S3Test extends TestCase {
     /**
      * Test that we don't get an exception with required parameters present
      */

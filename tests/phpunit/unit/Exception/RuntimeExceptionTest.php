@@ -11,13 +11,14 @@
 namespace ImboUnitTest\Exception;
 
 use Imbo\Exception\RuntimeException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Exception\RuntimeException
  * @group unit
  * @group exceptions
  */
-class RuntimeExceptionTest extends \PHPUnit_Framework_TestCase {
+class RuntimeExceptionTest extends TestCase {
     /**
      * Fetch imbo error codes
      *

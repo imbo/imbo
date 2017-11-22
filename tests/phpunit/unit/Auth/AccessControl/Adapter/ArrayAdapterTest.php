@@ -10,15 +10,16 @@
 
 namespace ImboUnitTest\Auth\AccessControl\Adapter;
 
-use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
-    Imbo\Auth\AccessControl\GroupQuery,
-    Imbo\Resource;
+use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
+use Imbo\Auth\AccessControl\GroupQuery;
+use Imbo\Resource;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter
  * @group unit
  */
-class ArrayAdapterTest extends \PHPUnit_Framework_TestCase {
+class ArrayAdapterTest extends TestCase {
     /**
      * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::__construct
      * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::validateAccessList

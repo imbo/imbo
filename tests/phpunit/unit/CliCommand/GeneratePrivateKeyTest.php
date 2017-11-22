@@ -10,16 +10,17 @@
 
 namespace ImboUnitTest\CliCommand;
 
-use Imbo\CliCommand\GeneratePrivateKey,
-    Symfony\Component\Console\Application,
-    Symfony\Component\Console\Tester\CommandTester;
+use Imbo\CliCommand\GeneratePrivateKey;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandTester;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\CliCommand\GeneratePrivateKey
  * @group unit-cli
  * @group cli-commands
  */
-class GeneratePrivateKeyTest extends \PHPUnit_Framework_TestCase {
+class GeneratePrivateKeyTest extends TestCase {
     /**
      * @var Imbo\CliCommand\GeneratePrivateKey
      */

@@ -10,16 +10,17 @@
 
 namespace ImboUnitTest;
 
-use Imbo\Helpers\BSONToArray,
-    MongoDB\Model\BSONArray,
-    MongoDB\Model\BSONDocument;
+use Imbo\Helpers\BSONToArray;
+use MongoDB\Model\BSONArray;
+use MongoDB\Model\BSONDocument;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Helpers\BSONToArray
  * @group unit
  * @group helpers
  */
-class BSONToArrayTest extends \PHPUnit_Framework_TestCase {
+class BSONToArrayTest extends TestCase {
     /**
      * @var BSONToArray
      */

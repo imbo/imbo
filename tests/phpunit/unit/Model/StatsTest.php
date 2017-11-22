@@ -11,13 +11,14 @@
 namespace ImboUnitTest\Model;
 
 use Imbo\Model\Stats;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Model\Stats
  * @group unit
  * @group models
  */
-class StatsTest extends \PHPUnit_Framework_TestCase {
+class StatsTest extends TestCase {
     /**
      * @var Stats
      */

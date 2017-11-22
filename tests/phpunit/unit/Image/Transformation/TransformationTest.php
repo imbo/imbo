@@ -10,17 +10,18 @@
 
 namespace ImboUnitTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Transformation,
-    Imbo\Model\Image,
-    Imagick,
-    ReflectionMethod;
+use Imbo\Image\Transformation\Transformation;
+use Imbo\Model\Image;
+use Imagick;
+use ReflectionMethod;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Image\Transformation\Transformation
  * @group unit
  * @group transformations
  */
-class TransformationTest extends \PHPUnit_Framework_TestCase {
+class TransformationTest extends TestCase {
     /**
      * @var Transformation
      */

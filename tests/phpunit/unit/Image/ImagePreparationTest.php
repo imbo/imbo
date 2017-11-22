@@ -10,15 +10,16 @@
 
 namespace ImboUnitTest\Image;
 
-use Imbo\Image\ImagePreparation,
-    Imbo\Model\Image,
-    Imbo\Image\Identifier\Generator\GeneratorInterface;
+use Imbo\Image\ImagePreparation;
+use Imbo\Model\Image;
+use Imbo\Image\Identifier\Generator\GeneratorInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Image\ImagePreparation
  * @group unit
  */
-class ImagePreparationTest extends \PHPUnit_Framework_TestCase {
+class ImagePreparationTest extends TestCase {
     /**
      * @var ImagePreparation
      */

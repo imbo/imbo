@@ -10,14 +10,15 @@
 
 namespace ImboUnitTest;
 
-use Imbo\CliApplication,
-    Symfony\Component\Console\Tester\ApplicationTester;
+use Imbo\CliApplication;
+use Symfony\Component\Console\Tester\ApplicationTester;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\CliApplication
  * @group unit-cli
  */
-class CliApplicationTest extends \PHPUnit_Framework_TestCase {
+class CliApplicationTest extends TestCase {
     /**
      * @covers Imbo\CliApplication::__construct
      */

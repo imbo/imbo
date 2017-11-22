@@ -10,15 +10,16 @@
 
 namespace ImboUnitTest\Image\Transformation;
 
-use Imbo\Image\Transformation\Strip,
-    ImagickException;
+use Imbo\Image\Transformation\Strip;
+use ImagickException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\Image\Transformation\Strip
  * @group unit
  * @group transformations
  */
-class StripTest extends \PHPUnit_Framework_TestCase {
+class StripTest extends TestCase {
     /**
      * @expectedException Imbo\Exception\TransformationException
      * @expectedExceptionMessage error

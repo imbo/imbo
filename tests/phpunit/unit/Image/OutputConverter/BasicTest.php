@@ -11,13 +11,13 @@
 namespace ImboUnitTest\Image\OutputConverter;
 
 use Imbo\Image\OutputConverter\Basic;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use ImagickException;
 
 /**
  * @coversDefaultClass Imbo\Image\OutputConverter\Basic
  */
-class BasicTest extends PHPUnit_Framework_TestCase {
+class BasicTest extends TestCase {
     /**
      * @var Basic
      */
