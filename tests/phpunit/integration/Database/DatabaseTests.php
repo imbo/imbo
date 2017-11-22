@@ -14,6 +14,8 @@ use Imbo\Model\Image;
 use Imbo\Model\Images;
 use Imbo\Resource\Images\Query;
 use Imbo\Database\Doctrine;
+use Imbo\Exception\DuplicateImageIdentifierException;
+use Imbo\Exception\DatabaseException;
 use DateTime;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
@@ -146,8 +148,10 @@ abstract class DatabaseTests extends TestCase {
 
         sleep(1);
 
-        $this->expectException('Imbo\Exception\DuplicateImageIdentifierException');
-        $this->expectExceptionCode(503);
+        $this->expectExceptionObject(new DuplicateImageIdentifierException(
+            'Duplicate image identifier when attempting to insert image into DB.',
+            503
+        ));
 
         $this->adapter->insertImage($user, $imageIdentifier, $image, false);
     }
@@ -170,9 +174,7 @@ abstract class DatabaseTests extends TestCase {
             'Could not delete image'
         );
 
-        $this->expectException('Imbo\Exception\DatabaseException');
-        $this->expectExceptionCode(404);
-        $this->expectExceptionMessage('Image not found');
+        $this->expectExceptionObject(new DatabaseException('Image not found', 404));
 
         $this->adapter->load($user, $imageIdentifier, $this->createMock('Imbo\Model\Image'));
     }

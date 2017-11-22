@@ -11,6 +11,7 @@
 namespace ImboUnitTest\EventListener;
 
 use Imbo\EventListener\Authenticate;
+use Imbo\Exception\RuntimeException;
 
 /**
  * @covers Imbo\EventListener\Authenticate
@@ -336,9 +337,7 @@ class AuthenticateTest extends ListenerTests {
      */
     public function testApprovesSignaturesWhenConfigurationForcesProtocol($serverUrl, $protocol, $authHeader, $shouldMatch, $signature, $timestamp) {
         if (!$shouldMatch) {
-            $this->expectException('Imbo\Exception\RuntimeException');
-            $this->expectExceptionMessage('Signature mismatch');
-            $this->expectExceptionCode(400);
+            $this->expectExceptionObject(new RuntimeException('Signature mismatch', 400));
         }
 
         $this->accessControl->expects($this->once())->method('getPrivateKey')->will($this->returnValue('key'));

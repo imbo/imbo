@@ -10,10 +10,11 @@
 
 namespace ImboUnitTest\EventListener;
 
-use Imbo\EventListener\StatsAccess,
-    Imbo\Resource\Stats as StatsResource,
-    Imbo\EventManager\EventManager,
-    ReflectionProperty;
+use Imbo\EventListener\StatsAccess;
+use Imbo\Resource\Stats as StatsResource;
+use Imbo\EventManager\EventManager;
+use Imbo\Exception\RuntimeException;
+use ReflectionProperty;
 
 /**
  * @covers Imbo\EventListener\StatsAccess
@@ -150,9 +151,7 @@ class StatsAccessTest extends ListenerTests {
         ]);
 
         if (!$hasAccess) {
-            $this->expectException('Imbo\Exception\RuntimeException');
-            $this->expectExceptionMessage('Access denied');
-            $this->expectExceptionCode(403);
+            $this->expectExceptionObject(new RuntimeException('Access denied', 403));
         }
 
         $listener->checkAccess($this->event);

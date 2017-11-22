@@ -11,6 +11,7 @@
 namespace ImboIntegrationTest\EventListener;
 
 use Imbo\EventListener\ImageTransformationLimiter;
+use Imbo\Exception\ResourceException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -36,12 +37,15 @@ class ImageTransformationLimiterTest extends TestCase {
         $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($request));
 
-        $this->expectException('Imbo\Exception\ResourceException');
-        $this->expectExceptionMessage(sprintf(
-            'Too many transformations applied to resource. The limit is %d transformations.',
-            $limit
-        ));
-        $this->expectExceptionCode(403);
+        $this->expectExceptionObject(
+            new ResourceException(
+                sprintf(
+                    'Too many transformations applied to resource. The limit is %d transformations.',
+                    $limit
+                ),
+                403
+            )
+        );
 
         $listener->checkTransformationCount($event);
     }
