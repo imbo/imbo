@@ -13,6 +13,7 @@ namespace ImboUnitTest\Auth\AccessControl\Adapter;
 use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
 use Imbo\Auth\AccessControl\GroupQuery;
 use Imbo\Resource;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -164,12 +165,14 @@ class ArrayAdapterTest extends TestCase {
     }
 
     /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Public key declared twice in config: pubkey
      * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::__construct
      * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::validateAccessList
      */
     public function testThrowsErrorOnDuplicatePublicKey() {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Public key declared twice in config: pubkey',
+            500
+        ));
         $accessControl = new ArrayAdapter([
             ['publicKey'  => 'pubkey', 'privateKey' => 'privkey', 'acl' => []],
             ['publicKey'  => 'pubkey', 'privateKey' => 'privkey', 'acl' => []]

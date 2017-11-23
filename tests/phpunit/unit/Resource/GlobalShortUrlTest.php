@@ -11,6 +11,7 @@
 namespace ImboUnitTest\Resource;
 
 use Imbo\Resource\GlobalShortUrl;
+use Imbo\Exception\ResourceException;
 
 /**
  * @covers Imbo\Resource\GlobalShortUrl
@@ -93,15 +94,13 @@ class GlobalShortUrlTest extends ResourceTests {
 
     /**
      * @covers Imbo\Resource\GlobalShortUrl::getImage
-     * @expectedException Imbo\Exception\ResourceException
-     * @expectedExceptionMessage Image not found
-     * @expectedExceptionCode 404
      */
     public function testRespondsWith404WhenShortUrlDoesNotExist() {
         $route = $this->createMock('Imbo\Router\Route');
         $route->expects($this->once())->method('get')->with('shortUrlId')->will($this->returnValue('aaaaaaa'));
         $this->request->expects($this->once())->method('getRoute')->will($this->returnValue($route));
         $this->database->expects($this->once())->method('getShortUrlParams')->with('aaaaaaa')->will($this->returnValue(null));
+        $this->expectExceptionObject(new ResourceException('Image not found', 404));
         $this->resource->getImage($this->event);
     }
 }

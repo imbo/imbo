@@ -11,6 +11,7 @@
 namespace ImboUnitTest\Http\Request;
 
 use Imbo\Http\Request\Request;
+use Imbo\Exception\InvalidArgumentException;
 use Imbo\Router\Route;
 use PHPUnit\Framework\TestCase;
 
@@ -213,22 +214,20 @@ class RequestTest extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Transformations must be specifed as an array
-     * @expectedExceptionCode 400
      * @covers Imbo\Http\Request\Request::getTransformations
      */
     public function testRequiresTransformationsToBeSpecifiedAsAnArray() {
         $request = new Request([
             't' => 'desaturate',
         ]);
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Transformations must be specifed as an array',
+            400
+        ));
         $request->getTransformations();
     }
 
     /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid transformation
-     * @expectedExceptionCode 400
      * @covers Imbo\Http\Request\Request::getTransformations
      */
     public function testDoesNotGenerateWarningWhenTransformationIsNotAString() {
@@ -242,6 +241,10 @@ class RequestTest extends TestCase {
         ];
 
         $request = new Request($query);
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Invalid transformation',
+            400
+        ));
         $request->getTransformations();
     }
 

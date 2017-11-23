@@ -11,6 +11,7 @@
 namespace ImboIntegrationTest\Storage;
 
 use Imbo\Storage\Filesystem;
+use Imbo\Exception\StorageException;
 
 /**
  * @covers Imbo\Storage\Filesystem
@@ -52,11 +53,11 @@ class FilesystemTest extends StorageTests {
         parent::tearDown();
     }
 
-    /**
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExceptionCode 507
-     */
     public function testStoringEmptyDataFails() {
+        $this->expectExceptionObject(new StorageException(
+            'Failed writing file (disk full? zero bytes input?) to disk:',
+            507
+        ));
         $this->getDriverActive()->store($this->getUser(), 'this_identifier_left_empty', '');
     }
 

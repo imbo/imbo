@@ -12,6 +12,8 @@ namespace ImboUnitTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Clip;
 use Imbo\Model\Image;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Exception\TransformationException;
 use Imagick;
 use ImagickException;
 use PHPUnit\Framework\TestCase;
@@ -71,12 +73,12 @@ class ClipTest extends TestCase {
 
     /**
      * @covers ::transform
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessageRegExp #clipping path .* not found#
-     * @expectedExceptionCode 400
      *
      */
     public function testExceptionIfMissingNamedPath() {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageRegExp('#clipping path .* not found#');
+        $this->expectExceptionCode(400);
         $this->transformation->transform(['path' => 'foo']);
     }
 
@@ -143,9 +145,6 @@ class ClipTest extends TestCase {
 
     /**
      * @covers ::transform
-     * @expectedException Imbo\Exception\TransformationException
-     * @expectedExceptionMessage Some error
-     * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenImagickFailsWithAFatalError() {
         $imagick = $this->createMock('Imagick');
@@ -164,8 +163,8 @@ class ClipTest extends TestCase {
             ->method('clipImage')
             ->willThrowException(new ImagickException('Some error'));
 
-        $this->transformation
-            ->setImagick($imagick)
-            ->transform([]);
+        $this->transformation->setImagick($imagick);
+        $this->expectExceptionObject(new TransformationException('Some error', 400));
+        $this->transformation->transform([]);
     }
 }

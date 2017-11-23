@@ -125,9 +125,6 @@ class StorageOperationsTest extends ListenerTests {
     }
 
     /**
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExceptionMessage Could not store image
-     * @expectedExceptionCode 500
      * @covers Imbo\EventListener\StorageOperations::insertImage
      */
     public function testWillDeleteImageFromDatabaseAndThrowExceptionWhenStoringFails() {
@@ -141,6 +138,8 @@ class StorageOperationsTest extends ListenerTests {
         $database = $this->createMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('deleteImage')->with($this->user, 'imageId');
         $this->event->expects($this->once())->method('getDatabase')->will($this->returnValue($database));
+
+        $this->expectExceptionObject(new StorageException('Could not store image', 500));
 
         $this->listener->insertImage($this->event);
     }

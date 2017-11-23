@@ -13,6 +13,7 @@ namespace ImboUnitTest\EventListener;
 use Imbo\EventListener\AccessToken;
 use Imbo\Exception\RuntimeException;
 use Imbo\Exception\ConfigurationException;
+use stdClass;
 
 /**
  * @covers Imbo\EventListener\AccessToken
@@ -60,28 +61,23 @@ class AccessTokenTest extends ListenerTests {
     }
 
     /**
-     * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage Incorrect access token
-     * @expectedExceptionCode 400
      * @covers Imbo\EventListener\AccessToken::checkAccessToken
      */
     public function testRequestWithBogusAccessToken() {
         $this->query->expects($this->once())->method('has')->with('accessToken')->will($this->returnValue(true));
         $this->query->expects($this->once())->method('get')->with('accessToken')->will($this->returnValue('/string'));
+        $this->expectExceptionObject(new RuntimeException('Incorrect access token', 400));
         $this->listener->checkAccessToken($this->event);
     }
 
     /**
-     * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage Missing access token
-     * @expectedExceptionCode 400
      * @covers Imbo\EventListener\AccessToken::checkAccessToken
      * @covers Imbo\EventListener\AccessToken::isWhitelisted
      */
     public function testThrowsExceptionIfAnAccessTokenIsMissingFromTheRequestWhenNotWhitelisted() {
         $this->event->expects($this->once())->method('getName')->will($this->returnValue('image.get'));
         $this->query->expects($this->once())->method('has')->with('accessToken')->will($this->returnValue(false));
-
+        $this->expectExceptionObject(new RuntimeException('Missing access token', 400));
         $this->listener->checkAccessToken($this->event);
     }
 
@@ -399,17 +395,12 @@ class AccessTokenTest extends ListenerTests {
 
     /**
      * Test that we can configure the access token argument key
-     *
-     * @expectedException Imbo\Exception\ConfigurationException
-     * @expectedExceptionMessage Invalid accessTokenGenerator
-     * @expectedExceptionCode 500
      */
     public function testConfigurationExceptionOnInvalidAccessTokenGenerator() {
+        $this->expectExceptionObject(new ConfigurationException('Invalid accessTokenGenerator', 500));
         $listener = new AccessToken([
-            'accessTokenGenerator' => new \StdClass(),
+            'accessTokenGenerator' => new StdClass(),
         ]);
-
-        $listener->checkAccessToken($this->event);
     }
 
     /**

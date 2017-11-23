@@ -16,6 +16,7 @@ use Imbo\Resource;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 /**
  * @covers Imbo\CliCommand\AddPublicKey
@@ -51,8 +52,6 @@ class AddPublicKeyTest extends TestCase {
     }
 
     /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Invalid access control adapter
      * @covers Imbo\CliCommand\AddPublicKey::getAclAdapter
      */
     public function testThrowsWhenAccessControlIsNotValid() {
@@ -62,12 +61,11 @@ class AddPublicKeyTest extends TestCase {
         ]);
 
         $commandTester = new CommandTester($command);
+        $this->expectExceptionObject(new RuntimeException('Invalid access control adapter'));
         $commandTester->execute(['publicKey' => 'foo']);
     }
 
     /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Invalid access control adapter
      * @covers Imbo\CliCommand\AddPublicKey::getAclAdapter
      */
     public function testThrowsWhenCallableReturnsInvalidAccessControl() {
@@ -79,12 +77,11 @@ class AddPublicKeyTest extends TestCase {
         ]);
 
         $commandTester = new CommandTester($command);
+        $this->expectExceptionObject(new RuntimeException('Invalid access control adapter'));
         $commandTester->execute(['publicKey' => 'foo']);
     }
 
     /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage The configured access control adapter is not mutable
      * @covers Imbo\CliCommand\AddPublicKey::getAclAdapter
      */
     public function testThrowsOnImmutableAdapter() {
@@ -94,12 +91,11 @@ class AddPublicKeyTest extends TestCase {
         ]);
 
         $commandTester = new CommandTester($command);
+        $this->expectExceptionObject(new RuntimeException('The configured access control adapter is not mutable'));
         $commandTester->execute(['publicKey' => 'foo']);
     }
 
     /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Public key with that name already exists
      * @covers Imbo\CliCommand\AddPublicKey::execute
      */
     public function testThrowsOnDuplicatePublicKeyName() {
@@ -110,6 +106,7 @@ class AddPublicKeyTest extends TestCase {
             ->will($this->returnValue(true));
 
         $commandTester = new CommandTester($this->command);
+        $this->expectExceptionObject(new RuntimeException('Public key with that name already exists'));
         $commandTester->execute(['publicKey' => 'foo']);
     }
 

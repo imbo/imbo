@@ -16,6 +16,7 @@ use Imbo\Image\OutputConverter\Basic;
 use Imbo\Image\OutputConverter\Bmp;
 use Imbo\Image\OutputConverter\Webp;
 use Imbo\Image\OutputConverter\OutputConverterInterface;
+use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Imagick;
 use stdClass;
@@ -45,11 +46,12 @@ class OutputConverterManagerTest extends TestCase {
 
     /**
      * @covers ::addConverters
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Given converter (stdClass) does not implement OutputConverterInterface
-     * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenRegisteringWrongConverter() {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Given converter (stdClass) does not implement OutputConverterInterface',
+            500
+        ));
         $this->manager->addConverters([new stdClass()]);
     }
 

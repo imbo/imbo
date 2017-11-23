@@ -50,12 +50,10 @@ class StatsAccessTest extends ListenerTests {
     }
 
     /**
-     * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage Access denied
-     * @expectedExceptionCode 403
      * @covers Imbo\EventListener\StatsAccess::checkAccess
      */
     public function testDoesNotAllowAnyIpAddressPerDefault() {
+        $this->expectExceptionObject(new RuntimeException('Access denied', 403));
         $this->listener->checkAccess($this->event);
     }
 

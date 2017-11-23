@@ -180,22 +180,18 @@ abstract class DatabaseTests extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\DatabaseException
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessage Image not found
      * @covers ::deleteImage
      */
     public function testDeleteImageThatDoesNotExist() {
+        $this->expectExceptionObject(new DatabaseException('Image not found', 404));
         $this->adapter->deleteImage('user', 'id');
     }
 
     /**
-     * @expectedException Imbo\Exception\DatabaseException
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessage Image not found
      * @covers ::load
      */
     public function testLoadImageThatDoesNotExist() {
+        $this->expectExceptionObject(new DatabaseException('Image not found', 404));
         $this->adapter->load('user', 'id', $this->createMock('Imbo\Model\Image'));
     }
 
@@ -217,13 +213,11 @@ abstract class DatabaseTests extends TestCase {
 
     /**
      * @dataProvider getUsers
-     * @expectedException Imbo\Exception\DatabaseException
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessage Image not found
      * @covers ::getLastModified
      * @param string[] $users
      */
     public function testGetLastModifiedOfImageThatDoesNotExist(array $users) {
+        $this->expectExceptionObject(new DatabaseException('Image not found', 404));
         $this->adapter->getLastModified($users, 'id');
     }
 
@@ -472,12 +466,10 @@ abstract class DatabaseTests extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\DatabaseException
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessage Image not found
      * @covers ::getMetadata
      */
     public function testGetMetadataWhenImageDoesNotExist() {
+        $this->expectExceptionObject(new DatabaseException('Image not found', 404));
         $this->adapter->getMetadata('user', 'id');
     }
 
@@ -676,12 +668,10 @@ abstract class DatabaseTests extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\DatabaseException
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessage Image not found
      * @covers ::deleteMetadata
      */
     public function testDeleteMetataFromImageThatDoesNotExist() {
+        $this->expectExceptionObject(new DatabaseException('Image not found', 404));
         $this->adapter->deleteMetadata('user', 'id');
     }
 
@@ -996,12 +986,10 @@ abstract class DatabaseTests extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\DatabaseException
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessage Image not found
      * @covers ::getImageMimeType
      */
     public function testGetMimeTypeWhenImageDoesNotExist() {
+        $this->expectExceptionObject(new DatabaseException('Image not found', 404));
         $this->adapter->getImageMimeType('user', 'id');
     }
 

@@ -73,73 +73,58 @@ class AuthenticateTest extends ListenerTests {
 
     /**
      * @covers Imbo\EventListener\Authenticate::authenticate
-     * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage Missing authentication timestamp
-     * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenAuthInfoIsMissing() {
         $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(false));
         $this->headers->expects($this->at(1))->method('get')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(null));
-
+        $this->expectExceptionObject(new RuntimeException('Missing authentication timestamp', 400));
         $this->listener->authenticate($this->event);
     }
 
     /**
      * @covers Imbo\EventListener\Authenticate::authenticate
-     * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage Missing authentication signature
-     * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenSignatureIsMissing() {
         $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(true));
         $this->headers->expects($this->at(1))->method('has')->with('x-imbo-authenticate-signature')->will($this->returnValue(true));
         $this->headers->expects($this->at(2))->method('get')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(gmdate('Y-m-d\TH:i:s\Z')));
-
+        $this->expectExceptionObject(new RuntimeException('Missing authentication signature', 400));
         $this->listener->authenticate($this->event);
     }
 
     /**
      * @covers Imbo\EventListener\Authenticate::authenticate
      * @covers Imbo\EventListener\Authenticate::timestampIsValid
-     * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage Invalid timestamp: some string
-     * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenTimestampIsInvalid() {
         $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(true));
         $this->headers->expects($this->at(1))->method('has')->with('x-imbo-authenticate-signature')->will($this->returnValue(true));
         $this->headers->expects($this->at(2))->method('get')->with('x-imbo-authenticate-timestamp')->will($this->returnValue('some string'));
-
+        $this->expectExceptionObject(new RuntimeException('Invalid timestamp: some string', 400));
         $this->listener->authenticate($this->event);
     }
 
     /**
      * @covers Imbo\EventListener\Authenticate::authenticate
      * @covers Imbo\EventListener\Authenticate::timestampHasExpired
-     * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage Timestamp has expired: 2010-10-10T20:10:10Z
-     * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenTimestampHasExpired() {
         $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(true));
         $this->headers->expects($this->at(1))->method('has')->with('x-imbo-authenticate-signature')->will($this->returnValue(true));
         $this->headers->expects($this->at(2))->method('get')->with('x-imbo-authenticate-timestamp')->will($this->returnValue('2010-10-10T20:10:10Z'));
-
+        $this->expectExceptionObject(new RuntimeException('Timestamp has expired: 2010-10-10T20:10:10Z', 400));
         $this->listener->authenticate($this->event);
     }
 
     /**
      * @covers Imbo\EventListener\Authenticate::authenticate
-     * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage Signature mismatch
-     * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenSignatureDoesNotMatch() {
         $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(true));
         $this->headers->expects($this->at(1))->method('has')->with('x-imbo-authenticate-signature')->will($this->returnValue(true));
         $this->headers->expects($this->at(2))->method('get')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(gmdate('Y-m-d\TH:i:s\Z')));
         $this->headers->expects($this->at(3))->method('get')->with('x-imbo-authenticate-signature')->will($this->returnValue('foobar'));
-
+        $this->expectExceptionObject(new RuntimeException('Signature mismatch', 400));
         $this->listener->authenticate($this->event);
     }
 

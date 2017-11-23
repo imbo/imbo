@@ -11,6 +11,7 @@
 namespace ImboUnitTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Crop;
+use Imbo\Exception\TransformationException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,25 +22,27 @@ use PHPUnit\Framework\TestCase;
 class CropTest extends TestCase {
     /**
      * @covers Imbo\Image\Transformation\Crop::transform
-     * @expectedException Imbo\Exception\TransformationException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Missing required parameter: width
      */
     public function testThrowsExceptionWhenWidthIsMissing() {
         $transformation = new Crop();
         $transformation->setImage($this->createMock('Imbo\Model\Image'));
+        $this->expectExceptionObject(new TransformationException(
+            'Missing required parameter: width',
+            400
+        ));
         $transformation->transform(['height' => 123]);
     }
 
     /**
      * @covers Imbo\Image\Transformation\Crop::transform
-     * @expectedException Imbo\Exception\TransformationException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Missing required parameter: height
      */
     public function testThrowsExceptionWhenHeightIsMissing() {
         $transformation = new Crop();
         $transformation->setImage($this->createMock('Imbo\Model\Image'));
+        $this->expectExceptionObject(new TransformationException(
+            'Missing required parameter: height',
+            400
+        ));
         $transformation->transform(['width' => 123]);
     }
 

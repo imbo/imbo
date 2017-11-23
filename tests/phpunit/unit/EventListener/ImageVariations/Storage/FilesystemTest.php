@@ -11,6 +11,7 @@
 namespace ImboUnitTest\EventListener\ImageVariations\Storage;
 
 use Imbo\EventListener\ImageVariations\Storage\Filesystem;
+use Imbo\Exception\StorageException;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use PHPUnit\Framework\TestCase;
@@ -33,9 +34,6 @@ class FilesystemTest extends TestCase {
 
     /**
      * @covers Imbo\EventListener\ImageVariations\Storage\Filesystem::storeImageVariation
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExceptionMessage Could not store image variation (directory not writable)
-     * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenNotAbleToWriteToDirectory() {
         $dir = 'unwritableDirectory';
@@ -44,6 +42,10 @@ class FilesystemTest extends TestCase {
         vfsStream::setup($dir, 0);
 
         $adapter = new Filesystem(['dataDir' => vfsStream::url($dir)]);
+        $this->expectExceptionObject(new StorageException(
+            'Could not store image variation (directory not writable)',
+            500
+        ));
         $adapter->storeImageVariation('pub', 'img', 'blob', 700);
     }
 

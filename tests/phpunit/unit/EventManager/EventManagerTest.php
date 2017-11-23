@@ -14,6 +14,7 @@ use Imbo\EventManager\EventManager;
 use Imbo\EventManager\Event;
 use Imbo\EventListener\ListenerInterface;
 use Imbo\EventListener\Initializer\InitializerInterface;
+use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -164,12 +165,13 @@ class EventManagerTest extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid event definition for listener: someName
-     * @expectedExceptionCode 500
      * @covers Imbo\EventManager\EventManager::addCallbacks
      */
     public function testThrowsExceptionsWhenInvalidHandlersAreAdded() {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Invalid event definition for listener: someName',
+            500
+        ));
         $this->manager->addCallbacks('someName', ['event' => function($event) {}]);
     }
 

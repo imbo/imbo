@@ -12,6 +12,7 @@ namespace ImboUnitTest\Resource;
 
 use Imbo\Resource\Images;
 use Imbo\Exception\DuplicateImageIdentifierException;
+use Imbo\Exception\ImageException;
 use DateTime;
 use DateTimeZone;
 
@@ -84,9 +85,6 @@ class ImagesTest extends ResourceTests {
 
     /**
      * @covers Imbo\Resource\Images::addImage
-     * @expectedException Imbo\Exception\ImageException
-     * @expectedExceptionMessage Failed to generate unique image identifier
-     * @expectedExceptionCode 503
      */
     public function testThrowsExceptionWhenItFailsToGenerateUniqueImageIdentifier() {
         $this->manager->expects($this->any())->method('trigger')->with('db.image.insert', ['updateIfDuplicate' => false])->will($this->throwException(new DuplicateImageIdentifierException()));
@@ -102,6 +100,7 @@ class ImagesTest extends ResourceTests {
 
         $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
 
+        $this->expectExceptionObject(new ImageException('Failed to generate unique image identifier', 503));
         $this->resource->addImage($this->event);
     }
 

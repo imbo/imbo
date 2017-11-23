@@ -11,6 +11,7 @@
 namespace ImboUnitTest\Resource;
 
 use Imbo\Resource\Metadata;
+use Imbo\Exception\InvalidArgumentException;
 use DateTime;
 use DateTimeZone;
 
@@ -106,23 +107,19 @@ class MetadataTest extends ResourceTests {
 
     /**
      * @covers Imbo\Resource\Metadata::validateMetadata
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Missing JSON data
-     * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenValidatingMissingJsonData() {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue(null));
+        $this->expectExceptionObject(new InvalidArgumentException('Missing JSON data', 400));
         $this->resource->validateMetadata($this->event);
     }
 
     /**
      * @covers Imbo\Resource\Metadata::validateMetadata
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid JSON data
-     * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenValidatingInvalidJsonData() {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('some string'));
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid JSON data', 400));
         $this->resource->validateMetadata($this->event);
     }
 

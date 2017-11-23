@@ -83,8 +83,12 @@ class S3 implements StorageInterface {
 
             if ($missingFields) {
                 throw new ConfigurationException(
-                    'Missing required configuration parameters in ' . __CLASS__ . ': ' .
-                    join(', ', $missingFields)
+                    sprintf(
+                        'Missing required configuration parameters in %s: %s',
+                        __CLASS__,
+                        join(', ', $missingFields)
+                    ),
+                    500
                 );
             }
         }

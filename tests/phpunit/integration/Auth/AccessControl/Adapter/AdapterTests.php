@@ -10,6 +10,7 @@
 
 namespace ImboIntegrationTest\Auth\AccessControl\Adapter;
 
+use Imbo\Exception\DatabaseException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -148,12 +149,8 @@ abstract class AdapterTests extends TestCase {
         $this->assertNull($this->adapter->getAccessRule('publickey', $ruleId));
     }
 
-    /**
-     * @expectedException Imbo\Exception\DatabaseException
-     * @expectedExceptionCode 500
-     * @expectedExceptionMessage Could not delete rule from database
-     */
     public function testDeleteAccessRuleWithIdThatDoesNotExist() {
+        $this->expectExceptionObject(new DatabaseException('Could not delete rule from database', 500));
         $this->assertFalse($this->adapter->deleteAccessRule('public', 'asdasd'));
     }
 }

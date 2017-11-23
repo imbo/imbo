@@ -12,6 +12,7 @@ namespace ImboUnitTest\EventListener;
 
 use Imbo\EventListener\EightbimMetadata;
 use Imbo\Exception\DatabaseException;
+use RuntimeException;
 
 /**
  * @coversDefaultClass Imbo\EventListener\EightbimMetadata
@@ -85,9 +86,6 @@ class EightbimMetadataTest extends ListenerTests {
 
     /**
      * @covers ::save
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Could not store 8BIM-metadata
-     * @expectedExceptionCode 500
      */
     public function testDeletesImageWhenStoringMetadataFails() {
         $user = 'user';
@@ -123,6 +121,7 @@ class EightbimMetadataTest extends ListenerTests {
         ]);
 
         $this->listener->populate($event);
+        $this->expectExceptionObject(new RuntimeException('Could not store 8BIM-metadata', 500));
         $this->listener->save($event);
     }
 }

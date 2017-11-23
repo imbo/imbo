@@ -12,6 +12,7 @@ namespace ImboUnitTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Watermark;
 use Imbo\Exception\StorageException;
+use Imbo\Exception\TransformationException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -34,21 +35,18 @@ class WatermarkTest extends TestCase {
 
     /**
      * @covers ::transform
-     * @expectedException Imbo\Exception\TransformationException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage You must specify an image identifier to use for the watermark
      */
     public function testTransformThrowsExceptionIfNoImageSpecified() {
         $image = $this->createMock('Imbo\Model\Image');
-
+        $this->expectExceptionObject(new TransformationException(
+            'You must specify an image identifier to use for the watermark',
+            400
+        ));
         $this->transformation->setImage($image)->transform([]);
     }
 
     /**
      * @covers ::transform
-     * @expectedException Imbo\Exception\TransformationException
-     * @expectedExceptionCode 400
-     * @expectedExceptionMessage Watermark image not found
      */
     public function testThrowsExceptionIfSpecifiedImageIsNotFound() {
         $e = new StorageException('File not found', 404);
@@ -66,10 +64,9 @@ class WatermarkTest extends TestCase {
         $event->expects($this->once())->method('getStorage')->will($this->returnValue($storage));
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
 
-        $this->transformation
-            ->setImage($this->createMock('Imbo\Model\Image'))
-            ->setEvent($event)
-            ->transform(['img' => 'foobar']);
+        $this->transformation->setImage($this->createMock('Imbo\Model\Image'));
+        $this->transformation->setEvent($event);
+        $this->expectExceptionObject(new TransformationException('Watermark image not found', 400));
+        $this->transformation->transform(['img' => 'foobar']);
     }
-
 }

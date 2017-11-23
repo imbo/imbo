@@ -22,6 +22,10 @@ use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use PHPUnit\Framework\TestCase;
+use Assert;
+use RuntimeException;
+use InvalidArgumentException;
+use Imbo\BehatApiExtension\Exception\AssertionFailedException;
 
 /**
  * @coversDefaultClass ImboBehatFeatureContext\FeatureContext
@@ -122,6 +126,7 @@ class FeatureContextTest extends TestCase {
             ->method('getConfig')
             ->with('handler')
             ->willReturn($handlerStack);
+
         $client
             ->expects($this->at(1))
             ->method('getConfig')
@@ -185,10 +190,9 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::isDate
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Date is not properly formatted: "invalid date".
      */
     public function testIsDateFunctionCanFail() {
+        $this->expectExceptionObject(new InvalidArgumentException('Date is not properly formatted: "invalid date".'));
         $this->context->isDate('invalid date');
     }
 
@@ -215,10 +219,13 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::setImboConfigHeader
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessageRegExp |Configuration file "foobar" does not exist in the ".*?[\\/]imbo-configs" directory\.|
      */
     public function testSettingConfigHeaderFailsWithNonExistingFile() {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageRegExp(
+            '|Configuration file "foobar" does not exist in the ".*?[\\/]imbo-configs" directory\.|'
+        );
+
         $this->context->setImboConfigHeader('foobar');
     }
 
@@ -255,10 +262,9 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::forceAdapterFailure
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid adapter: "foobar".
      */
     public function testThrowsExecptionWhenSpecifyingInvalidAdapterForFailure() {
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid adapter: "foobar".'));
         $this->context->forceAdapterFailure('foobar');
     }
 
@@ -326,13 +332,13 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::signRequest
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage The authentication handler is currently added to the stack. It can not be added more than once.
      */
     public function testCanNotAttachSignatureHandlerMoreThanOnce() {
-        $this->context
-            ->signRequest()
-            ->signRequest();
+        $this->context->signRequest();
+        $this->expectExceptionObject(new RuntimeException(
+            'The authentication handler is currently added to the stack. It can not be added more than once.'
+        ));
+        $this->context->signRequest();
     }
 
     /**
@@ -379,62 +385,65 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::appendAccessToken
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage The access token handler is currently added to the stack. It can not be added more than once.
      */
     public function testCanNotAttachAccessTokenHandlerMoreThanOnce() {
-        $this->context
-            ->appendAccessToken()
-            ->appendAccessToken();
+        $this->context->appendAccessToken();
+        $this->expectExceptionObject(new RuntimeException(
+            'The access token handler is currently added to the stack. It can not be added more than once.'
+        ));
+        $this->context->appendAccessToken();
     }
 
     /**
      * @covers ::signRequest
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage The access token handler is currently added to the stack. These handlers should not be added to the same request.
      */
     public function testCanNotAddBothAccessTokenAndSignatureHandlers() {
-        $this->context
-            ->appendAccessToken()
-            ->signRequest();
+        $this->context->appendAccessToken();
+        $this->expectExceptionObject(new RuntimeException(
+            'The access token handler is currently added to the stack. These handlers should not be added to the same request.'
+        ));
+        $this->context->signRequest();
     }
 
     /**
      * @covers ::appendAccessToken
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage The authentication handler is currently added to the stack. These handlers should not be added to the same request.
      */
     public function testCanNotAddBothSignatureAndAccessTokenHandlers() {
-        $this->context
-            ->signRequest()
-            ->appendAccessToken();
+        $this->context->signRequest();
+        $this->expectExceptionObject(new RuntimeException(
+            'The authentication handler is currently added to the stack. These handlers should not be added to the same request.'
+        ));
+        $this->context->appendAccessToken();
     }
 
     /**
      * @covers ::addUserImageToImbo
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage No keys exist for user "some user".
      */
     public function testThrowsExceptionWhenAddingUserImageWithUnknownUser() {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'No keys exist for user "some user".'
+        ));
         $this->context->addUserImageToImbo(__FILE__, 'some user');
     }
 
     /**
      * @covers ::addUserImageToImbo
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage File does not exist: "/some/path".
      */
     public function testThrowsExceptionWhenAddingUserImageWithInvalidFilename() {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'File does not exist: "/some/path".'
+        ));
         $this->context->addUserImageToImbo('/some/path', 'user');
     }
 
     /**
      * @covers ::addUserImageToImbo
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Image was not successfully added. Response body:
      */
     public function testAddingUserImageToImboFailsWhenImboDoesNotIncludeImageIdentifierInResponse() {
         $this->mockHandler->append(new Response(400, ['Content-Type' => 'application/json'], '{"error": {"message": "some id"}}'));
+        $this->expectExceptionObject(new RuntimeException(
+            'Image was not successfully added. Response body:'
+        ));
         $this->context->addUserImageToImbo(FIXTURES_DIR . '/image1.png', 'user');
     }
 
@@ -559,19 +568,22 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::primeDatabase
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessageRegExp |Fixture file "foobar.php" does not exist in ".*?[\\/]tests[\\/]behat[\\/]fixtures"\.|
      */
     public function testThrowsExceptionWhenPrimingDatabaseWithScriptThatDoesNotExist() {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageRegExp(
+            '|Fixture file "foobar.php" does not exist in ".*?[\\/]tests[\\/]behat[\\/]fixtures"\.|'
+        );
         $this->context->primeDatabase('foobar.php');
     }
 
     /**
      * @covers ::authenticateRequest
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid authentication method: "auth".
      */
     public function testThrowsExceptionWhenSpecifyingInvalidAuthenticationType() {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Invalid authentication method: "auth".'
+        ));
         $this->context->authenticateRequest('auth');
     }
 
@@ -723,21 +735,22 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::setRequestQueryParameter
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage The "t" query parameter already exists and it's not an array, so can't append more values to it.
      */
     public function testThrowsExceptionWhenAppendingArrayParamToRegularParam() {
-        $this->context
-            ->setRequestQueryParameter('t', 'border')
-            ->setRequestQueryParameter('t[]', 'thumb');
+        $this->context->setRequestQueryParameter('t', 'border');
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'The "t" query parameter already exists and it\'s not an array, so can\'t append more values to it.'
+        ));
+        $this->context->setRequestQueryParameter('t[]', 'thumb');
     }
 
     /**
      * @covers ::setRequestParameterToImageIdentifier
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage No image identifier exists for image: "/path".
      */
     public function testThrowsExceptionWhenSettingARequestParameterToAnNonExistingImageIdentifier() {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'No image identifier exists for image: "/path".'
+        ));
         $this->context->setRequestParameterToImageIdentifier('foo', '/path');
     }
 
@@ -775,10 +788,11 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::generateShortImageUrl
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage No image identifier exists for path: "/path".
      */
     public function testThrowsExceptionWheyGeneratingShortImageUrlForNonExistingImage() {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'No image identifier exists for path: "/path".'
+        ));
         $this->context->generateShortImageUrl('/path', new PyStringNode([], 1));
     }
 
@@ -878,10 +892,11 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::specifyAsTheWatermarkImage
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage No image exists for path: "/path".
      */
     public function testThrowsExceptionWhenSpecifyingWatermarkImageThatDoesNotExist() {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'No image exists for path: "/path".'
+        ));
         $this->context->specifyAsTheWatermarkImage('/path');
     }
 
@@ -939,14 +954,14 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::requestPreviouslyAddedImage
      * @covers ::getUserAndImageIdentifierOfPreviouslyAddedImage
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Could not find any response in the history with an image identifier.
      */
     public function testThrowsExceptionWhenTryingToRequestPreviouslyAddedImageWhenNoImageHasBeenAdded() {
         $this->mockHandler->append(new Response(200));
-        $this->context
-            ->requestPath('/path')
-            ->requestPreviouslyAddedImage();
+        $this->context->requestPath('/path');
+        $this->expectExceptionObject(new RuntimeException(
+            'Could not find any response in the history with an image identifier.'
+        ));
+        $this->context->requestPreviouslyAddedImage();
     }
 
     /**
@@ -1070,10 +1085,9 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::makeSameRequest
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage No request has been made yet.
      */
     public function testThrowsExceptionWhenTryingToReplayRequestWhenNoRequestHasBeenMade() {
+        $this->expectExceptionObject(new RuntimeException('No request has been made yet.'));
         $this->context->makeSameRequest();
     }
 
@@ -1157,21 +1171,23 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::requestMetadataOfPreviouslyAddedImage
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Could not find any response in the history with an image identifier.
      */
     public function testThrowsExceptionWhenRequestingMetadataOfPreviouslyAddedImageWhenNoImageHasBeenAdded() {
         $this->makeRequest('/path');
         $this->makeRequest('/anotherPath');
+        $this->expectExceptionObject(new RuntimeException(
+            'Could not find any response in the history with an image identifier.'
+        ));
         $this->context->requestMetadataOfPreviouslyAddedImage();
     }
 
     /**
      * @covers ::requestMetadataOfPreviouslyAddedImage
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Could not find any response in the history with an image identifier.
      */
     public function testThrowsExceptionWhenRequestingMetadataOfPreviouslyAddedImageWhenNoRequestHasBeenMade() {
+        $this->expectExceptionObject(new RuntimeException(
+            'Could not find any response in the history with an image identifier.'
+        ));
         $this->context->requestMetadataOfPreviouslyAddedImage();
     }
 
@@ -1240,10 +1256,12 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::requestImageResourceForLocalImage
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessageRegExp |Image URL for image with path ".*?[\\/]tests[\\/]phpunit[\\/]Fixtures[\\/]image1\.png" can not be found\.|
      */
     public function testThrowsExceptionWhenTryingToRequestImageUsingLocalPathAndImageDoesNotExistInImbo() {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageRegExp(
+            '|Image URL for image with path ".*?[\\/]tests[\\/]phpunit[\\/]Fixtures[\\/]image1\.png" can not be found\.|'
+        );
         $this->context->requestImageResourceForLocalImage(FIXTURES_DIR . '/image1.png');
     }
 
@@ -1307,10 +1325,9 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::requestPaths
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Missing or empty "path" key.
      */
     public function testThrowsExceptionWhenBulkRequestingWithMissingPath() {
+        $this->expectExceptionObject(new InvalidArgumentException('Missing or empty "path" key.'));
         $this->context->requestPaths(new TableNode([
             ['method'],
             ['GET'],
@@ -1319,10 +1336,11 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::requestPaths
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Both "sign request" and "access token" can not be set to "yes".
      */
     public function testThrowsExceptionWhenBulkRequestingAndUsingBothAccessTokenAndSignature() {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Both "sign request" and "access token" can not be set to "yes".'
+        ));
         $this->context->requestPaths(new TableNode([
             ['path',  'access token', 'sign request'],
             ['/path', 'yes',          'yes'         ]
@@ -1571,8 +1589,6 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::requestImageUsingShortUrl
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Invalid response body in the current response instance
      */
     public function testThrowsExceptionWhenTryingToRequestImageWithShortUrlWhenResponseHasInvalidBody() {
         $this->mockHandler->append(
@@ -1580,15 +1596,15 @@ class FeatureContextTest extends TestCase {
             new Response(200)
         );
 
-        $this->context
-            ->requestPath('/path')
-            ->requestImageUsingShortUrl();
+        $this->context->requestPath('/path');
+        $this->expectExceptionObject(new RuntimeException(
+            'Invalid response body in the current response instance'
+        ));
+        $this->context->requestImageUsingShortUrl();
     }
 
     /**
      * @covers ::requestImageUsingShortUrl
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Missing "id" from body: "{"foo":"bar"}".
      */
     public function testThrowsExceptionWhenTryingToRequestImageWithShortUrlWhenResponseBodyIsMissingId() {
         $this->mockHandler->append(
@@ -1596,9 +1612,11 @@ class FeatureContextTest extends TestCase {
             new Response(200)
         );
 
-        $this->context
-            ->requestPath('/path')
-            ->requestImageUsingShortUrl();
+        $this->context->requestPath('/path');
+        $this->expectExceptionObject(new RuntimeException(
+            'Missing "id" from body: "{"foo":"bar"}".'
+        ));
+        $this->context->requestImageUsingShortUrl();
     }
 
     /**
@@ -1631,18 +1649,17 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::assertImboError
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage The status code of the last response is lower than 400, so it is not considered an error.
      */
     public function testThrowsExceptionWhenAssertingImboErrorWhenResponseIsNotAnError() {
         $this->makeRequest('/path');
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'The status code of the last response is lower than 400, so it is not considered an error.'
+        ));
         $this->context->assertImboError('some message');
     }
 
     /**
      * @covers ::assertImboError
-     * @expectedException Assert\InvalidArgumentException
-     * @expectedExceptionMessage Expected error message "foobar", got "error message".
      */
     public function testAssertingImboErrorMessageCanFailWhenMessageIsWrong() {
         $this->mockHandler->append(
@@ -1652,18 +1669,14 @@ class FeatureContextTest extends TestCase {
             ]]))
         );
 
-        $this->assertSame(
-            $this->context,
-            $this->context
-                ->requestPath('/path')
-                ->assertImboError('foobar')
-        );
+        $this->context->requestPath('/path');
+        $this->expectException(Assert\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected error message "foobar", got "error message".');
+        $this->context->assertImboError('foobar');
     }
 
     /**
      * @covers ::assertImboError
-     * @expectedException Assert\InvalidArgumentException
-     * @expectedExceptionMessage Expected imbo error code "2", got "1".
      */
     public function testAssertingImboErrorMessageCanFailWhenCodeIsWrong() {
         $this->mockHandler->append(
@@ -1673,12 +1686,10 @@ class FeatureContextTest extends TestCase {
             ]]))
         );
 
-        $this->assertSame(
-            $this->context,
-            $this->context
-                ->requestPath('/path')
-                ->assertImboError('error message', 2)
-        );
+        $this->context->requestPath('/path');
+        $this->expectException(Assert\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected imbo error code "2", got "1".');
+        $this->context->assertImboError('error message', 2);
     }
 
     /**
@@ -1702,20 +1713,18 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::assertImageWidth
-     * @expectedException Assert\InvalidArgumentException
-     * @expectedExceptionMessage Incorrect image width, expected 123, got 599.
      */
     public function testAssertingImageWidthCanFail() {
         $this->mockHandler->append(
             new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
         );
 
-        $this->assertSame(
-            $this->context,
-            $this->context
-                ->requestPath('/path')
-                ->assertImageWidth(123)
+        $this->context->requestPath('/path');
+        $this->expectException(Assert\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Incorrect image width, expected 123, got 599.'
         );
+        $this->context->assertImageWidth(123);
     }
 
     /**
@@ -1797,37 +1806,34 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getApproximateImageWidthsForFailure
      * @covers ::assertImageWidth
      * @covers ::validateImageDimensions
-     * @expectedException Assert\InvalidArgumentException
      * @param string $approximateWidth
      * @param string $exceptionMessage
      */
     public function testAssertingApproximateImageWidthCanFail($approximateWidth, $exceptionMessage) {
-        $this->expectExceptionMessage($exceptionMessage);
         $this->mockHandler->append(
             new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
         );
 
-        $this->context
-            ->requestPath('/path')
-            ->assertImageWidth($approximateWidth);
+        $this->context->requestPath('/path');
+        $this->expectException(Assert\InvalidArgumentException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+        $this->context->assertImageWidth($approximateWidth);
     }
 
     /**
      * @covers ::assertImageHeight
-     * @expectedException Assert\InvalidArgumentException
-     * @expectedExceptionMessage Incorrect image height, expected 123, got 417.
      */
     public function testAssertingImageHeightCanFail() {
         $this->mockHandler->append(
             new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
         );
 
-        $this->assertSame(
-            $this->context,
-            $this->context
-                ->requestPath('/path')
-                ->assertImageHeight(123)
+        $this->context->requestPath('/path');
+        $this->expectException(Assert\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Incorrect image height, expected 123, got 417.'
         );
+        $this->context->assertImageHeight(123);
     }
 
     /**
@@ -1909,19 +1915,18 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getApproximateImageHeightsForFailure
      * @covers ::assertImageHeight
      * @covers ::validateImageDimensions
-     * @expectedException Assert\InvalidArgumentException
      * @param string $approximateHeight
      * @param string $exceptionMessage
      */
     public function testAssertingApproximateImageHeightCanFail($approximateHeight, $exceptionMessage) {
-        $this->expectExceptionMessage($exceptionMessage);
         $this->mockHandler->append(
             new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
         );
 
-        $this->context
-            ->requestPath('/path')
-            ->assertImageHeight($approximateHeight);
+        $this->context->requestPath('/path');
+        $this->expectException(Assert\InvalidArgumentException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+        $this->context->assertImageHeight($approximateHeight);
     }
 
     /**
@@ -1960,34 +1965,33 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getDataForImageDimensionAssertion
      * @covers ::assertImageDimension
-     * @expectedException Assert\InvalidArgumentException
      * @param string $imageData
      * @param string $dimension
      * @param string $exceptionMessage
      */
     public function testAssertingImageDimensionCanFail($imageData, $dimension, $exceptionMessage) {
-        $this->expectExceptionMessage($exceptionMessage);
         $this->mockHandler->append(
             new Response(200, [], $imageData)
         );
 
-        $this->context
-            ->requestPath('/path')
-            ->assertImageDimension($dimension);
+        $this->context->requestPath('/path');
+        $this->expectException(Assert\InvalidArgumentException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+        $this->context->assertImageDimension($dimension);
     }
 
     /**
      * @covers ::assertImageDimension
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid dimension value: "123 x 456". Specify "<width>x<height>".
      */
     public function testThrowsExceptionWhenAssertingImageDimensionWhenInvalidDimensionString() {
         $this->mockHandler->append(
             new Response(200)
         );
-        $this->context
-            ->requestPath('/path')
-            ->assertImageDimension('123 x 456');
+        $this->context->requestPath('/path');
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Invalid dimension value: "123 x 456". Specify "<width>x<height>".'
+        ));
+        $this->context->assertImageDimension('123 x 456');
     }
 
     /**
@@ -2061,20 +2065,20 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getApproximateImageDimensionsForFailure
      * @covers ::assertImageWidth
      * @covers ::validateImageDimensions
-     * @expectedException Assert\InvalidArgumentException
      * @param string $approximateDimension
      * @param string $exceptionMessage
      */
     public function testAssertingApproximateImageDimensionCanFail($approximateDimension, $exceptionMessage) {
-        $this->expectExceptionMessage($exceptionMessage);
         $this->mockHandler->append(
             new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
         );
 
-        $this->context
-            ->requestPath('/path')
-            ->assertImageDimension($approximateDimension);
+        $this->context->requestPath('/path');
+        $this->expectException(Assert\InvalidArgumentException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+        $this->context->assertImageDimension($approximateDimension);
     }
+
     /**
      * Data provider
      *
@@ -2109,7 +2113,6 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getDataForAssertingImagePixelInfoFailures
      * @covers ::assertImagePixelColor
      * @covers ::getImagePixelInfo
-     * @expectedException Assert\InvalidArgumentException
      * @param string $imageData
      * @param string $coordinate
      * @param string $color
@@ -2120,10 +2123,10 @@ class FeatureContextTest extends TestCase {
             new Response(200, [], $imageData)
         );
 
+        $this->context->requestPath('/path');
+        $this->expectException(Assert\InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);
-        $this->context
-            ->requestPath('/path')
-            ->assertImagePixelColor($coordinate, $color);
+        $this->context->assertImagePixelColor($coordinate, $color);
     }
 
     /**
@@ -2177,17 +2180,17 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertImagePixelColor
      * @covers ::getImagePixelInfo
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid coordinates: "1, 1". Format is "<w>x<h>", no spaces allowed.
      */
     public function testThrowsExceptionWhenAssertingImagePixelColorWithInvalidCoordinate() {
         $this->mockHandler->append(
             new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
         );
 
-        $this->context
-            ->requestPath('/path')
-            ->assertImagePixelColor('1, 1', 'ffffff');
+        $this->context->requestPath('/path');
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Invalid coordinates: "1, 1". Format is "<w>x<h>", no spaces allowed.'
+        ));
+        $this->context->assertImagePixelColor('1, 1', 'ffffff');
     }
 
     /**
@@ -2218,7 +2221,6 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getDataForAssertingImagePixelAlphaFailures
      * @covers ::assertImagePixelAlpha
      * @covers ::getImagePixelInfo
-     * @expectedException Assert\InvalidArgumentException
      * @param string $imageData
      * @param string $coordinate
      * @param string $alpha
@@ -2229,10 +2231,10 @@ class FeatureContextTest extends TestCase {
             new Response(200, [], $imageData)
         );
 
+        $this->context->requestPath('/path');
+        $this->expectException(Assert\InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);
-        $this->context
-            ->requestPath('/path')
-            ->assertImagePixelAlpha($coordinate, $alpha);
+        $this->context->assertImagePixelAlpha($coordinate, $alpha);
     }
 
     /**
@@ -2281,26 +2283,28 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertImagePixelAlpha
      * @covers ::getImagePixelInfo
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid coordinates: "1, 1". Format is "<w>x<h>", no spaces allowed.
      */
     public function testThrowsExceptionWhenAssertingImagePixelAlphaWithInvalidCoordinate() {
         $this->mockHandler->append(
             new Response(200, [], file_get_contents(FIXTURES_DIR . '/transparency.png'))
         );
 
-        $this->context
-            ->requestPath('/path')
-            ->assertImagePixelAlpha('1, 1', '1');
+        $this->context->requestPath('/path');
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Invalid coordinates: "1, 1". Format is "<w>x<h>", no spaces allowed.'
+        ));
+        $this->context->assertImagePixelAlpha('1, 1', '1');
     }
 
     /**
      * @covers ::assertAclRuleWithIdDoesNotExist
-     * @expectedException Assert\InvalidArgumentException
-     * @expectedExceptionMessage ACL rule "someId" with public key "publicKey" still exists. Expected "404 Access rule not found", got "200 OK".
      */
     public function testThrowsExceptionWhenAssertingThatAclRuleWithIdDoesNotExistWhenItDoesExist() {
         $this->mockHandler->append(new Response(200, [], '', '1.1', 'OK'));
+        $this->expectException(Assert\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'ACL rule "someId" with public key "publicKey" still exists. Expected "404 Access rule not found", got "200 OK".'
+        );
         $this->context->assertAclRuleWithIdDoesNotExist('publicKey', 'someId');
     }
 
@@ -2328,11 +2332,13 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::assertPublicKeyDoesNotExist
-     * @expectedException Assert\InvalidArgumentException
-     * @expectedExceptionMessage Public key "publicKey" still exists. Expected "404 Public key not found", got "200 OK".
      */
     public function testThrowsExceptionWhenAssertingThatPublicKeyDoesNotExistWhenItDoes() {
         $this->mockHandler->append(new Response(200, [], '', '1.1', 'OK'));
+        $this->expectException(Assert\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Public key "publicKey" still exists. Expected "404 Public key not found", got "200 OK".'
+        );
         $this->context->assertPublicKeyDoesNotExist('publicKey');
     }
 
@@ -2415,26 +2421,26 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::assertMaxAge
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Response does not have a cache-control header.
      */
     public function testThrowsExceptionWhenAssertingMaxAgeAndResponseDoesNotHaveCacheControlHeader() {
         $this->mockHandler->append(new Response(200));
-        $this->context
-            ->requestPath('/path')
-            ->assertMaxAge(123);
+        $this->context->requestPath('/path');
+        $this->expectExceptionObject(new RuntimeException(
+            'Response does not have a cache-control header.'
+        ));
+        $this->context->assertMaxAge(123);
     }
 
     /**
      * @covers ::assertMaxAge
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Response cache-control header does not include a max-age directive: "private".
      */
     public function testThrowsExceptionWhenAssertingMaxAgeAndResponseCacheControlHeaderDoesNotHaveMaxAgeDirective() {
         $this->mockHandler->append(new Response(200, ['cache-control' => 'private']));
-        $this->context
-            ->requestPath('/path')
-            ->assertMaxAge(123);
+        $this->context->requestPath('/path');
+        $this->expectExceptionObject(new RuntimeException(
+            'Response cache-control header does not include a max-age directive: "private".'
+        ));
+        $this->context->assertMaxAge(123);
     }
 
     /**
@@ -2452,14 +2458,15 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::assertMaxAge
-     * @expectedException Assert\InvalidArgumentException
-     * @expectedExceptionMessage The max-age directive in the cache-control header is not correct. Expected 123, got 456. Complete cache-control header: "private, max-age=456".
      */
     public function testAssertingResponseMaxAgeCanFail() {
         $this->mockHandler->append(new Response(200, ['cache-control' => 'private, max-age=456']));
-        $this->context
-            ->requestPath('/path')
-            ->assertMaxAge(123);
+        $this->context->requestPath('/path');
+        $this->expectException(Assert\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The max-age directive in the cache-control header is not correct. Expected 123, got 456. Complete cache-control header: "private, max-age=456".'
+        );
+        $this->context->assertMaxAge(123);
     }
 
     /**
@@ -2479,26 +2486,27 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::assertResponseHasCacheControlDirective
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Response does not have a cache-control header.
      */
     public function testThrowsExceptionWhenAssertingCacheControlHeaderDirectiveWhenResponseDoesNotHaveACacheControlHeader() {
         $this->mockHandler->append(new Response(200));
-        $this->context
-            ->requestPath('/path')
-            ->assertResponseHasCacheControlDirective('must-revalidate');
+        $this->context->requestPath('/path');
+        $this->expectExceptionObject(new RuntimeException(
+            'Response does not have a cache-control header.'
+        ));
+        $this->context->assertResponseHasCacheControlDirective('must-revalidate');
     }
 
     /**
      * @covers ::assertResponseHasCacheControlDirective
-     * @expectedException Assert\InvalidArgumentException
-     * @expectedExceptionMessage The cache-control header does not contain the "must-revalidate" directive. Complete cache-control header: "private, max-age=600".
      */
     public function testThrowsExceptionWhenAssertingThatACacheControlDirectiveExistsWhenItDoesNot() {
         $this->mockHandler->append(new Response(200, ['cache-control' => 'private, max-age=600']));
-        $this->context
-            ->requestPath('/path')
-            ->assertResponseHasCacheControlDirective('must-revalidate');
+        $this->context->requestPath('/path');
+        $this->expectException(Assert\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The cache-control header does not contain the "must-revalidate" directive. Complete cache-control header: "private, max-age=600".'
+        );
+        $this->context->assertResponseHasCacheControlDirective('must-revalidate');
     }
 
     /**
@@ -2518,57 +2526,55 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::assertResponseDoesNotHaveCacheControlDirective
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Response does not have a cache-control header.
      */
     public function testThrowsExceptionWhenAssertingResponseDoesNotHaveCacheControlHeaderDirectiveWhenResponseDoesNotHaveACacheControlHeader() {
         $this->mockHandler->append(new Response(200));
-        $this->context
-            ->requestPath('/path')
-            ->assertResponseDoesNotHaveCacheControlDirective('must-revalidate');
+        $this->context->requestPath('/path');
+        $this->expectExceptionObject(new RuntimeException(
+            'Response does not have a cache-control header.'
+        ));
+        $this->context->assertResponseDoesNotHaveCacheControlDirective('must-revalidate');
     }
 
     /**
      * @covers ::assertResponseDoesNotHaveCacheControlDirective
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage The cache-control header contains the "max-age" directive when it should not. Complete cache-control header: "private, max-age=600, must-revalidate".
      */
     public function testThrowsExceptionWhenAssertingThatACacheControlDirectiveDoesNotExistWhenItDoes() {
         $this->mockHandler->append(new Response(200, ['cache-control' => 'private, max-age=600, must-revalidate']));
-        $this->context
-            ->requestPath('/path')
-            ->assertResponseDoesNotHaveCacheControlDirective('max-age');
+        $this->context->requestPath('/path');
+        $this->expectExceptionObject(new RuntimeException(
+            'The cache-control header contains the "max-age" directive when it should not. Complete cache-control header: "private, max-age=600, must-revalidate".'
+        ));
+        $this->context->assertResponseDoesNotHaveCacheControlDirective('max-age');
     }
 
     /**
      * @covers ::assertLastResponseHeaders
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Need to compare at least 2 responses.
      */
     public function testThrowsExceptionWhenAssertingTheLastResponseHeadersAndOnlyOneResponseExist() {
         $this->mockHandler->append(new Response(200));
-        $this->context
-            ->requestPath('/path')
-            ->assertLastResponseHeaders(1, 'content-length');
+        $this->context->requestPath('/path');
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Need to compare at least 2 responses.'
+        ));
+        $this->context->assertLastResponseHeaders(1, 'content-length');
     }
 
     /**
      * @covers ::assertLastResponseHeaders
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Not enough responses in the history. Need at least 4, there are currently 2.
      */
     public function testThrowsExceptionWhenAssertingTheLastResponseHeadersAndThereIsNotEnoughResponses() {
         $this->mockHandler->append(new Response(200), new Response(200));
-        $this->context
-            ->requestPath('/path')
-            ->requestPath('/anotherPath')
-            ->assertLastResponseHeaders(4, 'content-length');
+        $this->context->requestPath('/path');
+        $this->context->requestPath('/anotherPath');
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Not enough responses in the history. Need at least 4, there are currently 2.'
+        ));
+        $this->context->assertLastResponseHeaders(4, 'content-length');
     }
 
     /**
      * @covers ::assertLastResponseHeaders
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage The "content-length" header is not present in all of the last 3 response headers.
      */
     public function testThrowsExceptionWhenAssertingLastResponseHeadersAndHeaderIsNotPresentInAllResponses() {
         $this->mockHandler->append(
@@ -2576,11 +2582,13 @@ class FeatureContextTest extends TestCase {
             new Response(200, ['content-length' => 123]),
             new Response(200)
         );
-        $this->context
-            ->requestPath('/path1')
-            ->requestPath('/path2')
-            ->requestPath('/path3')
-            ->assertLastResponseHeaders(3, 'content-length');
+        $this->context->requestPath('/path1');
+        $this->context->requestPath('/path2');
+        $this->context->requestPath('/path3');
+        $this->expectExceptionObject(new RuntimeException(
+            'The "content-length" header is not present in all of the last 3 response headers.'
+        ));
+        $this->context->assertLastResponseHeaders(3, 'content-length');
     }
 
     /**
@@ -2623,8 +2631,6 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::assertLastResponseHeaders
-     * @expectedException Assert\InvalidArgumentException
-     * @expectedExceptionMessage Expected 3 unique values, got 2. Values compared:
      */
     public function testCanAssertingLastResponesHeadersForUniquenessCanFail() {
         $this->mockHandler->append(
@@ -2632,17 +2638,20 @@ class FeatureContextTest extends TestCase {
             new Response(200, ['content-length' => 456]),
             new Response(200, ['content-length' => 456])
         );
-        $this->context
-            ->requestPath('/path1')
-            ->requestPath('/path2')
-            ->requestPath('/path3')
-            ->assertLastResponseHeaders(3, 'content-length', true);
+        $this->context->requestPath('/path1');
+        $this->context->requestPath('/path2');
+        $this->context->requestPath('/path3');
+
+        $this->expectException(Assert\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Expected 3 unique values, got 2. Values compared:'
+        );
+
+        $this->context->assertLastResponseHeaders(3, 'content-length', true);
     }
 
     /**
      * @covers ::assertLastResponseHeaders
-     * @expectedException Assert\InvalidArgumentException
-     * @expectedExceptionMessage Expected all values to be the same. Values compared:
      */
     public function testCanAssertingLastResponesHeadersForNonUniquenessCanFail() {
         $this->mockHandler->append(
@@ -2650,11 +2659,16 @@ class FeatureContextTest extends TestCase {
             new Response(200, ['content-length' => 123]),
             new Response(200, ['content-length' => 456])
         );
-        $this->context
-            ->requestPath('/path1')
-            ->requestPath('/path2')
-            ->requestPath('/path3')
-            ->assertLastResponseHeaders(3, 'content-length');
+        $this->context->requestPath('/path1');
+        $this->context->requestPath('/path2');
+        $this->context->requestPath('/path3');
+
+        $this->expectException(Assert\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Expected all values to be the same. Values compared:'
+        );
+
+        $this->context->assertLastResponseHeaders(3, 'content-length');
     }
 
     /**
@@ -2672,71 +2686,79 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::assertResponseBodySize
-     * @expectedException Assert\InvalidArgumentException
-     * @expectedExceptionMessage Expected response body size: 123, actual: 11.
      */
     public function testAssertingResponseBodySizeCanFail() {
         $this->mockHandler->append(new Response(200, [], 'some string'));
-        $this->context
-            ->requestPath('/path')
-            ->assertResponseBodySize(123);
+        $this->context->requestPath('/path');
+
+        $this->expectException(Assert\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Expected response body size: 123, actual: 11.'
+        );
+
+        $this->context->assertResponseBodySize(123);
     }
 
     /**
      * @covers ::assertLastResponsesMatch
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Missing response column
      */
     public function testThrowsExceptionWhenMatchingResponsesWithNoResponseKeyInTable() {
+        $this->expectExceptionObject(new InvalidArgumentException('Missing response column'));
         $this->context->assertLastResponsesMatch(new TableNode([['num'], ['3']]));
     }
 
     /**
      * @covers ::assertLastResponsesMatch
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Not enough transactions in the history. Needs at least 3, actual: 2.
      */
     public function testThrowsExceptionWhenMatchingMoreResponsesThanWhatIsPresentInTheHistory() {
         $this->mockHandler->append(new Response(200), new Response(200));
-        $this->context
-            ->requestPath('/path')
-            ->requestPath('/path')
-            ->assertLastResponsesMatch(new TableNode([
-                ['response'],
-                ['3'],
-            ]));
+        $this->context->requestPath('/path');
+        $this->context->requestPath('/path');
+
+        $this->expectExceptionObject(new RuntimeException(
+            'Not enough transactions in the history. Needs at least 3, actual: 2.'
+        ));
+
+        $this->context->assertLastResponsesMatch(new TableNode([
+            ['response'],
+            ['3'],
+        ]));
     }
 
     /**
      * @covers ::assertLastResponsesMatch
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Each row must refer to a response by using the "response" column.
      */
     public function testThrowsExceptionWhenMatchingResponsesAndARowIsMissingResponseNumber() {
         $this->mockHandler->append(new Response(200), new Response(200));
-        $this->context
-            ->requestPath('/path')
-            ->requestPath('/path')
-            ->assertLastResponsesMatch(new TableNode([
-                ['response'],
-                ['1'],
-                [''],
-            ]));
+        $this->context->requestPath('/path');
+        $this->context->requestPath('/path');
+
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Each row must refer to a response by using the "response" column.'
+        ));
+
+        $this->context->assertLastResponsesMatch(new TableNode([
+            ['response'],
+            ['1'],
+            [''],
+        ]));
     }
 
     /**
      * @covers ::assertLastResponsesMatch
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid column name: "foobar".
      */
     public function testThrowsExceptionWhenMatchingResponsesAndAnInvalidColumnIsUsed() {
         $this->mockHandler->append(new Response(200));
-        $this->context
-            ->requestPath('/path')
-            ->assertLastResponsesMatch(new TableNode([
-                ['response', 'foobar'],
-                ['1',        'baz'   ],
-            ]));
+        $this->context->requestPath('/path');
+
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Invalid column name: "foobar".'
+        ));
+
+        $this->context->assertLastResponsesMatch(new TableNode([
+            ['response', 'foobar'],
+            ['1',        'baz'   ],
+        ]));
     }
 
     /**
@@ -2922,7 +2944,6 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getDataForMatchingSeveralResponsesWhenFailing
      * @covers ::assertLastResponsesMatch
-     * @expectedException Assert\InvalidArgumentException
      * @param Response[] $responses
      * @param TableNode $table
      * @param string $exceptionMessage
@@ -2934,20 +2955,20 @@ class FeatureContextTest extends TestCase {
             $this->context->requestPath('/path');
         }
 
+        $this->expectException(Assert\InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);
+
         $this->context->assertLastResponsesMatch($table);
     }
 
     /**
      * @covers ::assertImageProperties
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Imagick could not read response body:
      */
     public function testThrowsExceptionWhenAssertingImagePropertiesAndResponseDoesNotContainAValidImage() {
         $this->mockHandler->append(new Response(200, [], 'foobar'));
-        $this->context
-            ->requestPath('/path')
-            ->assertImageProperties('prefix');
+        $this->context->requestPath('/path');
+        $this->expectExceptionObject(new RuntimeException('Imagick could not read response body:'));
+        $this->context->assertImageProperties('prefix');
     }
 
     /**
@@ -2965,14 +2986,14 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @covers ::assertImageProperties
-     * @expectedException Imbo\BehatApiExtension\Exception\AssertionFailedException
-     * @expectedExceptionMessage Image properties have not been properly stripped. Did not expect properties that starts with "png", found: "png:
      */
     public function testAssertingThatImageDoesNotHaveAnyPropertiesWithASpecificPrefixCanFail() {
         $this->mockHandler->append(new Response(200, [], file_get_contents(FIXTURES_DIR . '/image.png')));
-        $this->context
-            ->requestPath('/path')
-            ->assertImageProperties('png');
+        $this->context->requestPath('/path');
+        $this->expectExceptionObject(new AssertionFailedException(
+            'Image properties have not been properly stripped. Did not expect properties that starts with "png", found: "png:'
+        ));
+        $this->context->assertImageProperties('png');
     }
 
     /**
@@ -3002,7 +3023,6 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getSuiteSettings
      * @covers ::setUpAdapters
-     * @expectedException InvalidArgumentException
      * @param array $settings
      * @param string $expectedExceptionMessage
      */
@@ -3013,7 +3033,7 @@ class FeatureContextTest extends TestCase {
         $environment = $this->createMock('Behat\Testwork\Environment\Environment');
         $environment->expects($this->once())->method('getSuite')->willReturn($suite);
 
-        $this->expectExceptionMessage($expectedExceptionMessage);
+        $this->expectExceptionObject(new InvalidArgumentException($expectedExceptionMessage));
         FeatureContext::setUpAdapters(new BeforeScenarioScope(
             $environment,
             $this->createMock('Behat\Gherkin\Node\FeatureNode'),
