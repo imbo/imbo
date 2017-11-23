@@ -11,6 +11,7 @@
 namespace ImboUnitTest\EventListener;
 
 use Imbo\EventListener\ImageTransformationCache;
+use Imbo\Exception\InvalidArgumentException;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 
@@ -258,25 +259,26 @@ class ImageTransformationCacheTest extends ListenerTests {
     }
 
     /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The image transformation cache path is missing from the configuration
-     * @expectedExceptionCode 500
      * @covers Imbo\EventListener\ImageTransformationCache::__construct
      */
     public function testThrowsAnExceptionWhenPathIsMissingFromTheParameters() {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'The image transformation cache path is missing from the configuration',
+            500
+        ));
         $listener = new ImageTransformationCache([]);
     }
 
     /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Image transformation cache path is not writable by the webserver: vfs://cacheDir/dir
-     * @expectedExceptionCode 500
      * @covers Imbo\EventListener\ImageTransformationCache::__construct
      */
     public function testThrowsExceptionWhenCacheDirIsNotWritable() {
         $dir = new vfsStreamDirectory('dir', 0);
         $this->cacheDir->addChild($dir);
-
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Image transformation cache path is not writable by the webserver: vfs://cacheDir/dir',
+            500
+        ));
         $listener = new ImageTransformationCache(['path' => 'vfs://cacheDir/dir']);
     }
 

@@ -11,6 +11,7 @@
 namespace ImboUnitTest\Image\OutputConverter;
 
 use Imbo\Image\OutputConverter\Webp;
+use Imbo\Exception\OutputConverterException;
 use PHPUnit\Framework\TestCase;
 use ImagickException;
 
@@ -63,9 +64,6 @@ class WebpTest extends TestCase {
 
     /**
      * @covers ::convert
-     * @expectedException Imbo\Exception\OutputConverterException
-     * @expectedExceptionMessage some error
-     * @expectedExceptionCode 400
      */
     public function testThrowsExceptionOnImagickFailure() {
         $extension = 'webp';
@@ -76,6 +74,12 @@ class WebpTest extends TestCase {
                 ->with($extension)
                 ->will($this->throwException(new ImagickException('some error')));
 
-        $this->assertNull($this->converter->convert($imagick, $this->createMock('Imbo\Model\Image'), $extension, 'image/webp'));
+        $this->expectExceptionObject(new OutputConverterException('some error', 400));
+        $this->converter->convert(
+            $imagick,
+            $this->createMock('Imbo\Model\Image'),
+            $extension,
+            'image/webp'
+        );
     }
 }

@@ -11,6 +11,7 @@
 namespace ImboUnitTest\Model;
 
 use Imbo\Model\Stats;
+use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -115,12 +116,13 @@ class StatsTest extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Custom statistics requires a key to be set
-     * @expectedExceptionCode 500
      * @covers Imbo\Model\Stats::offsetSet
      */
     public function testThrowsExceptionWhenUsedAsArrayWithoutAKey() {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Custom statistics requires a key to be set',
+            500
+        ));
         $this->model[] = 'foobar';
     }
 

@@ -11,6 +11,7 @@
 namespace ImboUnitTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Strip;
+use Imbo\Exception\TransformationException;
 use ImagickException;
 use PHPUnit\Framework\TestCase;
 
@@ -20,11 +21,6 @@ use PHPUnit\Framework\TestCase;
  * @group transformations
  */
 class StripTest extends TestCase {
-    /**
-     * @expectedException Imbo\Exception\TransformationException
-     * @expectedExceptionMessage error
-     * @expectedExceptionCode 400
-     */
     public function testThrowsCorrectExceptionWhenAnErrorOccurs() {
         $imagickException = new ImagickException('error');
 
@@ -32,6 +28,7 @@ class StripTest extends TestCase {
         $imagick->expects($this->once())->method('stripImage')->will($this->throwException($imagickException));
 
         $transformation = new Strip();
+        $this->expectExceptionObject(new TransformationException('error', 400));
         $transformation->setImagick($imagick)->transform([]);
     }
 

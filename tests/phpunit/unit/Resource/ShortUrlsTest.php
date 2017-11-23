@@ -11,6 +11,7 @@
 namespace ImboUnitTest\Resource;
 
 use Imbo\Resource\ShortUrls;
+use Imbo\Exception\InvalidArgumentException;
 
 /**
  * @covers Imbo\Resource\ShortUrls
@@ -54,82 +55,52 @@ class ShortUrlsTest extends ResourceTests {
         $this->event->expects($this->any())->method('getOutputConverterManager')->will($this->returnValue($this->outputConverterManager));
     }
 
-    /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Missing JSON data
-     * @expectedExceptionCode 400
-     */
     public function testWillThrowAnExceptionWhenRequestBodyIsEmpty() {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue(null));
+        $this->expectExceptionObject(new InvalidArgumentException('Missing JSON data', 400));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid JSON data
-     * @expectedExceptionCode 400
-     */
     public function testWillThrowAnExceptionWhenRequestBodyIsInvalid() {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('some string'));
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid JSON data', 400));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Missing or invalid user
-     * @expectedExceptionCode 400
-     */
     public function testWillThrowAnExceptionWhenUserMissing() {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{}'));
+        $this->expectExceptionObject(new InvalidArgumentException('Missing or invalid user', 400));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Missing or invalid user
-     * @expectedExceptionCode 400
-     */
     public function testWillThrowAnExceptionWhenUserDoesNotMatch() {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"user": "user"}'));
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('otheruser'));
+        $this->expectExceptionObject(new InvalidArgumentException('Missing or invalid user', 400));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Missing or invalid image identifier
-     * @expectedExceptionCode 400
-     */
     public function testWillThrowAnExceptionWhenImageIdentifierIsMissing() {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"user": "user"}'));
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
+        $this->expectExceptionObject(new InvalidArgumentException('Missing or invalid image identifier', 400));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Missing or invalid image identifier
-     * @expectedExceptionCode 400
-     */
     public function testWillThrowAnExceptionWhenImageIdentifierDoesNotMatch() {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"user": "user", "imageIdentifier": "id"}'));
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('other id'));
+        $this->expectExceptionObject(new InvalidArgumentException('Missing or invalid image identifier', 400));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Extension provided is not a recognized format
-     * @expectedExceptionCode 400
-     */
     public function testWillThrowAnExceptionWhenExtensionIsNotRecognized() {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"user": "user", "imageIdentifier": "id", "extension": "foo"}'));
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
-
         $this->outputConverterManager->expects($this->any())->method('supportsExtension')->will($this->returnValue(false));
-
+        $this->expectExceptionObject(new InvalidArgumentException('Extension provided is not a recognized format', 400));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
@@ -242,11 +213,6 @@ class ShortUrlsTest extends ResourceTests {
         $this->getNewResource()->deleteImageShortUrls($this->event);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Image does not exist
-     * @expectedExceptionCode 404
-     */
     public function testCanNotAddShortUrlWhenImageDoesNotExist() {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('
             {
@@ -259,7 +225,7 @@ class ShortUrlsTest extends ResourceTests {
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->database->expects($this->once())->method('imageExists')->with('user', 'id')->will($this->returnValue(false));
-
+        $this->expectExceptionObject(new InvalidArgumentException('Image does not exist', 404));
         $this->getNewResource()->createShortUrl($this->event);
     }
 }

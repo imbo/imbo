@@ -11,6 +11,7 @@
 namespace ImboUnitTest\Database;
 
 use Imbo\Database\Doctrine;
+use Imbo\Exception\DatabaseException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use PDOException;
@@ -196,9 +197,6 @@ class DoctrineTest extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\DatabaseException
-     * @expectedExceptionMessage Invalid metadata
-     * @expectedExceptionCode 400
      * @covers Imbo\Database\Doctrine::normalizeMetadata
      */
     public function testThrowsExceptionWhenKeysContainTheSeparator() {
@@ -209,7 +207,7 @@ class DoctrineTest extends TestCase {
         $metadata = [
             'some::key' => 'value',
         ];
+        $this->expectExceptionObject(new DatabaseException('Invalid metadata', 400));
         $method->invokeArgs($this->driver, [&$metadata, &$result]);
-        $this->assertSame($result, $normalizedMetadata);
     }
 }

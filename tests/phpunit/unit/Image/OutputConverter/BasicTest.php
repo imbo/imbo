@@ -11,6 +11,7 @@
 namespace ImboUnitTest\Image\OutputConverter;
 
 use Imbo\Image\OutputConverter\Basic;
+use Imbo\Exception\OutputConverterException;
 use PHPUnit\Framework\TestCase;
 use ImagickException;
 
@@ -65,9 +66,6 @@ class BasicTest extends TestCase {
 
     /**
      * @covers ::convert
-     * @expectedException Imbo\Exception\OutputConverterException
-     * @expectedExceptionMessage some error
-     * @expectedExceptionCode 400
      */
     public function testThrowsExceptionOnImagickFailure() {
         $extension = 'png';
@@ -78,6 +76,12 @@ class BasicTest extends TestCase {
                 ->with($extension)
                 ->will($this->throwException(new ImagickException('some error')));
 
-        $this->assertNull($this->converter->convert($imagick, $this->createMock('Imbo\Model\Image'), $extension, 'image/png'));
+        $this->expectExceptionObject(new OutputConverterException('some error', 400));
+        $this->converter->convert(
+            $imagick,
+            $this->createMock('Imbo\Model\Image'),
+            $extension,
+            'image/png'
+        );
     }
 }

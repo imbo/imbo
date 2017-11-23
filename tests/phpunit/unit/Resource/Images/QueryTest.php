@@ -11,6 +11,7 @@
 namespace ImboUnitTest\Resource\Images;
 
 use Imbo\Resource\Images\Query;
+use Imbo\Exception\RuntimeException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -167,20 +168,14 @@ class QueryTest extends TestCase {
 
     /**
      * @covers Imbo\Resource\Images\Query::sort
-     * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage Invalid sort value: field:foo
-     * @expectedExceptionCode 400
      */
     public function testSortThrowsExceptionOnInvalidSortValues() {
+        $this->expectExceptionObject(new RuntimeException('Invalid sort value: field:foo', 400));
         $this->query->sort(['field:foo']);
     }
 
-    /**
-     * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage Badly formatted sort
-     * @expectedExceptionCode 400
-     */
     public function testSortThrowsExceptionWhenTheStortStringIsBadlyFormatted() {
+        $this->expectExceptionObject(new RuntimeException('Badly formatted sort', 400));
         $this->query->sort(['field:asc', '']);
     }
 }

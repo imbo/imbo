@@ -10,6 +10,7 @@
 
 namespace ImboIntegrationTest\Storage;
 
+use Imbo\Exception\StorageException;
 use DateTime;
 use PHPUnit\Framework\TestCase;
 
@@ -127,10 +128,6 @@ abstract class StorageTests extends TestCase {
         );
     }
 
-    /**
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExceptionCode 404
-     */
     public function testStoreDeleteAndGetImage() {
         $this->assertTrue(
             $this->driver->store($this->user, $this->imageIdentifier, $this->imageData),
@@ -142,30 +139,23 @@ abstract class StorageTests extends TestCase {
             'Could not delete image'
         );
 
+        $this->expectExceptionObject(new StorageException('File not found', 404));
+
         $this->driver->getImage($this->user, $this->imageIdentifier);
     }
 
-    /**
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExceptionCode 404
-     */
     public function testDeleteImageThatDoesNotExist() {
+        $this->expectExceptionObject(new StorageException('File not found', 404));
         $this->driver->delete($this->user, $this->imageIdentifier);
     }
 
-    /**
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExceptionCode 404
-     */
     public function testGetImageThatDoesNotExist() {
+        $this->expectExceptionObject(new StorageException('File not found', 404));
         $this->driver->getImage($this->user, $this->imageIdentifier);
     }
 
-    /**
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExceptionCode 404
-     */
     public function testGetLastModifiedOfImageThatDoesNotExist() {
+        $this->expectExceptionObject(new StorageException('File not found', 404));
         $this->driver->getLastModified($this->user, $this->imageIdentifier);
     }
 

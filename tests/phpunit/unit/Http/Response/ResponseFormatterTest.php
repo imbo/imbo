@@ -15,6 +15,7 @@ use Imbo\Http\ContentNegotiation;
 use Imbo\Model\Error;
 use Imbo\Model\Image;
 use Imbo\Router\Route;
+use Imbo\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use PHPUnit\Framework\TestCase;
 
@@ -202,9 +203,6 @@ class ResponseFormatterTest extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage Not acceptable
-     * @expectedExceptionCode 406
      * @covers Imbo\Http\Response\ResponseFormatter::negotiate
      */
     public function testThrowsAnExceptionInStrictModeWhenTheUserAgentDoesNotSupportAnyOfImbosMediaTypes() {
@@ -213,7 +211,7 @@ class ResponseFormatterTest extends TestCase {
         $requestHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
         $requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('text/xml'));
         $this->request->headers = $requestHeaders;
-
+        $this->expectExceptionObject(new RuntimeException('Not acceptable', 406));
         $this->responseFormatter->negotiate($this->event);
     }
 

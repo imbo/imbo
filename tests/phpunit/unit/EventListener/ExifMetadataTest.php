@@ -11,6 +11,7 @@
 namespace ImboUnitTest\EventListener;
 
 use Imbo\EventListener\ExifMetadata;
+use Imbo\Exception\RuntimeException;
 
 /**
  * @covers Imbo\EventListener\ExifMetadata
@@ -159,9 +160,6 @@ class ExifMetadataTest extends ListenerTests {
 
     /**
      * @covers Imbo\EventListener\ExifMetadata::save
-     * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage Could not store EXIF-metadata
-     * @expectedExceptionCode 500
      */
     public function testWillDeleteImageWhenUpdatingMetadataFails() {
         $databaseException = $this->createMock('Imbo\Exception\DatabaseException');
@@ -179,7 +177,7 @@ class ExifMetadataTest extends ListenerTests {
         $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
         $event->expects($this->once())->method('getDatabase')->will($this->returnValue($database));
-
+        $this->expectExceptionObject(new RuntimeException('Could not store EXIF-metadata', 500));
         $this->listener->save($event);
     }
 

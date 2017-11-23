@@ -13,6 +13,7 @@ namespace ImboUnitTest\Image;
 use Imbo\Image\ImagePreparation;
 use Imbo\Model\Image;
 use Imbo\Image\Identifier\Generator\GeneratorInterface;
+use Imbo\Exception\ImageException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -75,33 +76,25 @@ class ImagePreparationTest extends TestCase {
 
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
-     * @expectedException Imbo\Exception\ImageException
-     * @expectedExceptionMessage No image attached
-     * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenNoImageIsAttached() {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue(''));
-
+        $this->expectExceptionObject(new ImageException('No image attached', 400));
         $this->prepare->prepareImage($this->event);
     }
 
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
-     * @expectedException Imbo\Exception\ImageException
-     * @expectedExceptionMessage Unsupported image type: text/x-php
-     * @expectedExceptionCode 415
      */
     public function testThrowsExceptionWhenImageTypeIsNotSupported() {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue(file_get_contents(__FILE__)));
         $this->inputLoaderManager->expects($this->any())->method('load')->will($this->returnValue(null));
+        $this->expectExceptionObject(new ImageException('Unsupported image type: text/x-php', 415));
         $this->prepare->prepareImage($this->event);
     }
 
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
-     * @expectedException Imbo\Exception\ImageException
-     * @expectedExceptionMessage Invalid image
-     * @expectedExceptionCode 415
      * @group imagick
      */
     public function testThrowsExceptionWhenImageIsBroken() {
@@ -109,22 +102,20 @@ class ImagePreparationTest extends TestCase {
 
         $this->inputLoaderManager->expects($this->any())->method('load')->will($this->returnCallback($this->imagickLoader));
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue(file_get_contents($filePath)));
+        $this->expectExceptionObject(new ImageException('Invalid image', 415));
         $this->prepare->prepareImage($this->event);
     }
 
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
-     * @expectedException Imbo\Exception\ImageException
-     * @expectedExceptionMessage Invalid image
-     * @expectedExceptionCode 415
      * @group imagick
      */
     public function testThrowsExceptionWhenImageIsSlightlyBroken() {
         $filePath = FIXTURES_DIR . '/slightly-broken-image.png';
 
         $this->inputLoaderManager->expects($this->any())->method('load')->will($this->returnCallback($this->imagickLoader));
-
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue(file_get_contents($filePath)));
+        $this->expectExceptionObject(new ImageException('Invalid image', 415));
         $this->prepare->prepareImage($this->event);
     }
 

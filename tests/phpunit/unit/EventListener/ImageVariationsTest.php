@@ -17,6 +17,9 @@ use Imbo\Exception\TransformationException;
 use Imbo\Image\TransformationManager;
 use Imbo\EventListener\Initializer\Imagick as ImagickInitializer;
 use DateTime;
+use InvalidArgumentException;
+use PHPUnit\Framework\Error\Error;
+use PHPUnit\Framework\Error\Warning;
 
 /**
  * @covers Imbo\EventListener\ImageVariations
@@ -109,12 +112,10 @@ class ImageVariationsTest extends ListenerTests {
 
     /**
      * @covers Imbo\EventListener\ImageVariations::__construct
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Scale factor must be below 1
-     * @expectedExceptionCode 503
      */
     public function testThrowsOnInvalidScaleFactor() {
-        return new ImageVariations([
+        $this->expectExceptionObject(new InvalidArgumentException('Scale factor must be below 1', 503));
+        new ImageVariations([
             'database' => [
                 'adapter' => $this->db,
             ],
@@ -128,12 +129,13 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers Imbo\EventListener\ImageVariations::__construct
      * @covers Imbo\EventListener\ImageVariations::configureDatabase
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Missing database adapter configuration for the image variations event listener
-     * @expectedExceptionCode 500
      */
     public function testThrowsOnMissingDatabaseAdapter() {
-        return new ImageVariations([
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Missing database adapter configuration for the image variations event listener',
+            500
+        ));
+        new ImageVariations([
             'storage' => [ 'adapter' => $this->storage ],
         ]);
     }
@@ -141,12 +143,13 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers Imbo\EventListener\ImageVariations::__construct
      * @covers Imbo\EventListener\ImageVariations::configureDatabase
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid database adapter for the image variations event listener
-     * @expectedExceptionCode 500
      */
     public function testThrowsOnInvalidDatabaseFromCallable() {
-        return new ImageVariations([
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Invalid database adapter for the image variations event listener',
+            500
+        ));
+        new ImageVariations([
             'database' => [ 'adapter' => function() { return null; } ],
             'storage'  => [ 'adapter' => $this->storage ],
         ]);
@@ -155,12 +158,13 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers Imbo\EventListener\ImageVariations::__construct
      * @covers Imbo\EventListener\ImageVariations::configureDatabase
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid database adapter for the image variations event listener
-     * @expectedExceptionCode 500
      */
     public function testThrowsOnInvalidDatabaseFromString() {
-        return new ImageVariations([
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Invalid database adapter for the image variations event listener',
+            500
+        ));
+        new ImageVariations([
             'database' => [ 'adapter' => 'DateTime' ],
             'storage'  => [ 'adapter' => $this->storage ],
         ]);
@@ -169,12 +173,13 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers Imbo\EventListener\ImageVariations::__construct
      * @covers Imbo\EventListener\ImageVariations::configureStorage
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Missing storage adapter configuration for the image variations event listener
-     * @expectedExceptionCode 500
      */
     public function testThrowsOnMissingStorageAdapter() {
-        return new ImageVariations([
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Missing storage adapter configuration for the image variations event listener',
+            500
+        ));
+        new ImageVariations([
             'database' => [ 'adapter' => $this->db ],
         ]);
     }
@@ -182,12 +187,13 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers Imbo\EventListener\ImageVariations::__construct
      * @covers Imbo\EventListener\ImageVariations::configureStorage
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid storage adapter for the image variations event listener
-     * @expectedExceptionCode 500
      */
     public function testThrowsOnInvalidStorageFromCallable() {
-        return new ImageVariations([
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Invalid storage adapter for the image variations event listener',
+            500
+        ));
+        new ImageVariations([
             'storage'  => [ 'adapter' => function() { return null; } ],
             'database' => [ 'adapter' => $this->db ],
         ]);
@@ -196,12 +202,13 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers Imbo\EventListener\ImageVariations::__construct
      * @covers Imbo\EventListener\ImageVariations::configureStorage
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid storage adapter for the image variations event listener
-     * @expectedExceptionCode 500
      */
     public function testThrowsOnInvalidStorageFromString() {
-        return new ImageVariations([
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Invalid storage adapter for the image variations event listener',
+            500
+        ));
+        new ImageVariations([
             'storage'  => [ 'adapter' => 'DateTime' ],
             'database' => [ 'adapter' => $this->db ],
         ]);
@@ -282,8 +289,6 @@ class ImageVariationsTest extends ListenerTests {
 
     /**
      * @covers Imbo\EventListener\ImageVariations::chooseVariation
-     * @expectedException PHPUnit\Framework\Error\Error
-     * @expectedExceptionMessage Image variation storage is not in sync with the image variation database
      */
     public function testTriggersWarningIfVariationFoundInDbButNotStorage() {
         $width  = 1024;
@@ -320,9 +325,15 @@ class ImageVariationsTest extends ListenerTests {
 
         $this->imageStorage->expects($this->never())->method('getLastModified');
 
-        // Running this twice, once with error suppresion (to flag "return" for code coverage),
+        // Running this twice, once with error suppression (to flag "return" for code coverage),
         // once for triggering the warning
         @$this->listener->chooseVariation($this->event);
+
+        $this->expectException(Warning::class);
+        $this->expectExceptionMessage(
+            'Image variation storage is not in sync with the image variation database'
+        );
+
         $this->listener->chooseVariation($this->event);
     }
 
@@ -389,8 +400,6 @@ class ImageVariationsTest extends ListenerTests {
 
     /**
      * @covers Imbo\EventListener\ImageVariations::deleteVariations
-     * @expectedException PHPUnit\Framework\Error\Error
-     * @expectedExceptionMessage Could not delete image variation metadata for user (imgid)
      */
     public function testTriggersWarningOnFailedDeleteFromDatabase() {
         $this->db->expects($this->once())->method('deleteImageVariations')->with(
@@ -398,19 +407,27 @@ class ImageVariationsTest extends ListenerTests {
             $this->imageIdentifier
         )->will($this->throwException(new DatabaseException()));
 
+        $this->expectException(Warning::class);
+        $this->expectExceptionMessage(
+            'Could not delete image variation metadata for user (imgid)'
+        );
+
         $this->listener->deleteVariations($this->event);
     }
 
     /**
      * @covers Imbo\EventListener\ImageVariations::deleteVariations
-     * @expectedException PHPUnit\Framework\Error\Error
-     * @expectedExceptionMessage Could not delete image variations from storage for user (imgid)
      */
     public function testTriggersWarningOnFailedDeleteFromStorage() {
         $this->storage->expects($this->once())->method('deleteImageVariations')->with(
             $this->user,
             $this->imageIdentifier
         )->will($this->throwException(new StorageException()));
+
+        $this->expectException(Warning::class);
+        $this->expectExceptionMessage(
+            'Could not delete image variations from storage for user (imgid)'
+        );
 
         $this->listener->deleteVariations($this->event);
     }
@@ -540,8 +557,6 @@ class ImageVariationsTest extends ListenerTests {
 
     /**
      * @covers Imbo\EventListener\ImageVariations::generateVariations
-     * @expectedException PHPUnit\Framework\Error\Error
-     * @expectedExceptionMessage Could not generate image variation for user (imgid), width: 512
      */
     public function testGenerateVariationsTriggersWarningOnTransformationException() {
         $this->imageModel->method('getWidth')->willReturn(1024);
@@ -555,13 +570,16 @@ class ImageVariationsTest extends ListenerTests {
 
         $this->transformationManager->addTransformation('resize', $this->transformation);
 
+        $this->expectException(Warning::class);
+        $this->expectExceptionMessage(
+            'Could not generate image variation for user (imgid), width: 512'
+        );
+
         $this->listener->generateVariations($this->event);
     }
 
     /**
      * @covers Imbo\EventListener\ImageVariations::generateVariations
-     * @expectedException PHPUnit\Framework\Error\Error
-     * @expectedExceptionMessage Could not store image variation for user (imgid), width: 512
      */
     public function testGenerateVariationsTriggersWarningOnStorageException() {
         $this->imageModel->method('getWidth')->willReturn(1024);
@@ -570,13 +588,16 @@ class ImageVariationsTest extends ListenerTests {
             ->method('storeImageVariation')
             ->will($this->throwException(new StorageException()));
 
+        $this->expectException(Warning::class);
+        $this->expectExceptionMessage(
+            'Could not store image variation for user (imgid), width: 512'
+        );
+
         $this->listener->generateVariations($this->event);
     }
 
     /**
      * @covers Imbo\EventListener\ImageVariations::generateVariations
-     * @expectedException PHPUnit\Framework\Error\Error
-     * @expectedExceptionMessage Could not store image variation metadata for user (imgid), width: 512
      */
     public function testGenerateVariationsTriggersWarningOnDatabaseException() {
         $this->imageModel->method('getWidth')->willReturn(1024);
@@ -584,6 +605,11 @@ class ImageVariationsTest extends ListenerTests {
         $this->db->expects($this->once())
             ->method('storeImageVariationMetadata')
             ->will($this->throwException(new DatabaseException()));
+
+        $this->expectException(Warning::class);
+        $this->expectExceptionMessage(
+            'Could not store image variation metadata for user (imgid), width: 512'
+        );
 
         $this->listener->generateVariations($this->event);
     }

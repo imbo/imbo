@@ -13,6 +13,7 @@ namespace ImboUnitTest\Image\Transformation;
 use Imbo\Http\Response\Response;
 use Imbo\Image\Transformation\DrawPois;
 use Imbo\Model\Image;
+use Imbo\Exception\TransformationException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -57,8 +58,6 @@ class DrawPoisTest extends TestCase {
 
     /**
      * @covers Imbo\Image\Transformation\DrawPois::transform
-     * @expectedException Imbo\Exception\TransformationException
-     * @expectedExceptionMessage Point of interest had neither `width` and `height` nor `cx` and `cy`
      */
     public function testThrowsExceptionOnInvalidPoi() {
         $image = $this->createMock('Imbo\Model\Image');
@@ -73,6 +72,9 @@ class DrawPoisTest extends TestCase {
         $image->expects($this->never())->method('hasBeenTransformed');
 
         $transformation = new DrawPois();
+        $this->expectExceptionObject(new TransformationException(
+            'Point of interest had neither `width` and `height` nor `cx` and `cy`'
+        ));
         $transformation->setEvent($event)->setImage($image)->transform([]);
     }
 

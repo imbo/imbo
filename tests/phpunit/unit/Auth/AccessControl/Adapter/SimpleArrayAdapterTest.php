@@ -13,6 +13,7 @@ namespace ImboUnitTest\Auth\AccessControl\Adapter;
 use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
 use Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter;
 use Imbo\Resource;
+use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -29,11 +30,11 @@ class SimpleArrayAdapterTest extends TestCase {
         $this->assertSame($privateKey, $accessControl->getPrivateKey($publicKey));
     }
 
-    /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage A public key can only have a single private key (as of 2.0.0)
-     */
     public function testThrowsOnMultiplePrivateKeysPerPublicKey() {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'A public key can only have a single private key (as of 2.0.0)',
+            500
+        ));
         $accessControl = new SimpleArrayAdapter([
             'publicKey' => ['key1', 'key2']
         ]);

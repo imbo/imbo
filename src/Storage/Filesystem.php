@@ -47,7 +47,8 @@ class Filesystem implements StorageInterface {
 
         if (empty($this->params['dataDir'])) {
             throw new Exception\ConfigurationException(
-                'Missing required parameter dataDir in the Filesystem storage driver.'
+                'Missing required parameter dataDir in the Filesystem storage driver.',
+                500
             );
         }
     }

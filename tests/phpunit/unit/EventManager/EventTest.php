@@ -17,6 +17,7 @@ use Imbo\Http\Response\Response;
 use Imbo\Database\DatabaseInterface;
 use Imbo\Storage\StorageInterface;
 use PHPUnit\Framework\TestCase;
+use InvalidArgumentException;
 
 /**
  * @covers Imbo\EventManager\Event
@@ -95,11 +96,12 @@ class EventTest extends TestCase {
 
     /**
      * @covers Imbo\EventManager\Event::getArgument
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Argument "foobar" does not exist
-     * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenGettingArgumentThatDoesNotExist() {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Argument "foobar" does not exist',
+            500
+        ));
         $this->event->getArgument('foobar');
     }
 

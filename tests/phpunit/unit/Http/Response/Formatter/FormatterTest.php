@@ -11,6 +11,7 @@
 namespace ImboUnitTest\Http\Response\Formatter;
 
 use Imbo\Http\Response\Formatter\JSON;
+use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -22,12 +23,10 @@ use PHPUnit\Framework\TestCase;
 class FormatterTest extends TestCase {
     /**
      * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Unsupported model type
-     * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenModelIsNotSupported() {
         $formatter = new JSON($this->createMock('Imbo\Helpers\DateFormatter'));
+        $this->expectExceptionObject(new InvalidArgumentException('Unsupported model type', 500));
         $formatter->format($this->createMock('Imbo\Model\ModelInterface'));
     }
 }

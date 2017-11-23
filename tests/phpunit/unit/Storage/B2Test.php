@@ -36,11 +36,12 @@ class B2Test extends TestCase {
 
     /**
      * Test that we _do_ get an exception with required parameters present
-     *
-     * @expectedException Imbo\Exception\ConfigurationException
-     * @expectedExceptionMessageRegExp /: accountId, bucketId/
      */
     public function testConstructorMissingRequiredParameters() {
+        $this->expectException(ConfigurationException::class);
+        $this->expectExceptionMessageRegExp('/: accountId, bucketId/');
+        $this->expectExceptionCode(500);
+
         $b2 = new B2([
             'accountId' => '',
             'applicationKey' => 'bar',

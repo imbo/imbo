@@ -13,6 +13,7 @@ namespace ImboUnitTest\Image;
 use Imbo\Image\InputLoader\Basic;
 use Imbo\Image\InputLoader\InputLoaderInterface;
 use Imbo\Image\InputLoaderManager;
+use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -41,11 +42,12 @@ class InputLoaderManagerTest extends TestCase {
 
     /**
      * @covers ::addLoaders
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Given loader (stdClass) does not implement LoaderInterface
-     * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenRegisteringWrongLoader() {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Given loader (stdClass) does not implement LoaderInterface',
+            500
+        ));
         $this->manager->addLoaders([new stdClass()]);
     }
 

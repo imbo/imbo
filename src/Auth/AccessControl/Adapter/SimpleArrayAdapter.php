@@ -48,7 +48,10 @@ class SimpleArrayAdapter extends ArrayAdapter implements AdapterInterface {
 
         foreach ($accessList as $publicKey => $privateKey) {
             if (is_array($privateKey)) {
-                throw new InvalidArgumentException('A public key can only have a single private key (as of 2.0.0)');
+                throw new InvalidArgumentException(
+                    'A public key can only have a single private key (as of 2.0.0)',
+                    500
+                );
             }
 
             $entries[] = [

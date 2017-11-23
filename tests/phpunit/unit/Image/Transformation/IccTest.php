@@ -12,6 +12,9 @@ namespace ImboUnitTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Icc;
 use Imbo\Model\Image;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Exception\TransformationException;
+use Imbo\Exception\ConfigurationException;
 use Imagick;
 use ImagickException;
 use PHPUnit\Framework\TestCase;
@@ -53,24 +56,25 @@ class IccTest extends TestCase {
 
     /**
      * @covers ::transform
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage No profile name given for which ICC profile to use and no profile is assigned to the "default" name.
-     * @expectedExceptionCode 400
-     *
      */
     public function testExceptionWithoutProfiles() {
         $transformation = new Icc([]);
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'No profile name given for which ICC profile to use and no profile is assigned to the "default" name.',
+            400
+        ));
         $transformation->transform([]);
     }
 
     /**
      * @covers ::transform
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The given ICC profile name ("foo") is unknown to the server.
-     * @expectedExceptionCode 400
      */
     public function testExceptionWithInvalidName() {
         $transformation = new Icc([]);
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'The given ICC profile name ("foo") is unknown to the server.',
+            400
+        ));
         $transformation->transform(['profile' => 'foo']);
     }
 
@@ -105,9 +109,6 @@ class IccTest extends TestCase {
 
     /**
      * @covers ::transform
-     * @expectedException Imbo\Exception\TransformationException
-     * @expectedExceptionMessage Some error
-     * @expectedExceptionCode 400
      */
     public function testThrowsExceptionWhenImagickFailsWithAFatalError() {
         $transformation = new Icc([
@@ -120,35 +121,37 @@ class IccTest extends TestCase {
             ->method('profileImage')
             ->willThrowException(new ImagickException('Some error'));
 
-        $transformation
-            ->setImagick($imagick)
-            ->transform([]);
+        $transformation->setImagick($imagick);
+        $this->expectExceptionObject(new TransformationException('Some error', 400));
+        $transformation->transform([]);
     }
 
     /**
      * @covers ::__construct
-     * @expectedException Imbo\Exception\ConfigurationException
-     * @expectedExceptionMessage Imbo\Image\Transformation\Icc requires an array with name => profile file (.icc) mappings when created.
-     * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenConstructingWithWrongType() {
+        $this->expectExceptionObject(new ConfigurationException(
+            'Imbo\Image\Transformation\Icc requires an array with name => profile file (.icc) mappings when created.',
+            500
+        ));
         new Icc('/some/path');
     }
 
     /**
      * @covers ::transform
-     * @expectedException Imbo\Exception\ConfigurationException
-     * @expectedExceptionMessageRegExp /Could not load ICC profile referenced by "default": .*\/foo\/bar.icc/
-     * @expectedExceptionCode 500
      */
     public function testThrowsExceptionWhenInvalidPathIsUsed() {
         $transformation = new Icc([
             'default' => DATA_DIR . '/foo/bar.icc',
         ]);
 
-        $transformation
-            ->setImagick($this->imagick)
-            ->setImage($this->image)
-            ->transform([]);
+        $transformation->setImagick($this->imagick);
+        $transformation->setImage($this->image);
+        $this->expectException(ConfigurationException::class);
+        $this->expectExceptionMessageRegExp(
+            '/Could not load ICC profile referenced by "default": .*\/foo\/bar.icc/'
+        );
+        $this->expectExceptionCode(500);
+        $transformation->transform([]);
     }
 }

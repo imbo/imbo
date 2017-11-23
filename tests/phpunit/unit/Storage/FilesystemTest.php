@@ -11,9 +11,10 @@
 namespace ImboUnitTest\Storage;
 
 use Imbo\Storage\Filesystem;
+use Imbo\Exception\ConfigurationException;
+use Imbo\Exception\StorageException;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
-use Imbo\Exception\ConfigurationException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -46,12 +47,11 @@ class FilesystemTest extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExceptionMessage File not found
      * @covers Imbo\Storage\Filesystem::delete
      */
     public function testDeleteFileThatDoesNotExist() {
         $driver = new Filesystem(['dataDir' => 'foobar']);
+        $this->expectExceptionObject(new StorageException('File not found', 404));
         $driver->delete($this->user, $this->imageIdentifier);
     }
 
@@ -89,8 +89,6 @@ class FilesystemTest extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExpectionMessage Could not store image
      * @covers Imbo\Storage\Filesystem::store
      */
     public function testStoreToUnwritablePath() {
@@ -101,6 +99,7 @@ class FilesystemTest extends TestCase {
         vfsStream::setup($dir, 0);
 
         $driver = new Filesystem(['dataDir' => vfsStream::url($dir)]);
+        $this->expectExceptionObject(new StorageException('Could not store image', 500));
         $driver->store($this->user, $this->imageIdentifier, $image);
     }
 
@@ -148,12 +147,11 @@ class FilesystemTest extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExceptionCode 404
      * @covers Imbo\Storage\Filesystem::getImage
      */
     public function testGetImageFileThatDoesNotExist() {
         $driver = new Filesystem(['dataDir' => '/tmp']);
+        $this->expectExceptionObject(new StorageException('File not found', 404));
         $driver->getImage($this->user, $this->imageIdentifier);
     }
 
@@ -192,13 +190,11 @@ class FilesystemTest extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\StorageException
-     * @expectedExceptionMessage File not found
-     * @expectedExceptionCode 404
      * @covers Imbo\Storage\Filesystem::getLastModified
      */
     public function testGetLastModifiedWithFileThatDoesNotExist() {
         $driver = new Filesystem(['dataDir' => '/some/path']);
+        $this->expectExceptionObject(new StorageException('File not found', 404));
         $driver->getLastModified($this->user, $this->imageIdentifier);
     }
 
@@ -259,11 +255,11 @@ class FilesystemTest extends TestCase {
         $this->assertTrue($driver->getStatus());
     }
 
-    /**
-     * @expectedException Imbo\Exception\ConfigurationException
-     * @expectedExceptionMessageRegExp /Missing required parameter dataDir/
-     */
     public function testMissingDataDir() {
+        $this->expectExceptionObject(new ConfigurationException(
+            'Missing required parameter dataDir in the Filesystem storage driver.',
+            500
+        ));
         new Filesystem([]);
     }
 }

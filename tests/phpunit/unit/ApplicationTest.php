@@ -15,6 +15,7 @@ use Imbo\Version;
 use Imbo\EventListener\ListenerInterface;
 use Imbo\Http\Request\Request;
 use Imbo\Resource\ResourceInterface;
+use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -35,12 +36,10 @@ class ApplicationTest extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid database adapter
-     * @expectedExceptionCode 500
      * @covers Imbo\Application::run
      */
     public function testThrowsExceptionWhenConfigurationHasInvalidDatabaseAdapter() {
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid database adapter', 500));
         $this->application->run([
             'database' => function() { return new \stdClass(); },
             'trustedProxies' => [],
@@ -48,12 +47,10 @@ class ApplicationTest extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid storage adapter
-     * @expectedExceptionCode 500
      * @covers Imbo\Application::run
      */
     public function testThrowsExceptionWhenConfigurationHasInvalidStorageAdapter() {
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid storage adapter', 500));
         $this->application->run([
             'database' => $this->createMock('Imbo\Database\DatabaseInterface'),
             'storage' => function() { return new \stdClass(); },
@@ -62,12 +59,10 @@ class ApplicationTest extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid access control adapter
-     * @expectedExceptionCode 500
      * @covers Imbo\Application::run
      */
     public function testThrowsExceptionWhenConfigurationHasInvalidAccessControlAdapter() {
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid access control adapter', 500));
         $this->application->run([
             'database' => $this->createMock('Imbo\Database\DatabaseInterface'),
             'storage' => $this->createMock('Imbo\Storage\StorageInterface'),
@@ -165,12 +160,14 @@ class ApplicationTest extends TestCase {
 
     /**
      * @covers Imbo\Application::run
-     * @expectedException Imbo\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The "transformations" configuration key must be specified as an array
      */
     public function testThrowsExceptionIfTransformationsIsSetAndIsNotAnArray() {
         $defaultConfig = require __DIR__ . '/../../../config/config.default.php';
         $defaultConfig['transformations'] = function() {};
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'The "transformations" configuration key must be specified as an array',
+            500
+        ));
         $this->application->run($defaultConfig);
     }
 }

@@ -11,6 +11,7 @@
 namespace ImboUnitTest;
 
 use Imbo\Router;
+use Imbo\Exception\RuntimeException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -37,24 +38,20 @@ class RouterTest extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage I'm a teapot
-     * @expectedExceptionCode 418
      * @covers Imbo\Router::route
      */
     public function testCanBeATeaPot() {
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('BREW'));
+        $this->expectExceptionObject(new RuntimeException('I\'m a teapot', 418));
         $this->router->route($this->request);
     }
 
     /**
-     * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage Unsupported HTTP method
-     * @expectedExceptionCode 501
      * @covers Imbo\Router::route
      */
     public function testThrowsExceptionOnUnsupportedHttpMethod() {
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('TRACE'));
+        $this->expectExceptionObject(new RuntimeException('Unsupported HTTP method', 501));
         $this->router->route($this->request);
     }
 
@@ -81,14 +78,12 @@ class RouterTest extends TestCase {
 
     /**
      * @dataProvider getInvalidRoutes
-     * @expectedException Imbo\Exception\RuntimeException
-     * @expectedExceptionMessage Not Found
-     * @expectedExceptionCode 404
      * @covers Imbo\Router::route
      */
     public function testThrowsExceptionWhenNoRouteMatches($route) {
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
         $this->request->expects($this->once())->method('getPathInfo')->will($this->returnValue($route));
+        $this->expectExceptionObject(new RuntimeException('Not Found', 404));
         $this->router->route($this->request);
     }
 

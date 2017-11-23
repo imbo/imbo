@@ -11,6 +11,7 @@
 namespace ImboUnitTest\Resource;
 
 use Imbo\Resource\ShortUrl;
+use Imbo\Exception\ResourceException;
 
 /**
  * @covers Imbo\Resource\ShortUrl
@@ -53,25 +54,16 @@ class ShortUrlTest extends ResourceTests {
         $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
     }
 
-    /**
-     * @expectedException Imbo\Exception\ResourceException
-     * @expectedExceptionMessage ShortURL not found
-     * @expectedExceptionCode 404
-     */
     public function testThrowsAnExceptionWhenTheShortUrlDoesNotExist() {
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->route->expects($this->once())->method('get')->with('shortUrlId')->will($this->returnValue('aaaaaaa'));
         $this->database->expects($this->once())->method('getShortUrlParams')->with('aaaaaaa')->will($this->returnValue(null));
 
+        $this->expectExceptionObject(new ResourceException('ShortURL not found', 404));
         $this->getNewResource()->deleteShortUrl($this->event);
     }
 
-    /**
-     * @expectedException Imbo\Exception\ResourceException
-     * @expectedExceptionMessage ShortURL not found
-     * @expectedExceptionCode 404
-     */
     public function testThrowsAnExceptionWhenUserOrPrivateKeyDoesNotMatch() {
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
@@ -81,6 +73,7 @@ class ShortUrlTest extends ResourceTests {
             'imageIdentifier' => 'id',
         ]));
 
+        $this->expectExceptionObject(new ResourceException('ShortURL not found', 404));
         $this->getNewResource()->deleteShortUrl($this->event);
     }
 
