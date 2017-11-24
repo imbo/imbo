@@ -13,10 +13,10 @@ namespace ImboUnitTest\CliCommand;
 use Imbo\CliCommand\AddPublicKey;
 use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
 use Imbo\Resource;
+use Imbo\Exception\RuntimeException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 /**
  * @covers Imbo\CliCommand\AddPublicKey

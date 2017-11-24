@@ -13,7 +13,7 @@ namespace ImboUnitTest\Auth\AccessControl\Adapter;
 use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
 use Imbo\Auth\AccessControl\GroupQuery;
 use Imbo\Resource;
-use InvalidArgumentException;
+use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**

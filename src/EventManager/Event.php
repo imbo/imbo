@@ -10,7 +10,7 @@
 
 namespace Imbo\EventManager;
 
-use InvalidArgumentException;
+use Imbo\Exception\InvalidArgumentException;
 
 /**
  * Event class
