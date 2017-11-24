@@ -14,10 +14,10 @@ use Imbo\EventListener\ImageVariations;
 use Imbo\Exception\DatabaseException;
 use Imbo\Exception\StorageException;
 use Imbo\Exception\TransformationException;
+use Imbo\Exception\InvalidArgumentException;
 use Imbo\Image\TransformationManager;
 use Imbo\EventListener\Initializer\Imagick as ImagickInitializer;
 use DateTime;
-use InvalidArgumentException;
 use PHPUnit\Framework\Error\Error;
 use PHPUnit\Framework\Error\Warning;
 

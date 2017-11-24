@@ -12,7 +12,7 @@ namespace ImboUnitTest\EventListener;
 
 use Imbo\EventListener\EightbimMetadata;
 use Imbo\Exception\DatabaseException;
-use RuntimeException;
+use Imbo\Exception\RuntimeException;
 
 /**
  * @coversDefaultClass Imbo\EventListener\EightbimMetadata

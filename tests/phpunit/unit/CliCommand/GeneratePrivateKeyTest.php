@@ -11,10 +11,10 @@
 namespace ImboUnitTest\CliCommand;
 
 use Imbo\CliCommand\GeneratePrivateKey;
+use Imbo\Exception\RuntimeException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 /**
  * @covers Imbo\CliCommand\GeneratePrivateKey

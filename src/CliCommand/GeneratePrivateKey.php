@@ -10,10 +10,10 @@
 
 namespace Imbo\CliCommand;
 
-use Symfony\Component\Console\Command\Command,
-    Symfony\Component\Console\Input\InputInterface,
-    Symfony\Component\Console\Output\OutputInterface,
-    RuntimeException;
+use Imbo\Exception\RuntimeException;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Generate a private key that can be used in the configuration

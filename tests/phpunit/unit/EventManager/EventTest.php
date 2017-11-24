@@ -16,8 +16,8 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Database\DatabaseInterface;
 use Imbo\Storage\StorageInterface;
+use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use InvalidArgumentException;
 
 /**
  * @covers Imbo\EventManager\Event

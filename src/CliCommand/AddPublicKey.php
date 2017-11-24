@@ -10,16 +10,16 @@
 
 namespace Imbo\CliCommand;
 
-use Symfony\Component\Console\Input\InputArgument,
-    Symfony\Component\Console\Input\InputInterface,
-    Symfony\Component\Console\Question\Question,
-    Symfony\Component\Console\Question\ChoiceQuestion,
-    Symfony\Component\Console\Question\ConfirmationQuestion,
-    Symfony\Component\Console\Output\OutputInterface,
-    Imbo\Auth\AccessControl\Adapter\AdapterInterface,
-    Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface,
-    Imbo\Resource,
-    RuntimeException;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Output\OutputInterface;
+use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
+use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
+use Imbo\Resource;
+use Imbo\Exception\RuntimeException;
 
 /**
  * Add a public key to the configured access control adapter
