@@ -132,7 +132,11 @@ class AccessToken implements ListenerInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * Check the access token of the request
+     *
+     * @param EventInterface $event
+     * @throws RuntimeException
+     * @return null|true Returns true on a successful access token comparion, null otherwise
      */
     public function checkAccessToken(EventInterface $event) {
         $request = $event->getRequest();
@@ -195,7 +199,7 @@ class AccessToken implements ListenerInterface {
                 $correctToken = $accessTokenGenerator->generateSignature($argumentKey, $uriWithoutAccessToken, $privateKey);
 
                 if ($correctToken === $token) {
-                    return;
+                    return true;
                 }
             }
         }
