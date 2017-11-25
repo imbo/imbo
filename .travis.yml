@@ -41,7 +41,7 @@ before_script:
   - composer lint
   - composer prepare
   - composer install --prefer-dist
-  - composer start-httpd-for-behat-tests
+  - composer dev
 
 script:
   - ./vendor/bin/phpunit --verbose -c phpunit.xml.travis
