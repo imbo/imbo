@@ -41,7 +41,7 @@
     "phpdocumentor/phpdocumentor": "^2.9",
     "cwhite92/b2-sdk-php": "^1.2",
     "imbo/behat-api-extension": "^2.0",
-    "doctrine/dbal": "^2.5.0",
+    "doctrine/dbal": "^2.5",
     "aws/aws-sdk-php": "^3.19",
     "micheh/psr7-cache": "^0.5"
   },
