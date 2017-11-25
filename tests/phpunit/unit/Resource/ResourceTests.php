@@ -26,16 +26,27 @@ abstract class ResourceTests extends TestCase {
      */
     abstract protected function getNewResource();
 
+    /**
+     * @covers ::getSubscribedEvents
+     */
     public function testReturnsCorrectEventSubscriptions() {
         $className = get_class($this->getNewResource());
         $this->assertInternalType('array', $className::getSubscribedEvents());
     }
 
+    /**
+     * @covers ::getSubscribedEvents
+     */
     public function testReturnsTheCorrectAllowedMethods() {
         $resource = $this->getNewResource();
+
+        // Translate the class name to an event name: Imbo\Resource\GlobalShortUrl => globalshorturl
         $shortName = strtolower(substr(get_class($resource), strrpos(get_class($resource), '\\') + 1));
+
         $methods = $resource->getAllowedMethods();
         $definition = $resource::getSubscribedEvents();
+
+        $this->assertInternalType('array', $definition);
 
         foreach ($methods as $method) {
             $expectedEventName = strtolower($shortName . '.' . $method);
@@ -46,7 +57,11 @@ abstract class ResourceTests extends TestCase {
                 }
             }
 
-            $this->fail('Resource allows ' . $method . ', but no listener definition subscribes to ' . $expectedEventName);
+            $this->fail(sprintf(
+                'Resource allows %s, but no listener definition subscribes to %s',
+                $method,
+                $expectedEventName
+            ));
         }
 
         foreach ($definition as $event => $callback) {
@@ -62,7 +77,11 @@ abstract class ResourceTests extends TestCase {
                 }
             }
 
-            $this->fail('Resource subscribes to ' . $event . ' but does not allow ' . $expectedMethod);
+            $this->fail(sprintf(
+                'Resource subscribes to %s but does not allow %s',
+                $event,
+                $expectedMethod
+            ));
         }
     }
 }
