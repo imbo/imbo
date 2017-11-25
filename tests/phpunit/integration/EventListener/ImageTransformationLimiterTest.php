@@ -12,92 +12,100 @@ namespace ImboIntegrationTest\EventListener;
 
 use Imbo\EventListener\ImageTransformationLimiter;
 use Imbo\Exception\ResourceException;
+use Imbo\Http\Request\Request;
+use Imbo\EventManager\Event;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Imbo\EventListener\ImageTransformationLimiter
+ * @coversDefaultClass Imbo\EventListener\ImageTransformationLimiter
  * @group integration
  * @group listeners
  */
 class ImageTransformationLimiterTest extends TestCase {
     /**
-     * @covers Imbo\EventListener\ImageTransformationLimiter::__construct
-     * @covers Imbo\EventListener\ImageTransformationLimiter::checkTransformationCount
-     * @covers Imbo\EventListener\ImageTransformationLimiter::setTransformationLimit
+     * Data provider
+     *
+     * @return array[]
      */
-    public function testLimitsTransformationCount() {
-        $limit = 2;
+    public function getLimitAndTransformations() {
+        return [
+            [
+                'transformations' => [1, 2, 3, 4, 5],
+                'limit' => 2,
+                'exceptionMessage' => 'Too many transformations applied to resource. The limit is 2 transformations.'
+            ],
+            [
+                'transformations' => [1, 2],
+                'limit' => 2,
+                'exceptionMessage' => null,
+            ],
+            [
+                'transformations' => [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                'limit' => 0,
+                'exceptionMessage' => null,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getLimitAndTransformations
+     * @covers ::__construct
+     * @covers ::checkTransformationCount
+     * @covers ::setTransformationLimit
+     *
+     * @param array $transformations
+     * @param int $limit
+     */
+    public function testLimitsTransformationCount(array $transformations, $limit, $exceptionMessage) {
         $listener = new ImageTransformationLimiter(['limit' => $limit]);
 
-        $request = $this->createMock('Imbo\Http\Request\Request');
+        $request = $this->createConfiguredMock(Request::class, [
+            'getTransformations' => $transformations,
+        ]);
 
-        // content of array isn't important, the check is done on the count of the array
-        $request->expects($this->any())->method('getTransformations')->will($this->returnValue([1, 2, 3, 4, 5]));
+        $event = $this->createConfiguredMock(Event::class, [
+            'getRequest' => $request,
+        ]);
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->any())->method('getRequest')->will($this->returnValue($request));
-
-        $this->expectExceptionObject(
-            new ResourceException(
-                sprintf(
-                    'Too many transformations applied to resource. The limit is %d transformations.',
-                    $limit
-                ),
+        if ($exceptionMessage) {
+            $this->expectExceptionObject(new ResourceException(
+                $exceptionMessage,
                 403
-            )
+            ));
+        }
+
+        $this->assertNull(
+            $listener->checkTransformationCount($event),
+            'Did not expect method to return anything'
         );
-
-        $listener->checkTransformationCount($event);
     }
 
     /**
-     * @covers Imbo\EventListener\ImageTransformationLimiter::__construct
-     * @covers Imbo\EventListener\ImageTransformationLimiter::checkTransformationCount
-     * @covers Imbo\EventListener\ImageTransformationLimiter::setTransformationLimit
+     * Data provider
+     *
+     * @return array[]
      */
-    public function testAllowsTransformationCount() {
-        $listener = new ImageTransformationLimiter(['limit' => 2]);
-
-        $request = $this->createMock('Imbo\Http\Request\Request');
-
-        // content of array isn't important, the check is done on the count of the array
-        $request->expects($this->any())->method('getTransformations')->will($this->returnValue([1, 2]));
-
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->any())->method('getRequest')->will($this->returnValue($request));
-
-        $listener->checkTransformationCount($event);
+    public function getLimits() {
+        return [
+            ['limit' => 42],
+            ['limit' => 10],
+        ];
     }
 
     /**
-     * @covers Imbo\EventListener\ImageTransformationLimiter::__construct
-     * @covers Imbo\EventListener\ImageTransformationLimiter::checkTransformationCount
-     * @covers Imbo\EventListener\ImageTransformationLimiter::setTransformationLimit
+     * @dataProvider getLimits
+     * @covers ::__construct
+     * @covers ::getTransformationLimit
+     * @covers ::setTransformationLimit
+     *
+     * @param int $limit The limit to set and get
      */
-    public function testAllowsAnyTransformationCount() {
-        $listener = new ImageTransformationLimiter(['limit' => 0]);
-
-        $request = $this->createMock('Imbo\Http\Request\Request');
-
-        // content of array isn't important, the check is done on the count of the array
-        $request->expects($this->any())->method('getTransformations')->will($this->returnValue([1, 2, 3, 4, 5, 6, 7, 8, 9]));
-
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->any())->method('getRequest')->will($this->returnValue($request));
-
-        $listener->checkTransformationCount($event);
-    }
-
-    /**
-     * @covers Imbo\EventListener\ImageTransformationLimiter::__construct
-     * @covers Imbo\EventListener\ImageTransformationLimiter::getTransformationLimit
-     * @covers Imbo\EventListener\ImageTransformationLimiter::setTransformationLimit
-     */
-    public function testGetSetLimitCountTransformationCount() {
-        $listener = new ImageTransformationLimiter(['limit' => 42]);
-        $this->assertSame(42, $listener->getTransformationLimit());
-
-        $listener->setTransformationLimit(10);
-        $this->assertSame(10, $listener->getTransformationLimit());
+    public function testGetSetLimitCountTransformationCount($limit) {
+        $this->assertSame(
+            $limit,
+            $actual = (new ImageTransformationLimiter(['limit' => $limit]))->getTransformationLimit(),
+            sprintf('Expected limit to be %d, got: %d', $limit, $actual)
+        );
     }
 }

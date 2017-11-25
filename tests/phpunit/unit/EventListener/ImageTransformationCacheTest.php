@@ -12,11 +12,20 @@ namespace ImboUnitTest\EventListener;
 
 use Imbo\EventListener\ImageTransformationCache;
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Response\Response;
+use Imbo\Http\Request\Request;
+use Imbo\EventManager\Event;
+use Imbo\Model\Image;
+use Imbo\Model\Error;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\HeaderBag;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 
 /**
  * @covers Imbo\EventListener\ImageTransformationCache
+ * @coversDefaultClass Imbo\EventListener\ImageTransformationCache
  * @group unit
  * @group listeners
  */
@@ -33,42 +42,81 @@ class ImageTransformationCacheTest extends ListenerTests {
      */
     private $path = 'cacheDir';
 
+    /**
+     * @var Event
+     */
     private $event;
+
+    /**
+     * @var Request
+     */
     private $request;
+
+    /**
+     * @var Response
+     */
     private $response;
+
+    /**
+     * @var ParameterBag
+     */
     private $query;
+
+    /**
+     * @var string
+     */
     private $user = 'user';
+
+    /**
+     * @var string
+     */
     private $imageIdentifier = '7bf2e67f09de203da740a86cd37bbe8d';
+
+
+    /**
+     * @var ResponseHeaderBag
+     */
     private $responseHeaders;
+
+    /**
+     * @var HeaderBag
+     */
     private $requestHeaders;
+
+    /**
+     * @var vfsStreamDirectory
+     */
     private $cacheDir;
 
     /**
      * Set up the listener
      */
     public function setUp() {
-        if (!class_exists('org\bovigo\vfs\vfsStream')) {
-            $this->markTestSkipped('This testcase requires vfsStream to run');
+        if (!class_exists(vfsStream::class)) {
+            $this->markTestSkipped('This testcase requires mikey179/vfsStream to run');
         }
 
-        $this->responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
-        $this->requestHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $this->query = $this->createMock('Symfony\Component\HttpFoundation\ParameterBag');
+        $this->responseHeaders = $this->createMock(ResponseHeaderBag::class);
+        $this->requestHeaders = $this->createMock(HeaderBag::class);
+        $this->query = $this->createMock(ParameterBag::class);
 
-        $this->response = $this->createMock('Imbo\Http\Response\Response');
+        $this->response = $this->createMock(Response::class);
         $this->response->headers = $this->responseHeaders;
 
-        $this->request = $this->createMock('Imbo\Http\Request\Request');
+        $this->request = $this->createConfiguredMock(Request::class, [
+            'getUser' => $this->user,
+            'getImageIdentifier' => $this->imageIdentifier,
+        ]);
         $this->request->query = $this->query;
         $this->request->headers = $this->requestHeaders;
-        $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
-        $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
 
-        $this->event = $this->createMock('Imbo\EventManager\Event');
-        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
-        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $this->event = $this->createConfiguredMock(Event::class, [
+            'getRequest' => $this->request,
+            'getResponse' => $this->response,
+        ]);
 
         $this->cacheDir = vfsStream::setup($this->path);
+
         $this->listener = new ImageTransformationCache(['path' => vfsStream::url($this->path)]);
     }
 
@@ -80,33 +128,45 @@ class ImageTransformationCacheTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageTransformationCache::loadFromCache
-     * @covers Imbo\EventListener\ImageTransformationCache::getCacheDir
-     * @covers Imbo\EventListener\ImageTransformationCache::getCacheKey
-     * @covers Imbo\EventListener\ImageTransformationCache::getCacheFilePath
+     * @covers ::loadFromCache
+     * @covers ::getCacheDir
+     * @covers ::getCacheKey
+     * @covers ::getCacheFilePath
      */
     public function testChangesTheImageInstanceOnCacheHit() {
-        $imageFromCache = $this->createMock('Imbo\Model\Image');
+        $imageFromCache = $this->createMock(Image::class);
         $headersFromCache = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $cachedData = serialize([
             'image' => $imageFromCache,
             'headers' => $headersFromCache,
         ]);
 
-        $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
-        $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
-        $this->request->expects($this->any())->method('getExtension')->will($this->returnValue('png'));
-        $this->requestHeaders->expects($this->any())
-                             ->method('get')
+        $this->request->method('getUser')
+                      ->willReturn($this->user);
+
+        $this->request->method('getImageIdentifier')
+                      ->willReturn($this->imageIdentifier);
+
+        $this->request->method('getExtension')
+                      ->willReturn('png');
+
+        $this->requestHeaders->method('get')
                              ->with('Accept', '*/*')
-                             ->will($this->returnValue(
+                             ->willReturn(
                                  'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-                             ));
+                             );
 
-        $this->query->expects($this->any())->method('get')->with('t')->will($this->returnValue(['thumbnail']));
+        $this->query->method('get')
+                    ->with('t')
+                    ->willReturn(['thumbnail']);
 
-        $this->response->expects($this->once())->method('setModel')->with($imageFromCache)->will($this->returnSelf());
-        $this->event->expects($this->once())->method('stopPropagation');
+        $this->response->expects($this->once())
+                       ->method('setModel')
+                       ->with($imageFromCache)
+                       ->willReturnSelf();
+
+        $this->event->expects($this->once())
+                    ->method('stopPropagation');
 
         $dir = 'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6';
         $file = 'bc6ffe312a5741a5705afe8639c08835';
@@ -117,29 +177,36 @@ class ImageTransformationCacheTest extends ListenerTests {
 
         $this->listener->loadFromCache($this->event);
 
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ResponseHeaderBag', $this->response->headers);
-
-        return $this->listener;
+        $this->assertInstanceOf(ResponseHeaderBag::class, $this->response->headers);
     }
 
     /**
-     * @covers Imbo\EventListener\ImageTransformationCache::loadFromCache
-     * @covers Imbo\EventListener\ImageTransformationCache::getCacheDir
-     * @covers Imbo\EventListener\ImageTransformationCache::getCacheKey
-     * @covers Imbo\EventListener\ImageTransformationCache::getCacheFilePath
+     * @covers ::loadFromCache
+     * @covers ::getCacheDir
+     * @covers ::getCacheKey
+     * @covers ::getCacheFilePath
      */
     public function testRemovesCorruptCachedDataOnCacheHit() {
-        $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
-        $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
-        $this->request->expects($this->any())->method('getExtension')->will($this->returnValue('png'));
+        $this->request->method('getUser')
+                      ->willReturn($this->user);
+
+        $this->request->method('getImageIdentifier')
+                      ->willReturn($this->imageIdentifier);
+
+        $this->request->method('getExtension')
+                      ->willReturn('png');
+
         $this->requestHeaders->expects($this->once())
                              ->method('get')
                              ->with('Accept', '*/*')
-                             ->will($this->returnValue(
+                             ->willReturn(
                                  'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-                             ));
+                             );
 
-        $this->query->expects($this->once())->method('get')->with('t')->will($this->returnValue(['thumbnail']));
+        $this->query->expects($this->once())
+                    ->method('get')
+                    ->with('t')
+                    ->willReturn(['thumbnail']);
 
         $dir = 'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6';
         $file = 'bc6ffe312a5741a5705afe8639c08835';
@@ -155,43 +222,55 @@ class ImageTransformationCacheTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageTransformationCache::loadFromCache
-     * @covers Imbo\EventListener\ImageTransformationCache::getCacheDir
-     * @covers Imbo\EventListener\ImageTransformationCache::getCacheKey
-     * @covers Imbo\EventListener\ImageTransformationCache::getCacheFilePath
+     * @covers ::loadFromCache
+     * @covers ::getCacheDir
+     * @covers ::getCacheKey
+     * @covers ::getCacheFilePath
      */
     public function testAddsCorrectResponseHeaderOnCacheMiss() {
         $this->requestHeaders->expects($this->once())
                              ->method('get')
                              ->with('Accept', '*/*')
-                             ->will($this->returnValue('*/*'));
-        $this->responseHeaders->expects($this->once())->method('set')->with('X-Imbo-TransformationCache', 'Miss');
+                             ->willReturn('*/*');
+
+        $this->responseHeaders->expects($this->once())
+                              ->method('set')
+                              ->with('X-Imbo-TransformationCache', 'Miss');
+
         $this->listener->loadFromCache($this->event);
     }
 
     /**
-     * @covers Imbo\EventListener\ImageTransformationCache::storeInCache
+     * @covers ::storeInCache
      */
     public function testDoesNotStoreNonImageModelsInTheCache() {
-        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($this->createMock('Imbo\Model\Error')));
-        $this->request->expects($this->never())->method('getUser');
+        $this->response->expects($this->once())
+                       ->method('getModel')
+                       ->willReturn($this->createMock(Error::class));
+
+        $this->request->expects($this->never())
+                      ->method('getUser');
+
         $this->listener->storeInCache($this->event);
     }
 
     /**
-     * @covers Imbo\EventListener\ImageTransformationCache::storeInCache
-     * @covers Imbo\EventListener\ImageTransformationCache::getCacheDir
-     * @covers Imbo\EventListener\ImageTransformationCache::getCacheKey
-     * @covers Imbo\EventListener\ImageTransformationCache::getCacheFilePath
+     * @covers ::storeInCache
+     * @covers ::getCacheDir
+     * @covers ::getCacheKey
+     * @covers ::getCacheFilePath
      */
     public function testStoresImageInCache() {
-        $image = $this->createMock('Imbo\Model\Image');
+        $image = $this->createMock(Image::class);
 
-        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($this->createMock('Imbo\Model\Image')));
+        $this->response->expects($this->once())
+                       ->method('getModel')
+                       ->willReturn($this->createMock(Image::class));
+
         $this->requestHeaders->expects($this->once())
                              ->method('get')
                              ->with('Accept', '*/*')
-                             ->will($this->returnValue('*/*'));
+                             ->willReturn('*/*');
 
         $cacheFile = 'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/0/5/b0571fa001b22145f82750c84c6ddda4';
 
@@ -206,16 +285,18 @@ class ImageTransformationCacheTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageTransformationCache::storeInCache
-     * @covers Imbo\EventListener\ImageTransformationCache::getCacheDir
-     * @covers Imbo\EventListener\ImageTransformationCache::getCacheKey
-     * @covers Imbo\EventListener\ImageTransformationCache::getCacheFilePath
+     * @covers ::storeInCache
+     * @covers ::getCacheDir
+     * @covers ::getCacheKey
+     * @covers ::getCacheFilePath
      */
     public function testDoesNotStoreIfCachedVersionAlreadyExists() {
         // Reusing the same logic as this test
         $this->testChangesTheImageInstanceOnCacheHit();
 
-        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($this->createMock('Imbo\Model\Image')));
+        $this->response->expects($this->once())
+                       ->method('getModel')
+                       ->willReturn($this->createMock(Image::class));
 
         // Overwrite cached file
         $dir = 'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6';
@@ -231,9 +312,9 @@ class ImageTransformationCacheTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageTransformationCache::deleteFromCache
-     * @covers Imbo\EventListener\ImageTransformationCache::getCacheDir
-     * @covers Imbo\EventListener\ImageTransformationCache::rmdir
+     * @covers ::deleteFromCache
+     * @covers ::getCacheDir
+     * @covers ::rmdir
      */
     public function testCanDeleteAllImageVariationsFromCache() {
         $cachedFiles = [
@@ -259,18 +340,18 @@ class ImageTransformationCacheTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageTransformationCache::__construct
+     * @covers ::__construct
      */
     public function testThrowsAnExceptionWhenPathIsMissingFromTheParameters() {
         $this->expectExceptionObject(new InvalidArgumentException(
             'The image transformation cache path is missing from the configuration',
             500
         ));
-        $listener = new ImageTransformationCache([]);
+        new ImageTransformationCache([]);
     }
 
     /**
-     * @covers Imbo\EventListener\ImageTransformationCache::__construct
+     * @covers ::__construct
      */
     public function testThrowsExceptionWhenCacheDirIsNotWritable() {
         $dir = new vfsStreamDirectory('dir', 0);
@@ -279,13 +360,15 @@ class ImageTransformationCacheTest extends ListenerTests {
             'Image transformation cache path is not writable by the webserver: vfs://cacheDir/dir',
             500
         ));
-        $listener = new ImageTransformationCache(['path' => 'vfs://cacheDir/dir']);
+        new ImageTransformationCache(['path' => 'vfs://cacheDir/dir']);
     }
 
     /**
-     * @covers Imbo\EventListener\ImageTransformationCache::__construct
+     * @covers ::__construct
      */
     public function testDoesNotTriggerWarningIfCachePathDoesNotExistAndParentIsWritable() {
-        $listener = new ImageTransformationCache(['path' => 'vfs://cacheDir/some/dir/that/does/not/exist']);
+        $this->assertNotNull(
+            new ImageTransformationCache(['path' => 'vfs://cacheDir/some/dir/that/does/not/exist'])
+        );
     }
 }
