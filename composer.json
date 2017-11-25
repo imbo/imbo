@@ -97,5 +97,10 @@
       "cd docs; make html"
     ],
     "dev": "php -S localhost:8080 -t ./public tests/behat/router.php > build/logs/httpd.log 2>&1 &"
+  },
+  "config": {
+    "platform": {
+      "php": "7.0"
+    }
   }
 }
