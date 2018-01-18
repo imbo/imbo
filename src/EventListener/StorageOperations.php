@@ -54,6 +54,15 @@ class StorageOperations implements ListenerInterface {
         $imageIdentifier = $request->getImageIdentifier();
 
         $imageData = $storage->getImage($user, $imageIdentifier);
+
+        // Since the image is actually valid, this means that the backend
+        // were unable to read the image for some reason. Might be NFS
+        // that's down, web-backed storage being unavailable or something
+        // similar.
+        if ($imageData === false) {
+            throw new StorageException('Failed reading file from storage backend for user ' . $user . ', id: ' . $imageIdentifier, 503);
+        }
+
         $lastModified = $storage->getLastModified($user, $imageIdentifier);
 
         $response->setLastModified($lastModified)
