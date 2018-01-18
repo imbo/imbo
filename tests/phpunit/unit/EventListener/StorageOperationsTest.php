@@ -95,6 +95,17 @@ class StorageOperationsTest extends ListenerTests {
     }
 
     /**
+     * @expectedException Imbo\Exception\StorageException
+     * @expectedExceptionCode 503
+     * @expectedExceptionMessage Failed reading file from storage backend
+     * @covers Imbo\EventListener\StorageOperations::loadImage
+     */
+    public function testExceptionIfLoadImageFails() {
+        $this->storage->expects($this->once())->method('getImage')->with($this->user, $this->imageIdentifier)->will($this->returnValue(false));
+        $this->listener->loadImage($this->event);
+    }
+
+    /**
      * @covers Imbo\EventListener\StorageOperations::insertImage
      */
     public function testCanInsertImage() {
