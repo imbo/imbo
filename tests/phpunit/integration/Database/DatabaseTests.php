@@ -1548,12 +1548,12 @@ abstract class DatabaseTests extends PHPUnit_Framework_TestCase {
             ],
             'images with different users' => [
                 'images' => [
-                    ['user' => 'user1', 'imageIdentifier' => uniqid()] + $image,
-                    ['user' => 'user3', 'imageIdentifier' => uniqid()] + $image,
-                    ['user' => 'user1', 'imageIdentifier' => uniqid()] + $image,
-                    ['user' => 'user2', 'imageIdentifier' => uniqid()] + $image,
-                    ['user' => 'user2', 'imageIdentifier' => uniqid()] + $image,
-                    ['user' => 'user2', 'imageIdentifier' => uniqid()] + $image,
+                    ['user' => 'user1', 'imageIdentifier' => uniqid('imbo-', true)] + $image,
+                    ['user' => 'user3', 'imageIdentifier' => uniqid('imbo-', true)] + $image,
+                    ['user' => 'user1', 'imageIdentifier' => uniqid('imbo-', true)] + $image,
+                    ['user' => 'user2', 'imageIdentifier' => uniqid('imbo-', true)] + $image,
+                    ['user' => 'user2', 'imageIdentifier' => uniqid('imbo-', true)] + $image,
+                    ['user' => 'user2', 'imageIdentifier' => uniqid('imbo-', true)] + $image,
                 ],
                 'expectedUsers' => ['user1', 'user2', 'user3'],
             ],
