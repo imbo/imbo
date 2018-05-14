@@ -404,22 +404,34 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
     }
 
     public function testGetImagesAndReturnMetadata() {
-        $this->insertImages();
+        $this->insertImages(true);
 
         $query = new Query();
         $query->returnMetadata(true);
 
-        $images = $this->adapter->getImages(['user'], $query, $this->getMock('Imbo\Model\Images'));
+        $images = $this->adapter->getImages(['user', 'user2'], $query, $this->getMock('Imbo\Model\Images'));
+        $this->assertCount(6, $images, 'Incorrect length. Expected 6, got ' . count($images));
 
         foreach ($images as $image) {
             $this->assertArrayHasKey('metadata', $image);
         }
 
+        $this->assertSame('user',  $images[0]['user']);
         $this->assertSame(['key5' => 'value5'], $images[0]['metadata']);
+
+        $this->assertSame('user2', $images[1]['user']);
         $this->assertSame(['key4' => 'value4'], $images[1]['metadata']);
+
+        $this->assertSame('user',  $images[2]['user']);
         $this->assertSame(['key3' => 'value3'], $images[2]['metadata']);
+
+        $this->assertSame('user2', $images[3]['user']);
         $this->assertSame(['key2' => 'value2'], $images[3]['metadata']);
+
+        $this->assertSame('user',  $images[4]['user']);
         $this->assertSame(['key1' => 'value1'], $images[4]['metadata']);
+
+        $this->assertSame('user2', $images[5]['user']);
         $this->assertSame(['key0' => 'value0'], $images[5]['metadata']);
 
     }
