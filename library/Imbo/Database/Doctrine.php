@@ -186,6 +186,14 @@ class Doctrine implements DatabaseInterface {
             ]);
         }
 
+        $update = $connection->createQueryBuilder();
+        $update->update($this->tableNames['imageinfo'])
+              ->set('updated', time())
+              ->where('id = :id')
+              ->setParameters([
+                  ':id' => $imageId,
+              ])->execute();
+
         return true;
     }
 

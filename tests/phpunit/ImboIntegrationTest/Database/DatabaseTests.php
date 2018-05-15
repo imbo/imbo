@@ -197,11 +197,23 @@ abstract class DatabaseTests extends \PHPUnit_Framework_TestCase {
         $user = 'user';
         $imageIdentifier = 'id';
 
-        $this->assertTrue($this->adapter->insertImage($user, $imageIdentifier, $this->getImage()));
+        $original = $this->getImage();
+        $added = time() - 10;
+        $original->setAddedDate(new DateTime('@' . $added, new DateTimeZone('UTC')));
+        $original->setUpdatedDate(new DateTime('@' . $added, new DateTimeZone('UTC')));
+        $this->assertTrue($this->adapter->insertImage($user, $imageIdentifier, $original));
+
         $this->assertTrue($this->adapter->updateMetadata($user, $imageIdentifier, ['foo' => 'bar']));
         $this->assertSame(['foo' => 'bar'], $this->adapter->getMetadata($user, $imageIdentifier));
+
         $this->assertTrue($this->adapter->updateMetadata($user, $imageIdentifier, ['foo' => 'foo', 'bar' => 'foo']));
         $this->assertSame(['foo' => 'foo', 'bar' => 'foo'], $this->adapter->getMetadata($user, $imageIdentifier));
+
+        $image = new Image();
+        $this->assertTrue($this->adapter->load($user, $imageIdentifier, $image));
+
+        $this->assertEquals($added, $image->getAddedDate()->getTimestamp(), 'Added timestamp should not be modified');
+        $this->assertEquals(time(), $image->getUpdatedDate()->getTimestamp(), 'Updated timestamp should have updated', 1);
     }
 
     public function testMetadataWithNestedArraysIsRepresetedCorrectly() {
