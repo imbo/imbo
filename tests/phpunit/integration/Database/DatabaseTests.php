@@ -336,6 +336,75 @@ abstract class DatabaseTests extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @covers ::setLastModifiedNow
+     */
+    public function testCanSetLastModifiedDateToNow() {
+        $user = 'user';
+        $imageIdentifier = 'id';
+
+        $original = $this->getImage();
+        $added = time() - 10;
+        $original->setAddedDate(new DateTime('@' . $added, new DateTimeZone('UTC')));
+        $original->setUpdatedDate(new DateTime('@' . $added, new DateTimeZone('UTC')));
+
+        $this->assertTrue(
+            $this->adapter->insertImage($user, $imageIdentifier, $original),
+            'Could not insert image'
+        );
+
+        $now = $this->adapter->setLastModifiedNow($user, $imageIdentifier);
+        $this->assertEquals(time(), $now->getTimestamp(), 'Returned timestamp should be around now', 1);
+
+        $image = new Image();
+        $this->assertTrue($this->adapter->load($user, $imageIdentifier, $image));
+
+        $this->assertEquals($added, $image->getAddedDate()->getTimestamp(), 'Added timestamp should not be modified');
+        $this->assertEquals($now->getTimestamp(), $image->getUpdatedDate()->getTimestamp(), 'Updated timestamp should have updated');
+
+        $lastModified = $this->adapter->getLastModified([$user], $imageIdentifier);
+        $this->assertEquals($now->getTimestamp(), $lastModified->getTimestamp(), 'Last timestamp should have updated');
+    }
+
+    /**
+     * @covers ::setLastModifiedTime
+     */
+    public function testCanSetLastModifiedDateToTimestamp() {
+        $user = 'user';
+        $imageIdentifier = 'id';
+
+        $this->assertTrue(
+            $this->adapter->insertImage($user, $imageIdentifier, $this->getImage()),
+            'Could not insert image'
+        );
+
+        $desired = new DateTime('@' . (time() + 10), new DateTimeZone('UTC'));
+
+        $returned = $this->adapter->setLastModifiedTime($user, $imageIdentifier, $desired);
+        $this->assertEquals($desired->getTimestamp(), $returned->getTimestamp(), 'Returned timestamp should be around now');
+
+        $image = new Image();
+        $this->assertTrue($this->adapter->load($user, $imageIdentifier, $image));
+
+        $this->assertEquals($desired->getTimestamp(), $image->getUpdatedDate()->getTimestamp(), 'Updated timestamp should have updated');
+
+        $lastModified = $this->adapter->getLastModified([$user], $imageIdentifier);
+        $this->assertEquals($desired->getTimestamp(), $lastModified->getTimestamp(), 'Last timestamp should have updated');
+    }
+
+    /**
+     * @expectedException Imbo\Exception\DatabaseException
+     * @expectedExceptionCode 404
+     * @expectedExceptionMessage Image not found
+     * @covers ::setLastModifiedTime
+     */
+    public function testCannotSetLastModifiedDateForMissingImage() {
+        $user = 'user';
+        $imageIdentifier = 'id';
+
+        $this->adapter->setLastModifiedNow($user, $imageIdentifier);
+    }
+
+    /**
      * @covers ::getNumImages
      */
     public function testGetNumImages() {

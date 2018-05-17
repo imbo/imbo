@@ -132,6 +132,28 @@ interface DatabaseInterface {
     function getLastModified(array $users, $imageIdentifier = null);
 
     /**
+     * Update the last modified timestamp for a given image to now.
+     *
+     * @param string $user The user the image belongs to
+     * @param string $imageIdentifier The image identifier
+     * @return DateTime The date the timestamp was updated to
+     */
+    function setLastModifiedNow($user, $imageIdentifier);
+
+    /**
+     * Update the last modified timestamp for a given image
+     *
+     * Will find and modify the last modified timestamp for an image belonging
+     * to a certain user to the given timestamp.
+     *
+     * @param string $user The user the image belongs to
+     * @param string $imageIdentifier The image identifier
+     * @param DateTime $time The timestamp to set last modified to
+     * @return DateTime The date the timestamp was updated to
+     */
+    function setLastModifiedTime($user, $imageIdentifier, DateTime $time);
+
+    /**
      * Fetch the number of images, optionally filtered by a given user
      *
      * @param string $user The user which the images belongs to (pass null to count for all users)

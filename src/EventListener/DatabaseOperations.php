@@ -132,6 +132,11 @@ class DatabaseOperations implements ListenerInterface {
             $request->getUser(),
             $request->getImageIdentifier()
         );
+
+        $event->getDatabase()->setLastModifiedNow(
+            $request->getUser(),
+            $request->getImageIdentifier()
+        );
     }
 
     /**
@@ -146,6 +151,11 @@ class DatabaseOperations implements ListenerInterface {
             $request->getUser(),
             $request->getImageIdentifier(),
             $event->getArgument('metadata')
+        );
+
+        $event->getDatabase()->setLastModifiedNow(
+            $request->getUser(),
+            $request->getImageIdentifier()
         );
     }
 
