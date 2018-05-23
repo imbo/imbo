@@ -186,6 +186,12 @@ class Doctrine implements DatabaseInterface {
             ]);
         }
 
+        $connection->update($this->tableNames['imageinfo'], [
+            'updated' => time(),
+        ], [
+            'id' => $imageId
+        ]);
+
         return true;
     }
 
