@@ -363,7 +363,7 @@ class Doctrine implements DatabaseInterface {
             ];
 
             if ($returnMetadata) {
-                $image['metadata'] = $this->getMetadata($user, $row['imageIdentifier']);
+                $image['metadata'] = $this->getMetadata($row['user'], $row['imageIdentifier']);
             }
 
             $images[] = $image;
