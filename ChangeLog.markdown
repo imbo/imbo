@@ -1,6 +1,12 @@
 Changelog for Imbo
 ==================
 
+Imbo-2.2.2
+----------
+__2018-05-23__
+
+* #596: Backport of fix for #491 (Morten Fangel)
+
 Imbo-2.2.1
 ----------
 __2016-12-01__
