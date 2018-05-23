@@ -1,6 +1,12 @@
 Changelog for Imbo
 ==================
 
+Imbo-2.2.3
+----------
+__2018-05-23__
+
+* #597: Update timestamp when modifying metadata (Morten Fangel)
+
 Imbo-2.2.2
 ----------
 __2018-05-23__
