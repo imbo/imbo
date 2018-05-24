@@ -112,6 +112,7 @@ class DatabaseOperationsTest extends ListenerTests {
      */
     public function testCanDeleteMetadata() {
         $this->database->expects($this->once())->method('deleteMetadata')->with($this->user, $this->imageIdentifier);
+        $this->database->expects($this->once())->method('setLastModifiedNow')->with($this->user, $this->imageIdentifier);
 
         $this->listener->deleteMetadata($this->event);
     }
@@ -122,6 +123,7 @@ class DatabaseOperationsTest extends ListenerTests {
     public function testCanUpdateMetadata() {
         $this->event->expects($this->once())->method('getArgument')->with('metadata')->will($this->returnValue(['key' => 'value']));
         $this->database->expects($this->once())->method('updateMetadata')->with($this->user, $this->imageIdentifier, ['key' => 'value']);
+        $this->database->expects($this->once())->method('setLastModifiedNow')->with($this->user, $this->imageIdentifier);
 
         $this->listener->updateMetadata($this->event);
     }

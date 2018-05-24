@@ -209,7 +209,7 @@ class MongoDB implements DatabaseInterface {
 
             $this->getImageCollection()->updateOne(
                 ['user' => $user, 'imageIdentifier' => $imageIdentifier],
-                ['$set' => ['updated' => time(), 'metadata' => $updatedMetadata]]
+                ['$set' => ['metadata' => $updatedMetadata]]
             );
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to update meta data', 500, $e);
@@ -433,6 +433,34 @@ class MongoDB implements DatabaseInterface {
         }
 
         return new DateTime('@' . $data['updated'], new DateTimeZone('UTC'));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setLastModifiedNow($user, $imageIdentifier) {
+        return $this->setLastModifiedTime($user, $imageIdentifier, new DateTime('@' . time(), new DateTimeZone('UTC')));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setLastModifiedTime($user, $imageIdentifier, DateTime $time) {
+        $data = $this->getImageCollection()->findOne([
+            'user' => $user,
+            'imageIdentifier' => $imageIdentifier,
+        ]);
+
+        if ($data === null) {
+            throw new DatabaseException('Image not found', 404);
+        }
+
+        $this->getImageCollection()->updateOne(
+            ['user' => $user, 'imageIdentifier' => $imageIdentifier],
+            ['$set' => ['updated' => $time->getTimestamp()]]
+        );
+
+        return $time;
     }
 
     /**

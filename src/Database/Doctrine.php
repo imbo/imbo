@@ -452,6 +452,35 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
+    public function setLastModifiedNow($user, $imageIdentifier) {
+        return $this->setLastModifiedTime($user, $imageIdentifier, new DateTime('@' . time(), new DateTimeZone('UTC')));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setLastModifiedTime($user, $imageIdentifier, DateTime $time) {
+        // Fetch the current connection
+        $connection = $this->getConnection();
+
+        if (!$imageId = $this->getImageId($user, $imageIdentifier)) {
+            throw new DatabaseException('Image not found', 404);
+        }
+
+        $update = $connection->createQueryBuilder();
+        $update->update($this->tableNames['imageinfo'])
+               ->set('updated', $time->getTimestamp())
+               ->where('id = :id')
+               ->setParameters([
+                   ':id' => $imageId,
+               ])->execute();
+
+        return $time;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getNumImages($user = null) {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('COUNT(i.id)')
