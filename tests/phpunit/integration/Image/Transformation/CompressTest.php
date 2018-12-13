@@ -28,9 +28,7 @@ class CompressTest extends TransformationTests {
 
     public function testCanTransformTheImage() {
         $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('hasBeenTransformed')->with(true);
-        $image->expects($this->once())->method('getMimeType')->will($this->returnValue('image/jpeg'));
-
+        $image->expects($this->once())->method('setOutputQualityCompression')->with(50);
         $event = $this->createMock('Imbo\EventManager\Event');
 
         $imagick = new Imagick();
@@ -41,7 +39,6 @@ class CompressTest extends TransformationTests {
             ->setImagick($imagick)
             ->setImage($image)
             ->setEvent($event)
-            ->transform(['level' => 50]) // Set the correct level parameter
-            ->compress($event); // Perform the actual compression
+            ->transform(['level' => 50]);
     }
 }
