@@ -28,9 +28,19 @@ class Compress extends Transformation implements ListenerInterface {
     private $level;
 
     /**
+     * Whether we've been registered as an event listener or not - event listeners are invoked at the end of the
+     * request. If we haven't, we perform the transformation when the transform method is called instead.
+     *
+     * @var boolean
+     */
+    private static $registeredAsEventListener = false;
+
+    /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents() {
+        self::$registeredAsEventListener = true;
+
         return [
             'image.transformed' => 'compress',
         ];
@@ -46,7 +56,7 @@ class Compress extends Transformation implements ListenerInterface {
             return;
         }
 
-        $image = $this->image;
+        $image = $event->hasArgument('image') ? $event->getArgument('image') : $this->image;
         $mimeType = $image->getMimeType();
 
         if ($mimeType === 'image/gif') {
@@ -79,6 +89,10 @@ class Compress extends Transformation implements ListenerInterface {
 
         if ($this->level < 0 || $this->level > 100) {
             throw new TransformationException('level must be between 0 and 100', 400);
+        }
+
+        if (!self::$registeredAsEventListener) {
+            $this->compress($this->event);
         }
 
         return $this;
