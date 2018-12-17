@@ -129,6 +129,11 @@ class Image implements ModelInterface {
     private $hasBeenTransformed = false;
 
     /**
+     * Track requested output quality compression
+     */
+    private $outputQualityCompression;
+
+    /**
      * Get the size of the image data in bytes
      *
      * @return int
@@ -422,6 +427,26 @@ class Image implements ModelInterface {
         $this->hasBeenTransformed = (bool) $flag;
 
         return $this;
+    }
+
+    /**
+     * Get the requested output quality compression or quality value
+     *
+     * @return null|int
+     */
+    public function getOutputQualityCompression() {
+        return $this->outputQualityCompression;
+    }
+
+    /**
+     * Request a specific output quality compression or quality value. The output converter for the file type must still
+     * make use of the value.
+     *
+     * @param int $outputQualityCompression  The requested compression or quality value
+     * @return null
+     */
+    public function setOutputQualityCompression($outputQualityCompression) {
+        $this->outputQualityCompression = $outputQualityCompression;
     }
 
     /**

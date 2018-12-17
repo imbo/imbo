@@ -21,51 +21,11 @@ use Imbo\Exception\TransformationException,
  * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
-class Compress extends Transformation implements ListenerInterface {
+class Compress extends Transformation {
     /**
      * @var int
      */
     private $level;
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
-        return [
-            'image.transformed' => 'compress',
-        ];
-    }
-
-    /**
-     * Apply the compression
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function compress(EventInterface $event) {
-        if ($this->level === null) {
-            return;
-        }
-
-        $image = $this->image;
-        $mimeType = $image->getMimeType();
-
-        if ($mimeType === 'image/gif') {
-            // No need to do anything if the image is a GIF
-            return;
-        }
-
-        try {
-            // Levels from 0 - 100 will work for both JPEG and PNG, although the level has different
-            // meaning for these two image types. For PNG's a high level will mean more compression,
-            // which usually results in a smaller file size, as for JPEG's, a high level means a
-            // higher quality, resulting in a larger file size.
-            $this->imagick->setImageCompressionQuality($this->level);
-        } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
-        }
-
-        $image->hasBeenTransformed(true);
-    }
 
     /**
      * {@inheritdoc}
@@ -81,6 +41,7 @@ class Compress extends Transformation implements ListenerInterface {
             throw new TransformationException('level must be between 0 and 100', 400);
         }
 
+        $this->image->setOutputQualityCompression($this->level);
         return $this;
     }
 }
