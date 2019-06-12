@@ -181,6 +181,9 @@ class SmartSize extends Transformation {
             case 'wide':
                 return 0.66;
 
+            case 'full':
+                return 1;
+
             default:
                 return 0.5;
         }
@@ -199,6 +202,9 @@ class SmartSize extends Transformation {
 
             case 'wide':
                 return 1.6;
+
+            case 'full':
+                return 2;
 
             default:
                 return 1.25;
@@ -265,7 +271,7 @@ class SmartSize extends Transformation {
                 throw new TransformationException('Invalid POI format, expected format `<x>,<y>`', 400);
             }
 
-            if (!empty($params['crop']) && in_array($params['crop'], ['close', 'medium', 'wide']) === false) {
+            if (!empty($params['crop']) && in_array($params['crop'], ['close', 'medium', 'wide', 'full']) === false) {
                 throw new TransformationException('Invalid crop value. Valid values are: close,medium,wide', 400);
             }
         }
