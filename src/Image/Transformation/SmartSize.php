@@ -272,7 +272,7 @@ class SmartSize extends Transformation {
             }
 
             if (!empty($params['crop']) && in_array($params['crop'], ['close', 'medium', 'wide', 'full']) === false) {
-                throw new TransformationException('Invalid crop value. Valid values are: close,medium,wide', 400);
+                throw new TransformationException('Invalid crop value. Valid values are: close,medium,wide,full', 400);
             }
         }
 
