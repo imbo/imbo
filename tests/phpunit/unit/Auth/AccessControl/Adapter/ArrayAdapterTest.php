@@ -224,7 +224,7 @@ class ArrayAdapterTest extends TestCase {
      *
      * @return array[]
      */
-    public function getGroups() {
+    public function getGroupsForTest() {
         return [
             'no groups' => [
                 [], 'group', false,
@@ -239,7 +239,7 @@ class ArrayAdapterTest extends TestCase {
     }
 
     /**
-     * @dataProvider getGroups
+     * @dataProvider getGroupsForTest
      * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::groupExists
      */
     public function testCanCheckIfGroupExists($groups, $group, $exists) {

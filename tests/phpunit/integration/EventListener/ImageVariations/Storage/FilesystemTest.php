@@ -51,7 +51,7 @@ class FilesystemTest extends StorageTests {
     /**
      * Clean up directory structure after each test
      */
-    public function tearDown() {
+    protected function tearDown() : void {
         if (is_dir($this->path)) {
             $this->rmdir($this->path);
         }

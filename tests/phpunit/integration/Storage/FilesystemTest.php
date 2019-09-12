@@ -45,7 +45,7 @@ class FilesystemTest extends StorageTests {
         parent::setUp();
     }
 
-    public function tearDown() {
+    protected function tearDown() : void {
         if (is_dir($this->path)) {
             $this->rmdir($this->path);
         }

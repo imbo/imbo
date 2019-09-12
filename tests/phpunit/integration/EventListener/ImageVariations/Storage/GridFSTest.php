@@ -52,7 +52,7 @@ class GridFSTest extends StorageTests {
     /**
      * Drop the test database after each test
      */
-    public function tearDown() {
+    protected function tearDown() : void {
         if (!class_exists('MongoDB\Driver\Manager') || !class_exists('MongoDB\Client')) {
             (new Client())->dropDatabase($this->databaseName);
         }
