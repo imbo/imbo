@@ -89,6 +89,9 @@
       "cd docs; make spelling",
       "cd docs; make html"
     ],
-    "start": "php -S localhost:8080 -t ./public tests/behat/router.php > build/logs/httpd.log 2>&1 &"
+    "start": [
+      "mkdir -p build/logs",
+      "php -S localhost:8080 -t ./public tests/behat/router.php > build/logs/httpd.log 2>&1 &"
+    ]
   }
 }
