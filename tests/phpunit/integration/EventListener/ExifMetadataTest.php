@@ -91,9 +91,9 @@ class ExifMetadataTest extends TestCase {
 
         $properties = $listener->populate($event);
 
-        $this->assertEquals(9.0841802, $properties['gps:location'][0], '', 0.05);
-        $this->assertEquals(63.680437300003, $properties['gps:location'][1], '', 0.05);
-        $this->assertEquals(50.8, $properties['gps:altitude'], '', 0.05);
+        $this->assertEqualsWithDelta(9.0841802, $properties['gps:location'][0], 0.05);
+        $this->assertEqualsWithDelta(63.680437300003, $properties['gps:location'][1], 0.05);
+        $this->assertEqualsWithDelta(50.8, $properties['gps:altitude'], 0.05);
     }
 
     /**

@@ -94,7 +94,7 @@ class ResponseFormatterTest extends TestCase {
      */
     public function testReturnsACorrectEventSubscription() {
         $class = get_class($this->responseFormatter);
-        $this->assertInternalType('array', $class::getSubscribedEvents());
+        $this->assertIsArray($class::getSubscribedEvents());
     }
 
     /**

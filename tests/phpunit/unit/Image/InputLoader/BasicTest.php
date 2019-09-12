@@ -35,7 +35,7 @@ class BasicTest extends TestCase {
     public function testReturnsSupportedMimeTypes() {
         $types = $this->loader->getSupportedMimeTypes();
 
-        $this->assertInternalType('array', $types);
+        $this->assertIsArray($types);
 
         $this->assertContains('image/png', array_keys($types));
         $this->assertContains('image/jpeg', array_keys($types));

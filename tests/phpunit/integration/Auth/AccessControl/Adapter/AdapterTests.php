@@ -139,7 +139,7 @@ abstract class AdapterTests extends TestCase {
 
     public function testCanManipulateAccessRules() {
         $this->adapter->addKeyPair('public', 'private');
-        $this->assertInternalType('string', $ruleId = $this->adapter->addAccessRule('public', ['resources' => ['image.get'], 'users' => ['user']]));
+        $this->assertIsString($ruleId = $this->adapter->addAccessRule('public', ['resources' => ['image.get'], 'users' => ['user']]));
         $this->assertSame([
             'id' => $ruleId,
             'resources' => ['image.get'],

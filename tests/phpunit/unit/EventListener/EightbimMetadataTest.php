@@ -69,7 +69,7 @@ class EightbimMetadataTest extends ListenerTests {
         $event->expects($this->once())->method('getDatabase')->will($this->returnValue($database));
 
         $addedPaths = $this->listener->populate($event);
-        $this->assertInternalType('array', $addedPaths);
+        $this->assertIsArray($addedPaths);
         $this->assertEquals($addedPaths, ['paths' => ['House', 'Panda']]);
 
         $this->listener->save($event);

@@ -71,7 +71,7 @@ class ImagePreparationTest extends TestCase {
      */
     public function testReturnsACorrectDefinition() {
         $class = get_class($this->prepare);
-        $this->assertInternalType('array', $class::getSubscribedEvents());
+        $this->assertIsArray($class::getSubscribedEvents());
     }
 
     /**

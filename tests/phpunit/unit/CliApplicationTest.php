@@ -30,6 +30,6 @@ class CliApplicationTest extends TestCase {
         $applicationTester->run(['command' => 'list']);
         $output = $applicationTester->getDisplay();
 
-        $this->assertContains('generate-private-key', $output);
+        $this->assertStringContainsString('generate-private-key', $output);
     }
 }
