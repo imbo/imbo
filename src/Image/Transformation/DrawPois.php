@@ -9,7 +9,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Draw POIs (points of interest) transformation
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image\Transformations
  */
 class DrawPois extends Transformation {

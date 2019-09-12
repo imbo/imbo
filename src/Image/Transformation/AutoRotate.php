@@ -11,7 +11,6 @@ use Imbo\Exception\TransformationException,
  * Automatic rotate transformation. Rotates and flips the image
  * based on the EXIF orientation tag.
  *
- * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Image\Transformations
  */
 class AutoRotate extends Transformation implements InputSizeConstraint {

@@ -13,7 +13,6 @@ use Imbo\Http\Request\Request,
 /**
  * Event interface
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event
  */
 interface EventInterface {

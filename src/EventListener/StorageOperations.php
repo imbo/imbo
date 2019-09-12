@@ -7,7 +7,6 @@ use Imbo\EventManager\EventInterface,
 /**
  * Storage operations event listener
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
  */
 class StorageOperations implements ListenerInterface {

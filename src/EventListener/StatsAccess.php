@@ -11,7 +11,6 @@ use Imbo\EventManager\EventInterface,
  * addresses or subnets (using CIDR notation). If you disable the listener from the configuration
  * it will be open to anyone (and it does not require an access token by default).
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
  */
 class StatsAccess implements ListenerInterface {

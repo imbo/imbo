@@ -7,7 +7,6 @@ use Imbo\Exception,
 /**
  * Invalid argument exception
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Exceptions
  */
 class InvalidArgumentException extends BaseInvalidArgumentException implements Exception {

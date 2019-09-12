@@ -12,7 +12,6 @@ use Imbo\Model\Image,
  *
  * This is an interface for storage adapters in Imbo.
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Database
  */
 interface DatabaseInterface {

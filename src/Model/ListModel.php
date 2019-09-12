@@ -4,7 +4,6 @@ namespace Imbo\Model;
 /**
  * Simple model using an numerically indexed array for data
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Models
  */
 class ListModel implements ModelInterface {

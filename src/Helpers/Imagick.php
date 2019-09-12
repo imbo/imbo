@@ -4,7 +4,6 @@ namespace Imbo\Helpers;
 /**
  * Helper class for Imagick
  *
- * @author Mats Lindh <mats@lindh.no>
  * @package Core\Helpers
  */
 class Imagick {

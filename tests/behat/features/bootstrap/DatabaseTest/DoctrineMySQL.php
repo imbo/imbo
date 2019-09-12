@@ -7,8 +7,6 @@ use PDO;
 
 /**
  * Class for suites that want to use the Doctrine database adapter with a MySQL database
- *
- * @author Christer Edvartsen <cogo@starzinger.net>
  */
 class DoctrineMySQL implements AdapterTest {
     /**

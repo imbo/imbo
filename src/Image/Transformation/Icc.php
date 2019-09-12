@@ -25,7 +25,6 @@ use Imbo\Exception\ConfigurationException,
  *          },
  *      ],
  *
- * @author Mats Lindh <mats@lindh.no>
  * @package Image\Transformations
  */
 class Icc extends Transformation {

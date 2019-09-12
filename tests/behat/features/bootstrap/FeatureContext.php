@@ -26,7 +26,6 @@ use ImagickException;
 /**
  * Imbo feature context
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Test suite\Functional tests
  */
 class FeatureContext extends ApiContext {

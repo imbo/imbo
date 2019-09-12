@@ -10,7 +10,6 @@ use Imbo\EventManager\EventInterface;
  * before sending back transformed images to the client, or when storing transformed images in the
  * storage.
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
  */
 class Imagick implements ListenerInterface, ImagickAware {

@@ -25,7 +25,6 @@ use Imbo\EventManager\EventInterface,
  * - image extension (can be null)
  * - image transformations (can be null)
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
  */
 class ImageTransformationCache implements ListenerInterface {

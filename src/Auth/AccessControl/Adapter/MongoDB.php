@@ -21,8 +21,6 @@ use Imbo\Exception\DatabaseException,
  * - (array) options Options to use when creating the MongoClient instance. Defaults to
  *                   ['connect' => true, 'connectTimeoutMS' => 1000].
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
- * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Core\Auth\AccessControl\Adapter
  */
 class MongoDB extends AbstractAdapter implements MutableAdapterInterface {

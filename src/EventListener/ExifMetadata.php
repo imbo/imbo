@@ -11,8 +11,6 @@ use Imbo\EventManager\EventInterface,
  *
  * This listener will look for properties stored in the image, and store them as metadata in Imbo.
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
  */
 class ExifMetadata implements ListenerInterface {

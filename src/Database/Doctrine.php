@@ -20,7 +20,6 @@ use DateTimeZone;
  *
  * Refer to http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest for configuration parameters
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Database
  */
 class Doctrine implements DatabaseInterface {

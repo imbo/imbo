@@ -8,8 +8,6 @@ use Imbo\Exception\TransformationException,
 /**
  * MaxSize transformation
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
 class MaxSize extends Transformation implements InputSizeConstraint {

@@ -7,7 +7,6 @@ use Imbo\EventManager\EventInterface,
 /**
  * Auto rotate event listener
  *
- * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Event\Listeners
  */
 class AutoRotateImage implements ListenerInterface {

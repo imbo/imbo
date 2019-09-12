@@ -8,7 +8,6 @@ use Imbo\EventManager\EventInterface,
 /**
  * Global short URL resource
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
 class GlobalShortUrl implements ResourceInterface {

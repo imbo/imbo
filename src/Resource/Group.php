@@ -9,7 +9,6 @@ use Imbo\EventManager\EventInterface,
 /**
  * Resource group resource
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Resources
  */
 class Group implements ResourceInterface {

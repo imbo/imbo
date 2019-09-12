@@ -4,7 +4,6 @@ namespace Imbo\Model;
 /**
  * Simple model using an associative array for data
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Models
  */
 class ArrayModel implements ModelInterface {

@@ -7,7 +7,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Strip properties and comments from an image
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
 class Strip extends Transformation {

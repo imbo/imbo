@@ -6,7 +6,6 @@ namespace Imbo\EventListener;
  *
  * Any EventListener with this interface will receive a call to its `setImagick()` method.
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
  */
 interface ImagickAware {

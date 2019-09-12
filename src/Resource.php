@@ -4,7 +4,6 @@ namespace Imbo;
 /**
  * Resource class
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Core
  */
 class Resource {

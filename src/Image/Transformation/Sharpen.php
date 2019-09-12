@@ -7,7 +7,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Sharpen transformation
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
 class Sharpen extends Transformation {

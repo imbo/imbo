@@ -7,7 +7,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Blur transformation
  *
- * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Image\Transformations
  */
 class Blur extends Transformation {

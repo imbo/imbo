@@ -11,7 +11,6 @@ use Imbo\EventManager\EventInterface,
 /**
  * Access rules resource
  *
- * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Resources
  */
 class AccessRules implements ResourceInterface {

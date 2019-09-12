@@ -9,7 +9,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Crop transformation
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
 class Crop extends Transformation implements RegionExtractor, InputSizeConstraint {

@@ -8,7 +8,6 @@ use Imbo\Http\Request\Request,
 /**
  * Router class containing supported routes
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Router
  */
 class Router {

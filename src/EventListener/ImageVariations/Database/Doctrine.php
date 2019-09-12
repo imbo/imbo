@@ -12,7 +12,6 @@ use Imbo\Exception\InvalidArgumentException,
  *
  * Refer to http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest for configuration parameters
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Database
  */
 class Doctrine implements DatabaseInterface {

@@ -4,7 +4,6 @@ namespace Imbo\EventListener\AccessToken;
 /**
  * Interface for Access Token Generation
  *
- * @author Mats Lindh <mats@lindh.no>
  * @package AccessToken
  */
 interface AccessTokenInterface {

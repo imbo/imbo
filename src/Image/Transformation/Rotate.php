@@ -9,7 +9,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Rotate transformation
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
 class Rotate extends Transformation implements InputSizeConstraint {

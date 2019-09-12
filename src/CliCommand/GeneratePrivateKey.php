@@ -9,7 +9,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Generate a private key that can be used in the configuration
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Cli
  */
 class GeneratePrivateKey extends Command {

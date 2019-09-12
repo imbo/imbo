@@ -7,7 +7,6 @@ use Imbo\Model,
 /**
  * Response object from the server to the client
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Http
  */
 class Response extends SymfonyResponse {

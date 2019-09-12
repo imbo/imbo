@@ -7,7 +7,6 @@ use Imbo\Model,
 /**
  * JSON formatter
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Response\Formatters
  */
 class JSON extends Formatter implements FormatterInterface {

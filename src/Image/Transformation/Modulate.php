@@ -7,7 +7,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Modulate transformation
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
 class Modulate extends Transformation {

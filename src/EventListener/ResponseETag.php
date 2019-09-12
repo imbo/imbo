@@ -6,7 +6,6 @@ use Imbo\EventManager\EventInterface;
 /**
  * Generate an ETag for the response
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
  */
 class ResponseETag implements ListenerInterface {

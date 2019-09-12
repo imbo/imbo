@@ -4,7 +4,6 @@ namespace Imbo\EventListener\ImageVariations\Storage;
 /**
  * Storage adapter interface for the image variations event listener
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Storage
  */
 interface StorageInterface {

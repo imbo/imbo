@@ -10,7 +10,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Progressive image transformation
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
 class Progressive extends Transformation {

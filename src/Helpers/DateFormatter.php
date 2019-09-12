@@ -7,7 +7,6 @@ use DateTime,
 /**
  * Date formatter helper class
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Core\Helpers
  */
 class DateFormatter {

@@ -4,7 +4,6 @@ namespace Imbo\Model;
 /**
  * Groups model
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Models
  */
 class Groups implements ModelInterface {

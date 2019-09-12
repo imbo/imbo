@@ -8,7 +8,6 @@ use Imbo\Exception\InvalidArgumentException,
 /**
  * Clip transformation for making an image transparent outside of a clipping mask
  *
- * @author Mats Lindh <mats@lindh.no>
  * @package Image\Transformations
  */
 class Clip extends Transformation {

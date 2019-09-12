@@ -7,7 +7,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Flip vertically transformation
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
 class FlipVertically extends Transformation {

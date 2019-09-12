@@ -15,7 +15,6 @@ use Imbo\EventManager\EventInterface,
 /**
  * Image preparation
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image
  */
 class ImagePreparation implements ListenerInterface {

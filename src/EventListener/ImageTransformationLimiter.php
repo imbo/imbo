@@ -8,7 +8,6 @@ use Imbo\EventManager\EventInterface,
 /**
  * Limit the number of transformations that can be applied in a request.
  *
- * @author Mats Lindh <mats@lindh.no>
  * @package Event\Listeners
  */
 class ImageTransformationLimiter implements ListenerInterface {

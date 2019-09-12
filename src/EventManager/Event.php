@@ -6,7 +6,6 @@ use Imbo\Exception\InvalidArgumentException;
 /**
  * Event class
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event
  */
 class Event implements EventInterface {

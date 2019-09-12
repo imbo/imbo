@@ -6,7 +6,6 @@ use DateTime;
 /**
  * Image model
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Models
  */
 class Image implements ModelInterface {

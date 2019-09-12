@@ -7,7 +7,6 @@ use Imbo\Model,
 /**
  * Interface for formatters
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Response\Formatters
  */
 interface FormatterInterface {

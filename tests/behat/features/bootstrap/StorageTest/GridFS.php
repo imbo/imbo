@@ -7,8 +7,6 @@ use MongoDB\Client as MongoClient;
 
 /**
  * Class for suites that want to use the GridFS storage adapter
- *
- * @author Christer Edvartsen <cogo@starzinger.net>
  */
 class GridFS implements AdapterTest {
     /**

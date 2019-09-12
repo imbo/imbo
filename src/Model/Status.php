@@ -6,7 +6,6 @@ use DateTime;
 /**
  * Status model
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Models
  */
 class Status implements ModelInterface {

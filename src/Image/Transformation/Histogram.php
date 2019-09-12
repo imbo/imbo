@@ -11,7 +11,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Histogram transformation
  *
- * @author Mats Lindh <mats@lindh.no>
  * @package Image\Transformations
  */
 class Histogram extends Transformation {

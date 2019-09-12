@@ -9,7 +9,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Compression transformation
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
 class Compress extends Transformation {

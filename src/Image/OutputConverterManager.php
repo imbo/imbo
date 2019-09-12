@@ -14,7 +14,6 @@ use Imbo\Exception\InvalidArgumentException,
  * A plugin should update the given model to reflect the new state. By calling `setBlob`, the plugin
  * can update the actual binary data returned to the client.
  *
- * @author Mats Lindh <mats@lindh.no>
  * @package Image
  */
 class OutputConverterManager {

@@ -6,7 +6,6 @@ use DateTime;
 /**
  * User model
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Models
  */
 class User implements ModelInterface {

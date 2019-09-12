@@ -7,8 +7,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Desaturate transformation
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
 class Desaturate extends Transformation {

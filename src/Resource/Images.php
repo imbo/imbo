@@ -19,7 +19,6 @@ use Imbo\EventManager\EventInterface,
  * from     => Unix timestamp to fetch from
  * to       => Unit timestamp to fetch to
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
 class Images implements ResourceInterface {

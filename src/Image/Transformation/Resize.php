@@ -8,7 +8,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Resize transformation
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
 class Resize extends Transformation implements InputSizeConstraint {

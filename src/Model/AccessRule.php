@@ -4,7 +4,6 @@ namespace Imbo\Model;
 /**
  * Access rule model
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Models
  */
 class AccessRule implements ModelInterface {

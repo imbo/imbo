@@ -9,7 +9,6 @@ use Imbo\Exception\InvalidArgumentException,
 /**
  * Request class
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Http
  */
 class Request extends SymfonyRequest {

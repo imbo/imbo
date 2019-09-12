@@ -4,7 +4,6 @@ namespace Imbo\Helpers;
 /**
 * Helper class for useful functions for building/manipulating URLs
 *
-* @author Mats Lindh <mats@lindh.no>
 * @package Core\Helpers
 */
 class Parameters {

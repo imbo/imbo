@@ -7,7 +7,6 @@ use Imbo\Auth\AccessControl\GroupQuery,
 /**
  * Access control interface
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Core\Auth\AccessControl
  */
 interface AdapterInterface {
