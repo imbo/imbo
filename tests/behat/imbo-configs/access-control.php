@@ -1,9 +1,9 @@
 <?php
-use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
-    Imbo\Resource\ResourceInterface,
-    Imbo\EventManager\EventInterface,
-    Imbo\Model\ListModel,
-    Imbo\Resource;
+use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
+use Imbo\Resource\ResourceInterface;
+use Imbo\EventManager\EventInterface;
+use Imbo\Model\ListModel;
+use Imbo\Resource;
 
 class Foobar implements ResourceInterface {
     public function getAllowedMethods() {

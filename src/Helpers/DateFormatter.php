@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\Helpers;
 
-use DateTime,
-    DateTimeZone;
+use DateTime;
+use DateTimeZone;
 
 /**
  * Date formatter helper class

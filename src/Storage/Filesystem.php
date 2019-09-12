@@ -1,10 +1,10 @@
 <?php
 namespace Imbo\Storage;
 
-use Imbo\Exception\StorageException,
-    Imbo\Exception,
-    DateTime,
-    DateTimeZone;
+use Imbo\Exception\StorageException;
+use Imbo\Exception;
+use DateTime;
+use DateTimeZone;
 
 /**
  * Filesystem storage driver

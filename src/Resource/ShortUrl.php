@@ -1,9 +1,9 @@
 <?php
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception\ResourceException,
-    Imbo\Model\ArrayModel;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception\ResourceException;
+use Imbo\Model\ArrayModel;
 
 /**
  * Short URL collection

@@ -1,12 +1,12 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imagick,
-    Imbo\Model\Image,
-    Imbo\EventManager\Event,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ImagickAware;
+use Imagick;
+use Imbo\Model\Image;
+use Imbo\EventManager\Event;
+use Imbo\EventListener\ListenerInterface;
+use Imbo\EventManager\EventInterface;
+use Imbo\EventListener\ImagickAware;
 
 /**
  * Abstract transformation

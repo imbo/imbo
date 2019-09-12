@@ -1,9 +1,9 @@
 <?php
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Model,
-    Imbo\Version;
+use Imbo\EventManager\EventInterface;
+use Imbo\Model;
+use Imbo\Version;
 
 /**
  * Index resource

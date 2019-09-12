@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\Model;
 
-use Imbo\Exception\InvalidArgumentException,
-    ArrayAccess;
+use Imbo\Exception\InvalidArgumentException;
+use ArrayAccess;
 
 /**
  * Statistics model

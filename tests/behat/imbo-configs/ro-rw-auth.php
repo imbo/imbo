@@ -1,6 +1,6 @@
 <?php
-use Imbo\Auth\AccessControl\Adapter\ArrayAdapter,
-    Imbo\Resource;
+use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
+use Imbo\Resource;
 
 /**
  * Use individual read-only/read+write keys

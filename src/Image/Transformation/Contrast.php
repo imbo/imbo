@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException,
-    ImagickException;
+use Imbo\Exception\TransformationException;
+use ImagickException;
 
 /**
  * Contrast transformation

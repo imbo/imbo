@@ -1,10 +1,10 @@
 <?php
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Model,
-    DateTime,
-    DateTimeZone;
+use Imbo\EventManager\EventInterface;
+use Imbo\Model;
+use DateTime;
+use DateTimeZone;
 
 /**
  * Status resource

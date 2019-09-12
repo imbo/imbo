@@ -1,9 +1,9 @@
 <?php
 namespace Imbo\EventManager;
 
-use Imbo\EventListener\ListenerInterface,
-    Imbo\EventListener\Initializer\InitializerInterface,
-    Imbo\Exception\InvalidArgumentException;
+use Imbo\EventListener\ListenerInterface;
+use Imbo\EventListener\Initializer\InitializerInterface;
+use Imbo\Exception\InvalidArgumentException;
 
 /**
  * Event manager

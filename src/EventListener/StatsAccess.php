@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception\RuntimeException;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception\RuntimeException;
 
 /**
  * Stats access listener

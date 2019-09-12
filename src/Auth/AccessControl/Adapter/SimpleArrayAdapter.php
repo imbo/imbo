@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\Auth\AccessControl\Adapter;
 
-use Imbo\Exception\InvalidArgumentException,
-    Imbo\Resource;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Resource;
 
 /**
  * Simple array-backed access control adapter

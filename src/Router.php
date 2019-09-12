@@ -1,9 +1,9 @@
 <?php
 namespace Imbo;
 
-use Imbo\Http\Request\Request,
-    Imbo\Exception\RuntimeException,
-    Imbo\Router\Route;
+use Imbo\Http\Request\Request;
+use Imbo\Exception\RuntimeException;
+use Imbo\Router\Route;
 
 /**
  * Router class containing supported routes

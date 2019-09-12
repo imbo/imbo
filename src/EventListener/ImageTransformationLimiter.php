@@ -1,9 +1,9 @@
 <?php
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\Exception\ResourceException;
+use Imbo\EventManager\EventInterface;
+use Imbo\EventListener\ListenerInterface;
+use Imbo\Exception\ResourceException;
 
 /**
  * Limit the number of transformations that can be applied in a request.

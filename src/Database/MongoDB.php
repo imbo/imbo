@@ -1,20 +1,20 @@
 <?php
 namespace Imbo\Database;
 
-use Imbo\Model\Image,
-    Imbo\Model\Images,
-    Imbo\Resource\Images\Query,
-    Imbo\Exception\DatabaseException,
-    Imbo\Exception\DuplicateImageIdentifierException,
-    Imbo\Helpers\BSONToArray,
-    MongoDB\Client as MongoClient,
-    MongoDB\Driver\Manager,
-    MongoDB\Driver\Command,
-    MongoDB\Collection as MongoCollection,
-    MongoDB\Driver\Exception\Exception as MongoException,
-    MongoDB\Model\BSONDocument,
-    DateTime,
-    DateTimeZone;
+use Imbo\Model\Image;
+use Imbo\Model\Images;
+use Imbo\Resource\Images\Query;
+use Imbo\Exception\DatabaseException;
+use Imbo\Exception\DuplicateImageIdentifierException;
+use Imbo\Helpers\BSONToArray;
+use MongoDB\Client as MongoClient;
+use MongoDB\Driver\Manager;
+use MongoDB\Driver\Command;
+use MongoDB\Collection as MongoCollection;
+use MongoDB\Driver\Exception\Exception as MongoException;
+use MongoDB\Model\BSONDocument;
+use DateTime;
+use DateTimeZone;
 
 /**
  * MongoDB database driver

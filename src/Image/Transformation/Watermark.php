@@ -1,12 +1,12 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\StorageException,
-    Imbo\Exception\TransformationException,
-    Imbo\Helpers\Imagick as ImagickHelper,
-    Imbo\Image\InputSizeConstraint,
-    Imagick,
-    ImagickException;
+use Imbo\Exception\StorageException;
+use Imbo\Exception\TransformationException;
+use Imbo\Helpers\Imagick as ImagickHelper;
+use Imbo\Image\InputSizeConstraint;
+use Imagick;
+use ImagickException;
 
 /**
  * Watermark transformation

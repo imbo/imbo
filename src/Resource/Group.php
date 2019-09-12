@@ -1,10 +1,10 @@
 <?php
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception\ResourceException,
-    Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface,
-    Imbo\Model\Group as GroupModel;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception\ResourceException;
+use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
+use Imbo\Model\Group as GroupModel;
 
 /**
  * Resource group resource

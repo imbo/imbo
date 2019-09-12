@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\EventListener\AccessToken;
 
-use Imbo\EventListener\AccessToken\AccessTokenGenerator,
-    Imbo\EventListener\AccessToken\SHA256;
+use Imbo\EventListener\AccessToken\AccessTokenGenerator;
+use Imbo\EventListener\AccessToken\SHA256;
 use Imbo\Exception\RuntimeException;
 
 class MultipleAccessTokenGenerators extends AccessTokenGenerator {

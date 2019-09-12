@@ -1,14 +1,14 @@
 <?php
 namespace Imbo\EventManager;
 
-use Imbo\Http\Request\Request,
-    Imbo\Http\Response\Response,
-    Imbo\Database\DatabaseInterface,
-    Imbo\Auth\AccessControl\Adapter\AdapterInterface as AccessControlInterface,
-    Imbo\Storage\StorageInterface,
-    Imbo\Image\OutputConverterManager,
-    Imbo\Image\TransformationManager,
-    Imbo\Image\InputLoaderManager;
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+use Imbo\Database\DatabaseInterface;
+use Imbo\Auth\AccessControl\Adapter\AdapterInterface as AccessControlInterface;
+use Imbo\Storage\StorageInterface;
+use Imbo\Image\OutputConverterManager;
+use Imbo\Image\TransformationManager;
+use Imbo\Image\InputLoaderManager;
 
 /**
  * Event interface

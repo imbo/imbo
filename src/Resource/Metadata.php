@@ -1,9 +1,9 @@
 <?php
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception\InvalidArgumentException,
-    Imbo\Model;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Model;
 
 /**
  * Metadata resource

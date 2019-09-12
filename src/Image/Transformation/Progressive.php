@@ -1,11 +1,11 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
-    Imagick,
-    ImagickException;
+use Imbo\Exception\TransformationException;
+use Imbo\EventListener\ListenerInterface;
+use Imbo\EventManager\EventInterface;
+use Imagick;
+use ImagickException;
 
 /**
  * Progressive image transformation

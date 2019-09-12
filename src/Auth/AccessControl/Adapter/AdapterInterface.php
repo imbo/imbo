@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\Auth\AccessControl\Adapter;
 
-use Imbo\Auth\AccessControl\GroupQuery,
-    Imbo\Model\Groups as GroupsModel;
+use Imbo\Auth\AccessControl\GroupQuery;
+use Imbo\Model\Groups as GroupsModel;
 
 /**
  * Access control interface

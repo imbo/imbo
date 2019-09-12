@@ -1,8 +1,8 @@
 <?php
 namespace Imbo;
 
-use Imbo\Version,
-    Symfony\Component\Console\Application as BaseApplication;
+use Imbo\Version;
+use Symfony\Component\Console\Application as BaseApplication;
 
 /**
  * Cli application

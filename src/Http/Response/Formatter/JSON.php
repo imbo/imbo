@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\Http\Response\Formatter;
 
-use Imbo\Model,
-    stdClass;
+use Imbo\Model;
+use stdClass;
 
 /**
  * JSON formatter

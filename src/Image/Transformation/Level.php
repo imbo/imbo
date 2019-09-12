@@ -1,9 +1,9 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException,
-    ImagickException,
-    Imagick;
+use Imbo\Exception\TransformationException;
+use ImagickException;
+use Imagick;
 
 /**
  * Level transformation

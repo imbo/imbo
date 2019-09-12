@@ -1,11 +1,11 @@
 <?php
 namespace Imbo\EventListener\ImageVariations\Database;
 
-use Imbo\Exception\InvalidArgumentException,
-    Doctrine\DBAL\Configuration,
-    Doctrine\DBAL\DriverManager,
-    Doctrine\DBAL\Connection,
-    PDO;
+use Imbo\Exception\InvalidArgumentException;
+use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Connection;
+use PDO;
 
 /**
  * Doctrine 2 database driver for the image variations

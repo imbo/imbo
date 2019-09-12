@@ -1,9 +1,9 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\InvalidArgumentException,
-    Imbo\Exception\TransformationException,
-    ImagickException;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Exception\TransformationException;
+use ImagickException;
 
 /**
  * Clip transformation for making an image transparent outside of a clipping mask

@@ -1,14 +1,14 @@
 <?php
 namespace Imbo\Auth\AccessControl\Adapter;
 
-use Imbo\Exception\DatabaseException,
-    Imbo\Auth\AccessControl\GroupQuery,
-    Imbo\Model\Groups as GroupsModel,
-    Imbo\Helpers\BSONToArray,
-    MongoDB\Client as MongoClient,
-    MongoDB\Collection as MongoCollection,
-    MongoDB\Driver\Exception\Exception as MongoException,
-    MongoDB\BSON\ObjectID as MongoId;
+use Imbo\Exception\DatabaseException;
+use Imbo\Auth\AccessControl\GroupQuery;
+use Imbo\Model\Groups as GroupsModel;
+use Imbo\Helpers\BSONToArray;
+use MongoDB\Client as MongoClient;
+use MongoDB\Collection as MongoCollection;
+use MongoDB\Driver\Exception\Exception as MongoException;
+use MongoDB\BSON\ObjectID as MongoId;
 
 /**
  * MongoDB access control adapter

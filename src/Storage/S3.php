@@ -1,13 +1,13 @@
 <?php
 namespace Imbo\Storage;
 
-use Imbo\Exception\StorageException,
-    Imbo\Helpers\Parameters,
-    Imbo\Exception\ConfigurationException,
-    Aws\S3\S3Client,
-    Aws\S3\Exception\S3Exception,
-    DateTime,
-    DateTimeZone;
+use Imbo\Exception\StorageException;
+use Imbo\Helpers\Parameters;
+use Imbo\Exception\ConfigurationException;
+use Aws\S3\S3Client;
+use Aws\S3\Exception\S3Exception;
+use DateTime;
+use DateTimeZone;
 
 /**
  * Amazon Simple Storage Service storage adapter

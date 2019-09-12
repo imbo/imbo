@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception\StorageException;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception\StorageException;
 
 /**
  * Storage operations event listener

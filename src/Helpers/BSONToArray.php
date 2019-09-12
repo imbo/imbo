@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\Helpers;
 
-use MongoDB\Model\BSONDocument,
-    MongoDB\Model\BSONArray;
+use MongoDB\Model\BSONDocument;
+use MongoDB\Model\BSONArray;
 
 /**
  * Convert BSONDocument and BSONArray to their array counterparts, recursively

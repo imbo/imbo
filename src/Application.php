@@ -1,25 +1,25 @@
 <?php
 namespace Imbo;
 
-use Imbo\Http\Request\Request,
-    Imbo\Http\Response\Response,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\Event,
-    Imbo\EventManager\EventManager,
-    Imbo\Model\Error,
-    Imbo\Auth\AccessControl,
-    Imbo\Auth\AccessControl\Adapter\AdapterInterface as AccessControlInterface,
-    Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter as SimpleAclArrayAdapter,
-    Imbo\Exception\RuntimeException,
-    Imbo\Exception\InvalidArgumentException,
-    Imbo\Database\DatabaseInterface,
-    Imbo\Storage\StorageInterface,
-    Imbo\Http\Response\Formatter,
-    Imbo\Resource\ResourceInterface,
-    Imbo\Image\TransformationManager,
-    Imbo\EventListener\Initializer\InitializerInterface,
-    Imbo\Image\InputLoaderManager,
-    Imbo\Image\OutputConverterManager;
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+use Imbo\EventListener\ListenerInterface;
+use Imbo\EventManager\Event;
+use Imbo\EventManager\EventManager;
+use Imbo\Model\Error;
+use Imbo\Auth\AccessControl;
+use Imbo\Auth\AccessControl\Adapter\AdapterInterface as AccessControlInterface;
+use Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter as SimpleAclArrayAdapter;
+use Imbo\Exception\RuntimeException;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Database\DatabaseInterface;
+use Imbo\Storage\StorageInterface;
+use Imbo\Http\Response\Formatter;
+use Imbo\Resource\ResourceInterface;
+use Imbo\Image\TransformationManager;
+use Imbo\EventListener\Initializer\InitializerInterface;
+use Imbo\Image\InputLoaderManager;
+use Imbo\Image\OutputConverterManager;
 
 /**
  * Imbo application

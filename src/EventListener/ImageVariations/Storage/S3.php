@@ -1,11 +1,11 @@
 <?php
 namespace Imbo\EventListener\ImageVariations\Storage;
 
-use Imbo\Exception\StorageException,
-    Aws\S3\S3Client,
-    Aws\S3\Exception\S3Exception,
-    DateTime,
-    DateTimeZone;
+use Imbo\Exception\StorageException;
+use Aws\S3\S3Client;
+use Aws\S3\Exception\S3Exception;
+use DateTime;
+use DateTimeZone;
 
 /**
  * S3 storage driver for the image variations

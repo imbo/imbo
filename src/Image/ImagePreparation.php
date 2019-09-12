@@ -1,16 +1,16 @@
 <?php
 namespace Imbo\Image;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\Image\Identifier\Generator\GeneratorInterface,
-    Imbo\Exception\ImageException,
-    Imbo\Exception\LoaderException,
-    Imbo\Exception,
-    Imbo\Model\Image,
-    Imagick,
-    ImagickException,
-    finfo;
+use Imbo\EventManager\EventInterface;
+use Imbo\EventListener\ListenerInterface;
+use Imbo\Image\Identifier\Generator\GeneratorInterface;
+use Imbo\Exception\ImageException;
+use Imbo\Exception\LoaderException;
+use Imbo\Exception;
+use Imbo\Model\Image;
+use Imagick;
+use ImagickException;
+use finfo;
 
 /**
  * Image preparation

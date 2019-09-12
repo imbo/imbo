@@ -1,10 +1,10 @@
 <?php
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception\DuplicateImageIdentifierException,
-    Imbo\Exception\ImageException,
-    Imbo\Model;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception\DuplicateImageIdentifierException;
+use Imbo\Exception\ImageException;
+use Imbo\Model;
 
 /**
  * Images resource

@@ -1,12 +1,12 @@
 <?php
 namespace Imbo\Image;
 
-use Imbo\Image\Transformation\Transformation,
-    Imbo\Exception\TransformationException,
-    Imbo\Exception\InvalidArgumentException,
-    Imbo\EventManager\EventInterface,
-    Imbo\EventListener\Initializer\InitializerInterface,
-    Imbo\EventListener\ListenerInterface;
+use Imbo\Image\Transformation\Transformation;
+use Imbo\Exception\TransformationException;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\EventManager\EventInterface;
+use Imbo\EventListener\Initializer\InitializerInterface;
+use Imbo\EventListener\ListenerInterface;
 
 /**
  * Image transformation manager

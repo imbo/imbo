@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\Http\Response\Formatter;
 
-use Imbo\Model,
-    Imbo\Exception\InvalidArgumentException;
+use Imbo\Model;
+use Imbo\Exception\InvalidArgumentException;
 
 /**
  * Interface for formatters

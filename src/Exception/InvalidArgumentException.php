@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\Exception;
 
-use Imbo\Exception,
-    InvalidArgumentException as BaseInvalidArgumentException;
+use Imbo\Exception;
+use InvalidArgumentException as BaseInvalidArgumentException;
 
 /**
  * Invalid argument exception

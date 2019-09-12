@@ -1,9 +1,9 @@
 <?php
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception\RuntimeException,
-    Imbo\Exception;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception\RuntimeException;
+use Imbo\Exception;
 
 /**
  * Authentication event listener

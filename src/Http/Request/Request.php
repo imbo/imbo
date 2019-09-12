@@ -1,10 +1,10 @@
 <?php
 namespace Imbo\Http\Request;
 
-use Imbo\Exception\InvalidArgumentException,
-    Imbo\Model\Image,
-    Imbo\Router\Route,
-    Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Model\Image;
+use Imbo\Router\Route;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 /**
  * Request class

@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\Exception;
 
-use Imbo\Exception,
-    RuntimeException as BaseRuntimeException;
+use Imbo\Exception;
+use RuntimeException as BaseRuntimeException;
 
 /**
  * Runtime exception

@@ -1,14 +1,14 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException,
-    Imbo\Image\InputSizeConstraint,
-    Imbo\Model\Image,
-    Imagick,
-    ImagickPixel,
-    ImagickException,
-    ImagickPixelException,
-    ImagickDraw;
+use Imbo\Exception\TransformationException;
+use Imbo\Image\InputSizeConstraint;
+use Imbo\Model\Image;
+use Imagick;
+use ImagickPixel;
+use ImagickException;
+use ImagickPixelException;
+use ImagickDraw;
 
 /**
  * Border transformation

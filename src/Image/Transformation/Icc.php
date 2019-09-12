@@ -1,10 +1,10 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\ConfigurationException,
-    Imbo\Exception\InvalidArgumentException,
-    Imbo\Exception\TransformationException,
-    ImagickException;
+use Imbo\Exception\ConfigurationException;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Exception\TransformationException;
+use ImagickException;
 
 /**
  * Transformation for applying ICC profiles to an image.

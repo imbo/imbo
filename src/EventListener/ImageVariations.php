@@ -1,13 +1,13 @@
 <?php
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ImageVariations\Database\DatabaseInterface,
-    Imbo\EventListener\ImageVariations\Storage\StorageInterface,
-    Imbo\Exception\InvalidArgumentException,
-    Imbo\Exception\TransformationException,
-    Imbo\Exception\StorageException,
-    Imbo\Exception\DatabaseException;
+use Imbo\EventManager\EventInterface;
+use Imbo\EventListener\ImageVariations\Database\DatabaseInterface;
+use Imbo\EventListener\ImageVariations\Storage\StorageInterface;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Exception\TransformationException;
+use Imbo\Exception\StorageException;
+use Imbo\Exception\DatabaseException;
 
 /**
  * Image variations generator
