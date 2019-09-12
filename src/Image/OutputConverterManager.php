@@ -1,10 +1,10 @@
 <?php
 namespace Imbo\Image;
 
-use Imbo\Exception\InvalidArgumentException,
-    Imbo\Image\OutputConverter\OutputConverterInterface,
-    Imbo\Model\Image,
-    Imagick;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Image\OutputConverter\OutputConverterInterface;
+use Imbo\Model\Image;
+use Imagick;
 
 /**
  * Output converter manager

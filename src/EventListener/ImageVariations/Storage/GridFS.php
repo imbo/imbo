@@ -1,11 +1,11 @@
 <?php
 namespace Imbo\EventListener\ImageVariations\Storage;
 
-use Imbo\Exception\StorageException,
-    MongoDB\Client,
-    MongoDB\GridFS\Database,
-    MongoDB\GridFS\Bucket,
-    MongoDB\Driver\Exception\Exception as MongoDBException;
+use Imbo\Exception\StorageException;
+use MongoDB\Client;
+use MongoDB\GridFS\Database;
+use MongoDB\GridFS\Bucket;
+use MongoDB\Driver\Exception\Exception as MongoDBException;
 
 /**
  * GridFS (MongoDB) database driver for the image variations

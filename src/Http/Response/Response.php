@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\Http\Response;
 
-use Imbo\Model,
-    Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Imbo\Model;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
  * Response object from the server to the client

@@ -1,10 +1,10 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException,
-    Imbo\Image\RegionExtractor,
-    Imbo\Image\InputSizeConstraint,
-    ImagickException;
+use Imbo\Exception\TransformationException;
+use Imbo\Image\RegionExtractor;
+use Imbo\Image\InputSizeConstraint;
+use ImagickException;
 
 /**
  * Crop transformation

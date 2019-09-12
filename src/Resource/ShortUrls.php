@@ -1,10 +1,10 @@
 <?php
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception\InvalidArgumentException,
-    Imbo\Model\ArrayModel,
-    Imbo\Model\Image as ImageModel;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Model\ArrayModel;
+use Imbo\Model\Image as ImageModel;
 
 /**
  * Short URL collection

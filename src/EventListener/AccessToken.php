@@ -2,13 +2,13 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventListener\AccessToken\AccessTokenInterface;
-use Imbo\EventManager\EventInterface,
-    Imbo\Http\Request\Request,
-    Imbo\Exception\RuntimeException,
-    Imbo\Exception\ConfigurationException,
-    Imbo\Helpers\Urls,
-    Imbo\EventListener\AccessToken\SHA256,
-    GuzzleHttp\Psr7;
+use Imbo\EventManager\EventInterface;
+use Imbo\Http\Request\Request;
+use Imbo\Exception\RuntimeException;
+use Imbo\Exception\ConfigurationException;
+use Imbo\Helpers\Urls;
+use Imbo\EventListener\AccessToken\SHA256;
+use GuzzleHttp\Psr7;
 
 /**
  * Access token event listener

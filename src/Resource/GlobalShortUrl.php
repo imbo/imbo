@@ -1,9 +1,9 @@
 <?php
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception\ResourceException,
-    Symfony\Component\HttpFoundation\ParameterBag;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception\ResourceException;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * Global short URL resource

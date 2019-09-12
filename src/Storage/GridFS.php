@@ -1,14 +1,14 @@
 <?php
 namespace Imbo\Storage;
 
-use Imbo\Exception\StorageException,
-    MongoDB\Client,
-    MongoDB\GridFS\Database,
-    MongoDB\GridFS\Bucket,
-    MongoDB\Driver\Exception\Exception as MongoDBException,
-    MongoDB\Driver\Command,
-    DateTime,
-    DateTimeZone;
+use Imbo\Exception\StorageException;
+use MongoDB\Client;
+use MongoDB\GridFS\Database;
+use MongoDB\GridFS\Bucket;
+use MongoDB\Driver\Exception\Exception as MongoDBException;
+use MongoDB\Driver\Command;
+use DateTime;
+use DateTimeZone;
 
 /**
  * GridFS (MongoDB) storage driver for images

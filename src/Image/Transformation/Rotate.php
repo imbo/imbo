@@ -1,10 +1,10 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException,
-    Imbo\Image\InputSizeConstraint,
-    ImagickException,
-    ImagickPixelException;
+use Imbo\Exception\TransformationException;
+use Imbo\Image\InputSizeConstraint;
+use ImagickException;
+use ImagickPixelException;
 
 /**
  * Rotate transformation

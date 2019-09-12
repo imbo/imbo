@@ -1,10 +1,10 @@
 <?php
 namespace Imbo\Model;
 
-use Imbo\Exception,
-    Imbo\Http\Request\Request,
-    DateTimeZone,
-    DateTime;
+use Imbo\Exception;
+use Imbo\Http\Request\Request;
+use DateTimeZone;
+use DateTime;
 
 /**
  * Error model

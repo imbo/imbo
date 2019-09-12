@@ -1,10 +1,10 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\Transformation\Transformation,
-    Imbo\Exception\TransformationException,
-    Imagick,
-    ImagickException;
+use Imbo\Image\Transformation\Transformation;
+use Imbo\Exception\TransformationException;
+use Imagick;
+use ImagickException;
 
 /**
  * Vignette transformation

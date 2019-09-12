@@ -1,11 +1,11 @@
 <?php
 namespace Imbo\Http\Response;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\Model,
-    Imbo\Exception,
-    Symfony\Component\HttpFoundation\AcceptHeader;
+use Imbo\EventManager\EventInterface;
+use Imbo\EventListener\ListenerInterface;
+use Imbo\Model;
+use Imbo\Exception;
+use Symfony\Component\HttpFoundation\AcceptHeader;
 
 /**
  * This event listener will correctly format the response body based on the Accept headers in the

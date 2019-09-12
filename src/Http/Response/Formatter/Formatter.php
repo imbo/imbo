@@ -1,9 +1,9 @@
 <?php
 namespace Imbo\Http\Response\Formatter;
 
-use Imbo\Model,
-    Imbo\Helpers\DateFormatter,
-    Imbo\Exception\InvalidArgumentException;
+use Imbo\Model;
+use Imbo\Helpers\DateFormatter;
+use Imbo\Exception\InvalidArgumentException;
 
 /**
  * Abstract formatter

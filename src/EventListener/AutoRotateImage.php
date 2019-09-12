@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerInterface;
+use Imbo\EventManager\EventInterface;
+use Imbo\EventListener\ListenerInterface;
 
 /**
  * Auto rotate event listener

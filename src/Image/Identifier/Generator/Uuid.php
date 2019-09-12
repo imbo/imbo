@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\Image\Identifier\Generator;
 
-use Imbo\Model\Image,
-    Ramsey\Uuid\Uuid as UuidFactory;
+use Imbo\Model\Image;
+use Ramsey\Uuid\Uuid as UuidFactory;
 
 /**
  * UUID image identifier generator

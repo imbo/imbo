@@ -1,11 +1,11 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException,
-    Imbo\Image\InputSizeConstraint,
-    Imagick,
-    ImagickException,
-    ImagickPixelException;
+use Imbo\Exception\TransformationException;
+use Imbo\Image\InputSizeConstraint;
+use Imagick;
+use ImagickException;
+use ImagickPixelException;
 
 /**
  * Automatic rotate transformation. Rotates and flips the image

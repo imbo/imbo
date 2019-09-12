@@ -1,10 +1,10 @@
 <?php
 namespace Imbo\EventListener\ImageVariations\Database;
 
-use Imbo\Exception\DatabaseException,
-    MongoDB\Client as MongoClient,
-    MonboDB\Collection as MongoCollection,
-    MongoDB\Driver\Exception\Exception as MongoException;
+use Imbo\Exception\DatabaseException;
+use MongoDB\Client as MongoClient;
+use MonboDB\Collection as MongoCollection;
+use MongoDB\Driver\Exception\Exception as MongoException;
 
 /**
  * MongoDB database driver for the image variations

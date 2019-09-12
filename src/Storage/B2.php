@@ -2,13 +2,13 @@
 namespace Imbo\Storage;
 
 use Imbo\Exception\ConfigurationException;
-use Imbo\Exception\StorageException,
-    Imbo\Exception\InvalidArgumentException,
-    ChrisWhite\B2\Client,
-    ChrisWhite\B2\Exceptions\NotFoundException,
-    DateTime,
-    DateTimeZone,
-    Imbo\Helpers\Parameters;
+use Imbo\Exception\StorageException;
+use Imbo\Exception\InvalidArgumentException;
+use ChrisWhite\B2\Client;
+use ChrisWhite\B2\Exceptions\NotFoundException;
+use DateTime;
+use DateTimeZone;
+use Imbo\Helpers\Parameters;
 
 /**
  * Backblaze B2 Cloud Storage adapter

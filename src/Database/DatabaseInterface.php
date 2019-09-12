@@ -1,11 +1,11 @@
 <?php
 namespace Imbo\Database;
 
-use Imbo\Model\Image,
-    Imbo\Model\Images,
-    Imbo\Resource\Images\Query,
-    Imbo\Exception\DatabaseException,
-    DateTime;
+use Imbo\Model\Image;
+use Imbo\Model\Images;
+use Imbo\Resource\Images\Query;
+use Imbo\Exception\DatabaseException;
+use DateTime;
 
 /**
  * Database adapter interface

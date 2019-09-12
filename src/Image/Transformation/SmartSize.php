@@ -1,9 +1,9 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\RegionExtractor,
-    Imbo\Exception\TransformationException,
-    ImagickException;
+use Imbo\Image\RegionExtractor;
+use Imbo\Exception\TransformationException;
+use ImagickException;
 
 /**
  * SmartSize transformation

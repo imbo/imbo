@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Model;
+use Imbo\EventManager\EventInterface;
+use Imbo\Model;
 
 /**
  * Image resource

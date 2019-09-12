@@ -1,10 +1,10 @@
 <?php
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\Exception\RuntimeException,
-    Imbo\Exception\DatabaseException;
+use Imbo\EventManager\EventInterface;
+use Imbo\EventListener\ListenerInterface;
+use Imbo\Exception\RuntimeException;
+use Imbo\Exception\DatabaseException;
 
 /**
  * Exif metadata event listener

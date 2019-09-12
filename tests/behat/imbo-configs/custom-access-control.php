@@ -1,8 +1,8 @@
 <?php
-use Imbo\Auth\AccessControl\Adapter\AdapterInterface,
-    Imbo\Auth\AccessControl\Adapter\AbstractAdapter,
-    Imbo\Auth\AccessControl\GroupQuery,
-    Imbo\Model\Groups as GroupsModel;
+use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
+use Imbo\Auth\AccessControl\Adapter\AbstractAdapter;
+use Imbo\Auth\AccessControl\GroupQuery;
+use Imbo\Model\Groups as GroupsModel;
 
 /**
  * Use a custom user lookup implementation

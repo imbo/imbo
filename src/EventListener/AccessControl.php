@@ -1,11 +1,11 @@
 <?php
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception\RuntimeException,
-    Imbo\Auth\AccessControl\GroupQuery,
-    Imbo\Model\Groups as GroupsModel,
-    Imbo\Resource;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception\RuntimeException;
+use Imbo\Auth\AccessControl\GroupQuery;
+use Imbo\Model\Groups as GroupsModel;
+use Imbo\Resource;
 
 /**
  * Access control event listener

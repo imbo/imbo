@@ -1,9 +1,9 @@
 <?php
 namespace Imbo\EventListener\Initializer;
 
-use Imbo\Image\Transformation\Transformation,
-    Imbo\EventListener\ImagickAware,
-    Imbo\EventListener\ListenerInterface;
+use Imbo\Image\Transformation\Transformation;
+use Imbo\EventListener\ImagickAware;
+use Imbo\EventListener\ListenerInterface;
 
 /**
  * Imagick initializer

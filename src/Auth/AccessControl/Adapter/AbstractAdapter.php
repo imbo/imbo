@@ -1,10 +1,10 @@
 <?php
 namespace Imbo\Auth\AccessControl\Adapter;
 
-use Imbo\Auth\AccessControl\Adapter\AdapterInterface,
-    Imbo\Auth\AccessControl\GroupQuery,
-    Imbo\Exception\InvalidArgumentException,
-    Imbo\Model\Groups as GroupsModel;
+use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
+use Imbo\Auth\AccessControl\GroupQuery;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Model\Groups as GroupsModel;
 
 /**
  * Abstract access control adapter

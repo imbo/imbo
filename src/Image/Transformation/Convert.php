@@ -1,9 +1,9 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imbo\Model\Image,
-    Imbo\Exception\TransformationException,
-    ImagickException;
+use Imbo\Model\Image;
+use Imbo\Exception\TransformationException;
+use ImagickException;
 
 /**
  * Convert transformation

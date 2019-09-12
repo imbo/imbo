@@ -1,9 +1,9 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException,
-    Imbo\Image\InputSizeConstraint,
-    ImagickException;
+use Imbo\Exception\TransformationException;
+use Imbo\Image\InputSizeConstraint;
+use ImagickException;
 
 /**
  * MaxSize transformation

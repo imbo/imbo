@@ -1,10 +1,10 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException,
-    Imagick,
-    ImagickException,
-    ImagickDraw;
+use Imbo\Exception\TransformationException;
+use Imagick;
+use ImagickException;
+use ImagickDraw;
 
 /**
  * Draw POIs (points of interest) transformation

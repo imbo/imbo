@@ -1,12 +1,12 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException,
-    Imagick,
-    ImagickDraw,
-    ImagickPixel,
-    ImagickException,
-    ImagickPixelException;
+use Imbo\Exception\TransformationException;
+use Imagick;
+use ImagickDraw;
+use ImagickPixel;
+use ImagickException;
+use ImagickPixelException;
 
 /**
  * Histogram transformation

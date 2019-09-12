@@ -1,9 +1,9 @@
 <?php
 namespace Imbo\Image;
 
-use Imbo\Image\InputLoader\InputLoaderInterface,
-    Imbo\Exception\InvalidArgumentException,
-    Imagick;
+use Imbo\Image\InputLoader\InputLoaderInterface;
+use Imbo\Exception\InvalidArgumentException;
+use Imagick;
 
 /**
  * Loader manager

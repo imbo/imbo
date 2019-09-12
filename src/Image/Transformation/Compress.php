@@ -1,10 +1,10 @@
 <?php
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException,
-    Imbo\EventListener\ListenerInterface,
-    Imbo\EventManager\EventInterface,
-    ImagickException;
+use Imbo\Exception\TransformationException;
+use Imbo\EventListener\ListenerInterface;
+use Imbo\EventManager\EventInterface;
+use ImagickException;
 
 /**
  * Compression transformation

@@ -1,14 +1,14 @@
 <?php
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Http\Request\Request,
-    Imbo\Model\Image,
-    Imbo\Exception\StorageException,
-    Imbo\Exception\InvalidArgumentException,
-    Symfony\Component\HttpFoundation\ResponseHeaderBag,
-    RecursiveDirectoryIterator,
-    RecursiveIteratorIterator;
+use Imbo\EventManager\EventInterface;
+use Imbo\Http\Request\Request;
+use Imbo\Model\Image;
+use Imbo\Exception\StorageException;
+use Imbo\Exception\InvalidArgumentException;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 /**
  * Image transformation cache

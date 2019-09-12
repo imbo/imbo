@@ -1,9 +1,9 @@
 <?php
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Resource\Images\Query as ImagesQuery,
-    Imbo\Model;
+use Imbo\EventManager\EventInterface;
+use Imbo\Resource\Images\Query as ImagesQuery;
+use Imbo\Model;
 
 /**
  * Database operations event listener

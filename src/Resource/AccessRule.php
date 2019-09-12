@@ -1,11 +1,11 @@
 <?php
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception\RuntimeException,
-    Imbo\Exception\ResourceException,
-    Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface,
-    Imbo\Model\AccessRule as AccessRuleModel;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception\RuntimeException;
+use Imbo\Exception\ResourceException;
+use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
+use Imbo\Model\AccessRule as AccessRuleModel;
 
 /**
  * Access rule resource

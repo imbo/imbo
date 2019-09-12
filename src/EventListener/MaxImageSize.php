@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\EventListener\ListenerInterface;
+use Imbo\EventManager\EventInterface;
+use Imbo\EventListener\ListenerInterface;
 
 /**
  * Max image size event listener

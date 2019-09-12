@@ -1,8 +1,8 @@
 <?php
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface,
-    Imbo\Exception\RuntimeException;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception\RuntimeException;
 
 /**
  * Global images resource
