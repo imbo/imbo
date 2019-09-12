@@ -43,7 +43,7 @@ class MetadataTest extends ResourceTests {
     /**
      * Set up the resource
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->request = $this->createMock('Imbo\Http\Request\Request');
         $this->response = $this->createMock('Imbo\Http\Response\Response');
         $this->database = $this->createMock('Imbo\Database\DatabaseInterface');

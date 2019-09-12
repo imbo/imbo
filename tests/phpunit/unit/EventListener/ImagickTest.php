@@ -32,7 +32,7 @@ class ImagickTest extends ListenerTests {
     /**
      * Set up the listener
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->request = $this->createMock('Imbo\Http\Request\Request');
         $this->response = $this->createMock('Imbo\Http\Response\Response');
         $this->transformationManager = $this->createMock('Imbo\Image\TransformationManager');

@@ -39,7 +39,7 @@ class AddPublicKeyTest extends TestCase {
      *
      * @covers Imbo\CliCommand\AddPublicKey::__construct
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->adapter = $this->createMock('Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface');
 
         $this->command = new AddPublicKey();

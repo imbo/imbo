@@ -29,7 +29,7 @@ class RequestTest extends TestCase {
     /**
      * Set up the request
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->request = new Request();
     }
 

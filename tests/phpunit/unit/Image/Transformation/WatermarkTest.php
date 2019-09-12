@@ -29,7 +29,7 @@ class WatermarkTest extends TestCase {
     /**
      * Set up the transformation
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->transformation = new Watermark();
     }
 

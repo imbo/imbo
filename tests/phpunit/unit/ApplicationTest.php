@@ -31,7 +31,7 @@ class ApplicationTest extends TestCase {
     /**
      * Set up the application
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->application = new Application();
     }
 

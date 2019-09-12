@@ -31,7 +31,7 @@ class ResponseTest extends TestCase {
     /**
      * Set up the response
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->response = new Response();
     }
 

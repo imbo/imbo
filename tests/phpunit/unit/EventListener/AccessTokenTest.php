@@ -67,7 +67,7 @@ class AccessTokenTest extends ListenerTests {
     /**
      * Set up the listener
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->query = $this->createMock(ParameterBag::class);
 
         $this->accessControl = $this->createMock(AccessControlAdapter::class);

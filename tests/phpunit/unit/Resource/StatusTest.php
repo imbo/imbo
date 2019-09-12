@@ -38,7 +38,7 @@ class StatusTest extends ResourceTests {
     /**
      * Set up the resource
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->response = $this->createMock('Imbo\Http\Response\Response');
         $this->database = $this->createMock('Imbo\Database\DatabaseInterface');
         $this->storage = $this->createMock('Imbo\Storage\StorageInterface');

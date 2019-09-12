@@ -33,7 +33,7 @@ class JSONTest extends TestCase {
      *
      * @covers Imbo\Http\Response\Formatter\Formatter::__construct
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->dateFormatter = $this->createMock('Imbo\Helpers\DateFormatter');
         $this->formatter = new JSON($this->dateFormatter);
     }

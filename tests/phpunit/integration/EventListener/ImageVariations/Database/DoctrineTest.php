@@ -39,7 +39,7 @@ class DoctrineTest extends DatabaseTests {
      * Make sure we have the PDO and pdo_sqlite extension available and create a new in-memory
      * table for every test
      */
-    public function setUp() {
+    public function setUp() : void {
         if (!extension_loaded('PDO')) {
             $this->markTestSkipped('PDO is required to run this test');
         }

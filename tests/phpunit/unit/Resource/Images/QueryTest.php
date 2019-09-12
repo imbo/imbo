@@ -28,7 +28,7 @@ class QueryTest extends TestCase {
     /**
      * Set up the query
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->query = new Query();
     }
 

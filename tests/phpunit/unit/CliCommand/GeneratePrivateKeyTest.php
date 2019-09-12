@@ -32,7 +32,7 @@ class GeneratePrivateKeyTest extends TestCase {
      *
      * @covers Imbo\CliCommand\GeneratePrivateKey::__construct
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->command = new GeneratePrivateKey();
 
         $application = new Application();

@@ -27,7 +27,7 @@ class ContrastTest extends TestCase {
     /**
      * Set up the transformation instance
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->transformation = new Contrast();
     }
 

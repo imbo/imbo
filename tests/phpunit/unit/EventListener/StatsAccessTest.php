@@ -33,7 +33,7 @@ class StatsAccessTest extends ListenerTests {
     /**
      * Set up the listener
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->request = $this->createMock('Imbo\Http\Request\Request');
 
         $this->event = $this->createMock('Imbo\EventManager\Event');

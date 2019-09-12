@@ -30,7 +30,7 @@ class RouterTest extends TestCase {
     /**
      * Set up the router instance
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->router = new Router();
         $this->request = $this->getMockBuilder('Imbo\Http\Request\Request')
                               ->setMethods(['getPathInfo', 'getMethod'])

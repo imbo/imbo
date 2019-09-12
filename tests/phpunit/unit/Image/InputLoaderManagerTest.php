@@ -29,7 +29,7 @@ class InputLoaderManagerTest extends TestCase {
     /**
      * Set up the manager
      */
-    public function setup() {
+    public function setUp() : void {
         $this->manager = new InputLoaderManager();
     }
 

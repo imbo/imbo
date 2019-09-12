@@ -34,7 +34,7 @@ class EventManagerTest extends TestCase {
     /**
      * Set up the event manager
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->request = $this->createMock('Imbo\Http\Request\Request');
         $this->event = new Event(['request' => $this->request]);
         $this->manager = new EventManager();

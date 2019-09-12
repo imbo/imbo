@@ -37,7 +37,7 @@ class S3Test extends StorageTests {
     /**
      * Make sure we have the correct config available
      */
-    public function setUp() {
+    public function setUp() : void {
         foreach (['AWS_S3_KEY', 'AWS_S3_SECRET', 'AWS_S3_BUCKET'] as $key) {
             if (empty($GLOBALS[$key])) {
                 $this->markTestSkipped('This test needs the ' . $key . ' value to be set in phpunit.xml');

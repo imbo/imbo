@@ -38,7 +38,7 @@ class DoctrineTest extends TestCase {
     /**
      * Set up the driver
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->driver = $this->getMockBuilder(Doctrine::class)
                              ->disableOriginalConstructor()
                              ->setMethods(['getConnection'])

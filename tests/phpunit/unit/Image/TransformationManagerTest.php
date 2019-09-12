@@ -27,7 +27,7 @@ class TransformationManagerTest extends TestCase {
     protected $query;
     protected $image;
 
-    public function setUp() {
+    public function setUp() : void {
         $this->config = require __DIR__ . '/../../../../config/config.default.php';
         $this->manager = new TransformationManager();
         $this->manager->addTransformations($this->config['transformations']);

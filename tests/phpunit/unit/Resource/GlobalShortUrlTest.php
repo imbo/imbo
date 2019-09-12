@@ -67,7 +67,7 @@ class GlobalShortUrlTest extends ResourceTests {
     /**
      * Set up the resource
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);

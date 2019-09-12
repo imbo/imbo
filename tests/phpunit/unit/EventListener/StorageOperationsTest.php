@@ -35,7 +35,7 @@ class StorageOperationsTest extends ListenerTests {
     /**
      * Set up the listener
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->response = $this->createMock('Imbo\Http\Response\Response');
         $this->request = $this->createMock('Imbo\Http\Request\Request');
         $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));

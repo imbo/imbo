@@ -33,7 +33,7 @@ class EventTest extends TestCase {
     /**
      * Set up the event instance
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->event = new Event();
     }
 

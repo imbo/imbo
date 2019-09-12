@@ -25,7 +25,7 @@ class BasicTest extends TestCase {
     /**
      * Set up the loader
      */
-    public function setup() {
+    public function setUp() : void {
         $this->loader = new Basic();
     }
 

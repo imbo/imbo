@@ -27,7 +27,7 @@ class GroupQueryTest extends TestCase {
     /**
      * Set up
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->query = new GroupQuery();
     }
 

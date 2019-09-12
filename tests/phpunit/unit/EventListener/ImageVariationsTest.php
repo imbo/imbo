@@ -67,7 +67,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * Set up the listener
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->db = $this->createMock('Imbo\EventListener\ImageVariations\Database\DatabaseInterface');
         $this->storage = $this->createMock('Imbo\EventListener\ImageVariations\Storage\StorageInterface');
 

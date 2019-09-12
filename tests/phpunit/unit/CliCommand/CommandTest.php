@@ -27,7 +27,7 @@ class CliCommandTest extends TestCase {
     /**
      * Set up the command
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->command = $this->getMockBuilder('Imbo\CliCommand\CliCommand')->disableOriginalConstructor()->getMockForAbstractClass();
     }
 

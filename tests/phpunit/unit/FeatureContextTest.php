@@ -81,7 +81,7 @@ class FeatureContextTest extends TestCase {
     /**
      * Set up the feature context
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->history = [];
 
         $this->mockHandler = new MockHandler();

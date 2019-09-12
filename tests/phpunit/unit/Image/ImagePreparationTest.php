@@ -40,7 +40,7 @@ class ImagePreparationTest extends TestCase {
     /**
      * Set up the image preparation instance
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->request = $this->createMock('Imbo\Http\Request\Request');
         $this->response = $this->createMock('Imbo\Http\Response\Response');
         $this->event = $this->createMock('Imbo\EventManager\Event');
