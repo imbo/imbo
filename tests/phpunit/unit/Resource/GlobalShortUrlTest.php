@@ -12,10 +12,7 @@ use Imbo\Router\Route;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
- * @covers Imbo\Resource\GlobalShortUrl
  * @coversDefaultClass Imbo\Resource\GlobalShortUrl
- * @group unit
- * @group resources
  */
 class GlobalShortUrlTest extends ResourceTests {
     /**

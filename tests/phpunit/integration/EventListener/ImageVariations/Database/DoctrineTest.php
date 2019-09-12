@@ -5,10 +5,7 @@ use Imbo\EventListener\ImageVariations\Database\Doctrine;
 use PDO;
 
 /**
- * @covers Imbo\EventListener\ImageVariations\Database\Doctrine
- * @group integration
- * @group database
- * @group doctrine
+ * @coversDefaultClass Imbo\EventListener\ImageVariations\Database\Doctrine
  */
 class DoctrineTest extends DatabaseTests {
     /**

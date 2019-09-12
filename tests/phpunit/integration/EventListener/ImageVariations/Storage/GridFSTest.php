@@ -5,10 +5,7 @@ use Imbo\EventListener\ImageVariations\Storage\GridFS;
 use MongoDB\Client;
 
 /**
- * @covers Imbo\EventListener\ImageVariations\Storage\GridFS
- * @group integration
- * @group storage
- * @group mongodb
+ * @coversDefaultClass Imbo\EventListener\ImageVariations\Storage\GridFS
  */
 class GridFSTest extends StorageTests {
     /**

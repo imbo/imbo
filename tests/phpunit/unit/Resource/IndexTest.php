@@ -5,8 +5,6 @@ use Imbo\Resource\Index;
 
 /**
  * @coversDefaultClass Imbo\Resource\Index
- * @group unit
- * @group resources
  */
 class IndexTest extends ResourceTests {
     /**

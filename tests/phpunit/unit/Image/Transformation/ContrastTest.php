@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Contrast;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Image\Transformation\Contrast
- * @group unit
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Contrast
  */
 class ContrastTest extends TestCase {
     /**

@@ -7,9 +7,7 @@ use ImagickException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Image\Transformation\Strip
- * @group unit
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Strip
  */
 class StripTest extends TestCase {
     public function testThrowsCorrectExceptionWhenAnErrorOccurs() {

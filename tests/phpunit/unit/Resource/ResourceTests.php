@@ -3,10 +3,6 @@ namespace ImboUnitTest\Resource;
 
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group unit
- * @group resources
- */
 abstract class ResourceTests extends TestCase {
     /**
      * Return a resource that can be tested

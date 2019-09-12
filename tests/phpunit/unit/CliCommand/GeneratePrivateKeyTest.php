@@ -8,9 +8,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\CliCommand\GeneratePrivateKey
- * @group unit-cli
- * @group cli-commands
+ * @coversDefaultClass Imbo\CliCommand\GeneratePrivateKey
  */
 class GeneratePrivateKeyTest extends TestCase {
     /**

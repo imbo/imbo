@@ -12,8 +12,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Icc
- * @group unit
- * @group transformations
  */
 class IccTest extends TestCase {
     /**

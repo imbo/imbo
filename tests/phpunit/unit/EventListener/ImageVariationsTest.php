@@ -13,9 +13,7 @@ use PHPUnit\Framework\Error\Error;
 use PHPUnit\Framework\Error\Warning;
 
 /**
- * @covers Imbo\EventListener\ImageVariations
- * @group unit
- * @group listeners
+ * @coversDefaultClass Imbo\EventListener\ImageVariations
  */
 class ImageVariationsTest extends ListenerTests {
     /**
@@ -102,7 +100,7 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::__construct
+     * @covers ::__construct
      */
     public function testThrowsOnInvalidScaleFactor() {
         $this->expectExceptionObject(new InvalidArgumentException('Scale factor must be below 1', 503));
@@ -118,8 +116,8 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::__construct
-     * @covers Imbo\EventListener\ImageVariations::configureDatabase
+     * @covers ::__construct
+     * @covers ::configureDatabase
      */
     public function testThrowsOnMissingDatabaseAdapter() {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -132,8 +130,8 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::__construct
-     * @covers Imbo\EventListener\ImageVariations::configureDatabase
+     * @covers ::__construct
+     * @covers ::configureDatabase
      */
     public function testThrowsOnInvalidDatabaseFromCallable() {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -147,8 +145,8 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::__construct
-     * @covers Imbo\EventListener\ImageVariations::configureDatabase
+     * @covers ::__construct
+     * @covers ::configureDatabase
      */
     public function testThrowsOnInvalidDatabaseFromString() {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -162,8 +160,8 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::__construct
-     * @covers Imbo\EventListener\ImageVariations::configureStorage
+     * @covers ::__construct
+     * @covers ::configureStorage
      */
     public function testThrowsOnMissingStorageAdapter() {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -176,8 +174,8 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::__construct
-     * @covers Imbo\EventListener\ImageVariations::configureStorage
+     * @covers ::__construct
+     * @covers ::configureStorage
      */
     public function testThrowsOnInvalidStorageFromCallable() {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -191,8 +189,8 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::__construct
-     * @covers Imbo\EventListener\ImageVariations::configureStorage
+     * @covers ::__construct
+     * @covers ::configureStorage
      */
     public function testThrowsOnInvalidStorageFromString() {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -206,7 +204,7 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::chooseVariation
+     * @covers ::chooseVariation
      */
     public function testFallsBackIfNoTransformationsAreApplied() {
         $this->request->expects($this->any())->method('getTransformations')->will($this->returnValue([]));
@@ -216,7 +214,7 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::chooseVariation
+     * @covers ::chooseVariation
      */
     public function testFallsBackIfNoRelevantTransformationsApplied() {
         $width  = 1024;
@@ -235,7 +233,7 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::chooseVariation
+     * @covers ::chooseVariation
      */
     public function testFallsBackIfSizeIsLargerThanOriginal() {
         $width  = 1024;
@@ -254,7 +252,7 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::chooseVariation
+     * @covers ::chooseVariation
      */
     public function testFallsBackIfDatabaseDoesNotReturnAnyVariation() {
         $width  = 1024;
@@ -279,7 +277,7 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::chooseVariation
+     * @covers ::chooseVariation
      */
     public function testTriggersWarningIfVariationFoundInDbButNotStorage() {
         $width  = 1024;
@@ -329,7 +327,7 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::chooseVariation
+     * @covers ::chooseVariation
      */
     public function testUpdatesResponseAndImageModelOnSuccess() {
         $width  = 1024;
@@ -390,7 +388,7 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::deleteVariations
+     * @covers ::deleteVariations
      */
     public function testTriggersWarningOnFailedDeleteFromDatabase() {
         $this->db->expects($this->once())->method('deleteImageVariations')->with(
@@ -407,7 +405,7 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::deleteVariations
+     * @covers ::deleteVariations
      */
     public function testTriggersWarningOnFailedDeleteFromStorage() {
         $this->storage->expects($this->once())->method('deleteImageVariations')->with(
@@ -424,7 +422,7 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::deleteVariations
+     * @covers ::deleteVariations
      */
     public function testDoesNotTriggerWarningsOnSuccessfulVariationsDelete() {
         $this->db->expects($this->once())->method('deleteImageVariations')->with(
@@ -441,7 +439,7 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::generateVariations
+     * @covers ::generateVariations
      */
     public function testGenerateVariationsCallsStoreImageVariationForEveryWidth() {
         $listener = new ImageVariations([
@@ -470,7 +468,7 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::generateVariations
+     * @covers ::generateVariations
      */
     public function testGenerateVariationsWithLosslessParamTriggersPngConversion() {
         $listener = new ImageVariations([
@@ -496,7 +494,7 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::generateVariations
+     * @covers ::generateVariations
      */
     public function testGenerateVariationsAutoScalesRespectingMaxMinWidth() {
         $listener = new ImageVariations([
@@ -523,7 +521,7 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::generateVariations
+     * @covers ::generateVariations
      */
     public function testGenerateVariationsIncludesSpecifiedWidths() {
         $listener = new ImageVariations([
@@ -547,7 +545,7 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::generateVariations
+     * @covers ::generateVariations
      */
     public function testGenerateVariationsTriggersWarningOnTransformationException() {
         $this->imageModel->method('getWidth')->willReturn(1024);
@@ -570,7 +568,7 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::generateVariations
+     * @covers ::generateVariations
      */
     public function testGenerateVariationsTriggersWarningOnStorageException() {
         $this->imageModel->method('getWidth')->willReturn(1024);
@@ -588,7 +586,7 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations::generateVariations
+     * @covers ::generateVariations
      */
     public function testGenerateVariationsTriggersWarningOnDatabaseException() {
         $this->imageModel->method('getWidth')->willReturn(1024);

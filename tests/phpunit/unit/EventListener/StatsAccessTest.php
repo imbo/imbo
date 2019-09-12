@@ -8,9 +8,7 @@ use Imbo\Exception\RuntimeException;
 use ReflectionProperty;
 
 /**
- * @covers Imbo\EventListener\StatsAccess
- * @group unit
- * @group listeners
+ * @coversDefaultClass Imbo\EventListener\StatsAccess
  */
 class StatsAccessTest extends ListenerTests {
     /**
@@ -41,7 +39,7 @@ class StatsAccessTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\StatsAccess::checkAccess
+     * @covers ::checkAccess
      */
     public function testDoesNotAllowAnyIpAddressPerDefault() {
         $this->expectExceptionObject(new RuntimeException('Access denied', 403));

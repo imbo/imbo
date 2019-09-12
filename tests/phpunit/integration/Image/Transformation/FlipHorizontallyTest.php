@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\FlipHorizontally;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\FlipHorizontally
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\FlipHorizontally
  */
 class FlipHorizontallyTest extends TransformationTests {
     /**
@@ -18,7 +16,7 @@ class FlipHorizontallyTest extends TransformationTests {
     }
 
     /**
-     * @covers Imbo\Image\Transformation\FlipHorizontally::transform
+     * @covers ::transform
      */
     public function testCanFlipTheImage() {
         $image = $this->createMock('Imbo\Model\Image');

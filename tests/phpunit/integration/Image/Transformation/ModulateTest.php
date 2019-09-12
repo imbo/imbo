@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Modulate;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\Modulate
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Modulate
  */
 class ModulateTest extends TransformationTests {
     /**

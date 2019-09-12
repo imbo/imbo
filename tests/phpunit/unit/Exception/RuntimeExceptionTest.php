@@ -5,9 +5,7 @@ use Imbo\Exception\RuntimeException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Exception\RuntimeException
- * @group unit
- * @group exceptions
+ * @coversDefaultClass Imbo\Exception\RuntimeException
  */
 class RuntimeExceptionTest extends TestCase {
     /**

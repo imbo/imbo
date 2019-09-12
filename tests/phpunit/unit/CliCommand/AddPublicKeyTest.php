@@ -10,9 +10,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\CliCommand\AddPublicKey
- * @group unit-cli
- * @group cli-commands
+ * @coversDefaultClass Imbo\CliCommand\AddPublicKey
  */
 class AddPublicKeyTest extends TestCase {
     /**

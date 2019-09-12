@@ -12,10 +12,7 @@ use ImagickException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Image\Transformation\Clip
  * @coversDefaultClass Imbo\Image\Transformation\Clip
- * @group unit
- * @group transformations
  */
 class ClipTest extends TestCase {
     /**

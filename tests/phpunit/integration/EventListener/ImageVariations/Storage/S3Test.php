@@ -6,10 +6,8 @@ use ImboIntegrationTest\Storage\S3Test as S3TestMain;
 use Aws\S3\S3Client;
 
 /**
- * @covers Imbo\EventListener\ImageVariations\Storage\S3
- * @group integration
- * @group storage
- * @group aws
+ * @coversDefaultClass Imbo\EventListener\ImageVariations\Storage\S3
+ * @group local
  */
 class S3Test extends StorageTests {
     /**

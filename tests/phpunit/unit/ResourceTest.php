@@ -5,8 +5,7 @@ use Imbo\Resource;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Resource
- * @group unit
+ * @coversDefaultClass Imbo\Resource
  */
 class ResourceTest extends TestCase {
     public function testMethodsReturnsArrays() {

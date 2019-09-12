@@ -6,9 +6,7 @@ use Imbo\Exception\TransformationException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Image\Transformation\Crop
- * @group unit
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Crop
  */
 class CropTest extends TestCase {
     /**

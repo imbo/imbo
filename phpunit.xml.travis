@@ -25,8 +25,7 @@
 
   <groups>
     <exclude>
-      <group>aws</group>
-      <group>backblaze</group>
+      <group>local</group>
     </exclude>
   </groups>
 </phpunit>

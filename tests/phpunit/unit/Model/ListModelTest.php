@@ -5,9 +5,7 @@ use Imbo\Model\ListModel;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Model\ListModel
- * @group unit
- * @group models
+ * @coversDefaultClass Imbo\Model\ListModel
  */
 class ListModelTest extends TestCase {
     /**

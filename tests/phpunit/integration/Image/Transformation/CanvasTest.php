@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Canvas;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\Canvas
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Canvas
  */
 class CanvasTest extends TransformationTests {
     /**

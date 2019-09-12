@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Resize;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\Resize
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Resize
  */
 class ResizeTest extends TransformationTests {
     /**
@@ -51,7 +49,7 @@ class ResizeTest extends TransformationTests {
 
     /**
      * @dataProvider getResizeParams
-     * @covers Imbo\Image\Transformation\Resize::transform
+     * @covers ::transform
      */
     public function testCanTransformImage($params, $transformation, $resizedWidth = null, $resizedHeight = null) {
         $image = $this->createMock('Imbo\Model\Image');

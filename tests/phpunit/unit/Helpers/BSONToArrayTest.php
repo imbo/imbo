@@ -7,9 +7,7 @@ use MongoDB\Model\BSONDocument;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Helpers\BSONToArray
- * @group unit
- * @group helpers
+ * @coversDefaultClass Imbo\Helpers\BSONToArray
  */
 class BSONToArrayTest extends TestCase {
     /**

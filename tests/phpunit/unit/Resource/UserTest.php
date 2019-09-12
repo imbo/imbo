@@ -7,8 +7,6 @@ use DateTimeZone;
 
 /**
  * @coversDefaultClass Imbo\Resource\User
- * @group unit
- * @group resources
  */
 class UserTest extends ResourceTests {
     /**

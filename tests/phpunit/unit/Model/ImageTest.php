@@ -7,9 +7,7 @@ use DateTime;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Model\Image
- * @group unit
- * @group models
+ * @coversDefaultClass Imbo\Model\Image
  */
 class ImageTest extends TestCase {
     /**

@@ -5,9 +5,7 @@ use Imbo\Storage\Filesystem;
 use Imbo\Exception\StorageException;
 
 /**
- * @covers Imbo\Storage\Filesystem
- * @group integration
- * @group storage
+ * @coversDefaultClass Imbo\Storage\Filesystem
  */
 class FilesystemTest extends StorageTests {
     /**

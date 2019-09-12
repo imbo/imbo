@@ -8,10 +8,7 @@ use org\bovigo\vfs\vfsStreamWrapper;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\EventListener\ImageVariations\Storage\Filesystem
- * @group unit
- * @group storage
- * @group filesystem
+ * @coversDefaultClass Imbo\EventListener\ImageVariations\Storage\Filesystem
  */
 class FilesystemTest extends TestCase {
     /**
@@ -24,7 +21,7 @@ class FilesystemTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations\Storage\Filesystem::storeImageVariation
+     * @covers ::storeImageVariation
      */
     public function testThrowsExceptionWhenNotAbleToWriteToDirectory() {
         $dir = 'unwritableDirectory';
@@ -41,7 +38,7 @@ class FilesystemTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\EventListener\ImageVariations\Storage\Filesystem::deleteImageVariations
+     * @covers ::deleteImageVariations
      */
     public function testDoesNotThrowWhenDeletingNonExistantVariation() {
         $dir = 'basedir';

@@ -6,9 +6,7 @@ use Imbo\Image\Transformation\AutoRotate;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\AutoRotate
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\AutoRotate
  */
 class AutoRotateTest extends TransformationTests {
     /**

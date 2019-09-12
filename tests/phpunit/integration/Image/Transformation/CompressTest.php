@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Compress;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\Compress
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Compress
  */
 class CompressTest extends TransformationTests {
     /**

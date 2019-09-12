@@ -5,8 +5,6 @@ use Imbo\Resource\Image;
 
 /**
  * @coversDefaultClass Imbo\Resource\Image
- * @group unit
- * @group resources
  */
 class ImageTest extends ResourceTests {
     /**

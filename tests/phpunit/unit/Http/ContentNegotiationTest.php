@@ -5,9 +5,7 @@ use Imbo\Http\ContentNegotiation;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Http\ContentNegotiation
- * @group unit
- * @group http
+ * @coversDefaultClass Imbo\Http\ContentNegotiation
  */
 class ContentNegotiationTest extends TestCase {
     /**

@@ -7,9 +7,7 @@ use DateTimeZone;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Http\Response\Response
- * @group unit
- * @group http
+ * @coversDefaultClass Imbo\Http\Response\Response
  */
 class ResponseTest extends TestCase {
     /**

@@ -6,8 +6,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Model\Images
- * @group unit
- * @group models
  */
 class ImagesTest extends TestCase {
     /**

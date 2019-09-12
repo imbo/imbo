@@ -4,9 +4,7 @@ namespace ImboUnitTest\EventListener;
 use Imbo\EventListener\ResponseSender;
 
 /**
- * @covers Imbo\EventListener\ResponseSender
- * @group unit
- * @group listeners
+ * @coversDefaultClass Imbo\EventListener\ResponseSender
  */
 class ResponseSenderTest extends ListenerTests {
     /**
@@ -29,7 +27,7 @@ class ResponseSenderTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ResponseSender::send
+     * @covers ::send
      */
     public function testCanSendTheResponse() {
         $image = $this->createMock('Imbo\Model\Image');
@@ -52,7 +50,7 @@ class ResponseSenderTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ResponseSender::send
+     * @covers ::send
      */
     public function testCanSendTheResponseAndInjectTheCorrectImageIdentifier() {
         $request = $this->createMock('Imbo\Http\Request\Request');

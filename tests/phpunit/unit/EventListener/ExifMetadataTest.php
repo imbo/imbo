@@ -5,9 +5,7 @@ use Imbo\EventListener\ExifMetadata;
 use Imbo\Exception\RuntimeException;
 
 /**
- * @covers Imbo\EventListener\ExifMetadata
- * @group unit
- * @group listeners
+ * @coversDefaultClass Imbo\EventListener\ExifMetadata
  */
 class ExifMetadataTest extends ListenerTests {
     /**
@@ -112,12 +110,12 @@ class ExifMetadataTest extends ListenerTests {
 
     /**
      * @dataProvider getFilterData
-     * @covers Imbo\EventListener\ExifMetadata::setImagick
-     * @covers Imbo\EventListener\ExifMetadata::getImagick
-     * @covers Imbo\EventListener\ExifMetadata::populate
-     * @covers Imbo\EventListener\ExifMetadata::save
-     * @covers Imbo\EventListener\ExifMetadata::filterProperties
-     * @covers Imbo\EventListener\ExifMetadata::parseProperties
+     * @covers ::setImagick
+     * @covers ::getImagick
+     * @covers ::populate
+     * @covers ::save
+     * @covers ::filterProperties
+     * @covers ::parseProperties
      */
     public function testCanFilterData($data, $tags, $expectedData) {
         $user = 'user';
@@ -150,7 +148,7 @@ class ExifMetadataTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ExifMetadata::save
+     * @covers ::save
      */
     public function testWillDeleteImageWhenUpdatingMetadataFails() {
         $databaseException = $this->createMock('Imbo\Exception\DatabaseException');
@@ -173,7 +171,7 @@ class ExifMetadataTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\ExifMetadata::getImagick
+     * @covers ::getImagick
      */
     public function testCanInstantiateImagickItself() {
         $this->assertInstanceOf('Imagick', $this->listener->getImagick());

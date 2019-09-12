@@ -7,9 +7,7 @@ use Imbo\Model\Image;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Image\Transformation\SmartSize
- * @group unit
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\SmartSize
  */
 class SmartSizeTest extends TestCase {
     /**

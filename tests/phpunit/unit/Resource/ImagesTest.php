@@ -9,8 +9,6 @@ use DateTimeZone;
 
 /**
  * @coversDefaultClass Imbo\Resource\Images
- * @group unit
- * @group resources
  */
 class ImagesTest extends ResourceTests {
     /**

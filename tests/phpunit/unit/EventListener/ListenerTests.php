@@ -4,10 +4,6 @@ namespace ImboUnitTest\EventListener;
 use Imbo\EventListener\ListenerInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group unit
- * @group listeners
- */
 abstract class ListenerTests extends TestCase {
     /**
      * Get the listener we are testing

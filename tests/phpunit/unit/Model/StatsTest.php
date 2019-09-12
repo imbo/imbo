@@ -6,9 +6,7 @@ use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Model\Stats
- * @group unit
- * @group models
+ * @coversDefaultClass Imbo\Model\Stats
  */
 class StatsTest extends TestCase {
     /**

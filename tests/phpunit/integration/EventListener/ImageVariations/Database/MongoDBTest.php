@@ -5,10 +5,7 @@ use Imbo\EventListener\ImageVariations\Database\MongoDB;
 use MongoDB\Client as MongoClient;
 
 /**
- * @covers Imbo\EventListener\ImageVariations\Database\MongoDB
- * @group integration
- * @group database
- * @group mongo
+ * @coversDefaultClass Imbo\EventListener\ImageVariations\Database\MongoDB
  */
 class MongoDBTest extends DatabaseTests {
     private $databaseName = 'imboIntegrationTestDatabase';

@@ -5,10 +5,8 @@ use Imbo\Storage\S3;
 use Aws\S3\S3Client;
 
 /**
- * @covers Imbo\Storage\S3
- * @group integration
- * @group storage
- * @group aws
+ * @coversDefaultClass Imbo\Storage\S3
+ * @group local
  */
 class S3Test extends StorageTests {
     /**
@@ -48,7 +46,7 @@ class S3Test extends StorageTests {
     }
 
     /**
-     * @covers Imbo\Storage\S3::getStatus
+     * @covers ::getStatus
      */
     public function testGetStatus() {
         $this->assertTrue($this->getDriver()->getStatus());

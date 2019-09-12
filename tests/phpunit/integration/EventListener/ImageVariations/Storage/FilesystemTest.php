@@ -4,10 +4,7 @@ namespace ImboIntegrationTest\EventListener\ImageVariations\Storage;
 use Imbo\EventListener\ImageVariations\Storage\Filesystem;
 
 /**
- * @covers Imbo\EventListener\ImageVariations\Storage\Filesystem
- * @group integration
- * @group storage
- * @group filesystem
+ * @coversDefaultClass Imbo\EventListener\ImageVariations\Storage\Filesystem
  */
 class FilesystemTest extends StorageTests {
     /**

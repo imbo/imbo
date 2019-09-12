@@ -8,9 +8,7 @@ use DateTime;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Model\Error
- * @group unit
- * @group models
+ * @coversDefaultClass Imbo\Model\Error
  */
 class ErrorTest extends TestCase {
     /**

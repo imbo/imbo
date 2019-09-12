@@ -8,8 +8,7 @@ use Imbo\Exception\ImageException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Image\ImagePreparation
- * @group unit
+ * @coversDefaultClass Imbo\Image\ImagePreparation
  */
 class ImagePreparationTest extends TestCase {
     /**
@@ -86,7 +85,6 @@ class ImagePreparationTest extends TestCase {
 
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
-     * @group imagick
      */
     public function testThrowsExceptionWhenImageIsBroken() {
         $filePath = FIXTURES_DIR . '/broken-image.jpg';
@@ -99,7 +97,6 @@ class ImagePreparationTest extends TestCase {
 
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
-     * @group imagick
      */
     public function testThrowsExceptionWhenImageIsSlightlyBroken() {
         $this->markTestSkipped('Test causes seg fault');

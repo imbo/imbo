@@ -8,8 +8,7 @@ use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter
- * @group unit
+ * @coversDefaultClass Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter
  */
 class SimpleArrayAdapterTest extends TestCase {
     /**

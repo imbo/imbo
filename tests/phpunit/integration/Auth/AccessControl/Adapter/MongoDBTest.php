@@ -5,9 +5,7 @@ use Imbo\Auth\AccessControl\Adapter\MongoDB;
 use MongoDB\Client as MongoClient;
 
 /**
- * @covers Imbo\Auth\AccessControl\Adapter\MongoDB
- * @group integration
- * @group mongo
+ * @coversDefaultClass Imbo\Auth\AccessControl\Adapter\MongoDB
  */
 class MongoDBTest extends AdapterTests {
     /**

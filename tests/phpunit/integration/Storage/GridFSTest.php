@@ -5,10 +5,7 @@ use Imbo\Storage\GridFS;
 use MongoDB\Client;
 
 /**
- * @covers Imbo\Storage\GridFS
- * @group integration
- * @group storage
- * @group mongodb
+ * @coversDefaultClass Imbo\Storage\GridFS
  */
 class GridFSTest extends StorageTests {
     /**
@@ -46,7 +43,7 @@ class GridFSTest extends StorageTests {
     }
 
     /**
-     * @covers Imbo\Storage\GridFS::getStatus
+     * @covers ::getStatus
      */
     public function testReturnsFalseWhenFetchingStatusAndTheHostnameIsNotCorrect() {
         $storage = new GridFS([

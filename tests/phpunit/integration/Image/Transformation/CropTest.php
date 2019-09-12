@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Crop;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\Crop
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Crop
  */
 class CropTest extends TransformationTests {
     /**

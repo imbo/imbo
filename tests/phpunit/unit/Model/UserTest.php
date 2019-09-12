@@ -6,9 +6,7 @@ use DateTime;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Model\User
- * @group unit
- * @group models
+ * @coversDefaultClass Imbo\Model\User
  */
 class UserTest extends TestCase {
     /**

@@ -20,8 +20,6 @@ use Imbo\BehatApiExtension\Exception\AssertionFailedException;
 
 /**
  * @coversDefaultClass ImboBehatFeatureContext\FeatureContext
- * @group unit
- * @group behat
  */
 class FeatureContextTest extends TestCase {
     /**

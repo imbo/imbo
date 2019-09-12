@@ -6,10 +6,8 @@ use ChrisWhite\B2\Client;
 use ChrisWhite\B2\Exceptions\NotFoundException;
 
 /**
- * @covers Imbo\Storage\B2
- * @group integration
- * @group storage
- * @group backblaze
+ * @coversDefaultClass Imbo\Storage\B2
+ * @group local
  */
 class B2Test extends StorageTests {
     /**

@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Modulate;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Image\Transformation\Modulate
- * @group unit
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Modulate
  */
 class ModulateTest extends TestCase {
     /**

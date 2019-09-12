@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Histogram;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\Histogram
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Histogram
  */
 class HistogramTest extends TransformationTests {
     /**

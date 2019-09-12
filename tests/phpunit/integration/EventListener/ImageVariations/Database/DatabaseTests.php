@@ -4,10 +4,6 @@ namespace ImboIntegrationTest\EventListener\ImageVariations\Database;
 use Imbo\EventListener\ImageVariations\Database\DatabaseInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group integration
- * @group database
- */
 abstract class DatabaseTests extends TestCase {
     /**
      * @var DatabaseInterface
