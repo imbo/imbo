@@ -14,7 +14,7 @@ use Imbo\Resource\ShortUrls;
 use Imbo\Exception\InvalidArgumentException;
 
 /**
- * @covers Imbo\Resource\ShortUrls
+ * @coversDefaultClass Imbo\Resource\ShortUrls
  * @group unit
  * @group resources
  */

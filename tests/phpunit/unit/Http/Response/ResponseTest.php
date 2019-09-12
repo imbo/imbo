@@ -11,8 +11,6 @@
 namespace ImboUnitTest\Http\Response;
 
 use Imbo\Http\Response\Response;
-use Imbo\Exception;
-use Imbo\Exception\RuntimeException;
 use DateTime;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;

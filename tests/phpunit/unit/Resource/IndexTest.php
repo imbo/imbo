@@ -13,7 +13,7 @@ namespace ImboUnitTest\Resource;
 use Imbo\Resource\Index;
 
 /**
- * @covers Imbo\Resource\Index
+ * @coversDefaultClass Imbo\Resource\Index
  * @group unit
  * @group resources
  */

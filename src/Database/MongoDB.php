@@ -15,13 +15,13 @@ use Imbo\Model\Image,
     Imbo\Resource\Images\Query,
     Imbo\Exception\DatabaseException,
     Imbo\Exception\DuplicateImageIdentifierException,
-    Imbo\Exception\InvalidArgumentException,
     Imbo\Helpers\BSONToArray,
     MongoDB\Client as MongoClient,
     MongoDB\Driver\Manager,
     MongoDB\Driver\Command,
     MongoDB\Collection as MongoCollection,
     MongoDB\Driver\Exception\Exception as MongoException,
+    MongoDB\Model\BSONDocument,
     DateTime,
     DateTimeZone;
 
@@ -506,16 +506,14 @@ class MongoDB implements DatabaseInterface {
                 ]);
             }
 
-            $result = $this->getImageCollection()->aggregate($pipeline, ['useCursor' => false]);
-
-            if (!count($result)) {
-                return 0;
-            }
-
-            return (int) $result[0]->numBytes;
+            $docs = $this->getImageCollection()->aggregate($pipeline)->toArray();
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to fetch information from the database', 500, $e);
         }
+
+        return empty($docs) ? 0 : array_sum(array_map(function(BSONDocument $doc) : int {
+            return $doc->numBytes;
+        }, $docs));
     }
 
     /**
