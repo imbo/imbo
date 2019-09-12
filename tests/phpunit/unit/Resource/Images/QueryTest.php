@@ -6,9 +6,7 @@ use Imbo\Exception\RuntimeException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Resource\Images\Query
- * @group unit
- * @group resources
+ * @coversDefaultClass Imbo\Resource\Images\Query
  */
 class QueryTest extends TestCase {
     /**

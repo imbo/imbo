@@ -7,8 +7,6 @@ use Imbo\Exception\RuntimeException;
 
 /**
  * @coversDefaultClass Imbo\EventListener\EightbimMetadata
- * @group unit
- * @group listeners
  */
 class EightbimMetadataTest extends ListenerTests {
     /**

@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Convert;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Image\Transformation\Convert
- * @group unit
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Convert
  */
 class ConvertTest extends TestCase {
     /**

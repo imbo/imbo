@@ -10,8 +10,7 @@ use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Application
- * @group unit
+ * @coversDefaultClass Imbo\Application
  */
 class ApplicationTest extends TestCase {
     /**
@@ -27,7 +26,7 @@ class ApplicationTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Application::run
+     * @covers ::run
      */
     public function testThrowsExceptionWhenConfigurationHasInvalidDatabaseAdapter() {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid database adapter', 500));
@@ -38,7 +37,7 @@ class ApplicationTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Application::run
+     * @covers ::run
      */
     public function testThrowsExceptionWhenConfigurationHasInvalidStorageAdapter() {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid storage adapter', 500));
@@ -50,7 +49,7 @@ class ApplicationTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Application::run
+     * @covers ::run
      */
     public function testThrowsExceptionWhenConfigurationHasInvalidAccessControlAdapter() {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid access control adapter', 500));
@@ -64,7 +63,7 @@ class ApplicationTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Application::run
+     * @covers ::run
      */
     public function testApplicationSetsTrustedProxies() {
         $this->expectOutputRegex('|^{.*}$|');
@@ -86,7 +85,7 @@ class ApplicationTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Application::run
+     * @covers ::run
      */
     public function testApplicationPassesRequestAndResponseToCallbacks() {
         // We just want to swallow the output, since we're testing it explicitly below.
@@ -142,7 +141,7 @@ class ApplicationTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Application::run
+     * @covers ::run
      */
     public function testCanRunWithDefaultConfiguration() {
         $this->expectOutputRegex('|^{.*}$|');
@@ -150,7 +149,7 @@ class ApplicationTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Application::run
+     * @covers ::run
      */
     public function testThrowsExceptionIfTransformationsIsSetAndIsNotAnArray() {
         $defaultConfig = require __DIR__ . '/../../../config/config.default.php';

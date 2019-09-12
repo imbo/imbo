@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Rotate;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\Rotate
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Rotate
  */
 class RotateTest extends TransformationTests {
     /**
@@ -26,7 +24,7 @@ class RotateTest extends TransformationTests {
 
     /**
      * @dataProvider getRotateParams
-     * @covers Imbo\Image\Transformation\Rotate::transform
+     * @covers ::transform
      */
     public function testCanTransformImage($angle, $width, $height) {
         $image = $this->createMock('Imbo\Model\Image');

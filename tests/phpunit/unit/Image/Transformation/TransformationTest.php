@@ -8,9 +8,7 @@ use ReflectionMethod;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Image\Transformation\Transformation
- * @group unit
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Transformation
  */
 class TransformationTest extends TestCase {
     /**

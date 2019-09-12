@@ -5,9 +5,7 @@ use Imbo\CliCommand\CliCommand;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\CliCommand\CliCommand
- * @group unit-cli
- * @group cli-commands
+ * @coversDefaultClass Imbo\CliCommand\CliCommand
  */
 class CliCommandTest extends TestCase {
     /**

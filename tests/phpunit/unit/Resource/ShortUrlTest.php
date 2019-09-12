@@ -6,8 +6,6 @@ use Imbo\Exception\ResourceException;
 
 /**
  * @coversDefaultClass Imbo\Resource\ShortUrl
- * @group unit
- * @group resources
  */
 class ShortUrlTest extends ResourceTests {
     /**

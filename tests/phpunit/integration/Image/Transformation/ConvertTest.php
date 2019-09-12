@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Convert;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\Convert
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Convert
  */
 class ConvertTest extends TransformationTests {
     /**

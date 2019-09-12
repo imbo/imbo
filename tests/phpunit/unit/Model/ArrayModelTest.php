@@ -5,9 +5,7 @@ use Imbo\Model\ArrayModel;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Model\ArrayModel
- * @group unit
- * @group models
+ * @coversDefaultClass Imbo\Model\ArrayModel
  */
 class ArrayModelTest extends TestCase {
     /**

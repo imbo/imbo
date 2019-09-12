@@ -6,9 +6,7 @@ use Imbo\Exception\TransformationException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Image\Transformation\Compress
- * @group unit
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Compress
  */
 class CompressTest extends TestCase {
     /**

@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Thumbnail;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\Thumbnail
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Thumbnail
  */
 class ThumbnailTest extends TransformationTests {
     /**
@@ -66,7 +64,7 @@ class ThumbnailTest extends TransformationTests {
 
     /**
      * @dataProvider getThumbnailParams
-     * @covers Imbo\Image\Transformation\Thumbnail::transform
+     * @covers ::transform
      */
     public function testCanTransformImage($params, $width, $height, $diff = 0) {
         $image = $this->createMock('Imbo\Model\Image');

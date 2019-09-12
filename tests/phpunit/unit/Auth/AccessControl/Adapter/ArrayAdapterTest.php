@@ -8,14 +8,13 @@ use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter
- * @group unit
+ * @coverscoversDefaultClass Imbo\Auth\AccessControl\Adapter\ArrayAdapter
  */
 class ArrayAdapterTest extends TestCase {
     /**
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::__construct
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::validateAccessList
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::getUsersForResource
+     * @covers ::__construct
+     * @covers ::validateAccessList
+     * @covers ::getUsersForResource
      */
     public function testReturnsCorrectListOfAllowedUsersForResource() {
         $accessControl = new ArrayAdapter([
@@ -49,9 +48,9 @@ class ArrayAdapterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::__construct
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::validateAccessList
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::getPrivateKey
+     * @covers ::__construct
+     * @covers ::validateAccessList
+     * @covers ::getPrivateKey
      */
     public function testGetPrivateKey() {
         $accessControl = new ArrayAdapter([
@@ -79,9 +78,9 @@ class ArrayAdapterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::__construct
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::validateAccessList
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::hasAccess
+     * @covers ::__construct
+     * @covers ::validateAccessList
+     * @covers ::hasAccess
      */
     public function testCanReadResourcesFromGroups() {
         $acl = [
@@ -114,9 +113,9 @@ class ArrayAdapterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::__construct
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::validateAccessList
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::hasAccess
+     * @covers ::__construct
+     * @covers ::validateAccessList
+     * @covers ::hasAccess
      */
     public function testCanReadResourcesGrantedUsingWildcard() {
         $accessControl = new ArrayAdapter([
@@ -156,8 +155,8 @@ class ArrayAdapterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::__construct
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::validateAccessList
+     * @covers ::__construct
+     * @covers ::validateAccessList
      */
     public function testThrowsErrorOnDuplicatePublicKey() {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -198,7 +197,7 @@ class ArrayAdapterTest extends TestCase {
 
     /**
      * @dataProvider getGroupsData
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::getGroups
+     * @covers ::getGroups
      */
     public function testCanGetGroups(array $groups, array $result, $query = null) {
         $numGroups = count($groups);
@@ -231,7 +230,7 @@ class ArrayAdapterTest extends TestCase {
 
     /**
      * @dataProvider getGroupsForTest
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::groupExists
+     * @covers ::groupExists
      */
     public function testCanCheckIfGroupExists($groups, $group, $exists) {
         $adapter = new ArrayAdapter([], $groups);
@@ -239,7 +238,7 @@ class ArrayAdapterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::publicKeyExists
+     * @covers ::publicKeyExists
      */
     public function testPublicKeyExists() {
         $adapter = new ArrayAdapter([
@@ -321,7 +320,7 @@ class ArrayAdapterTest extends TestCase {
 
     /**
      * @dataProvider getAccessRules
-     * @covers Imbo\Auth\AccessControl\Adapter\ArrayAdapter::getAccessRule
+     * @covers ::getAccessRule
      */
     public function testGetAccessRule($acl, $publicKey, $ruleId, $rule) {
         $adapter = new ArrayAdapter($acl);

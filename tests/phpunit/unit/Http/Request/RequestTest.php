@@ -7,9 +7,7 @@ use Imbo\Router\Route;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Http\Request\Request
- * @group unit
- * @group http
+ * @coversDefaultClass Imbo\Http\Request\Request
  */
 class RequestTest extends TestCase {
     /**

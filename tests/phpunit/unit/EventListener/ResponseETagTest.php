@@ -4,9 +4,7 @@ namespace ImboUnitTest\EventListener;
 use Imbo\EventListener\ResponseETag;
 
 /**
- * @covers Imbo\EventListener\ResponseETag
- * @group unit
- * @group listeners
+ * @coversDefaultClass Imbo\EventListener\ResponseETag
  */
 class ResponseETagTest extends ListenerTests {
     /**

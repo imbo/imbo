@@ -5,9 +5,7 @@ use Imbo\Model\AccessRules;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Model\AccessRules
- * @group unit
- * @group models
+ * @coversDefaultClass Imbo\Model\AccessRules
  */
 class AccessRulesTest extends TestCase {
     /**

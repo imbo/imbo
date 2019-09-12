@@ -6,9 +6,7 @@ use Imbo\Exception\RuntimeException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Router
- * @group unit
- * @group router
+ * @coversDefaultClass Imbo\Router
  */
 class RouterTest extends TestCase {
     /**
@@ -29,7 +27,7 @@ class RouterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Router::route
+     * @covers ::route
      */
     public function testCanBeATeaPot() {
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('BREW'));
@@ -38,7 +36,7 @@ class RouterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Router::route
+     * @covers ::route
      */
     public function testThrowsExceptionOnUnsupportedHttpMethod() {
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('TRACE'));
@@ -69,7 +67,7 @@ class RouterTest extends TestCase {
 
     /**
      * @dataProvider getInvalidRoutes
-     * @covers Imbo\Router::route
+     * @covers ::route
      */
     public function testThrowsExceptionWhenNoRouteMatches($route) {
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
@@ -145,7 +143,7 @@ class RouterTest extends TestCase {
 
     /**
      * @dataProvider getValidRoutes
-     * @covers Imbo\Router::route
+     * @covers ::route
      */
     public function testCanMatchValidRoutes($route, $resource, $user = null, $imageIdentifier = null, $extension = null) {
         $this->request->expects($this->once())->method('getPathInfo')->will($this->returnValue($route));

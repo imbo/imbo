@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Transverse;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\Transverse
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Transverse
  */
 class TransverseTest extends TransformationTests {
     /**
@@ -18,7 +16,7 @@ class TransverseTest extends TransformationTests {
     }
 
     /**
-     * @covers Imbo\Image\Transformation\Transverse::transform
+     * @covers ::transform
      */
     public function testCanTransformImage() {
         $image = $this->createMock('Imbo\Model\Image');

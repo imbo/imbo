@@ -6,9 +6,7 @@ use Imbo\Exception\StorageException;
 use DateTime;
 
 /**
- * @covers Imbo\EventListener\StorageOperations
- * @group unit
- * @group listeners
+ * @coversDefaultClass Imbo\EventListener\StorageOperations
  */
 class StorageOperationsTest extends ListenerTests {
     /**
@@ -48,7 +46,7 @@ class StorageOperationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\StorageOperations::deleteImage
+     * @covers ::deleteImage
      */
     public function testCanDeleteAnImage() {
         $this->storage->expects($this->once())->method('delete')->with($this->user, $this->imageIdentifier);
@@ -56,7 +54,7 @@ class StorageOperationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\StorageOperations::loadImage
+     * @covers ::loadImage
      */
     public function testCanLoadImage() {
         $date = new DateTime();
@@ -75,7 +73,7 @@ class StorageOperationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\StorageOperations::loadImage
+     * @covers ::loadImage
      */
     public function testExceptionIfLoadImageFails() {
         $this->storage->expects($this->once())->method('getImage')->with($this->user, $this->imageIdentifier)->will($this->returnValue(false));
@@ -86,7 +84,7 @@ class StorageOperationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\StorageOperations::insertImage
+     * @covers ::insertImage
      */
     public function testCanInsertImage() {
         $image = $this->createMock('Imbo\Model\Image');
@@ -101,7 +99,7 @@ class StorageOperationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\StorageOperations::insertImage
+     * @covers ::insertImage
      */
     public function testCanInsertImageThatAlreadyExists() {
         $image = $this->createMock('Imbo\Model\Image');
@@ -116,7 +114,7 @@ class StorageOperationsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\StorageOperations::insertImage
+     * @covers ::insertImage
      */
     public function testWillDeleteImageFromDatabaseAndThrowExceptionWhenStoringFails() {
         $image = $this->createMock('Imbo\Model\Image');

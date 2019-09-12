@@ -8,8 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Watermark
- * @group unit
- * @group transformations
  */
 class WatermarkTest extends TestCase {
     /**

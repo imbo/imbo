@@ -11,10 +11,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Http\Response\ResponseFormatter
- * @group unit
- * @group http
- * @group formatters
+ * @coversDefaultClass Imbo\Http\Response\ResponseFormatter
  */
 class ResponseFormatterTest extends TestCase {
     /**
@@ -81,7 +78,7 @@ class ResponseFormatterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::getSubscribedEvents
+     * @covers ::getSubscribedEvents
      */
     public function testReturnsACorrectEventSubscription() {
         $class = get_class($this->responseFormatter);
@@ -89,7 +86,7 @@ class ResponseFormatterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::format
+     * @covers ::format
      */
     public function testReturnWhenStatusCodeIs204() {
         $this->response->expects($this->once())->method('getStatusCode')->will($this->returnValue(204));
@@ -98,7 +95,7 @@ class ResponseFormatterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::format
+     * @covers ::format
      */
     public function testReturnWhenThereIsNoModel() {
         $this->response->expects($this->once())->method('getStatusCode')->will($this->returnValue(200));
@@ -124,7 +121,7 @@ class ResponseFormatterTest extends TestCase {
 
     /**
      * @dataProvider getJsonpTriggers
-     * @covers Imbo\Http\Response\ResponseFormatter::format
+     * @covers ::format
      */
     public function testCanWrapJsonDataInSpecifiedCallback($param, $callback, $contentType, $valid = true) {
         $json = '{"key":"value"}';
@@ -158,8 +155,8 @@ class ResponseFormatterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::setFormatter
-     * @covers Imbo\Http\Response\ResponseFormatter::getFormatter
+     * @covers ::setFormatter
+     * @covers ::getFormatter
      */
     public function testCanSetAndGetTheFormatter() {
         $formatter = 'some formatter';
@@ -168,7 +165,7 @@ class ResponseFormatterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::negotiate
+     * @covers ::negotiate
      */
     public function testDoesNotDoContentNegotiationWhenTheRequestedPathIncludesAnExtension() {
         $this->request->expects($this->once())->method('getExtension')->will($this->returnValue('json'));
@@ -181,7 +178,7 @@ class ResponseFormatterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::format
+     * @covers ::format
      */
     public function testDoesNotSetResponseContentWhenHttpMethodIsHead() {
         $this->response->expects($this->once())->method('getStatusCode')->will($this->returnValue(200));
@@ -194,7 +191,7 @@ class ResponseFormatterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::negotiate
+     * @covers ::negotiate
      */
     public function testThrowsAnExceptionInStrictModeWhenTheUserAgentDoesNotSupportAnyOfImbosMediaTypes() {
         $this->contentNegotiation->expects($this->any())->method('isAcceptable')->will($this->returnValue(false));
@@ -209,7 +206,7 @@ class ResponseFormatterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::negotiate
+     * @covers ::negotiate
      */
     public function testUsesDefaultMediaTypeInNonStrictModeWhenTheUserAgentDoesNotSupportAnyMediaTypes() {
         $this->event->expects($this->once())->method('hasArgument')->with('noStrict')->will($this->returnValue(true));
@@ -225,7 +222,7 @@ class ResponseFormatterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::negotiate
+     * @covers ::negotiate
      */
     public function testPicksThePrioritizedMediaTypeIfMoreThanOneWithSameQualityAreSupportedByTheUserAgent() {
         $requestHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
@@ -254,7 +251,7 @@ class ResponseFormatterTest extends TestCase {
 
     /**
      * @dataProvider getOriginalMimeTypes
-     * @covers Imbo\Http\Response\ResponseFormatter::negotiate
+     * @covers ::negotiate
      */
     public function testUsesTheOriginalMimeTypeOfTheImageIfTheClientHasNoPreference($originalMimeType, $expectedFormatter) {
         // Use a real object since the code we are testing uses get_class(), which won't work as
@@ -276,7 +273,7 @@ class ResponseFormatterTest extends TestCase {
 
     /**
      * @dataProvider getOriginalMimeTypes
-     * @covers Imbo\Http\Response\ResponseFormatter::negotiate
+     * @covers ::negotiate
      */
     public function testUsesTheOriginalMimeTypeOfTheImageIfConfigDisablesContentNegotiationForImages($originalMimeType, $expectedFormatter) {
         // Use a real object since the code we are testing uses get_class(), which won't work as
@@ -309,7 +306,7 @@ class ResponseFormatterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::negotiate
+     * @covers ::negotiate
      * @dataProvider getImageResources
      */
     public function testForcesContentNegotiationOnErrorModelsWhenResourceIsAnImage($routeName) {
@@ -331,7 +328,7 @@ class ResponseFormatterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::negotiate
+     * @covers ::negotiate
      */
     public function testDoesNotForceContentNegotiationOnErrorModelsWhenResourceIsNotAnImage() {
         $route = new Route();
@@ -347,7 +344,7 @@ class ResponseFormatterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::format
+     * @covers ::format
      */
     public function testTriggersAConversionTransformationIfNeededWhenTheModelIsAnImage() {
         $image = $this->createMock('Imbo\Model\Image');
@@ -371,7 +368,7 @@ class ResponseFormatterTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\ResponseFormatter::format
+     * @covers ::format
      */
     public function testDoesNotTriggerAnImageConversionWhenTheImageHasTheCorrectMimeType() {
         $image = $this->createMock('Imbo\Model\Image');

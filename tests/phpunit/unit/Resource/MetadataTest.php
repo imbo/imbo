@@ -8,8 +8,6 @@ use DateTimeZone;
 
 /**
  * @coversDefaultClass Imbo\Resource\Metadata
- * @group unit
- * @group resources
  */
 class MetadataTest extends ResourceTests {
     /**

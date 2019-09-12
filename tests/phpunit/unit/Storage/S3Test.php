@@ -6,9 +6,7 @@ use Imbo\Storage\S3;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Storage\S3
- * @group unit
- * @group storage
+ * @coversDefaultClass Imbo\Storage\S3
  */
 class S3Test extends TestCase {
     /**

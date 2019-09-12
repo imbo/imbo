@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Desaturate;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\Desaturate
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Desaturate
  */
 class DesaturateTest extends TransformationTests {
     /**
@@ -18,7 +16,7 @@ class DesaturateTest extends TransformationTests {
     }
 
     /**
-     * @covers Imbo\Image\Transformation\Desaturate::transform
+     * @covers ::transform
      */
     public function testCanDesaturateImages() {
         $image = $this->createMock('Imbo\Model\Image');

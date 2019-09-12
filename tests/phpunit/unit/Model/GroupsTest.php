@@ -5,9 +5,7 @@ use Imbo\Model\Groups;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Model\Groups
- * @group unit
- * @group models
+ * @coversDefaultClass Imbo\Model\Groups
  */
 class GroupsTest extends TestCase {
     /**

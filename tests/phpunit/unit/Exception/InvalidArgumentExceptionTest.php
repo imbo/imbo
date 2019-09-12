@@ -5,9 +5,7 @@ use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Exception\InvalidArgumentException
- * @group unit
- * @group exceptions
+ * @coversDefaultClass Imbo\Exception\InvalidArgumentException
  */
 class InvalidArgumentExceptionTest extends TestCase {
     /**

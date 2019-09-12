@@ -6,10 +6,7 @@ use DateTime;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Http\Response\Formatter\JSON
- * @group unit
- * @group http
- * @group formatters
+ * @coversDefaultClass Imbo\Http\Response\Formatter\JSON
  */
 class JSONTest extends TestCase {
     /**

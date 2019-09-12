@@ -5,8 +5,6 @@ use Imbo\Resource\Status;
 
 /**
  * @coversDefaultClass Imbo\Resource\Status
- * @group unit
- * @group resources
  */
 class StatusTest extends ResourceTests {
     /**

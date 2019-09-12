@@ -5,11 +5,7 @@ use Imbo\Database\Doctrine;
 use PDO;
 
 /**
- * @covers Imbo\Database\Doctrine
  * @coversDefaultClass Imbo\Database\Doctrine
- * @group integration
- * @group database
- * @group doctrine
  */
 class DoctrineTest extends DatabaseTests {
     /**

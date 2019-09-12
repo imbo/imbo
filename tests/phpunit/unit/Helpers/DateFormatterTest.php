@@ -7,9 +7,7 @@ use DateTimeZone;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Helpers\DateFormatter
- * @group unit
- * @group helpers
+ * @coversDefaultClass Imbo\Helpers\DateFormatter
  */
 class DateFormatterTest extends TestCase {
     /**

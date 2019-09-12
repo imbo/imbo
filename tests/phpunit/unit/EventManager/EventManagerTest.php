@@ -9,9 +9,7 @@ use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\EventManager\EventManager
- * @group unit
- * @group eventmanager
+ * @coversDefaultClass Imbo\EventManager\EventManager
  */
 class EventManagerTest extends TestCase {
     /**

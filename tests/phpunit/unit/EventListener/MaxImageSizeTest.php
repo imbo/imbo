@@ -4,9 +4,7 @@ namespace ImboUnitTest\EventListener;
 use Imbo\EventListener\MaxImageSize;
 
 /**
- * @covers Imbo\EventListener\MaxImageSize
- * @group unit
- * @group listeners
+ * @coversDefaultClass Imbo\EventListener\MaxImageSize
  */
 class MaxImageSizeTest extends ListenerTests {
     /**
@@ -44,7 +42,7 @@ class MaxImageSizeTest extends ListenerTests {
 
     /**
      * @dataProvider getImageDimensions
-     * @covers Imbo\EventListener\MaxImageSize::enforceMaxSize
+     * @covers ::enforceMaxSize
      */
     public function testWillTriggerTransformationWhenImageIsAboveTheLimits($imageWidth, $imageHeight, $maxWidth, $maxHeight, $willTrigger) {
         $image = $this->createMock('Imbo\Model\Image');

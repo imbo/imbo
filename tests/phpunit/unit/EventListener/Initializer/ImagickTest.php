@@ -5,10 +5,7 @@ use Imbo\EventListener\Initializer\Imagick;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\EventListener\Initializer\Imagick
  * @coversDefaultClass Imbo\EventListener\Initializer\Imagick
- * @group unit
- * @group listeners
  */
 class ImagickTest extends TestCase {
     /**

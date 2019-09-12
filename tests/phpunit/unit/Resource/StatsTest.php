@@ -5,8 +5,6 @@ use Imbo\Resource\Stats;
 
 /**
  * @coversDefaultClass Imbo\Resource\Stats
- * @group unit
- * @group resources
  */
 class StatsTest extends ResourceTests {
     /**

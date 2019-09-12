@@ -5,9 +5,7 @@ use Imbo\Router\Route;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Router\Route
- * @group unit
- * @group router
+ * @coversDefaultClass Imbo\Router\Route
  */
 class RouteTest extends TestCase {
     /**

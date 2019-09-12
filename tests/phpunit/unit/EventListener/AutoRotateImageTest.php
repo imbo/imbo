@@ -5,9 +5,7 @@ use Imbo\EventListener\AutoRotateImage;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\EventListener\AutoRotateImage
- * @group unit
- * @group listeners
+ * @coversDefaultClass Imbo\EventListener\AutoRotateImage
  */
 class AutoRotateImageTest extends TestCase {
     /**
@@ -23,7 +21,7 @@ class AutoRotateImageTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\EventListener\AutoRotateImage::getSubscribedEvents
+     * @covers ::getSubscribedEvents
      */
     public function testReturnsCorrectSubscriptionData() {
         $className = get_class($this->listener);
@@ -34,7 +32,7 @@ class AutoRotateImageTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\EventListener\AutoRotateImage::autoRotate
+     * @covers ::autoRotate
      */
     public function testTriggersTransformationForRotating() {
         $image = $this->createMock('Imbo\Model\Image');

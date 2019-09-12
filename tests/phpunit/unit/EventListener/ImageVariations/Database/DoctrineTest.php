@@ -7,14 +7,11 @@ use PHPUnit\Framework\TestCase;
 use PDO;
 
 /**
- * @covers Imbo\EventListener\ImageVariations\Database\Doctrine
- * @group unit
- * @group database
- * @group doctrine
+ * @coversDefaultClass Imbo\EventListener\ImageVariations\Database\Doctrine
  */
 class DoctrineTest extends TestCase {
     /**
-     * @covers Imbo\EventListener\ImageVariations\Database\Doctrine::__construct
+     * @covers ::__construct
      */
     public function testThrowsExceptionWhenUsingPdoInConfiguration() {
         $this->expectExceptionObject(new InvalidArgumentException(

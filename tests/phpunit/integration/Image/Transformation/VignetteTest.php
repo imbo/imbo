@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Vignette;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\Vignette
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Vignette
  */
 class VignetteTest extends TransformationTests {
     /**
@@ -18,7 +16,7 @@ class VignetteTest extends TransformationTests {
     }
 
     /**
-     * @covers Imbo\Image\Transformation\Vignette::transform
+     * @covers ::transform
      */
     public function testCanVignetteImages() {
         $image = $this->createMock('Imbo\Model\Image');

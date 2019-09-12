@@ -4,9 +4,7 @@ namespace ImboUnitTest\EventListener;
 use Imbo\EventListener\Imagick;
 
 /**
- * @covers Imbo\EventListener\Imagick
- * @group unit
- * @group listeners
+ * @coversDefaultClass Imbo\EventListener\Imagick
  */
 class ImagickTest extends ListenerTests {
     /**
@@ -46,8 +44,8 @@ class ImagickTest extends ListenerTests {
 
 
     /**
-     * @covers Imbo\EventListener\Imagick::readImageBlob
-     * @covers Imbo\EventListener\Imagick::setImagick
+     * @covers ::readImageBlob
+     * @covers ::setImagick
      */
     public function testFetchesImageFromRequest() {
         $image = $this->createMock('Imbo\Model\Image');
@@ -63,8 +61,8 @@ class ImagickTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Imagick::readImageBlob
-     * @covers Imbo\EventListener\Imagick::setImagick
+     * @covers ::readImageBlob
+     * @covers ::setImagick
      */
     public function testFetchesImageFromResponse() {
         $image = $this->createMock('Imbo\Model\Image');
@@ -93,8 +91,8 @@ class ImagickTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Imagick::readImageBlob
-     * @covers Imbo\EventListener\Imagick::setImagick
+     * @covers ::readImageBlob
+     * @covers ::setImagick
      * @dataProvider hasImageBeenTransformed
      */
     public function testUpdatesModelBeforeStoring($hasBeenTransformed) {
@@ -118,8 +116,8 @@ class ImagickTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Imagick::readImageBlob
-     * @covers Imbo\EventListener\Imagick::setImagick
+     * @covers ::readImageBlob
+     * @covers ::setImagick
      * @dataProvider hasImageBeenTransformed
      */
     public function testUpdatesModelBeforeSendingResponse($hasBeenTransformed) {

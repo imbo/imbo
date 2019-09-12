@@ -5,10 +5,6 @@ use Imbo\Exception\StorageException;
 use DateTime;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group integration
- * @group storage
- */
 abstract class StorageTests extends TestCase {
     /**
      * @var Imbo\Storage\StorageInterface

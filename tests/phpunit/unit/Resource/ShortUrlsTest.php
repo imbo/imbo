@@ -6,8 +6,6 @@ use Imbo\Exception\InvalidArgumentException;
 
 /**
  * @coversDefaultClass Imbo\Resource\ShortUrls
- * @group unit
- * @group resources
  */
 class ShortUrlsTest extends ResourceTests {
     /**

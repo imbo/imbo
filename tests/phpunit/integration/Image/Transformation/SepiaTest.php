@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Sepia;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\Sepia
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Sepia
  */
 class SepiaTest extends TransformationTests {
     /**
@@ -18,7 +16,7 @@ class SepiaTest extends TransformationTests {
     }
 
     /**
-     * @covers Imbo\Image\Transformation\Sepia::transform
+     * @covers ::transform
      */
     public function testCanTransformImageWithoutParams() {
         $image = $this->createMock('Imbo\Model\Image');
@@ -31,7 +29,7 @@ class SepiaTest extends TransformationTests {
     }
 
     /**
-     * @covers Imbo\Image\Transformation\Sepia::transform
+     * @covers ::transform
      */
     public function testCanTransformImageWithParams() {
         $image = $this->createMock('Imbo\Model\Image');

@@ -5,9 +5,7 @@ use Imbo\EventListener\Authenticate;
 use Imbo\Exception\RuntimeException;
 
 /**
- * @covers Imbo\EventListener\Authenticate
- * @group unit
- * @group listeners
+ * @coversDefaultClass Imbo\EventListener\Authenticate
  */
 class AuthenticateTest extends ListenerTests {
     /**
@@ -63,7 +61,7 @@ class AuthenticateTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Authenticate::authenticate
+     * @covers ::authenticate
      */
     public function testThrowsExceptionWhenAuthInfoIsMissing() {
         $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(false));
@@ -73,7 +71,7 @@ class AuthenticateTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Authenticate::authenticate
+     * @covers ::authenticate
      */
     public function testThrowsExceptionWhenSignatureIsMissing() {
         $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(true));
@@ -84,8 +82,8 @@ class AuthenticateTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Authenticate::authenticate
-     * @covers Imbo\EventListener\Authenticate::timestampIsValid
+     * @covers ::authenticate
+     * @covers ::timestampIsValid
      */
     public function testThrowsExceptionWhenTimestampIsInvalid() {
         $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(true));
@@ -96,8 +94,8 @@ class AuthenticateTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Authenticate::authenticate
-     * @covers Imbo\EventListener\Authenticate::timestampHasExpired
+     * @covers ::authenticate
+     * @covers ::timestampHasExpired
      */
     public function testThrowsExceptionWhenTimestampHasExpired() {
         $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(true));
@@ -108,7 +106,7 @@ class AuthenticateTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Authenticate::authenticate
+     * @covers ::authenticate
      */
     public function testThrowsExceptionWhenSignatureDoesNotMatch() {
         $this->headers->expects($this->at(0))->method('has')->with('x-imbo-authenticate-timestamp')->will($this->returnValue(true));
@@ -120,10 +118,10 @@ class AuthenticateTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Authenticate::authenticate
-     * @covers Imbo\EventListener\Authenticate::signatureIsValid
-     * @covers Imbo\EventListener\Authenticate::timestampIsValid
-     * @covers Imbo\EventListener\Authenticate::timestampHasExpired
+     * @covers ::authenticate
+     * @covers ::signatureIsValid
+     * @covers ::timestampIsValid
+     * @covers ::timestampHasExpired
      */
     public function testApprovesValidSignature() {
         $httpMethod = 'GET';
@@ -154,10 +152,10 @@ class AuthenticateTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Authenticate::authenticate
-     * @covers Imbo\EventListener\Authenticate::signatureIsValid
-     * @covers Imbo\EventListener\Authenticate::timestampIsValid
-     * @covers Imbo\EventListener\Authenticate::timestampHasExpired
+     * @covers ::authenticate
+     * @covers ::signatureIsValid
+     * @covers ::timestampIsValid
+     * @covers ::timestampHasExpired
      */
     public function testApprovesValidSignatureWithAuthInfoFromQueryParameters() {
         $httpMethod = 'GET';
@@ -294,10 +292,10 @@ class AuthenticateTest extends ListenerTests {
 
     /**
      * @dataProvider getRewrittenSignatureData
-     * @covers Imbo\EventListener\Authenticate::authenticate
-     * @covers Imbo\EventListener\Authenticate::signatureIsValid
-     * @covers Imbo\EventListener\Authenticate::timestampIsValid
-     * @covers Imbo\EventListener\Authenticate::timestampHasExpired
+     * @covers ::authenticate
+     * @covers ::signatureIsValid
+     * @covers ::timestampIsValid
+     * @covers ::timestampHasExpired
      */
     public function testApprovesSignaturesWhenConfigurationForcesProtocol($serverUrl, $protocol, $authHeader, $shouldMatch, $signature, $timestamp) {
         if (!$shouldMatch) {

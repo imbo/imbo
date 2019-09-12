@@ -6,8 +6,7 @@ use ImagickException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Image\Identifier\Generator\RandomString
- * @group unit
+ * @coversDefaultClass Imbo\Image\Identifier\Generator\RandomString
  */
 class RandomStringTest extends TestCase {
     public function testGeneratesUniqueStrings() {

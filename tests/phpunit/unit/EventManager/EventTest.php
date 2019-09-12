@@ -11,9 +11,7 @@ use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\EventManager\Event
- * @group unit
- * @group eventmanager
+ * @coversDefaultClass Imbo\EventManager\Event
  */
 class EventTest extends TestCase {
     /**

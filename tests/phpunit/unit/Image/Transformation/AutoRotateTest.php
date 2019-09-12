@@ -6,9 +6,7 @@ use Imbo\Image\Transformation\AutoRotate;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Image\Transformation\AutoRotate
- * @group unit
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\AutoRotate
  */
 class AutoRotateTest extends TestCase {
     /**

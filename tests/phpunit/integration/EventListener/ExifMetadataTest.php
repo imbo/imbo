@@ -6,14 +6,12 @@ use Imbo\Model\Image;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\EventListener\ExifMetadata
- * @group integration
- * @group listeners
+ * @coversDefaultClass Imbo\EventListener\ExifMetadata
  */
 class ExifMetadataTest extends TestCase {
     /**
-     * @covers Imbo\EventListener\ExifMetadata::__construct
-     * @covers Imbo\EventListener\ExifMetadata::populate
+     * @covers ::__construct
+     * @covers ::populate
      */
     public function testCanGetPropertiesFromImageUnfiltered() {
         $listener = new ExifMetadata();
@@ -36,9 +34,9 @@ class ExifMetadataTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\EventListener\ExifMetadata::__construct
-     * @covers Imbo\EventListener\ExifMetadata::populate
-     * @covers Imbo\EventListener\ExifMetadata::filterProperties
+     * @covers ::__construct
+     * @covers ::populate
+     * @covers ::filterProperties
      */
     public function testCanGetPropertiesFromImageFiltered() {
         $listener = new ExifMetadata([
@@ -64,10 +62,10 @@ class ExifMetadataTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\EventListener\ExifMetadata::__construct
-     * @covers Imbo\EventListener\ExifMetadata::populate
-     * @covers Imbo\EventListener\ExifMetadata::parseProperties
-     * @covers Imbo\EventListener\ExifMetadata::parseGpsCoordinate
+     * @covers ::__construct
+     * @covers ::populate
+     * @covers ::parseProperties
+     * @covers ::parseGpsCoordinate
      */
     public function testCanParseGpsValues() {
         $listener = new ExifMetadata();
@@ -88,9 +86,9 @@ class ExifMetadataTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\EventListener\ExifMetadata::__construct
-     * @covers Imbo\EventListener\ExifMetadata::populate
-     * @covers Imbo\EventListener\ExifMetadata::save
+     * @covers ::__construct
+     * @covers ::populate
+     * @covers ::save
      */
     public function testCanGetAndSaveProperties() {
         $listener = new ExifMetadata();

@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\CliApplication
- * @group unit-cli
  */
 class CliApplicationTest extends TestCase {
     /**

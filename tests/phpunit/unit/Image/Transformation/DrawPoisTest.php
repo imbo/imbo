@@ -8,9 +8,7 @@ use Imbo\Exception\TransformationException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Image\Transformation\DrawPois
- * @group unit
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\DrawPois
  */
 class DrawPoisTest extends TestCase {
     /**

@@ -11,10 +11,6 @@ use DateTime;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group integration
- * @group database
- */
 abstract class DatabaseTests extends TestCase {
     /**
      * @var Imbo\Database\DatabaseInterface

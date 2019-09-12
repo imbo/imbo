@@ -5,9 +5,7 @@ use Imbo\Auth\AccessControl\GroupQuery;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Auth\AccessControl\GroupQuery
- * @covers Imbo\Auth\AccessControl\AbstractQuery
- * @group unit
+ * @coversDefaultClass Imbo\Auth\AccessControl\GroupQuery
  */
 class GroupQueryTest extends TestCase {
     /**
@@ -23,7 +21,7 @@ class GroupQueryTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Auth\AccessControl\AbstractQuery::limit
+     * @covers ::limit
      */
     public function testSetAndGetLimit() {
         $this->assertSame(20, $this->query->limit());
@@ -32,7 +30,7 @@ class GroupQueryTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Auth\AccessControl\AbstractQuery::page
+     * @covers ::page
      */
     public function testSetAndGetPage() {
         $this->assertSame(1, $this->query->page());

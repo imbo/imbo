@@ -4,9 +4,7 @@ namespace ImboUnitTest\EventListener;
 use Imbo\EventListener\VarnishHashTwo;
 
 /**
- * @covers Imbo\EventListener\VarnishHashTwo
- * @group unit
- * @group listeners
+ * @coversDefaultClass Imbo\EventListener\VarnishHashTwo
  */
 class VarnishHashTwoTest extends ListenerTests {
     /**
@@ -44,7 +42,7 @@ class VarnishHashTwoTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\VarnishHashTwo::addHeader
+     * @covers ::addHeader
      */
     public function testCanSendAHashTwoHeader() {
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
@@ -60,8 +58,8 @@ class VarnishHashTwoTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\VarnishHashTwo::__construct
-     * @covers Imbo\EventListener\VarnishHashTwo::addHeader
+     * @covers ::__construct
+     * @covers ::addHeader
      */
     public function testCanSpecifyACustomHeaderName() {
         $listener = new VarnishHashTwo(['headerName' => 'X-CustomHeader']);

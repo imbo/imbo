@@ -4,9 +4,7 @@ namespace ImboUnitTest\EventListener;
 use Imbo\EventListener\Cors;
 
 /**
- * @covers Imbo\EventListener\Cors
- * @group unit
- * @group listeners
+ * @coversDefaultClass Imbo\EventListener\Cors
  */
 class CorsTest extends ListenerTests {
     /**
@@ -21,7 +19,7 @@ class CorsTest extends ListenerTests {
     /**
      * Set up the listener
      *
-     * @covers Imbo\EventListener\Cors::__construct
+     * @covers ::__construct
      */
     public function setUp() : void {
         $requestHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
@@ -48,8 +46,8 @@ class CorsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Cors::__construct
-     * @covers Imbo\EventListener\Cors::getAllowedOrigins
+     * @covers ::__construct
+     * @covers ::getAllowedOrigins
      */
     public function testCleansUpOrigins() {
         $listener = new Cors([
@@ -74,8 +72,8 @@ class CorsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Cors::options
-     * @covers Imbo\EventListener\Cors::originIsAllowed
+     * @covers ::options
+     * @covers ::originIsAllowed
      */
     public function testDoesNotAddHeadersWhenOriginIsDisallowedAndHttpMethodIsOptions() {
         $headers = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
@@ -86,8 +84,8 @@ class CorsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Cors::invoke
-     * @covers Imbo\EventListener\Cors::originIsAllowed
+     * @covers ::invoke
+     * @covers ::originIsAllowed
      */
     public function testDoesNotAddHeadersWhenOriginIsDisallowedAndHttpMethodIsOtherThanOptions() {
         $this->event->expects($this->never())->method('getResponse');
@@ -95,8 +93,8 @@ class CorsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Cors::invoke
-     * @covers Imbo\EventListener\Cors::originIsAllowed
+     * @covers ::invoke
+     * @covers ::originIsAllowed
      */
     public function testAddsHeadersIfWildcardOriginIsDefined() {
         $listener = new Cors([
@@ -117,8 +115,8 @@ class CorsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Cors::invoke
-     * @covers Imbo\EventListener\Cors::originIsAllowed
+     * @covers ::invoke
+     * @covers ::originIsAllowed
      */
     public function testAddsHeadersIfOriginIsDefinedAndAllowed() {
         $listener = new Cors([
@@ -140,8 +138,8 @@ class CorsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Cors::invoke
-     * @covers Imbo\EventListener\Cors::setExposedHeaders
+     * @covers ::invoke
+     * @covers ::setExposedHeaders
      */
     public function testIncludesAllImboHeadersAsExposedHeaders() {
         $listener = new Cors([
@@ -169,7 +167,7 @@ class CorsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Cors::setExposedHeaders
+     * @covers ::setExposedHeaders
      */
     public function testDoesNotAddExposeHeadersHeaderWhenOriginIsInvalid() {
         $listener = new Cors([]);
@@ -182,7 +180,7 @@ class CorsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Cors::options
+     * @covers ::options
      */
     public function testSetsCorrectResposeHeadersOnOptionsRequestWhenOriginIsAllowed() {
         $listener = new Cors([
@@ -225,7 +223,7 @@ class CorsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Cors::getSubscribedEvents
+     * @covers ::getSubscribedEvents
      */
     public function testReturnsSubscribedEvents() {
         $className = get_class($this->listener);
@@ -233,7 +231,7 @@ class CorsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Cors::invoke
+     * @covers ::invoke
      */
     public function testDoesNotAddAccessControlHeadersWhenOriginIsNotAllowed() {
         $route = $this->createMock('Imbo\Router\Route');
@@ -331,7 +329,7 @@ class CorsTest extends ListenerTests {
 
     /**
      * @dataProvider getAllowedMethodsParams
-     * @covers Imbo\EventListener\Cors::subscribe
+     * @covers ::subscribe
      */
     public function testWillSubscribeToTheCorrectEventsBasedOnParams($params, $events) {
         $listener = new Cors($params);
@@ -354,7 +352,7 @@ class CorsTest extends ListenerTests {
     }
 
     /**
-     * @covers Imbo\EventListener\Cors::invoke
+     * @covers ::invoke
      */
     public function testAddsVaryHeaderContainingOriginRegardlessOfAllowedStatus() {
         $this->request->expects($this->any())->method('getMethod')->will($this->returnValue('GET'));

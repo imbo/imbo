@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\MaxSize;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\MaxSize
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\MaxSize
  */
 class MaxSizeTest extends TransformationTests {
     /**
@@ -95,7 +93,7 @@ class MaxSizeTest extends TransformationTests {
 
     /**
      * @dataProvider getMaxSizeParams
-     * @covers Imbo\Image\Transformation\MaxSize::transform
+     * @covers ::transform
      */
     public function testCanTransformImages($file, $params, $width, $height, $transformedWidth, $transformedHeight, $transformation = true) {
         $image = $this->createMock('Imbo\Model\Image');

@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Progressive;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\Progressive
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Progressive
  */
 class ProgressiveTest extends TransformationTests {
     /**
@@ -18,7 +16,7 @@ class ProgressiveTest extends TransformationTests {
     }
 
     /**
-     * @covers Imbo\Image\Transformation\Progressive::transform
+     * @covers ::transform
      */
     public function testCanMakeTheImageProgressive() {
         $image = $this->createMock('Imbo\Model\Image');

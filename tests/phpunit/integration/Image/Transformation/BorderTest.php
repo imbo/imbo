@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Border;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\Border
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Border
  */
 class BorderTest extends TransformationTests {
     /**

@@ -9,9 +9,7 @@ use org\bovigo\vfs\vfsStreamWrapper;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Storage\Filesystem
- * @group unit
- * @group storage
+ * @coversDefaultClass Imbo\Storage\Filesystem
  */
 class FilesystemTest extends TestCase {
     /**

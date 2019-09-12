@@ -7,8 +7,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Image\TransformationManager
- * @group unit
+ * @coversDefaultClass Imbo\Image\TransformationManager
  */
 class TransformationManagerTest extends TestCase {
     protected $manager;

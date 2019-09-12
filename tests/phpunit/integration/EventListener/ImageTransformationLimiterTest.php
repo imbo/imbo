@@ -8,10 +8,7 @@ use Imbo\EventManager\Event;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\EventListener\ImageTransformationLimiter
  * @coversDefaultClass Imbo\EventListener\ImageTransformationLimiter
- * @group integration
- * @group listeners
  */
 class ImageTransformationLimiterTest extends TestCase {
     /**

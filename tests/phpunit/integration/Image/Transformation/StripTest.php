@@ -5,9 +5,7 @@ use Imbo\Image\Transformation\Strip;
 use Imagick;
 
 /**
- * @covers Imbo\Image\Transformation\Strip
- * @group integration
- * @group transformations
+ * @coversDefaultClass Imbo\Image\Transformation\Strip
  */
 class StripTest extends TransformationTests {
     /**
@@ -18,7 +16,7 @@ class StripTest extends TransformationTests {
     }
 
     /**
-     * @covers Imbo\Image\Transformation\Strip::transform
+     * @covers ::transform
      */
     public function testStripMetadata() {
         $image = $this->createMock('Imbo\Model\Image');

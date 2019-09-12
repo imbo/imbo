@@ -5,11 +5,7 @@ use Imbo\Database\MongoDB;
 use MongoDB\Client as MongoClient;
 
 /**
- * @covers Imbo\Database\MongoDB
  * @coversDefaultClass Imbo\Database\MongoDB
- * @group integration
- * @group database
- * @group mongo
  */
 class MongoDBTest extends DatabaseTests {
     /**

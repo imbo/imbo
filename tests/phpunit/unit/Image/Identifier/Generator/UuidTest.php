@@ -6,8 +6,7 @@ use ImagickException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Image\Identifier\Generator\Uuid
- * @group unit
+ * @coversDefaultClass Imbo\Image\Identifier\Generator\Uuid
  */
 class UuidTest extends TestCase {
     public function testGeneratesUniqueUuidV4() {

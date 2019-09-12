@@ -10,10 +10,7 @@ use ReflectionMethod;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Database\Doctrine
- * @group unit
- * @group database
- * @group doctrine
+ * @coversDefaultClass Imbo\Database\Doctrine
  */
 class DoctrineTest extends TestCase {
     /**

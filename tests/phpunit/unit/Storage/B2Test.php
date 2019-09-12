@@ -6,9 +6,7 @@ use Imbo\Storage\B2;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Imbo\Storage\B2
- * @group unit
- * @group storage
+ * @coversDefaultClass Imbo\Storage\B2
  */
 class B2Test extends TestCase {
     /**
