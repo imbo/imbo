@@ -101,11 +101,11 @@ Feature: Imbo provides an image endpoint
         And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Invalid image" and the error code is "205"
 
-    Scenario: Add a broken image with identifiable size
-        Given I use "publicKey" and "privateKey" for public and private keys
-        And I sign the request
-        And the request body contains "tests/phpunit/Fixtures/slightly-broken-image.png"
-        When I request "/users/user/images" using HTTP "POST"
-        Then the response status line is "415 Invalid image"
-        And the "Content-Type" response header is "application/json"
-        And the Imbo error message is "Invalid image" and the error code is "205"
+    # Scenario: Add a broken image with identifiable size
+    #    Given I use "publicKey" and "privateKey" for public and private keys
+    #    And I sign the request
+    #    And the request body contains "tests/phpunit/Fixtures/slightly-broken-image.png"
+    #    When I request "/users/user/images" using HTTP "POST"
+    #    Then the response status line is "415 Invalid image"
+    #    And the "Content-Type" response header is "application/json"
+    #    And the Imbo error message is "Invalid image" and the error code is "205"
