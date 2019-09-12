@@ -29,7 +29,7 @@ abstract class ListenerTests extends TestCase {
         $listener = $this->getListener();
         $className = get_class($listener);
         $events = $className::getSubscribedEvents();
-        $this->assertInternalType('array', $events);
+        $this->assertIsArray($events);
 
         foreach ($events as $event => $callbacks) {
             if (is_string($callbacks)) {
@@ -37,7 +37,7 @@ abstract class ListenerTests extends TestCase {
             } else {
                 foreach ($callbacks as $method => $priority) {
                     $this->assertTrue(method_exists($listener, $method), 'Method ' . $method . ' does not exist in class ' . $className);
-                    $this->assertInternalType('integer', $priority);
+                    $this->assertIsInt($priority);
                 }
             }
         }

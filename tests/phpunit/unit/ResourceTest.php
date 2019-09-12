@@ -19,8 +19,8 @@ use PHPUnit\Framework\TestCase;
  */
 class ResourceTest extends TestCase {
     public function testMethodsReturnsArrays() {
-        $this->assertInternalType('array', Resource::getReadOnlyResources());
-        $this->assertInternalType('array', Resource::getReadWriteResources());
-        $this->assertInternalType('array', Resource::getAllResources());
+        $this->assertIsArray(Resource::getReadOnlyResources());
+        $this->assertIsArray(Resource::getReadWriteResources());
+        $this->assertIsArray(Resource::getAllResources());
     }
 }

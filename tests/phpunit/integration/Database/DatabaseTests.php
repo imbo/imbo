@@ -349,7 +349,7 @@ abstract class DatabaseTests extends TestCase {
         );
 
         $now = $this->adapter->setLastModifiedNow($user, $imageIdentifier);
-        $this->assertEquals(time(), $now->getTimestamp(), 'Returned timestamp should be around now', 1);
+        $this->assertEqualsWithDelta(time(), $now->getTimestamp(), 1, 'Returned timestamp should be around now');
 
         $image = new Image();
         $this->assertTrue($this->adapter->load($user, $imageIdentifier, $image));
@@ -388,16 +388,13 @@ abstract class DatabaseTests extends TestCase {
     }
 
     /**
-     * @expectedException Imbo\Exception\DatabaseException
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessage Image not found
      * @covers ::setLastModifiedTime
      */
     public function testCannotSetLastModifiedDateForMissingImage() {
-        $user = 'user';
-        $imageIdentifier = 'id';
-
-        $this->adapter->setLastModifiedNow($user, $imageIdentifier);
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionCode(404);
+        $this->expectExceptionMessage('Image not found');
+        $this->adapter->setLastModifiedNow('user', 'id');
     }
 
     /**

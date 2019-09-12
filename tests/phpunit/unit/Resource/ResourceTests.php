@@ -31,7 +31,7 @@ abstract class ResourceTests extends TestCase {
      */
     public function testReturnsCorrectEventSubscriptions() {
         $className = get_class($this->getNewResource());
-        $this->assertInternalType('array', $className::getSubscribedEvents());
+        $this->assertIsArray($className::getSubscribedEvents());
     }
 
     /**
@@ -46,7 +46,7 @@ abstract class ResourceTests extends TestCase {
         $methods = $resource->getAllowedMethods();
         $definition = $resource::getSubscribedEvents();
 
-        $this->assertInternalType('array', $definition);
+        $this->assertIsArray($definition);
 
         foreach ($methods as $method) {
             $expectedEventName = strtolower($shortName . '.' . $method);

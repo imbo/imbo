@@ -238,7 +238,7 @@ class CorsTest extends ListenerTests {
      */
     public function testReturnsSubscribedEvents() {
         $className = get_class($this->listener);
-        $this->assertInternalType('array', $className::getSubscribedEvents());
+        $this->assertIsArray($className::getSubscribedEvents());
     }
 
     /**

@@ -37,7 +37,7 @@ class WebpTest extends TestCase {
     public function testReturnsSupportedMimeTypes() {
         $types = $this->converter->getSupportedMimeTypes();
 
-        $this->assertInternalType('array', $types);
+        $this->assertIsArray($types);
 
         $this->assertContains('image/webp', array_keys($types));
     }
