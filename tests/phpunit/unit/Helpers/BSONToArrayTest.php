@@ -29,7 +29,7 @@ class BSONToArrayTest extends TestCase {
     /**
      * Set up the helper
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->helper = new BSONToArray();
     }
 

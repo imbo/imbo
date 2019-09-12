@@ -78,7 +78,7 @@ abstract class StorageTests extends TestCase {
     /**
      * Set up
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->imageData = file_get_contents(FIXTURES_DIR . '/image.png');
         $this->driver = $this->getDriver();
     }

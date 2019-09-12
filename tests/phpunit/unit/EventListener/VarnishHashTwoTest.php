@@ -31,7 +31,7 @@ class VarnishHashTwoTest extends ListenerTests {
     /**
      * Set up the listener
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->request = $this->createMock('Imbo\Http\Request\Request');
 
         $this->responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');

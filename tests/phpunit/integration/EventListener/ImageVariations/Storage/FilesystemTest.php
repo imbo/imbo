@@ -36,7 +36,7 @@ class FilesystemTest extends StorageTests {
     /**
      * Set up the directory for each test, ensuring it's empty
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'imboVariationsFilesystemIntegrationTest';
 
         if (is_dir($this->path)) {

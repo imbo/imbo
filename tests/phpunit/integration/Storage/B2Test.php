@@ -36,7 +36,7 @@ class B2Test extends StorageTests {
     /**
      * Make sure we have the correct config available
      */
-    public function setUp() {
+    public function setUp() : void {
         $required = ['BACKBLAZE_B2_ACCOUNT_ID', 'BACKBLAZE_B2_APPLICATION_KEY', 'BACKBLAZE_B2_BUCKET', 'BACKBLAZE_B2_BUCKET_ID'];
         $missing = [];
 

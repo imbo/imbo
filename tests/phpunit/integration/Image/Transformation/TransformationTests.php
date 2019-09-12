@@ -27,7 +27,7 @@ abstract class TransformationTests extends TestCase {
     /**
      * Make sure we have Imagick available
      */
-    public function setUp() {
+    public function setUp() : void {
         if (!class_exists('Imagick')) {
             $this->markTestSkipped('Imagick must be available to run this test');
         }

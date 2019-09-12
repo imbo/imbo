@@ -27,7 +27,7 @@ class AccessRuleTest extends TestCase {
     /**
      * Set up the model
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->model = new AccessRule();
     }
 

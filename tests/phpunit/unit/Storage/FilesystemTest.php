@@ -40,7 +40,7 @@ class FilesystemTest extends TestCase {
     /**
      * Setup method
      */
-    public function setUp() {
+    public function setUp() : void {
         if (!class_exists('org\bovigo\vfs\vfsStream')) {
             $this->markTestSkipped('This testcase requires vfsStream to run');
         }

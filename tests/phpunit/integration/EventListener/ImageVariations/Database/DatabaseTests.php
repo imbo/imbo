@@ -33,7 +33,7 @@ abstract class DatabaseTests extends TestCase {
     /**
      * Set up
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->adapter = $this->getAdapter();
     }
 

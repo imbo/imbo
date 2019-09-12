@@ -38,7 +38,7 @@ class StatsTest extends ResourceTests {
     /**
      * Set up the resource
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->response = $this->createMock('Imbo\Http\Response\Response');
         $this->eventManager = $this->createMock('Imbo\EventManager\EventManager');
         $this->event = $this->createMock('Imbo\EventManager\Event');

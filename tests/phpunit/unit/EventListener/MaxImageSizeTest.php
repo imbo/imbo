@@ -26,7 +26,7 @@ class MaxImageSizeTest extends ListenerTests {
     /**
      * Set up the listener
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->listener = new MaxImageSize([]);
     }
 

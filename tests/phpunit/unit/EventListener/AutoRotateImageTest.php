@@ -27,7 +27,7 @@ class AutoRotateImageTest extends TestCase {
     /**
      * Set up the listener
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->listener = new AutoRotateImage();
     }
 

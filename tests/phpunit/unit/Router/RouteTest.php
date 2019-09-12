@@ -27,7 +27,7 @@ class RouteTest extends TestCase {
     /**
      * Set up the route instance
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->route = new Route();
     }
 

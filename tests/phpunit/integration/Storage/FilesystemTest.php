@@ -33,7 +33,7 @@ class FilesystemTest extends StorageTests {
         ]);
     }
 
-    public function setUp() {
+    public function setUp() : void {
         $this->path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'imboFilesystemIntegrationTest';
 
         if (is_dir($this->path)) {

@@ -91,7 +91,7 @@ class ImageTransformationCacheTest extends ListenerTests {
     /**
      * Set up the listener
      */
-    public function setUp() {
+    public function setUp() : void {
         if (!class_exists(vfsStream::class)) {
             $this->markTestSkipped('This testcase requires mikey179/vfsStream to run');
         }

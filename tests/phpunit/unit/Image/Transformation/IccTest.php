@@ -45,7 +45,7 @@ class IccTest extends TestCase {
     /**
      * Set up the transformation instance
      */
-    public function setUp() {
+    public function setUp() : void {
         $blob = file_get_contents(FIXTURES_DIR . '/white.png');
 
         $this->image = $this->createMock('Imbo\Model\Image');

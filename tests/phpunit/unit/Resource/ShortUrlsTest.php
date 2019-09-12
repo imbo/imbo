@@ -40,7 +40,7 @@ class ShortUrlsTest extends ResourceTests {
     /**
      * Set up the resource
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->resource = $this->getNewResource();
         $this->request = $this->createMock('Imbo\Http\Request\Request');
         $this->response = $this->createMock('Imbo\Http\Response\Response');

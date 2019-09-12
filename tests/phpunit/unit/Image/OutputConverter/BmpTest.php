@@ -27,7 +27,7 @@ class BmpTest extends TestCase {
     /**
      * Set up the loader
      */
-    public function setup() {
+    public function setUp() : void {
         $this->converter = new Bmp();
     }
 

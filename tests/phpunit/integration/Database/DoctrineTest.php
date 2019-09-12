@@ -76,7 +76,7 @@ class DoctrineTest extends DatabaseTests {
     /**
      * Create the necessary tables for testing
      */
-    public function setUp() {
+    public function setUp() : void {
         if (!extension_loaded('PDO')) {
             $this->markTestSkipped('PDO is required to run this test');
         }

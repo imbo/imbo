@@ -39,7 +39,7 @@ class GridFSTest extends StorageTests {
     /**
      * Make sure we have the mongo extension available and drop the test database just in case
      */
-    public function setUp() {
+    public function setUp() : void {
         if (!class_exists('MongoDB\Driver\Manager') || !class_exists('MongoDB\Client')) {
             $this->markTestSkipped('pecl/mongodb and mongodb/mongodb are both required to run this test');
         }

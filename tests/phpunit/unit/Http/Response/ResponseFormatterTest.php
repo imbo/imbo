@@ -43,7 +43,7 @@ class ResponseFormatterTest extends TestCase {
     /**
      * Set up the response formatter
      */
-    public function setUp() {
+    public function setUp() : void {
         $this->event = $this->createMock('Imbo\EventManager\Event');
         $this->request = $this->createMock('Imbo\Http\Request\Request');
         $this->response = $this->createMock('Imbo\Http\Response\Response');
