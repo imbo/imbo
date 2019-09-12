@@ -7,7 +7,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Sepia transformation
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image\Transformations
  */
 class Sepia extends Transformation {

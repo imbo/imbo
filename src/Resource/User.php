@@ -6,7 +6,6 @@ use Imbo\EventManager\EventInterface;
 /**
  * User resource
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
 class User implements ResourceInterface {

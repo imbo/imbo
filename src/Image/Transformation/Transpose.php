@@ -7,8 +7,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Transpose transformation
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
 class Transpose extends Transformation {

@@ -15,7 +15,6 @@ use Imbo\Image\InputLoader\InputLoaderInterface,
  * support the image for any reason, or throw a LoaderException if the image is determined to be
  * invalid or damaged.
  *
- * @author Mats Lindh <mats@lindh.no>
  * @package Image
  */
 class InputLoaderManager {

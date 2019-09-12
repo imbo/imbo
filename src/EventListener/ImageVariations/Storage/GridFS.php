@@ -19,7 +19,6 @@ use Imbo\Exception\StorageException,
  * - `string databaseName`: Name of the database to connect to. Defaults to 'imbo_imagevariation_storage'
  * - `array bucketOptions`: Options for the internal Bucket instance. Defaults to []
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Storage
  */
 class GridFS implements StorageInterface {

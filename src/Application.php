@@ -24,7 +24,6 @@ use Imbo\Http\Request\Request,
 /**
  * Imbo application
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Core
  */
 class Application {

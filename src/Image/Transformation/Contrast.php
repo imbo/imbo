@@ -7,8 +7,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Contrast transformation
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image\Transformations
  */
 class Contrast extends Transformation {

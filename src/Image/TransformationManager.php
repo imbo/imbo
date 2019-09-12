@@ -11,7 +11,6 @@ use Imbo\Image\Transformation\Transformation,
 /**
  * Image transformation manager
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Event\Manager
  */
 class TransformationManager implements ListenerInterface {

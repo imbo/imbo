@@ -21,7 +21,6 @@ use Imbo\Exception\StorageException,
  *                   to using the B2 client.
  * - (string) bucketId The id of the bucket referenced by name. We currently need both.
  *
- * @author Mats Lindh <mats@lindh.no>
  * @package Storage
  */
 class B2 implements StorageInterface {

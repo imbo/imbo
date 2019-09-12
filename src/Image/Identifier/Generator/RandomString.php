@@ -6,7 +6,6 @@ use Imbo\Model\Image;
 /**
  * Random string image identifier generator
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Core\Image\Identifier\Generator
  */
 class RandomString implements GeneratorInterface {

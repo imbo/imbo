@@ -3,8 +3,6 @@ namespace ImboBehatFeatureContext;
 
 /**
  * Interface for adapter test classes
- *
- * @author Christer Edvartsen <cogo@starzinger.net>
  */
 interface AdapterTest {
     /**

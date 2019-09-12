@@ -7,7 +7,6 @@ use Imbo\Version,
 /**
  * Cli application
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Cli
  */
 class CliApplication extends BaseApplication {

@@ -6,7 +6,6 @@ use Imbo\Exception\RuntimeException;
 /**
  * Query object for the images resource
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources\Images
  */
 class Query {

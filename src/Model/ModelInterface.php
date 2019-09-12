@@ -4,7 +4,6 @@ namespace Imbo\Model;
 /**
  * Model interface
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Models
  */
 interface ModelInterface {

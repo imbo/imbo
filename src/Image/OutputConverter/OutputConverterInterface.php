@@ -7,7 +7,6 @@ use Imagick;
 /**
  * Loader interface
  *
- * @author Mats Lindh <mats@lindh.no>
  * @package Image\OutputConverters
  */
 interface OutputConverterInterface {

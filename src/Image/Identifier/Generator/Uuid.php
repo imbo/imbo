@@ -7,7 +7,6 @@ use Imbo\Model\Image,
 /**
  * UUID image identifier generator
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Core\Image\Identifier\Generator
  */
 class Uuid implements GeneratorInterface {

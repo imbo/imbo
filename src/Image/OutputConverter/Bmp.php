@@ -9,7 +9,6 @@ use ImagickException;
 /**
  * Output converter for outputting BMP. Make the web great again.
  *
- * @author Mats Lindh <mats@lindh.no>
  * @package Image\OutputConverters
  */
 class Bmp implements OutputConverterInterface {

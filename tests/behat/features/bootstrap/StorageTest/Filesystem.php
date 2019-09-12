@@ -8,8 +8,6 @@ use RecursiveDirectoryIterator;
 
 /**
  * Class for suites that want to use the Filesystem storage adapter
- *
- * @author Christer Edvartsen <cogo@starzinger.net>
  */
 class Filesystem implements AdapterTest {
     /**

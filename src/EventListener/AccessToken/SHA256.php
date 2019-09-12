@@ -4,7 +4,6 @@ namespace Imbo\EventListener\AccessToken;
 /**
  * Implementation of the default SHA256 access token generator (HMAC-ed with the private key)
  *
- * @author Mats Lindh <mats@lindh.no>
  * @package AccessToken
  */
 class SHA256 extends AccessTokenGenerator {

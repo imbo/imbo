@@ -8,7 +8,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Thumbnail transformation
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
 class Thumbnail extends Transformation implements InputSizeConstraint {

@@ -6,7 +6,6 @@ use Imbo\Model\Image;
 /**
  * Image identifier generator interface
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Core\Image\Identifier\Generator
  */
 interface GeneratorInterface {

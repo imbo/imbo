@@ -20,7 +20,6 @@ use Imbo\Exception\StorageException,
  *                   to using this client. Imbo will not try to automatically add the bucket for
  *                   you.
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Storage
  */
 class S3 implements StorageInterface {

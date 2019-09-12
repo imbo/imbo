@@ -7,7 +7,6 @@ use Imbo\Exception\InvalidArgumentException,
 /**
  * Simple array-backed access control adapter
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Core\Auth\AccessControl\Adapter
  */
 class SimpleArrayAdapter extends ArrayAdapter implements AdapterInterface {

@@ -11,7 +11,6 @@ use Imbo\Exception\StorageException,
 /**
  * Watermark transformation
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image\Transformations
  */
 class Watermark extends Transformation implements InputSizeConstraint {

@@ -10,7 +10,6 @@ use Imbo\Exception\TransformationException,
 /**
  * Canvas transformation
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
 class Canvas extends Transformation implements InputSizeConstraint {

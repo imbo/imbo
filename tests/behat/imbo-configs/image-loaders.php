@@ -5,8 +5,6 @@ use Imbo\Image\InputLoader\InputLoaderInterface;
  * Text .. image .. loader. Renders text to a 300x300 texture.
  *
  * This loader is an example and should never be used in production.
- *
- * @author Mats Lindh <mats@lindh.no>
  */
 class Text implements InputLoaderInterface {
     /**

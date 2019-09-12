@@ -7,7 +7,6 @@ use Imbo\Exception\InvalidArgumentException,
 /**
  * Statistics model
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Models
  */
 class Stats implements ModelInterface, ArrayAccess {

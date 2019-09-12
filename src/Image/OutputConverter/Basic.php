@@ -9,7 +9,6 @@ use ImagickException;
 /**
  * Basic output converter that supports gif/png/jpg.
  *
- * @author Mats Lindh <mats@lindh.no>
  * @package Image\OutputConverters
  */
 class Basic implements OutputConverterInterface {

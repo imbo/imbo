@@ -8,7 +8,6 @@ use Imbo\EventManager\EventInterface,
 /**
  * Metadata resource
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
 class Metadata implements ResourceInterface {

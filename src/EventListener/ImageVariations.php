@@ -12,7 +12,6 @@ use Imbo\EventManager\EventInterface,
 /**
  * Image variations generator
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
  */
 class ImageVariations implements ListenerInterface {

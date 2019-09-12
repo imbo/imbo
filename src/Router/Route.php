@@ -6,7 +6,6 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 /**
  * A class representing the current route matched by the router
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Router
  */
 class Route extends ParameterBag {

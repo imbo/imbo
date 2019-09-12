@@ -7,7 +7,6 @@ use Imbo\Exception,
 /**
  * Runtime exception
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Exceptions
  */
 class RuntimeException extends BaseRuntimeException implements Exception {

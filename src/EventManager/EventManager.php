@@ -8,7 +8,6 @@ use Imbo\EventListener\ListenerInterface,
 /**
  * Event manager
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Manager
  */
 class EventManager {

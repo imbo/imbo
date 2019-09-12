@@ -8,7 +8,6 @@ namespace Imbo\Image;
  * provided to this transformation needs to be adjusted if the input size has changed,
  * for instance when the ImageVariations-listener is used.
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image
  */
 interface InputSizeConstraint {

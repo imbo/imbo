@@ -10,7 +10,6 @@ use Imbo\EventManager\EventInterface,
 /**
  * Access rule resource
  *
- * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Resources
  */
 class AccessRule implements ResourceInterface {

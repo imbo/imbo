@@ -6,7 +6,6 @@ namespace Imbo\Image;
  * can let Imbo know that the transformation will return a region of the input
  * image, given a set of parameters.
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image
  */
 interface RegionExtractor {

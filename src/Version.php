@@ -4,7 +4,6 @@ namespace Imbo;
 /**
  * Version class
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Core
  */
 class Version {

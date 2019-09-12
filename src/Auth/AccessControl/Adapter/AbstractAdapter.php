@@ -9,7 +9,6 @@ use Imbo\Auth\AccessControl\Adapter\AdapterInterface,
 /**
  * Abstract access control adapter
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Core\Auth\AccessControl
  */
 abstract class AbstractAdapter implements AdapterInterface {

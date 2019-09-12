@@ -4,7 +4,6 @@ namespace Imbo\Auth\AccessControl\Adapter;
 /**
  * Mutable access control adapter interface
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Core\Auth\AccessControl\Adapter
  */
 interface MutableAdapterInterface extends AdapterInterface {

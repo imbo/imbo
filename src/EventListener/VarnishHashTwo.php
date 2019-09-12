@@ -9,8 +9,6 @@ use Imbo\EventManager\EventInterface;
  * This event listener can be used to send HashTwo headers for Varnish.
  *
  * @link https://www.varnish-software.com/blog/advanced-cache-invalidation-strategies
- *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
  */
 class VarnishHashTwo implements ListenerInterface {

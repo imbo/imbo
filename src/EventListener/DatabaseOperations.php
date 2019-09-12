@@ -8,7 +8,6 @@ use Imbo\EventManager\EventInterface,
 /**
  * Database operations event listener
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
  */
 class DatabaseOperations implements ListenerInterface {

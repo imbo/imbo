@@ -6,7 +6,6 @@ use Symfony\Component\Console\Command\Command;
 /**
  * Base command
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Cli
  */
 abstract class CliCommand extends Command {

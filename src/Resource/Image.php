@@ -7,7 +7,6 @@ use Imbo\EventManager\EventInterface,
 /**
  * Image resource
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
 class Image implements ResourceInterface {

@@ -9,7 +9,6 @@ use Imbo\Image\Transformation\Transformation,
 /**
  * Vignette transformation
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Image\Transformations
  */
 class Vignette extends Transformation {

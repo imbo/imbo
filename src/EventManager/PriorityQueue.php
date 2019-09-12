@@ -6,7 +6,6 @@ use SplPriorityQueue;
 /**
  * A priority queue used for event listeners
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Manager
  */
 class PriorityQueue extends SplPriorityQueue {

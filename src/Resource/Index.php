@@ -8,7 +8,6 @@ use Imbo\EventManager\EventInterface,
 /**
  * Index resource
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
 class Index implements ResourceInterface {

@@ -13,7 +13,6 @@ use Imbo\EventManager\EventInterface,
  * This resource can be used to manipulate the public keys for an instance,
  * given that a mutable access control adapter is used.
  *
- * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Resources
  */
 class Keys implements ResourceInterface {

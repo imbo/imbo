@@ -12,7 +12,6 @@ use Imbo\EventManager\EventInterface,
  * This resource can be used to monitor the imbo installation to see if it has access to the
  * current database and storage.
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
 class Status implements ResourceInterface {

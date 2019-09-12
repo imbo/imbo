@@ -11,7 +11,6 @@ use Imagick,
 /**
  * Abstract transformation
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
 abstract class Transformation implements ListenerInterface, ImagickAware {

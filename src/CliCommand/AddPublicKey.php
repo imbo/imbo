@@ -15,7 +15,6 @@ use Imbo\Exception\RuntimeException;
 /**
  * Add a public key to the configured access control adapter
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Cli
  */
 class AddPublicKey extends CliCommand {

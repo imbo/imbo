@@ -7,7 +7,6 @@ use MongoDB\Model\BSONDocument,
 /**
  * Convert BSONDocument and BSONArray to their array counterparts, recursively
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Core\Helpers
  */
 class BSONToArray {

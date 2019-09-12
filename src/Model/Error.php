@@ -9,7 +9,6 @@ use Imbo\Exception,
 /**
  * Error model
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Models
  */
 class Error implements ModelInterface {

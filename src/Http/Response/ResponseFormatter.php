@@ -11,7 +11,6 @@ use Imbo\EventManager\EventInterface,
  * This event listener will correctly format the response body based on the Accept headers in the
  * request
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Http
  */
 class ResponseFormatter implements ListenerInterface {

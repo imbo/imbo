@@ -15,7 +15,6 @@ use Imbo\Exception\StorageException,
  *
  * - <pre>(string) dataDir</pre> Absolute path to the base directory the images should be stored in
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Storage
  */
 class Filesystem implements StorageInterface {

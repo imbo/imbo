@@ -10,7 +10,6 @@ use Imbo\Exception\TransformationException,
  *
  * This transformation can be used to adjust the level of RGB/CMYK in an image.
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Image\Transformations
  */
 class Level extends Transformation {

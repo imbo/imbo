@@ -8,8 +8,6 @@ use Imbo\Image\RegionExtractor,
 /**
  * SmartSize transformation
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
- * @author Kristoffer Brabrand <kristoffer@brabrand.no>
  * @package Image\Transformations
  */
 class SmartSize extends Transformation {

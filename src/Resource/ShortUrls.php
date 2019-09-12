@@ -9,7 +9,6 @@ use Imbo\EventManager\EventInterface,
 /**
  * Short URL collection
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Resources
  */
 class ShortUrls implements ResourceInterface {

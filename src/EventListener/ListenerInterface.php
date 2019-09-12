@@ -4,7 +4,6 @@ namespace Imbo\EventListener;
 /**
  * Event listener interface
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Event\Listeners
  */
 interface ListenerInterface {

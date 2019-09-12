@@ -29,7 +29,6 @@ use Imbo\Model\Image,
  * - (array) options Options to use when creating the MongoDB\Client instance. Defaults to
  *                   ['connect' => true, 'connectTimeoutMS' => 1000].
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Database
  */
 class MongoDB implements DatabaseInterface {

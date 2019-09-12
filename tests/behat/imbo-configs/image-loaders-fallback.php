@@ -1,9 +1,6 @@
 <?php
 use Imbo\Image\InputLoader\InputLoaderInterface;
 
-/**
- * @author Mats Lindh <mats@lindh.no>
- */
 class OverrideJpegDummyLoader implements InputLoaderInterface {
     public function getSupportedMimeTypes() {
         return [

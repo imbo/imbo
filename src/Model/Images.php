@@ -4,7 +4,6 @@ namespace Imbo\Model;
 /**
  * Images model
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Models
  */
 class Images implements ModelInterface {

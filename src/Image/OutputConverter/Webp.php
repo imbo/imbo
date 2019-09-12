@@ -9,7 +9,6 @@ use ImagickException;
 /**
  * Output converter for outputting Webp
  *
- * @author Mats Lindh <mats@lindh.no>
  * @package Image\OutputConverters
  */
 class Webp implements OutputConverterInterface {

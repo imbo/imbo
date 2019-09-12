@@ -8,7 +8,6 @@ use Imbo\Model,
 /**
  * Abstract formatter
  *
- * @author Christer Edvartsen <cogo@starzinger.net>
  * @package Response\Formatters
  */
 abstract class Formatter implements FormatterInterface {

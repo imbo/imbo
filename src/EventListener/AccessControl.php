@@ -15,7 +15,6 @@ use Imbo\EventManager\EventInterface,
  * the listener will throw an exception resulting in a HTTP response with 400 Bad Request.
  * It will also handle loading of ACL-related resources such as resource groups.
  *
- * @author Espen Hovlandsdal <espen@hovlandsdal.com>
  * @package Event\Listeners
  */
 class AccessControl implements ListenerInterface {

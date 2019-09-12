@@ -12,7 +12,6 @@ use Imbo\EventManager\EventInterface,
  * This listener will look for properties stored in the image, and store certain metadata (at the
  * moment, the available clipping paths) in Imbo.
  *
- * @author Mats Lindh <mats@lindh.no>
  * @package Event\Listeners
  */
 class EightbimMetadata implements ListenerInterface, ImagickAware {
