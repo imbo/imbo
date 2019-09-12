@@ -6,8 +6,6 @@ use ImagickException;
 
 /**
  * Flip vertically transformation
- *
- * @package Image\Transformations
  */
 class FlipVertically extends Transformation {
     /**

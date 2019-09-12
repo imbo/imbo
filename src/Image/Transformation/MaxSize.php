@@ -7,8 +7,6 @@ use ImagickException;
 
 /**
  * MaxSize transformation
- *
- * @package Image\Transformations
  */
 class MaxSize extends Transformation implements InputSizeConstraint {
     /**

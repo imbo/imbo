@@ -6,8 +6,6 @@ use ImagickException;
 
 /**
  * Modulate transformation
- *
- * @package Image\Transformations
  */
 class Modulate extends Transformation {
     /**

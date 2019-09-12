@@ -5,8 +5,6 @@ use Imagick;
 
 /**
  * Basic image loader / fallback image loader
- *
- * @package Image\Loaders
  */
 class Basic implements InputLoaderInterface {
     /**

@@ -1,11 +1,6 @@
 <?php
 namespace Imbo\Model;
 
-/**
- * Group model
- *
- * @package Models
- */
 class Group implements ModelInterface {
     /**
      * Name of the group

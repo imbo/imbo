@@ -3,8 +3,6 @@ namespace Imbo\EventListener\AccessToken;
 
 /**
  * Interface for Access Token Generation
- *
- * @package AccessToken
  */
 interface AccessTokenInterface {
     /**

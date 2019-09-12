@@ -6,8 +6,6 @@ use RuntimeException as BaseRuntimeException;
 
 /**
  * Runtime exception
- *
- * @package Exceptions
  */
 class RuntimeException extends BaseRuntimeException implements Exception {
     /**

@@ -3,11 +3,6 @@ namespace Imbo\Model;
 
 use DateTime;
 
-/**
- * Image model
- *
- * @package Models
- */
 class Image implements ModelInterface {
     /**
      * Mapping for some mime types

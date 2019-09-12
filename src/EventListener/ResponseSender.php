@@ -5,8 +5,6 @@ use Imbo\EventManager\EventInterface;
 
 /**
  * Response sender listener
- *
- * @package Event\Listeners
  */
 class ResponseSender implements ListenerInterface {
     /**

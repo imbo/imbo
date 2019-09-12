@@ -7,8 +7,6 @@ use Imbo\Model;
 
 /**
  * Metadata resource
- *
- * @package Resources
  */
 class Metadata implements ResourceInterface {
     /**

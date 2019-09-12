@@ -11,8 +11,6 @@ use Imbo\Exception\DatabaseException;
 
 /**
  * Image variations generator
- *
- * @package Event\Listeners
  */
 class ImageVariations implements ListenerInterface {
     /**

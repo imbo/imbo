@@ -3,8 +3,6 @@ namespace Imbo\Helpers;
 
 /**
  * Helper class for Imagick
- *
- * @package Core\Helpers
  */
 class Imagick {
     /**

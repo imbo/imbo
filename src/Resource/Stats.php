@@ -8,8 +8,6 @@ use Imbo\EventManager\EventInterface;
  *
  * This resource can be used to monitor the imbo installation to see if it has access to the
  * current database and storage.
- *
- * @package Resources
  */
 class Stats implements ResourceInterface {
     /**

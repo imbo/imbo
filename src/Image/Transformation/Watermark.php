@@ -10,8 +10,6 @@ use ImagickException;
 
 /**
  * Watermark transformation
- *
- * @package Image\Transformations
  */
 class Watermark extends Transformation implements InputSizeConstraint {
     /**

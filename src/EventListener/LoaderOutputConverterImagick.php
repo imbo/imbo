@@ -5,8 +5,6 @@ use Imbo\EventManager\EventInterface;
 
 /**
  * Add the current Imagick instance to the active LoaderManager and OutputConverterManager
- *
- * @package Event\Listeners
  */
 class LoaderOutputConverterImagick implements ListenerInterface, ImagickAware {
     /**

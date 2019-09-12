@@ -12,8 +12,6 @@ use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
  *
  * This resource can be used to manipulate the public keys for an instance,
  * given that a mutable access control adapter is used.
- *
- * @package Resources
  */
 class Keys implements ResourceInterface {
     /**

@@ -9,8 +9,6 @@ use Imbo\EventManager\EventInterface;
  * This event listener is responsible for reading the initial image data, and updating the model
  * before sending back transformed images to the client, or when storing transformed images in the
  * storage.
- *
- * @package Event\Listeners
  */
 class Imagick implements ListenerInterface, ImagickAware {
     /**

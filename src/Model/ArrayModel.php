@@ -1,11 +1,6 @@
 <?php
 namespace Imbo\Model;
 
-/**
- * Simple model using an associative array for data
- *
- * @package Models
- */
 class ArrayModel implements ModelInterface {
     /**
      * Data

@@ -6,8 +6,6 @@ use Imagick;
 
 /**
  * Loader interface
- *
- * @package Image\OutputConverters
  */
 interface OutputConverterInterface {
     /**

@@ -6,8 +6,6 @@ use ImagickException;
 
 /**
  * Desaturate transformation
- *
- * @package Image\Transformations
  */
 class Desaturate extends Transformation {
     /**

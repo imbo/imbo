@@ -9,8 +9,6 @@ use ImagickPixelException;
 
 /**
  * Canvas transformation
- *
- * @package Image\Transformations
  */
 class Canvas extends Transformation implements InputSizeConstraint {
     /**

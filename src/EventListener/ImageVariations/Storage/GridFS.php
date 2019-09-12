@@ -18,8 +18,6 @@ use MongoDB\Driver\Exception\Exception as MongoDBException;
  *                          ['connect' => true, 'connectTimeoutMS' => 1000]
  * - `string databaseName`: Name of the database to connect to. Defaults to 'imbo_imagevariation_storage'
  * - `array bucketOptions`: Options for the internal Bucket instance. Defaults to []
- *
- * @package Storage
  */
 class GridFS implements StorageInterface {
     /**

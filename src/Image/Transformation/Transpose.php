@@ -6,8 +6,6 @@ use ImagickException;
 
 /**
  * Transpose transformation
- *
- * @package Image\Transformations
  */
 class Transpose extends Transformation {
     /**

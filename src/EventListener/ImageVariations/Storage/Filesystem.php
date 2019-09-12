@@ -10,8 +10,6 @@ use Imbo\Exception\StorageException;
  *
  * - <pre>(string) dataDir</pre> Absolute path to the base directory the image variations should
  *                               be stored in. Must be specified.
- *
- * @package Storage
  */
 class Filesystem implements StorageInterface {
     /**

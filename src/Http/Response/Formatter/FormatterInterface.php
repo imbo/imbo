@@ -6,8 +6,6 @@ use Imbo\Exception\InvalidArgumentException;
 
 /**
  * Interface for formatters
- *
- * @package Response\Formatters
  */
 interface FormatterInterface {
     /**

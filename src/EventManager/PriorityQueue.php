@@ -3,11 +3,6 @@ namespace Imbo\EventManager;
 
 use SplPriorityQueue;
 
-/**
- * A priority queue used for event listeners
- *
- * @package Event\Manager
- */
 class PriorityQueue extends SplPriorityQueue {
     /**
      * Queue order counter

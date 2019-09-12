@@ -7,8 +7,6 @@ use Imbo\Model\Groups as GroupsModel;
 
 /**
  * Array-backed access control adapter
- *
- * @package Core\Auth\AccessControl\Adapter
  */
 class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
     /**

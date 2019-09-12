@@ -6,8 +6,6 @@ use ImagickException;
 
 /**
  * Contrast transformation
- *
- * @package Image\Transformations
  */
 class Contrast extends Transformation {
     /**

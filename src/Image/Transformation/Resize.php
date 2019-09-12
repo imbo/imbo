@@ -7,8 +7,6 @@ use ImagickException;
 
 /**
  * Resize transformation
- *
- * @package Image\Transformations
  */
 class Resize extends Transformation implements InputSizeConstraint {
     /**

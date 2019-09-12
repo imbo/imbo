@@ -7,8 +7,6 @@ use Imbo\Exception\StorageException;
  * Storage adapter interface
  *
  * This is an interface for storage adapters in Imbo.
- *
- * @package Storage
  */
 interface StorageInterface {
     /**

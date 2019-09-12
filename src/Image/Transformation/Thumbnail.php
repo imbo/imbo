@@ -7,8 +7,6 @@ use ImagickException;
 
 /**
  * Thumbnail transformation
- *
- * @package Image\Transformations
  */
 class Thumbnail extends Transformation implements InputSizeConstraint {
     /**

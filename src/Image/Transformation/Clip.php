@@ -7,8 +7,6 @@ use ImagickException;
 
 /**
  * Clip transformation for making an image transparent outside of a clipping mask
- *
- * @package Image\Transformations
  */
 class Clip extends Transformation {
     /**

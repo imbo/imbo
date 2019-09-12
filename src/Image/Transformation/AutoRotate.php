@@ -10,8 +10,6 @@ use ImagickPixelException;
 /**
  * Automatic rotate transformation. Rotates and flips the image
  * based on the EXIF orientation tag.
- *
- * @package Image\Transformations
  */
 class AutoRotate extends Transformation implements InputSizeConstraint {
     /**

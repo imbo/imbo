@@ -9,8 +9,6 @@ use Imbo\Model\AccessRule as AccessRuleModel;
 
 /**
  * Access rule resource
- *
- * @package Resources
  */
 class AccessRule implements ResourceInterface {
     /**

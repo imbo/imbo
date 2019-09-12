@@ -14,8 +14,6 @@ use finfo;
 
 /**
  * Image preparation
- *
- * @package Image
  */
 class ImagePreparation implements ListenerInterface {
     /**

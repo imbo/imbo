@@ -6,8 +6,6 @@ use ImagickException;
 
 /**
  * Blur transformation
- *
- * @package Image\Transformations
  */
 class Blur extends Transformation {
     /**

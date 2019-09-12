@@ -23,11 +23,6 @@ use RecursiveDirectoryIterator;
 use Imagick;
 use ImagickException;
 
-/**
- * Imbo feature context
- *
- * @package Test suite\Functional tests
- */
 class FeatureContext extends ApiContext {
     /**
      * Names for middlewares

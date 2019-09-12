@@ -6,8 +6,6 @@ use ImagickException;
 
 /**
  * Transverse transformation
- *
- * @package Image\Transformations
  */
 class Transverse extends Transformation {
     /**

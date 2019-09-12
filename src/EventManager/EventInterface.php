@@ -10,11 +10,6 @@ use Imbo\Image\OutputConverterManager;
 use Imbo\Image\TransformationManager;
 use Imbo\Image\InputLoaderManager;
 
-/**
- * Event interface
- *
- * @package Event
- */
 interface EventInterface {
     /**
      * Get the event name

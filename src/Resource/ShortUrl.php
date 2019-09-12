@@ -5,11 +5,6 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Exception\ResourceException;
 use Imbo\Model\ArrayModel;
 
-/**
- * Short URL collection
- *
- * @package Resources
- */
 class ShortUrl implements ResourceInterface {
     /**
      * {@inheritdoc}

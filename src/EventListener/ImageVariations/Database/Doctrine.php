@@ -11,8 +11,6 @@ use PDO;
  * Doctrine 2 database driver for the image variations
  *
  * Refer to http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest for configuration parameters
- *
- * @package Database
  */
 class Doctrine implements DatabaseInterface {
     /**

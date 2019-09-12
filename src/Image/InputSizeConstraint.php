@@ -7,8 +7,6 @@ namespace Imbo\Image;
  * given a set of parameters. It can also be used to signal that the parameters
  * provided to this transformation needs to be adjusted if the input size has changed,
  * for instance when the ImageVariations-listener is used.
- *
- * @package Image
  */
 interface InputSizeConstraint {
     const NO_TRANSFORMATION = 0;

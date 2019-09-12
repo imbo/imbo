@@ -1,11 +1,6 @@
 <?php
 namespace Imbo\Model;
 
-/**
- * Access rule model
- *
- * @package Models
- */
 class AccessRule implements ModelInterface {
     /**
      * ID of the rule

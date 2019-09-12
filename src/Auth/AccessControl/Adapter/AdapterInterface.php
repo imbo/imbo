@@ -6,8 +6,6 @@ use Imbo\Model\Groups as GroupsModel;
 
 /**
  * Access control interface
- *
- * @package Core\Auth\AccessControl
  */
 interface AdapterInterface {
     /**

@@ -10,8 +10,6 @@ use Imbo\EventListener\ListenerInterface;
 
 /**
  * Image transformation manager
- *
- * @package Event\Manager
  */
 class TransformationManager implements ListenerInterface {
     /**

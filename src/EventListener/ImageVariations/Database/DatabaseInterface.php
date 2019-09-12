@@ -5,8 +5,6 @@ use Imbo\Exception\DatabaseException;
 
 /**
  * Database adapter interface for the image variations event listener
- *
- * @package Database
  */
 interface DatabaseInterface {
     /**

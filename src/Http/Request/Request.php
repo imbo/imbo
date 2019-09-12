@@ -8,8 +8,6 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 /**
  * Request class
- *
- * @package Http
  */
 class Request extends SymfonyRequest {
     /**

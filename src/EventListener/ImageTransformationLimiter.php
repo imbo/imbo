@@ -7,8 +7,6 @@ use Imbo\Exception\ResourceException;
 
 /**
  * Limit the number of transformations that can be applied in a request.
- *
- * @package Event\Listeners
  */
 class ImageTransformationLimiter implements ListenerInterface {
     /**

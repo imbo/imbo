@@ -7,8 +7,6 @@ use Imbo\Model;
 
 /**
  * Database operations event listener
- *
- * @package Event\Listeners
  */
 class DatabaseOperations implements ListenerInterface {
     /**

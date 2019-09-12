@@ -17,8 +17,6 @@ use GuzzleHttp\Psr7;
  * valid access token. The official PHP-based imbo client (https://github.com/imbo/imboclient-php)
  * appends this token to all such requests by default. If the access token is missing or invalid
  * the event listener will throw an exception resulting in a HTTP response with 400 Bad Request.
- *
- * @package Event\Listeners
  */
 class AccessToken implements ListenerInterface {
     /**

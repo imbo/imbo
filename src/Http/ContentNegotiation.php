@@ -3,8 +3,6 @@ namespace Imbo\Http;
 
 /**
  * Content negotiation
- *
- * @package Http
  */
 class ContentNegotiation {
     /**

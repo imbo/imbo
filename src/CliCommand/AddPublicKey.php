@@ -12,11 +12,6 @@ use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
 use Imbo\Resource;
 use Imbo\Exception\RuntimeException;
 
-/**
- * Add a public key to the configured access control adapter
- *
- * @package Cli
- */
 class AddPublicKey extends CliCommand {
     const RESOURCES_READ_ONLY = 'Read-only on user resources';
     const RESOURCES_READ_WRITE = 'Read+write on user resources';

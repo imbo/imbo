@@ -4,11 +4,6 @@ namespace Imbo\Model;
 use Imbo\Exception\InvalidArgumentException;
 use ArrayAccess;
 
-/**
- * Statistics model
- *
- * @package Models
- */
 class Stats implements ModelInterface, ArrayAccess {
     /**
      * Custom stats that can be set

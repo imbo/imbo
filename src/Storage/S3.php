@@ -19,8 +19,6 @@ use DateTimeZone;
  * - (string) bucket The name of the bucket to store the files in. The bucket should exist prior
  *                   to using this client. Imbo will not try to automatically add the bucket for
  *                   you.
- *
- * @package Storage
  */
 class S3 implements StorageInterface {
     /**

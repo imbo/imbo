@@ -3,8 +3,6 @@ namespace Imbo\Auth\AccessControl;
 
 /**
  * Abstract query interface for access control
- *
- * @package Core\Auth\AccessControl
  */
 abstract class AbstractQuery {
     /**

@@ -8,8 +8,6 @@ use ImagickPixelException;
 
 /**
  * Rotate transformation
- *
- * @package Image\Transformations
  */
 class Rotate extends Transformation implements InputSizeConstraint {
     /**

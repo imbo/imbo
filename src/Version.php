@@ -3,8 +3,6 @@ namespace Imbo;
 
 /**
  * Version class
- *
- * @package Core
  */
 class Version {
     /**

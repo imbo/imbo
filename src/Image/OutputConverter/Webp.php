@@ -8,8 +8,6 @@ use ImagickException;
 
 /**
  * Output converter for outputting Webp
- *
- * @package Image\OutputConverters
  */
 class Webp implements OutputConverterInterface {
     /**

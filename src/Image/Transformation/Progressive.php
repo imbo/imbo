@@ -9,8 +9,6 @@ use ImagickException;
 
 /**
  * Progressive image transformation
- *
- * @package Image\Transformations
  */
 class Progressive extends Transformation {
     /**

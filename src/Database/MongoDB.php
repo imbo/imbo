@@ -28,8 +28,6 @@ use DateTimeZone;
  *                   'mongodb://localhost:27017'
  * - (array) options Options to use when creating the MongoDB\Client instance. Defaults to
  *                   ['connect' => true, 'connectTimeoutMS' => 1000].
- *
- * @package Database
  */
 class MongoDB implements DatabaseInterface {
     /**

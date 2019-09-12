@@ -23,8 +23,6 @@ use Imbo\Image\OutputConverterManager;
 
 /**
  * Imbo application
- *
- * @package Core
  */
 class Application {
     /**

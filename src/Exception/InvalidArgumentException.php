@@ -6,8 +6,6 @@ use InvalidArgumentException as BaseInvalidArgumentException;
 
 /**
  * Invalid argument exception
- *
- * @package Exceptions
  */
 class InvalidArgumentException extends BaseInvalidArgumentException implements Exception {
     /**

@@ -14,8 +14,6 @@ use Imagick;
  * A plugin should return an Imagick instance with the loaded image content, null if it does not
  * support the image for any reason, or throw a LoaderException if the image is determined to be
  * invalid or damaged.
- *
- * @package Image
  */
 class InputLoaderManager {
     /**

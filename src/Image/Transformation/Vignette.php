@@ -8,8 +8,6 @@ use ImagickException;
 
 /**
  * Vignette transformation
- *
- * @package Image\Transformations
  */
 class Vignette extends Transformation {
     /**
