@@ -1,14 +1,5 @@
 <?php
 /**
- * This file is part of the Imbo package
- *
- * (c) Christer Edvartsen <cogo@starzinger.net>
- *
- * For the full copyright and license information, please view the LICENSE file that was
- * distributed with this source code.
- */
-
-/**
  * Router for the built in httpd in PHP. Route everything through index.php. When ran from the base
  * project directory, the command looks like this:
  *
