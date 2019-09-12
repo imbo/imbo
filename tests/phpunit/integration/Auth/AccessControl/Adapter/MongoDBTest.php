@@ -51,7 +51,7 @@ class MongoDBTest extends AdapterTests {
     /**
      * Drop the test database after each test
      */
-    public function tearDown() {
+    protected function tearDown() : void {
         if (class_exists('MongoDB\Client')) {
             (new MongoClient())->dropDatabase($this->databaseName);
         }

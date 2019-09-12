@@ -46,7 +46,7 @@ class GridFSTest extends StorageTests {
         parent::setUp();
     }
 
-    public function tearDown() {
+    protected function tearDown() : void {
         if (class_exists('MongoDB\Client')) {
             (new Client())->dropDatabase($this->databaseName);
         }
