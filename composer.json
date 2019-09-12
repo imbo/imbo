@@ -23,8 +23,8 @@
     "docs": "http://docs.imbo.io"
   },
   "require": {
-    "php": ">=7.0",
-    "ext-imagick": ">=3.0.1",
+    "php": ">=7.2",
+    "ext-imagick": "^3.4",
     "symfony/http-foundation": "^2.8",
     "symfony/console": "^2.8",
     "ramsey/uuid": "^3.4",
@@ -97,10 +97,5 @@
       "cd docs; make html"
     ],
     "dev": "php -S localhost:8080 -t ./public tests/behat/router.php > build/logs/httpd.log 2>&1 &"
-  },
-  "config": {
-    "platform": {
-      "php": "7.0"
-    }
   }
 }
