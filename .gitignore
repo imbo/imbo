@@ -8,3 +8,4 @@ public/.htaccess
 .idea
 behat.yml
 phpunit.xml
+.phpunit.result.cache
