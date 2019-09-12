@@ -11,9 +11,9 @@
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 
-use PHPUnit_Framework_MockObject_Generator as Generator;
-use PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount as Any;
-use PHPUnit_Framework_MockObject_Stub_Return as ReturnValue;
+use PHPUnit\Framework\MockObject\Generator;
+use PHPUnit\Framework\MockObject\Matcher\AnyInvokedCount as Any;
+use PHPUnit\Framework\MockObject\Stub\ReturnStub as ReturnValue;
 
 /**
  * Set a database and storage adapter that has some behaviour determined via request headers
