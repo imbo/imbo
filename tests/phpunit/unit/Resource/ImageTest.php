@@ -13,7 +13,7 @@ namespace ImboUnitTest\Resource;
 use Imbo\Resource\Image;
 
 /**
- * @covers Imbo\Resource\Image
+ * @coversDefaultClass Imbo\Resource\Image
  * @group unit
  * @group resources
  */

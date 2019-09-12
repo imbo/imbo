@@ -10,8 +10,6 @@
 
 namespace ImboUnitTest\Resource;
 
-use ReflectionClass;
-use ReflectionMethod;
 use PHPUnit\Framework\TestCase;
 
 /**

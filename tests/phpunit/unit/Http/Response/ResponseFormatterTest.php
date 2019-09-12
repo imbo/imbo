@@ -208,10 +208,12 @@ class ResponseFormatterTest extends TestCase {
     public function testThrowsAnExceptionInStrictModeWhenTheUserAgentDoesNotSupportAnyOfImbosMediaTypes() {
         $this->contentNegotiation->expects($this->any())->method('isAcceptable')->will($this->returnValue(false));
         $this->response->expects($this->once())->method('setVary')->with('Accept');
+        $this->response->expects($this->once())->method('getModel')->willReturn($this->createMock(Image::class));
         $requestHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
         $requestHeaders->expects($this->once())->method('get')->with('Accept', '*/*')->will($this->returnValue('text/xml'));
         $this->request->headers = $requestHeaders;
         $this->expectExceptionObject(new RuntimeException('Not acceptable', 406));
+
         $this->responseFormatter->negotiate($this->event);
     }
 
@@ -225,6 +227,7 @@ class ResponseFormatterTest extends TestCase {
         $this->request->headers = $requestHeaders;
         $this->contentNegotiation->expects($this->any())->method('isAcceptable')->will($this->returnValue(false));
         $this->response->expects($this->once())->method('setVary')->with('Accept');
+        $this->response->expects($this->once())->method('getModel')->willReturn($this->createMock(Image::class));
 
         $this->responseFormatter->negotiate($this->event);
         $this->assertSame('json', $this->responseFormatter->getFormatter());
@@ -239,6 +242,7 @@ class ResponseFormatterTest extends TestCase {
         $this->request->headers = $requestHeaders;
         $this->contentNegotiation->expects($this->any())->method('isAcceptable')->will($this->returnValue(1));
         $this->response->expects($this->once())->method('setVary')->with('Accept');
+        $this->response->expects($this->once())->method('getModel')->willReturn($this->createMock(Image::class));
 
         $this->responseFormatter->negotiate($this->event);
         $this->assertSame('json', $this->responseFormatter->getFormatter());

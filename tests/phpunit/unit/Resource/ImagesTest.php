@@ -17,7 +17,7 @@ use DateTime;
 use DateTimeZone;
 
 /**
- * @covers Imbo\Resource\Images
+ * @coversDefaultClass Imbo\Resource\Images
  * @group unit
  * @group resources
  */

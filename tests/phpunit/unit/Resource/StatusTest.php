@@ -13,7 +13,7 @@ namespace ImboUnitTest\Resource;
 use Imbo\Resource\Status;
 
 /**
- * @covers Imbo\Resource\Status
+ * @coversDefaultClass Imbo\Resource\Status
  * @group unit
  * @group resources
  */

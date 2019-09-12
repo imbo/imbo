@@ -40,26 +40,6 @@ class CompressTest extends TestCase {
         $this->transformation->transform([]);
     }
 
-    public function testDoesNotApplyCompressionToGifImages() {
-        $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getMimeType')->will($this->returnValue('image/gif'));
-
-        $imagick = $this->createMock('Imagick');
-        $imagick->expects($this->never())->method('setImageCompressionQuality');
-
-        $this->transformation->setImagick($imagick)->setImage($image)->transform(['level' => 40]);
-        $this->transformation->compress($this->createMock('Imbo\EventManager\EventInterface'));
-    }
-
-    public function testDoesNotApplyCompressionWhenLevelIsNotSet() {
-        $imagick = $this->createMock('Imagick');
-        $imagick->expects($this->never())->method('setImageCompressionQuality');
-
-        $this->transformation->setImagick($imagick)->compress(
-            $this->createMock('Imbo\EventManager\Event')
-        );
-    }
-
     public function testThrowsExceptionOnInvalidLevel() {
         $this->expectExceptionObject(new TransformationException(
             'level must be between 0 and 100',
