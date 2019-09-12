@@ -10,8 +10,6 @@ use ImagickPixelException;
 
 /**
  * Histogram transformation
- *
- * @package Image\Transformations
  */
 class Histogram extends Transformation {
     /**

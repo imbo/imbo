@@ -3,11 +3,6 @@ namespace Imbo\Resource\Images;
 
 use Imbo\Exception\RuntimeException;
 
-/**
- * Query object for the images resource
- *
- * @package Resources\Images
- */
 class Query {
     /**
      * The page to get

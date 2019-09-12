@@ -3,8 +3,6 @@ namespace Imbo\EventListener;
 
 /**
  * Event listener interface
- *
- * @package Event\Listeners
  */
 interface ListenerInterface {
     /**

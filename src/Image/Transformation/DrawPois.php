@@ -8,8 +8,6 @@ use ImagickDraw;
 
 /**
  * Draw POIs (points of interest) transformation
- *
- * @package Image\Transformations
  */
 class DrawPois extends Transformation {
     /**

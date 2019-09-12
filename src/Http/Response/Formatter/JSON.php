@@ -6,8 +6,6 @@ use stdClass;
 
 /**
  * JSON formatter
- *
- * @package Response\Formatters
  */
 class JSON extends Formatter implements FormatterInterface {
     /**

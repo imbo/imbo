@@ -6,11 +6,6 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Model\ArrayModel;
 use Imbo\Model\Image as ImageModel;
 
-/**
- * Short URL collection
- *
- * @package Resources
- */
 class ShortUrls implements ResourceInterface {
     /**
      * {@inheritdoc}

@@ -8,8 +8,6 @@ use Imbo\EventManager\EventInterface;
  *
  * This event listener will listen to all outgoing responses and check if any HTTP cache headers
  * have explicitly been set. If not, it will apply the configured defaults.
- *
- * @package Event\Listeners
  */
 class HttpCache implements ListenerInterface {
     /**

@@ -14,8 +14,6 @@ use DateTimeZone;
  * Configuration options supported by this driver:
  *
  * - <pre>(string) dataDir</pre> Absolute path to the base directory the images should be stored in
- *
- * @package Storage
  */
 class Filesystem implements StorageInterface {
     /**

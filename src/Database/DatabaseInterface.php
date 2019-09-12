@@ -11,8 +11,6 @@ use DateTime;
  * Database adapter interface
  *
  * This is an interface for storage adapters in Imbo.
- *
- * @package Database
  */
 interface DatabaseInterface {
     /**

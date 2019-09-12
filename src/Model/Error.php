@@ -6,11 +6,6 @@ use Imbo\Http\Request\Request;
 use DateTimeZone;
 use DateTime;
 
-/**
- * Error model
- *
- * @package Models
- */
 class Error implements ModelInterface {
     /**
      * HTTP code

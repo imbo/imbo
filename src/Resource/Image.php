@@ -4,11 +4,6 @@ namespace Imbo\Resource;
 use Imbo\EventManager\EventInterface;
 use Imbo\Model;
 
-/**
- * Image resource
- *
- * @package Resources
- */
 class Image implements ResourceInterface {
     /**
      * {@inheritdoc}

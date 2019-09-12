@@ -18,8 +18,6 @@ use Imbo\Model;
  * query    => urlencoded json data to use in the query
  * from     => Unix timestamp to fetch from
  * to       => Unit timestamp to fetch to
- *
- * @package Resources
  */
 class Images implements ResourceInterface {
     /**

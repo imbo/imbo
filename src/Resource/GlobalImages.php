@@ -15,8 +15,6 @@ use Imbo\Exception\RuntimeException;
  * metadata => Whether or not to include metadata pr. image. Set to 1 to enable
  * from     => Unix timestamp to fetch from
  * to       => Unit timestamp to fetch to
- *
- * @package Resources
  */
 class GlobalImages implements ResourceInterface {
     /**

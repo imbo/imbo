@@ -9,8 +9,6 @@ use Imagick;
  * Level transformation
  *
  * This transformation can be used to adjust the level of RGB/CMYK in an image.
- *
- * @package Image\Transformations
  */
 class Level extends Transformation {
     /**

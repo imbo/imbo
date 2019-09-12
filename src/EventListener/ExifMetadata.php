@@ -10,8 +10,6 @@ use Imbo\Exception\DatabaseException;
  * Exif metadata event listener
  *
  * This listener will look for properties stored in the image, and store them as metadata in Imbo.
- *
- * @package Event\Listeners
  */
 class ExifMetadata implements ListenerInterface {
     /**

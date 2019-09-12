@@ -9,8 +9,6 @@ use ImagickException;
  * Convert transformation
  *
  * This transformation can be used to convert the image from one type to another.
- *
- * @package Image\Transformations
  */
 class Convert extends Transformation {
     /**

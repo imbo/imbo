@@ -6,8 +6,6 @@ use ImagickException;
 
 /**
  * Strip properties and comments from an image
- *
- * @package Image\Transformations
  */
 class Strip extends Transformation {
     /**

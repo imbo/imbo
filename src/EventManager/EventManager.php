@@ -5,11 +5,6 @@ use Imbo\EventListener\ListenerInterface;
 use Imbo\EventListener\Initializer\InitializerInterface;
 use Imbo\Exception\InvalidArgumentException;
 
-/**
- * Event manager
- *
- * @package Event\Manager
- */
 class EventManager {
     /**
      * The event handlers

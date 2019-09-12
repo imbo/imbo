@@ -7,8 +7,6 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * Global short URL resource
- *
- * @package Resources
  */
 class GlobalShortUrl implements ResourceInterface {
     /**

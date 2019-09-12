@@ -12,8 +12,6 @@ use ImagickDraw;
 
 /**
  * Border transformation
- *
- * @package Image\Transformations
  */
 class Border extends Transformation implements InputSizeConstraint {
     /**

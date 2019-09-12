@@ -6,8 +6,6 @@ use Imbo\Exception\StorageException;
 
 /**
  * Storage operations event listener
- *
- * @package Event\Listeners
  */
 class StorageOperations implements ListenerInterface {
     /**

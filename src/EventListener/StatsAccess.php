@@ -10,8 +10,6 @@ use Imbo\Exception\RuntimeException;
  * This event listener lets you control the access to the /stats endpoint by white-/blacklisting ip
  * addresses or subnets (using CIDR notation). If you disable the listener from the configuration
  * it will be open to anyone (and it does not require an access token by default).
- *
- * @package Event\Listeners
  */
 class StatsAccess implements ListenerInterface {
     /**

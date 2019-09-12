@@ -8,8 +8,6 @@ use ImagickException;
 
 /**
  * Crop transformation
- *
- * @package Image\Transformations
  */
 class Crop extends Transformation implements RegionExtractor, InputSizeConstraint {
     /**

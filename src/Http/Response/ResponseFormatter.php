@@ -10,8 +10,6 @@ use Symfony\Component\HttpFoundation\AcceptHeader;
 /**
  * This event listener will correctly format the response body based on the Accept headers in the
  * request
- *
- * @package Http
  */
 class ResponseFormatter implements ListenerInterface {
     /**

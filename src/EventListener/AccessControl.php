@@ -14,8 +14,6 @@ use Imbo\Resource;
  * has access to the requested resource. If the public key does not have access to the resource,
  * the listener will throw an exception resulting in a HTTP response with 400 Bad Request.
  * It will also handle loading of ACL-related resources such as resource groups.
- *
- * @package Event\Listeners
  */
 class AccessControl implements ListenerInterface {
     /**

@@ -5,8 +5,6 @@ use Imagick;
 
 /**
  * Input loader interface
- *
- * @package Loaders
  */
 interface InputLoaderInterface {
     /**

@@ -16,8 +16,6 @@ use MongoDB\Driver\Exception\Exception as MongoException;
  *                   'mongodb://localhost:27017'
  * - (array) options Options to use when creating the MongoClient instance. Defaults to
  *                   ['connect' => true, 'connectTimeoutMS' => 1000].
- *
- * @package Database
  */
 class MongoDB implements DatabaseInterface {
     /**

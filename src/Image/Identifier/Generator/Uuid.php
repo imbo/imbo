@@ -6,8 +6,6 @@ use Ramsey\Uuid\Uuid as UuidFactory;
 
 /**
  * UUID image identifier generator
- *
- * @package Core\Image\Identifier\Generator
  */
 class Uuid implements GeneratorInterface {
     /**

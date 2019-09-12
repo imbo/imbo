@@ -7,8 +7,6 @@ use Imbo\Router\Route;
 
 /**
  * Router class containing supported routes
- *
- * @package Router
  */
 class Router {
     /**

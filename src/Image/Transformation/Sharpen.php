@@ -6,8 +6,6 @@ use ImagickException;
 
 /**
  * Sharpen transformation
- *
- * @package Image\Transformations
  */
 class Sharpen extends Transformation {
     /**

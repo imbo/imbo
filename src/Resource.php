@@ -3,8 +3,6 @@ namespace Imbo;
 
 /**
  * Resource class
- *
- * @package Core
  */
 class Resource {
     const GROUPS_GET              = 'groups.get';

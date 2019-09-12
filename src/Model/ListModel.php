@@ -1,11 +1,6 @@
 <?php
 namespace Imbo\Model;
 
-/**
- * Simple model using an numerically indexed array for data
- *
- * @package Models
- */
 class ListModel implements ModelInterface {
     /**
      * The list

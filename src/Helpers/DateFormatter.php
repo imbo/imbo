@@ -6,8 +6,6 @@ use DateTimeZone;
 
 /**
  * Date formatter helper class
- *
- * @package Core\Helpers
  */
 class DateFormatter {
     /**

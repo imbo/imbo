@@ -13,8 +13,6 @@ use Imagick;
  *
  * A plugin should update the given model to reflect the new state. By calling `setBlob`, the plugin
  * can update the actual binary data returned to the client.
- *
- * @package Image
  */
 class OutputConverterManager {
     /**

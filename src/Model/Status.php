@@ -3,11 +3,6 @@ namespace Imbo\Model;
 
 use DateTime;
 
-/**
- * Status model
- *
- * @package Models
- */
 class Status implements ModelInterface {
     /**
      * Date

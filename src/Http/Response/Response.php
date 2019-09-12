@@ -6,8 +6,6 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
  * Response object from the server to the client
- *
- * @package Http
  */
 class Response extends SymfonyResponse {
     /**

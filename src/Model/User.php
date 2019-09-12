@@ -3,11 +3,6 @@ namespace Imbo\Model;
 
 use DateTime;
 
-/**
- * User model
- *
- * @package Models
- */
 class User implements ModelInterface {
     /**
      * User ID

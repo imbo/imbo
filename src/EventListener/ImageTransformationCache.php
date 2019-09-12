@@ -24,8 +24,6 @@ use RecursiveIteratorIterator;
  * - normalized accept header
  * - image extension (can be null)
  * - image transformations (can be null)
- *
- * @package Event\Listeners
  */
 class ImageTransformationCache implements ListenerInterface {
     /**

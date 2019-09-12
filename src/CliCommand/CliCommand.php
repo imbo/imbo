@@ -3,11 +3,6 @@ namespace Imbo\CliCommand;
 
 use Symfony\Component\Console\Command\Command;
 
-/**
- * Base command
- *
- * @package Cli
- */
 abstract class CliCommand extends Command {
     /**
      * Configuration array

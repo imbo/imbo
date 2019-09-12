@@ -8,8 +8,6 @@ use ImagickException;
 
 /**
  * Compression transformation
- *
- * @package Image\Transformations
  */
 class Compress extends Transformation {
     /**

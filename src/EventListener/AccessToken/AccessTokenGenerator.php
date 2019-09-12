@@ -3,8 +3,6 @@ namespace Imbo\EventListener\AccessToken;
 
 /**
  * Abstract class for Access Token Generation
- *
- * @package AccessToken
  */
 abstract class AccessTokenGenerator implements AccessTokenInterface {
     /**

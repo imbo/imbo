@@ -9,8 +9,6 @@ use Imbo\EventManager\EventInterface;
  * This event listener will listen to all incoming OPTIONS requests
  * and adds the correct headers required for CORS to function properly -
  * all configured on a per-user/resource base.
- *
- * @package Event\Listeners
  */
 class Cors implements ListenerInterface {
     /**

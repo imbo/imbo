@@ -3,11 +3,6 @@ namespace Imbo\EventManager;
 
 use Imbo\Exception\InvalidArgumentException;
 
-/**
- * Event class
- *
- * @package Event
- */
 class Event implements EventInterface {
     /**
      * @var string

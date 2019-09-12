@@ -1,11 +1,6 @@
 <?php
 namespace Imbo;
 
-/**
- * Base exception interface
- *
- * @package Exceptions
- */
 interface Exception {
     /**#@+
      * Internal error codes

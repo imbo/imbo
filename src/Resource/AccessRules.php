@@ -8,11 +8,6 @@ use Imbo\Exception\ResourceException;
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
 use Imbo\Model\AccessRules as AccessRulesModel;
 
-/**
- * Access rules resource
- *
- * @package Resources
- */
 class AccessRules implements ResourceInterface {
     /**
      * {@inheritdoc}

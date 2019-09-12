@@ -6,8 +6,6 @@ use ImagickException;
 
 /**
  * Sepia transformation
- *
- * @package Image\Transformations
  */
 class Sepia extends Transformation {
     /**

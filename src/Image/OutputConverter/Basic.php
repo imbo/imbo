@@ -8,8 +8,6 @@ use ImagickException;
 
 /**
  * Basic output converter that supports gif/png/jpg.
- *
- * @package Image\OutputConverters
  */
 class Basic implements OutputConverterInterface {
     /**

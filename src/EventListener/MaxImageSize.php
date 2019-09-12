@@ -6,8 +6,6 @@ use Imbo\EventListener\ListenerInterface;
 
 /**
  * Max image size event listener
- *
- * @package Event\Listeners
  */
 class MaxImageSize implements ListenerInterface {
     /**

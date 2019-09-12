@@ -24,8 +24,6 @@ use ImagickException;
  *              ]);
  *          },
  *      ],
- *
- * @package Image\Transformations
  */
 class Icc extends Transformation {
     /**

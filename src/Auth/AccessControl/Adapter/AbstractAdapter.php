@@ -8,8 +8,6 @@ use Imbo\Model\Groups as GroupsModel;
 
 /**
  * Abstract access control adapter
- *
- * @package Core\Auth\AccessControl
  */
 abstract class AbstractAdapter implements AdapterInterface {
     /**

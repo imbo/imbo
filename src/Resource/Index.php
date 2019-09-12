@@ -5,11 +5,6 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Model;
 use Imbo\Version;
 
-/**
- * Index resource
- *
- * @package Resources
- */
 class Index implements ResourceInterface {
     /**
      * {@inheritdoc}

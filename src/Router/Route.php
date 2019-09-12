@@ -3,11 +3,6 @@ namespace Imbo\Router;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-/**
- * A class representing the current route matched by the router
- *
- * @package Router
- */
 class Route extends ParameterBag {
     /**
      * Route name

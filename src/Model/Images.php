@@ -1,11 +1,6 @@
 <?php
 namespace Imbo\Model;
 
-/**
- * Images model
- *
- * @package Models
- */
 class Images implements ModelInterface {
     /**
      * An array of Image models

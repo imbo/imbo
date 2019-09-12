@@ -3,8 +3,6 @@ namespace Imbo\Helpers;
 
 /**
  * Helper class for useful functions for building/manipulating URLs
- *
- * @package Core\Helpers
  */
 class Urls {
     /**

@@ -1,11 +1,6 @@
 <?php
 namespace Imbo\Model;
 
-/**
- * Groups model
- *
- * @package Models
- */
 class Groups implements ModelInterface {
     /**
      * An array of groups

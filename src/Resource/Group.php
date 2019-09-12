@@ -6,11 +6,6 @@ use Imbo\Exception\ResourceException;
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
 use Imbo\Model\Group as GroupModel;
 
-/**
- * Resource group resource
- *
- * @package Resources
- */
 class Group implements ResourceInterface {
     /**
      * {@inheritdoc}

@@ -4,11 +4,6 @@ namespace Imbo;
 use Imbo\Version;
 use Symfony\Component\Console\Application as BaseApplication;
 
-/**
- * Cli application
- *
- * @package Cli
- */
 class CliApplication extends BaseApplication {
     /**
      * Class constructor

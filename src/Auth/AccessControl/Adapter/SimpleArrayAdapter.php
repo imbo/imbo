@@ -6,8 +6,6 @@ use Imbo\Resource;
 
 /**
  * Simple array-backed access control adapter
- *
- * @package Core\Auth\AccessControl\Adapter
  */
 class SimpleArrayAdapter extends ArrayAdapter implements AdapterInterface {
     /**

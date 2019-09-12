@@ -10,8 +10,6 @@ use Imbo\EventListener\ImagickAware;
 
 /**
  * Abstract transformation
- *
- * @package Image\Transformations
  */
 abstract class Transformation implements ListenerInterface, ImagickAware {
     /**

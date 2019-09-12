@@ -19,8 +19,6 @@ use DateTimeZone;
  * Doctrine 2 database driver
  *
  * Refer to http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest for configuration parameters
- *
- * @package Database
  */
 class Doctrine implements DatabaseInterface {
     /**

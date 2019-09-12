@@ -20,8 +20,6 @@ use Imbo\Helpers\Parameters;
  * - (string) bucket The name of the bucket to store the files in. The bucket must exist prior
  *                   to using the B2 client.
  * - (string) bucketId The id of the bucket referenced by name. We currently need both.
- *
- * @package Storage
  */
 class B2 implements StorageInterface {
     /**

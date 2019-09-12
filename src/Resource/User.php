@@ -3,11 +3,6 @@ namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
 
-/**
- * User resource
- *
- * @package Resources
- */
 class User implements ResourceInterface {
     /**
      * {@inheritdoc}

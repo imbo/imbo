@@ -3,11 +3,6 @@ namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
 
-/**
- * Resource groups resource
- *
- * @package Resources
- */
 class Groups implements ResourceInterface {
     /**
      * {@inheritdoc}

@@ -2,10 +2,8 @@
 namespace Imbo\Helpers;
 
 /**
-* Helper class for useful functions for building/manipulating URLs
-*
-* @package Core\Helpers
-*/
+ * Helper class for useful functions for building/manipulating URLs
+ */
 class Parameters {
     /**
      * @param $fields array List of fields to ensure is present in $params

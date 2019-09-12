@@ -7,8 +7,6 @@ use ImagickException;
 
 /**
  * SmartSize transformation
- *
- * @package Image\Transformations
  */
 class SmartSize extends Transformation {
     /**

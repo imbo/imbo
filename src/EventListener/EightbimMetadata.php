@@ -11,8 +11,6 @@ use Imbo\Exception\DatabaseException;
  *
  * This listener will look for properties stored in the image, and store certain metadata (at the
  * moment, the available clipping paths) in Imbo.
- *
- * @package Event\Listeners
  */
 class EightbimMetadata implements ListenerInterface, ImagickAware {
     /**
