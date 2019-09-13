@@ -15,34 +15,11 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  * @coversDefaultClass Imbo\Resource\GlobalShortUrl
  */
 class GlobalShortUrlTest extends ResourceTests {
-    /**
-     * @var GlobalShortUrl
-     */
     private $resource;
-
-    /**
-     * @var Request
-     */
     private $request;
-
-    /**
-     * @var Response
-     */
     private $response;
-
-    /**
-     * @var DatabaseInterface
-     */
     private $database;
-
-    /**
-     * @var EventManager
-     */
     private $manager;
-
-    /**
-     * @var Event
-     */
     private $event;
 
     protected function getNewResource() : GlobalShortUrl {

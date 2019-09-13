@@ -14,26 +14,9 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass Imbo\Image\Transformation\Icc
  */
 class IccTest extends TestCase {
-    /**
-     * @var Icc
-     */
-    private $transformation;
-
-    /**
-     * @var Image
-     */
     private $image;
-
-    /**
-     * Imagick instance for testing
-     *
-     * @var Imagick
-     */
     private $imagick;
 
-    /**
-     * Set up the transformation instance
-     */
     public function setUp() : void {
         $blob = file_get_contents(FIXTURES_DIR . '/white.png');
 
@@ -46,7 +29,7 @@ class IccTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testExceptionWithoutProfiles() {
+    public function testExceptionWithoutProfiles() : void {
         $transformation = new Icc([]);
         $this->expectExceptionObject(new InvalidArgumentException(
             'No profile name given for which ICC profile to use and no profile is assigned to the "default" name.',
@@ -58,7 +41,7 @@ class IccTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testExceptionWithInvalidName() {
+    public function testExceptionWithInvalidName() : void {
         $transformation = new Icc([]);
         $this->expectExceptionObject(new InvalidArgumentException(
             'The given ICC profile name ("foo") is unknown to the server.',
@@ -70,7 +53,7 @@ class IccTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testTransformationHappensWithMatchingName() {
+    public function testTransformationHappensWithMatchingName() : void {
         $transformation = new Icc([
             'foo' => DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc',
         ]);
@@ -85,7 +68,7 @@ class IccTest extends TestCase {
      * @covers ::__construct
      * @covers ::transform
      */
-    public function testTransformationHappensWithDefaultKey() {
+    public function testTransformationHappensWithDefaultKey() : void {
         $transformation = new Icc([
             'default' => DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc',
         ]);
@@ -99,7 +82,7 @@ class IccTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testThrowsExceptionWhenImagickFailsWithAFatalError() {
+    public function testThrowsExceptionWhenImagickFailsWithAFatalError() : void {
         $transformation = new Icc([
             'default' => DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc',
         ]);
@@ -118,7 +101,7 @@ class IccTest extends TestCase {
     /**
      * @covers ::__construct
      */
-    public function testThrowsExceptionWhenConstructingWithWrongType() {
+    public function testThrowsExceptionWhenConstructingWithWrongType() : void {
         $this->expectExceptionObject(new ConfigurationException(
             'Imbo\Image\Transformation\Icc requires an array with name => profile file (.icc) mappings when created.',
             500
@@ -129,7 +112,7 @@ class IccTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testThrowsExceptionWhenInvalidPathIsUsed() {
+    public function testThrowsExceptionWhenInvalidPathIsUsed() : void {
         $transformation = new Icc([
             'default' => DATA_DIR . '/foo/bar.icc',
         ]);
