@@ -90,6 +90,9 @@
       "cd docs; make spelling",
       "cd docs; make html"
     ],
+    "phpstan": [
+      "vendor/bin/phpstan analyse -l 1 -c .phpstan.neon tests"
+    ],
     "start": [
       "mkdir -p build/logs",
       "php -S localhost:8080 -t ./public tests/behat/router.php > build/logs/httpd.log 2>&1 &"

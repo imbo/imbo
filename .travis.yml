@@ -40,6 +40,7 @@ before_script:
   - composer lint
   - composer prepare
   - composer install --prefer-dist
+  - composer phpstan
   - composer start
 
 script:
