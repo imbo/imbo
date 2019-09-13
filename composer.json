@@ -25,10 +25,10 @@
   "require": {
     "php": ">=7.2",
     "ext-imagick": "^3.4",
-    "symfony/http-foundation": "^2.8",
-    "symfony/console": "^2.8",
-    "ramsey/uuid": "^3.4",
-    "guzzlehttp/psr7": "^1.3"
+    "symfony/http-foundation": "^4.3",
+    "symfony/console": "^4.3",
+    "ramsey/uuid": "^3.8",
+    "guzzlehttp/psr7": "^1.6"
   },
   "require-dev": {
     "ext-mongodb": "^1.6",
@@ -40,7 +40,8 @@
     "imbo/behat-api-extension": "^2.2",
     "doctrine/dbal": "^2.9",
     "aws/aws-sdk-php": "^3.111",
-    "micheh/psr7-cache": "^0.5"
+    "micheh/psr7-cache": "^0.5",
+    "phpstan/phpstan": "^0.11.15"
   },
   "suggest": {
     "ext-mongodb": "Enables usage of MongoDB and GridFS as database and image storage. version: ^1.6",
