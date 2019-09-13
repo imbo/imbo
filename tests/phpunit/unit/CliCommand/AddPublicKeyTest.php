@@ -2,7 +2,6 @@
 namespace ImboUnitTest\CliCommand;
 
 use Imbo\CliCommand\AddPublicKey;
-use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
 use Imbo\Resource;
 use Imbo\Exception\RuntimeException;
 use Symfony\Component\Console\Application;
@@ -108,15 +107,13 @@ class AddPublicKeyTest extends TestCase {
             ->method('addKeyPair')
             ->with('foo', 'ZiePublicKey');
 
-        $helper = $this->command->getHelper('question');
-        $helper->setInputStream($this->getInputStream([
+        $commandTester = new CommandTester($this->command);
+        $commandTester->setInputs([
             'ZiePublicKey',
             '0',
             'rexxars',
             'n'
-        ]));
-
-        $commandTester = new CommandTester($this->command);
+        ]);
         $commandTester->execute(['publicKey' => 'foo']);
     }
 
@@ -124,15 +121,13 @@ class AddPublicKeyTest extends TestCase {
      * @covers Imbo\CliCommand\AddPublicKey::askForUsers
      */
     public function testWillNotAcceptEmptyUserSpecification() {
-        $helper = $this->command->getHelper('question');
-        $helper->setInputStream($this->getInputStream([
+        $commandTester = new CommandTester($this->command);
+        $commandTester->setInputs([
             '0',
             '',
             '*',
             'n',
-        ]));
-
-        $commandTester = new CommandTester($this->command);
+        ]);
         $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
 
         $this->assertRegExp('/at least one user/', $commandTester->getDisplay(true));
@@ -142,16 +137,14 @@ class AddPublicKeyTest extends TestCase {
      * @covers Imbo\CliCommand\AddPublicKey::askForCustomResources
      */
     public function testWillNotAcceptEmptyCustomResourceSpecification() {
-        $helper = $this->command->getHelper('question');
-        $helper->setInputStream($this->getInputStream([
+        $commandTester = new CommandTester($this->command);
+        $commandTester->setInputs([
             '4',
             '',
             'foo.bar,bar.foo',
             '*',
             'n'
-        ]));
-
-        $commandTester = new CommandTester($this->command);
+        ]);
         $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
 
         $this->assertRegExp(
@@ -198,14 +191,12 @@ class AddPublicKeyTest extends TestCase {
                 })]
             );
 
-        $helper = $this->command->getHelper('question');
-        $helper->setInputStream($this->getInputStream([
+        $commandTester = new CommandTester($this->command);
+        $commandTester->setInputs([
             '0', 'espenh,kribrabr',    'y',
             '1', 'rexxars, kbrabrand', 'y',
             '2', '*',                  'n',
-        ]));
-
-        $commandTester = new CommandTester($this->command);
+        ]);
         $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
 
         $this->assertSame(
@@ -243,10 +234,8 @@ class AddPublicKeyTest extends TestCase {
             ->method('addKeyPair')
             ->with('foo', 'bar');
 
-        $helper = $this->command->getHelper('question');
-        $helper->setInputStream($this->getInputStream(['3', '0,5', '*', 'n']));
-
         $commandTester = new CommandTester($this->command);
+        $commandTester->setInputs(['3', '0,5', '*', 'n']);
         $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
     }
 
@@ -275,15 +264,13 @@ class AddPublicKeyTest extends TestCase {
             ->method('addKeyPair')
             ->with('foo', 'bar');
 
-        $helper = $this->command->getHelper('question');
-        $helper->setInputStream($this->getInputStream([
+        $commandTester = new CommandTester($this->command);
+        $commandTester->setInputs([
             '4',
             'foo.read,bar.write',
             '*',
             'n'
-        ]));
-
-        $commandTester = new CommandTester($this->command);
+        ]);
         $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
     }
 
