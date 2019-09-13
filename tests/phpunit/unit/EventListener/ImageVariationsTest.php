@@ -9,7 +9,6 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Image\TransformationManager;
 use Imbo\EventListener\Initializer\Imagick as ImagickInitializer;
 use DateTime;
-use PHPUnit\Framework\Error\Error;
 use PHPUnit\Framework\Error\Warning;
 
 /**

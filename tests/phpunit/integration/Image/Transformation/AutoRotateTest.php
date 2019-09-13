@@ -1,7 +1,6 @@
 <?php
 namespace ImboIntegrationTest\Image\Transformation;
 
-use Imbo\Model\Image;
 use Imbo\Image\Transformation\AutoRotate;
 use Imagick;
 

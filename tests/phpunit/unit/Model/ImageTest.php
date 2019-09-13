@@ -2,7 +2,6 @@
 namespace ImboUnitTest\Model;
 
 use Imbo\Model\Image;
-use Imbo\Image\Transformation\Transformation;
 use DateTime;
 use PHPUnit\Framework\TestCase;
 

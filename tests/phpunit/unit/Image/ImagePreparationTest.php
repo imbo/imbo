@@ -2,8 +2,6 @@
 namespace ImboUnitTest\Image;
 
 use Imbo\Image\ImagePreparation;
-use Imbo\Model\Image;
-use Imbo\Image\Identifier\Generator\GeneratorInterface;
 use Imbo\Exception\ImageException;
 use PHPUnit\Framework\TestCase;
 
