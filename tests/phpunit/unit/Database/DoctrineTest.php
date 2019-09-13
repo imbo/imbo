@@ -41,7 +41,7 @@ class DoctrineTest extends TestCase {
     /**
      * @covers Imbo\Database\Doctrine::getStatus
      */
-    public function testGetStatusWhenDatabaseIsAlreadyConnected() {
+    public function testGetStatusWhenDatabaseIsAlreadyConnected() : void {
         $this->connection->expects($this->any())
                          ->method('isConnected')
                          ->willReturn(true);
@@ -52,7 +52,7 @@ class DoctrineTest extends TestCase {
     /**
      * @covers Imbo\Database\Doctrine::getStatus
      */
-    public function testGetStatusWhenDatabaseIsNotConnectedAndCanConnect() {
+    public function testGetStatusWhenDatabaseIsNotConnectedAndCanConnect() : void {
         $this->connection->expects($this->any())
                          ->method('isConnected')
                          ->willReturn(false);
@@ -67,7 +67,7 @@ class DoctrineTest extends TestCase {
     /**
      * @covers Imbo\Database\Doctrine::getStatus
      */
-    public function testGetStatusWhenDatabaseIsNotConnectedAndCanNotConnect() {
+    public function testGetStatusWhenDatabaseIsNotConnectedAndCanNotConnect() : void {
         $this->connection->expects($this->any())
                          ->method('isConnected')
                          ->will($this->returnValue(false));
@@ -82,7 +82,7 @@ class DoctrineTest extends TestCase {
     /**
      * @covers Imbo\Database\Doctrine::getStatus
      */
-    public function testGetStatusWhenDatabaseIsNotConnectedAndConnectThrowsAnException() {
+    public function testGetStatusWhenDatabaseIsNotConnectedAndConnectThrowsAnException() : void {
         $this->connection->expects($this->any())
                          ->method('isConnected')
                          ->will($this->returnValue(false));
@@ -164,7 +164,7 @@ class DoctrineTest extends TestCase {
      * @covers Imbo\Database\Doctrine::normalizeMetadata
      * @dataProvider getMetadata
      */
-    public function testCanNormalizeMetadata($denormalizedMetadata, $normalizedMetadata) {
+    public function testCanNormalizeMetadata($denormalizedMetadata, $normalizedMetadata) : void {
         $method = new ReflectionMethod($this->driver, 'normalizeMetadata');
         $method->setAccessible(true);
 
@@ -177,7 +177,7 @@ class DoctrineTest extends TestCase {
      * @covers Imbo\Database\Doctrine::denormalizeMetadata
      * @dataProvider getMetadata
      */
-    public function testCanDenormalizeMetadata($denormalizedMetadata, $normalizedMetadata) {
+    public function testCanDenormalizeMetadata($denormalizedMetadata, $normalizedMetadata) : void {
         $method = new ReflectionMethod($this->driver, 'denormalizeMetadata');
         $method->setAccessible(true);
 
@@ -187,7 +187,7 @@ class DoctrineTest extends TestCase {
     /**
      * @covers Imbo\Database\Doctrine::normalizeMetadata
      */
-    public function testThrowsExceptionWhenKeysContainTheSeparator() {
+    public function testThrowsExceptionWhenKeysContainTheSeparator() : void {
         $method = new ReflectionMethod($this->driver, 'normalizeMetadata');
         $method->setAccessible(true);
 

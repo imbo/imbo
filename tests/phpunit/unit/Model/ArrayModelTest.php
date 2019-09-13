@@ -24,7 +24,7 @@ class ArrayModelTest extends TestCase {
      * @covers Imbo\Model\ArrayModel::getData
      * @covers Imbo\Model\ArrayModel::setData
      */
-    public function testCanSetAndGetData() {
+    public function testCanSetAndGetData() : void {
         $this->assertSame([], $this->model->getData());
         $this->assertSame($this->model, $this->model->setData(['key' => 'value']));
         $this->assertSame(['key' => 'value'], $this->model->getData());
@@ -34,7 +34,7 @@ class ArrayModelTest extends TestCase {
      * @covers Imbo\Model\ArrayModel::setTitle
      * @covers Imbo\Model\ArrayModel::getTitle
      */
-    public function testCanSetAndGetTitle() {
+    public function testCanSetAndGetTitle() : void {
         $this->assertNull($this->model->getTitle());
         $this->assertSame($this->model, $this->model->setTitle('title'));
         $this->assertSame('title', $this->model->getTitle());

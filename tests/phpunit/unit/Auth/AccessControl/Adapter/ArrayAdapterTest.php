@@ -16,7 +16,7 @@ class ArrayAdapterTest extends TestCase {
      * @covers ::validateAccessList
      * @covers ::getUsersForResource
      */
-    public function testReturnsCorrectListOfAllowedUsersForResource() {
+    public function testReturnsCorrectListOfAllowedUsersForResource() : void {
         $accessControl = new ArrayAdapter([
             [
                 'publicKey' => 'pubKey1',
@@ -52,7 +52,7 @@ class ArrayAdapterTest extends TestCase {
      * @covers ::validateAccessList
      * @covers ::getPrivateKey
      */
-    public function testGetPrivateKey() {
+    public function testGetPrivateKey() : void {
         $accessControl = new ArrayAdapter([
             [
                 'publicKey' => 'pubKey1',
@@ -82,7 +82,7 @@ class ArrayAdapterTest extends TestCase {
      * @covers ::validateAccessList
      * @covers ::hasAccess
      */
-    public function testCanReadResourcesFromGroups() {
+    public function testCanReadResourcesFromGroups() : void {
         $acl = [
             [
                 'publicKey'  => 'pubkey',
@@ -117,7 +117,7 @@ class ArrayAdapterTest extends TestCase {
      * @covers ::validateAccessList
      * @covers ::hasAccess
      */
-    public function testCanReadResourcesGrantedUsingWildcard() {
+    public function testCanReadResourcesGrantedUsingWildcard() : void {
         $accessControl = new ArrayAdapter([
             [
                 'publicKey'  => 'pubkey',
@@ -158,7 +158,7 @@ class ArrayAdapterTest extends TestCase {
      * @covers ::__construct
      * @covers ::validateAccessList
      */
-    public function testThrowsErrorOnDuplicatePublicKey() {
+    public function testThrowsErrorOnDuplicatePublicKey() : void {
         $this->expectExceptionObject(new InvalidArgumentException(
             'Public key declared twice in config: pubkey',
             500
@@ -199,7 +199,7 @@ class ArrayAdapterTest extends TestCase {
      * @dataProvider getGroupsData
      * @covers ::getGroups
      */
-    public function testCanGetGroups(array $groups, array $result, $query = null) {
+    public function testCanGetGroups(array $groups, array $result, $query = null) : void {
         $numGroups = count($groups);
 
         $model = $this->createMock('Imbo\Model\Groups');
@@ -232,7 +232,7 @@ class ArrayAdapterTest extends TestCase {
      * @dataProvider getGroupsForTest
      * @covers ::groupExists
      */
-    public function testCanCheckIfGroupExists($groups, $group, $exists) {
+    public function testCanCheckIfGroupExists($groups, $group, $exists) : void {
         $adapter = new ArrayAdapter([], $groups);
         $this->assertSame($exists, $adapter->groupExists($group));
     }
@@ -240,7 +240,7 @@ class ArrayAdapterTest extends TestCase {
     /**
      * @covers ::publicKeyExists
      */
-    public function testPublicKeyExists() {
+    public function testPublicKeyExists() : void {
         $adapter = new ArrayAdapter([
             [
                 'publicKey' => 'pubKey1',
@@ -322,7 +322,7 @@ class ArrayAdapterTest extends TestCase {
      * @dataProvider getAccessRules
      * @covers ::getAccessRule
      */
-    public function testGetAccessRule($acl, $publicKey, $ruleId, $rule) {
+    public function testGetAccessRule($acl, $publicKey, $ruleId, $rule) : void {
         $adapter = new ArrayAdapter($acl);
         $this->assertSame($rule, $adapter->getAccessRule($publicKey, $ruleId));
     }

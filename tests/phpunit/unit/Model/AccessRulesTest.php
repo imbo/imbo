@@ -25,7 +25,7 @@ class AccessRulesTest extends TestCase {
      * @covers Imbo\Model\AccessRules::setRules
      * @covers Imbo\Model\AccessRules::getData
      */
-    public function testSetAndGetId() {
+    public function testSetAndGetId() : void {
         $rules = [
             ['id' => 1, 'group' => 'group', 'users' => ['user']],
             ['id' => 2, 'resources' => ['image.get', 'image.head'], 'users' => ['user']],

@@ -69,7 +69,7 @@ abstract class StorageTests extends TestCase {
         $this->driver = $this->getDriver();
     }
 
-    public function testStoreAndGetImage() {
+    public function testStoreAndGetImage() : void {
         $this->assertTrue(
             $this->driver->store($this->user, $this->imageIdentifier, $this->imageData),
             'Could not store initial image'
@@ -82,7 +82,7 @@ abstract class StorageTests extends TestCase {
         );
     }
 
-    public function testStoreSameImageTwice() {
+    public function testStoreSameImageTwice() : void {
         $this->assertTrue(
             $this->driver->store($this->user, $this->imageIdentifier, $this->imageData),
             'Could not store initial image'
@@ -114,7 +114,7 @@ abstract class StorageTests extends TestCase {
         );
     }
 
-    public function testStoreDeleteAndGetImage() {
+    public function testStoreDeleteAndGetImage() : void {
         $this->assertTrue(
             $this->driver->store($this->user, $this->imageIdentifier, $this->imageData),
             'Could not store initial image'
@@ -130,22 +130,22 @@ abstract class StorageTests extends TestCase {
         $this->driver->getImage($this->user, $this->imageIdentifier);
     }
 
-    public function testDeleteImageThatDoesNotExist() {
+    public function testDeleteImageThatDoesNotExist() : void {
         $this->expectExceptionObject(new StorageException('File not found', 404));
         $this->driver->delete($this->user, $this->imageIdentifier);
     }
 
-    public function testGetImageThatDoesNotExist() {
+    public function testGetImageThatDoesNotExist() : void {
         $this->expectExceptionObject(new StorageException('File not found', 404));
         $this->driver->getImage($this->user, $this->imageIdentifier);
     }
 
-    public function testGetLastModifiedOfImageThatDoesNotExist() {
+    public function testGetLastModifiedOfImageThatDoesNotExist() : void {
         $this->expectExceptionObject(new StorageException('File not found', 404));
         $this->driver->getLastModified($this->user, $this->imageIdentifier);
     }
 
-    public function testGetLastModified() {
+    public function testGetLastModified() : void {
         $this->assertTrue(
             $this->driver->store($this->user, $this->imageIdentifier, $this->imageData),
             'Could not store initial image'
@@ -157,7 +157,7 @@ abstract class StorageTests extends TestCase {
         );
     }
 
-    public function testCanCheckIfImageAlreadyExists() {
+    public function testCanCheckIfImageAlreadyExists() : void {
         $this->assertFalse(
             $this->driver->imageExists($this->user, $this->imageIdentifier),
             'Image is not supposed to exist'

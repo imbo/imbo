@@ -26,7 +26,7 @@ class InvalidArgumentExceptionTest extends TestCase {
      * @covers Imbo\Exception\InvalidArgumentException::getImboErrorCode
      * @dataProvider getErrorCodes
      */
-    public function testSetAndGetImboErrorCode($actual, $expected) {
+    public function testSetAndGetImboErrorCode($actual, $expected) : void {
         $exception = new InvalidArgumentException();
         $this->assertSame($exception, $exception->setImboErrorCode($actual));
         $this->assertSame($expected, $exception->getImboErrorCode());

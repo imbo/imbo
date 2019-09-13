@@ -26,7 +26,7 @@ class ResponseTest extends TestCase {
      * @covers Imbo\Http\Response\Response::setModel
      * @covers Imbo\Http\Response\Response::getModel
      */
-    public function testCanSetAndGetModel() {
+    public function testCanSetAndGetModel() : void {
         $model = $this->createMock('Imbo\Model\ModelInterface');
         $this->assertNull($this->response->getModel());
         $this->assertSame($this->response, $this->response->setModel($model));
@@ -39,7 +39,7 @@ class ResponseTest extends TestCase {
      * @covers Imbo\Http\Response\Response::setModel
      * @covers Imbo\Http\Response\Response::setNotModified
      */
-    public function testRemovesModelWhenMarkedAsNotModified() {
+    public function testRemovesModelWhenMarkedAsNotModified() : void {
         $model = $this->createMock('Imbo\Model\ModelInterface');
         $this->assertSame($this->response, $this->response->setModel($model));
         $this->assertSame($this->response, $this->response->setNotModified());
@@ -50,7 +50,7 @@ class ResponseTest extends TestCase {
     /**
      * @covers Imbo\Http\Response\Response::setError
      */
-    public function testUpdatesResponseWhenSettingAnErrorModel() {
+    public function testUpdatesResponseWhenSettingAnErrorModel() : void {
         $message = 'You wronged';
         $code = 404;
         $imboErrorCode = '123';

@@ -13,7 +13,7 @@ class ExifMetadataTest extends TestCase {
      * @covers ::__construct
      * @covers ::populate
      */
-    public function testCanGetPropertiesFromImageUnfiltered() {
+    public function testCanGetPropertiesFromImageUnfiltered() : void {
         $listener = new ExifMetadata();
 
         $image = new Image();
@@ -38,7 +38,7 @@ class ExifMetadataTest extends TestCase {
      * @covers ::populate
      * @covers ::filterProperties
      */
-    public function testCanGetPropertiesFromImageFiltered() {
+    public function testCanGetPropertiesFromImageFiltered() : void {
         $listener = new ExifMetadata([
             'allowedTags' => [
                 'exif:Flash',
@@ -67,7 +67,7 @@ class ExifMetadataTest extends TestCase {
      * @covers ::parseProperties
      * @covers ::parseGpsCoordinate
      */
-    public function testCanParseGpsValues() {
+    public function testCanParseGpsValues() : void {
         $listener = new ExifMetadata();
 
         $image = new Image();
@@ -90,7 +90,7 @@ class ExifMetadataTest extends TestCase {
      * @covers ::populate
      * @covers ::save
      */
-    public function testCanGetAndSaveProperties() {
+    public function testCanGetAndSaveProperties() : void {
         $listener = new ExifMetadata();
         $user = 'foobar';
         $imageIdentifier = 'imageId';

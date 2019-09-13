@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass Imbo\Image\Transformation\Strip
  */
 class StripTest extends TestCase {
-    public function testThrowsCorrectExceptionWhenAnErrorOccurs() {
+    public function testThrowsCorrectExceptionWhenAnErrorOccurs() : void {
         $imagickException = new ImagickException('error');
 
         $imagick = $this->createMock('Imagick');
@@ -21,7 +21,7 @@ class StripTest extends TestCase {
         $transformation->setImagick($imagick)->transform([]);
     }
 
-    public function testReloadsImageIfNewerImagick() {
+    public function testReloadsImageIfNewerImagick() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 

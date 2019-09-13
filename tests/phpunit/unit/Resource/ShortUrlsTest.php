@@ -41,39 +41,39 @@ class ShortUrlsTest extends ResourceTests {
         $this->event->expects($this->any())->method('getOutputConverterManager')->will($this->returnValue($this->outputConverterManager));
     }
 
-    public function testWillThrowAnExceptionWhenRequestBodyIsEmpty() {
+    public function testWillThrowAnExceptionWhenRequestBodyIsEmpty() : void {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue(null));
         $this->expectExceptionObject(new InvalidArgumentException('Missing JSON data', 400));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    public function testWillThrowAnExceptionWhenRequestBodyIsInvalid() {
+    public function testWillThrowAnExceptionWhenRequestBodyIsInvalid() : void {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('some string'));
         $this->expectExceptionObject(new InvalidArgumentException('Invalid JSON data', 400));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    public function testWillThrowAnExceptionWhenUserMissing() {
+    public function testWillThrowAnExceptionWhenUserMissing() : void {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{}'));
         $this->expectExceptionObject(new InvalidArgumentException('Missing or invalid user', 400));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    public function testWillThrowAnExceptionWhenUserDoesNotMatch() {
+    public function testWillThrowAnExceptionWhenUserDoesNotMatch() : void {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"user": "user"}'));
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('otheruser'));
         $this->expectExceptionObject(new InvalidArgumentException('Missing or invalid user', 400));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    public function testWillThrowAnExceptionWhenImageIdentifierIsMissing() {
+    public function testWillThrowAnExceptionWhenImageIdentifierIsMissing() : void {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"user": "user"}'));
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->expectExceptionObject(new InvalidArgumentException('Missing or invalid image identifier', 400));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    public function testWillThrowAnExceptionWhenImageIdentifierDoesNotMatch() {
+    public function testWillThrowAnExceptionWhenImageIdentifierDoesNotMatch() : void {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"user": "user", "imageIdentifier": "id"}'));
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('other id'));
@@ -81,7 +81,7 @@ class ShortUrlsTest extends ResourceTests {
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    public function testWillThrowAnExceptionWhenExtensionIsNotRecognized() {
+    public function testWillThrowAnExceptionWhenExtensionIsNotRecognized() : void {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"user": "user", "imageIdentifier": "id", "extension": "foo"}'));
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
@@ -120,7 +120,7 @@ class ShortUrlsTest extends ResourceTests {
     /**
      * @dataProvider createShortUrlParams
      */
-    public function testCanCreateShortUrls($extension = null, $queryString = null, array $query = []) {
+    public function testCanCreateShortUrls($extension = null, $queryString = null, array $query = []) : void {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('
             {
                 "user": "user",
@@ -141,7 +141,7 @@ class ShortUrlsTest extends ResourceTests {
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    public function testWillReturn200OKIfTheShortUrlAlreadyExists() {
+    public function testWillReturn200OKIfTheShortUrlAlreadyExists() : void {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('
             {
                 "user": "user",
@@ -161,7 +161,7 @@ class ShortUrlsTest extends ResourceTests {
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    public function testWillGenerateANewIdIfTheGeneratedOneExists() {
+    public function testWillGenerateANewIdIfTheGeneratedOneExists() : void {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"user": "user", "imageIdentifier": "id"}'));
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
@@ -179,7 +179,7 @@ class ShortUrlsTest extends ResourceTests {
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    public function testWillNotAddAModelIfTheEventIsNotAShortUrlsEvent() {
+    public function testWillNotAddAModelIfTheEventIsNotAShortUrlsEvent() : void {
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->database->expects($this->once())->method('deleteShortUrls')->with('user', 'id');
@@ -189,7 +189,7 @@ class ShortUrlsTest extends ResourceTests {
         $this->getNewResource()->deleteImageShortUrls($this->event);
     }
 
-    public function testWillAddAModelIfTheEventIsAShortUrlsEvent() {
+    public function testWillAddAModelIfTheEventIsAShortUrlsEvent() : void {
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->database->expects($this->once())->method('deleteShortUrls')->with('user', 'id');
@@ -199,7 +199,7 @@ class ShortUrlsTest extends ResourceTests {
         $this->getNewResource()->deleteImageShortUrls($this->event);
     }
 
-    public function testCanNotAddShortUrlWhenImageDoesNotExist() {
+    public function testCanNotAddShortUrlWhenImageDoesNotExist() : void {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('
             {
                 "user": "user",

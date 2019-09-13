@@ -38,7 +38,7 @@ class FilesystemTest extends TestCase {
     /**
      * @covers Imbo\Storage\Filesystem::delete
      */
-    public function testDeleteFileThatDoesNotExist() {
+    public function testDeleteFileThatDoesNotExist() : void {
         $driver = new Filesystem(['dataDir' => 'foobar']);
         $this->expectExceptionObject(new StorageException('File not found', 404));
         $driver->delete($this->user, $this->imageIdentifier);
@@ -47,7 +47,7 @@ class FilesystemTest extends TestCase {
     /**
      * @covers Imbo\Storage\Filesystem::delete
      */
-    public function testDelete() {
+    public function testDelete() : void {
         vfsStream::setup('basedir');
         $driver = new Filesystem(['dataDir' => vfsStream::url('basedir')]);
 
@@ -80,7 +80,7 @@ class FilesystemTest extends TestCase {
     /**
      * @covers Imbo\Storage\Filesystem::store
      */
-    public function testStoreToUnwritablePath() {
+    public function testStoreToUnwritablePath() : void {
         $image = 'some image data';
         $dir = 'unwritableDirectory';
 
@@ -95,7 +95,7 @@ class FilesystemTest extends TestCase {
     /**
      * @covers Imbo\Storage\Filesystem::store
      */
-    public function testStore() {
+    public function testStore() : void {
         $imageData = file_get_contents(FIXTURES_DIR . '/image.png');
 
         $baseDir = 'someDir';
@@ -110,7 +110,7 @@ class FilesystemTest extends TestCase {
     /**
      * @covers Imbo\Storage\Filesystem::getImagePath
      */
-    public function testGetImagePath() {
+    public function testGetImagePath() : void {
         $driver = new Filesystem(['dataDir' => DIRECTORY_SEPARATOR . 'tmp']);
 
         $reflection = new \ReflectionClass($driver);
@@ -138,7 +138,7 @@ class FilesystemTest extends TestCase {
     /**
      * @covers Imbo\Storage\Filesystem::getImage
      */
-    public function testGetImageFileThatDoesNotExist() {
+    public function testGetImageFileThatDoesNotExist() : void {
         $driver = new Filesystem(['dataDir' => '/tmp']);
         $this->expectExceptionObject(new StorageException('File not found', 404));
         $driver->getImage($this->user, $this->imageIdentifier);
@@ -147,7 +147,7 @@ class FilesystemTest extends TestCase {
     /**
      * @covers Imbo\Storage\Filesystem::getImage
      */
-    public function testGetImage() {
+    public function testGetImage() : void {
         vfsStream::setup('basedir');
         $driver = new Filesystem(['dataDir' => vfsStream::url('basedir')]);
 
@@ -181,7 +181,7 @@ class FilesystemTest extends TestCase {
     /**
      * @covers Imbo\Storage\Filesystem::getLastModified
      */
-    public function testGetLastModifiedWithFileThatDoesNotExist() {
+    public function testGetLastModifiedWithFileThatDoesNotExist() : void {
         $driver = new Filesystem(['dataDir' => '/some/path']);
         $this->expectExceptionObject(new StorageException('File not found', 404));
         $driver->getLastModified($this->user, $this->imageIdentifier);
@@ -190,7 +190,7 @@ class FilesystemTest extends TestCase {
     /**
      * @covers Imbo\Storage\Filesystem::getLastModified
      */
-    public function testGetLastModified() {
+    public function testGetLastModified() : void {
         vfsStream::setup('basedir');
         $driver = new Filesystem(['dataDir' => vfsStream::url('basedir')]);
 
@@ -227,7 +227,7 @@ class FilesystemTest extends TestCase {
     /**
      * @covers Imbo\Storage\Filesystem::getStatus
      */
-    public function testGetStatusWhenBaseDirIsNotWritable() {
+    public function testGetStatusWhenBaseDirIsNotWritable() : void {
         vfsStream::setup('dir', 0);
 
         $driver = new Filesystem(['dataDir' => vfsStream::url('dir')]);
@@ -237,14 +237,14 @@ class FilesystemTest extends TestCase {
     /**
      * @covers Imbo\Storage\Filesystem::getStatus
      */
-    public function testGetStatusWhenBaseDirIsWritable() {
+    public function testGetStatusWhenBaseDirIsWritable() : void {
         vfsStream::setup('dir');
 
         $driver = new Filesystem(['dataDir' => vfsStream::url('dir')]);
         $this->assertTrue($driver->getStatus());
     }
 
-    public function testMissingDataDir() {
+    public function testMissingDataDir() : void {
         $this->expectExceptionObject(new ConfigurationException(
             'Missing required parameter dataDir in the Filesystem storage driver.',
             500

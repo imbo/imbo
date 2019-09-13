@@ -131,7 +131,7 @@ class SmartSizeTest extends TestCase {
      * @covers Imbo\Image\Transformation\SmartSize::transform
      * @dataProvider getSmartSizeArguments
      */
-    public function testSmartSize($imageDimensions, $params, $cropParams) {
+    public function testSmartSize($imageDimensions, $params, $cropParams) : void {
         $imagick = $this->createMock('Imagick');
         $imagick->expects($this->any())
                 ->method('cropImage')

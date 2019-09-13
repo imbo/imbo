@@ -31,7 +31,7 @@ class GeneratePrivateKeyTest extends TestCase {
     /**
      * @covers Imbo\CliCommand\GeneratePrivateKey::execute
      */
-    public function testCanGenerateAPrivateKey() {
+    public function testCanGenerateAPrivateKey() : void {
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(['command' => $this->command->getName()]);
 
@@ -41,7 +41,7 @@ class GeneratePrivateKeyTest extends TestCase {
     /**
      * @covers Imbo\CliCommand\GeneratePrivateKey::execute
      */
-    public function testFailsWhenItCantGenerateAPrivateKey() {
+    public function testFailsWhenItCantGenerateAPrivateKey() : void {
         $this->command->maxTries = 0;
         $commandTester = new CommandTester($this->command);
         $this->expectExceptionObject(new RuntimeException('Could not generate private key'));

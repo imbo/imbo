@@ -13,7 +13,7 @@ class DoctrineTest extends TestCase {
     /**
      * @covers ::__construct
      */
-    public function testThrowsExceptionWhenUsingPdoInConfiguration() {
+    public function testThrowsExceptionWhenUsingPdoInConfiguration() : void {
         $this->expectExceptionObject(new InvalidArgumentException(
             "The usage of 'pdo' in the configuration for Imbo\EventListener\ImageVariations\Database\Doctrine is not allowed, use 'driver' instead",
             500

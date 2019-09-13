@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass Imbo\Image\Identifier\Generator\RandomString
  */
 class RandomStringTest extends TestCase {
-    public function testGeneratesUniqueStrings() {
+    public function testGeneratesUniqueStrings() : void {
         $stringLength = 15;
 
         $image = $this->createMock('Imbo\Model\Image');

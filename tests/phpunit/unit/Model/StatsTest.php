@@ -56,7 +56,7 @@ class StatsTest extends TestCase {
      * @covers Imbo\Model\Stats::setNumUsers
      * @covers Imbo\Model\Stats::getNumUsers
      */
-    public function testCanSetAndGetNumberOfUsers($users, $images, $bytes) {
+    public function testCanSetAndGetNumberOfUsers($users, $images, $bytes) : void {
         $this->model->setNumUsers($users);
         $this->assertSame($users, $this->model->getNumUsers());
     }
@@ -66,7 +66,7 @@ class StatsTest extends TestCase {
      * @covers Imbo\Model\Stats::setNumImages
      * @covers Imbo\Model\Stats::getNumImages
      */
-    public function testCanSetAndGetAmountOfImages($users, $images, $bytes) {
+    public function testCanSetAndGetAmountOfImages($users, $images, $bytes) : void {
         $this->model->setNumImages($images);
         $this->assertSame($images, $this->model->getNumImages());
     }
@@ -76,7 +76,7 @@ class StatsTest extends TestCase {
      * @covers Imbo\Model\Stats::setNumBytes
      * @covers Imbo\Model\Stats::getNumBytes
      */
-    public function testCanSetAndGetAmountOfBytes($users, $images, $bytes) {
+    public function testCanSetAndGetAmountOfBytes($users, $images, $bytes) : void {
         $this->model->setNumBytes($bytes);
         $this->assertSame($bytes, $this->model->getNumBytes());
     }
@@ -88,7 +88,7 @@ class StatsTest extends TestCase {
      * @covers Imbo\Model\Stats::offsetGet
      * @covers Imbo\Model\Stats::offsetUnset
      */
-    public function testSupportsCustomStats() {
+    public function testSupportsCustomStats() : void {
         $this->assertSame([], $this->model->getCustomStats());
 
         $this->model['foo'] = 'bar';
@@ -107,7 +107,7 @@ class StatsTest extends TestCase {
     /**
      * @covers Imbo\Model\Stats::offsetSet
      */
-    public function testThrowsExceptionWhenUsedAsArrayWithoutAKey() {
+    public function testThrowsExceptionWhenUsedAsArrayWithoutAKey() : void {
         $this->expectExceptionObject(new InvalidArgumentException(
             'Custom statistics requires a key to be set',
             500
@@ -118,7 +118,7 @@ class StatsTest extends TestCase {
     /**
      * @covers Imbo\Model\Stats::getData
      */
-    public function testGetData() {
+    public function testGetData() : void {
         $this->model
             ->setNumUsers(100)
             ->setNumBytes(1000)

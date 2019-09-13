@@ -25,14 +25,14 @@ abstract class AdapterTests extends TestCase {
         $this->adapter = $this->getAdapter();
     }
 
-    public function testReturnsEmptyArrayWhenThereIsNoGroups() {
+    public function testReturnsEmptyArrayWhenThereIsNoGroups() : void {
         $model = $this->createMock('Imbo\Model\Groups');
         $model->expects($this->once())->method('setHits')->with(0);
 
         $this->assertSame([], $this->adapter->getGroups(null, $model));
     }
 
-    public function testCanAddAndFetchGroups() {
+    public function testCanAddAndFetchGroups() : void {
         $this->assertFalse($this->adapter->getGroup('g1'));
         $this->assertFalse($this->adapter->getGroup('g2'));
 
@@ -54,7 +54,7 @@ abstract class AdapterTests extends TestCase {
         $this->assertSame(['status.get'], $groups['g2']);
     }
 
-    public function testCanCheckIfGroupExists() {
+    public function testCanCheckIfGroupExists() : void {
         $this->assertFalse($this->adapter->groupExists('g1'));
         $this->assertFalse($this->adapter->groupExists('g2'));
         $this->assertFalse($this->adapter->groupExists('g3'));
@@ -67,7 +67,7 @@ abstract class AdapterTests extends TestCase {
         $this->assertFalse($this->adapter->groupExists('g3'));
     }
 
-    public function testCanUpdateResourceGroup() {
+    public function testCanUpdateResourceGroup() : void {
         $this->adapter->addResourceGroup('g1', ['images.get', 'images.head']);
         $this->adapter->addResourceGroup('g2', ['image.get']);
 
@@ -79,7 +79,7 @@ abstract class AdapterTests extends TestCase {
         $this->assertSame(['image.get'], $this->adapter->getGroup('g2')); // Has not changed
     }
 
-    public function testCanRemoveGroup() {
+    public function testCanRemoveGroup() : void {
         // Try to delete group that does not exist
         $this->assertFalse($this->adapter->deleteResourceGroup('g1'));
 
@@ -89,7 +89,7 @@ abstract class AdapterTests extends TestCase {
         $this->assertSame(false, $this->adapter->getGroup('g1'));
     }
 
-    public function testCanManipulateKeys() {
+    public function testCanManipulateKeys() : void {
         // Ensure the public key does not exist
         $this->assertFalse($this->adapter->publicKeyExists('publicKey'));
 
@@ -122,11 +122,11 @@ abstract class AdapterTests extends TestCase {
         $this->assertNull($this->adapter->getPrivateKey('publicKey'));
     }
 
-    public function testGetAccessRuleThatDoesNotExist() {
+    public function testGetAccessRuleThatDoesNotExist() : void {
         $this->assertNull($this->adapter->getAccessRule('publickey', 'id'));
     }
 
-    public function testCanManipulateAccessRules() {
+    public function testCanManipulateAccessRules() : void {
         $this->adapter->addKeyPair('public', 'private');
         $this->assertIsString($ruleId = $this->adapter->addAccessRule('public', ['resources' => ['image.get'], 'users' => ['user']]));
         $this->assertSame([
@@ -138,7 +138,7 @@ abstract class AdapterTests extends TestCase {
         $this->assertNull($this->adapter->getAccessRule('publickey', $ruleId));
     }
 
-    public function testDeleteAccessRuleWithIdThatDoesNotExist() {
+    public function testDeleteAccessRuleWithIdThatDoesNotExist() : void {
         $this->expectExceptionObject(new DatabaseException('Could not delete rule from database', 500));
         $this->assertFalse($this->adapter->deleteAccessRule('public', 'asdasd'));
     }

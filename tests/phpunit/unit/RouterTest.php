@@ -29,7 +29,7 @@ class RouterTest extends TestCase {
     /**
      * @covers ::route
      */
-    public function testCanBeATeaPot() {
+    public function testCanBeATeaPot() : void {
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('BREW'));
         $this->expectExceptionObject(new RuntimeException('I\'m a teapot', 418));
         $this->router->route($this->request);
@@ -38,7 +38,7 @@ class RouterTest extends TestCase {
     /**
      * @covers ::route
      */
-    public function testThrowsExceptionOnUnsupportedHttpMethod() {
+    public function testThrowsExceptionOnUnsupportedHttpMethod() : void {
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('TRACE'));
         $this->expectExceptionObject(new RuntimeException('Unsupported HTTP method', 501));
         $this->router->route($this->request);
@@ -69,7 +69,7 @@ class RouterTest extends TestCase {
      * @dataProvider getInvalidRoutes
      * @covers ::route
      */
-    public function testThrowsExceptionWhenNoRouteMatches($route) {
+    public function testThrowsExceptionWhenNoRouteMatches($route) : void {
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
         $this->request->expects($this->once())->method('getPathInfo')->will($this->returnValue($route));
         $this->expectExceptionObject(new RuntimeException('Not Found', 404));
@@ -145,7 +145,7 @@ class RouterTest extends TestCase {
      * @dataProvider getValidRoutes
      * @covers ::route
      */
-    public function testCanMatchValidRoutes($route, $resource, $user = null, $imageIdentifier = null, $extension = null) {
+    public function testCanMatchValidRoutes($route, $resource, $user = null, $imageIdentifier = null, $extension = null) : void {
         $this->request->expects($this->once())->method('getPathInfo')->will($this->returnValue($route));
         $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
 

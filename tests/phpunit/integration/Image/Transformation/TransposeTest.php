@@ -15,7 +15,7 @@ class TransposeTest extends TransformationTests {
     /**
      * @covers ::transform
      */
-    public function testCanTransformImage() {
+    public function testCanTransformImage() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
 

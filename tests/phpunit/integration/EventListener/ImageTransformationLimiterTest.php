@@ -45,7 +45,7 @@ class ImageTransformationLimiterTest extends TestCase {
      * @param array $transformations
      * @param int $limit
      */
-    public function testLimitsTransformationCount(array $transformations, $limit, $exceptionMessage) {
+    public function testLimitsTransformationCount(array $transformations, $limit, $exceptionMessage) : void {
         $listener = new ImageTransformationLimiter(['limit' => $limit]);
 
         $request = $this->createConfiguredMock(Request::class, [
@@ -89,7 +89,7 @@ class ImageTransformationLimiterTest extends TestCase {
      *
      * @param int $limit The limit to set and get
      */
-    public function testGetSetLimitCountTransformationCount($limit) {
+    public function testGetSetLimitCountTransformationCount($limit) : void {
         $this->assertSame(
             $limit,
             $actual = (new ImageTransformationLimiter(['limit' => $limit]))->getTransformationLimit(),

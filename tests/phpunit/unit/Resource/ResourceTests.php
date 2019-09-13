@@ -15,7 +15,7 @@ abstract class ResourceTests extends TestCase {
     /**
      * @covers ::getSubscribedEvents
      */
-    public function testReturnsCorrectEventSubscriptions() {
+    public function testReturnsCorrectEventSubscriptions() : void {
         $className = get_class($this->getNewResource());
         $this->assertIsArray($className::getSubscribedEvents());
     }
@@ -23,7 +23,7 @@ abstract class ResourceTests extends TestCase {
     /**
      * @covers ::getSubscribedEvents
      */
-    public function testReturnsTheCorrectAllowedMethods() {
+    public function testReturnsTheCorrectAllowedMethods() : void {
         $resource = $this->getNewResource();
 
         // Translate the class name to an event name: Imbo\Resource\GlobalShortUrl => globalshorturl

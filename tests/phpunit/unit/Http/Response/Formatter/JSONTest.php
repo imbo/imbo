@@ -29,7 +29,7 @@ class JSONTest extends TestCase {
     /**
      * @covers Imbo\Http\Response\Formatter\JSON::getContentType
      */
-    public function testReturnsCurrectContentType() {
+    public function testReturnsCurrectContentType() : void {
         $this->assertSame('application/json', $this->formatter->getContentType());
     }
 
@@ -38,7 +38,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\JSON::formatError
      * @covers Imbo\Http\Response\Formatter\JSON::encode
      */
-    public function testCanFormatAnErrorModel() {
+    public function testCanFormatAnErrorModel() : void {
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
         $date = new DateTime($formattedDate);
 
@@ -64,7 +64,7 @@ class JSONTest extends TestCase {
     /**
      * @covers Imbo\Http\Response\Formatter\JSON::formatError
      */
-    public function testCanFormatAnErrorModelWhenNoImageIdentifierExists() {
+    public function testCanFormatAnErrorModelWhenNoImageIdentifierExists() : void {
         $date = new DateTime();
 
         $model = $this->createMock('Imbo\Model\Error');
@@ -81,7 +81,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatStatus
      */
-    public function testCanFormatAStatusModel() {
+    public function testCanFormatAStatusModel() : void {
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
         $date = new DateTime($formattedDate);
 
@@ -104,7 +104,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatUser
      */
-    public function testCanFormatAUserModel() {
+    public function testCanFormatAUserModel() : void {
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
         $date = new DateTime($formattedDate);
 
@@ -127,7 +127,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatImages
      */
-    public function testCanFormatAnImagesModel() {
+    public function testCanFormatAnImagesModel() : void {
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
 
         $date = new DateTime();
@@ -194,7 +194,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatImages
      */
-    public function testCanFormatAnImagesModelWithNoMetadataSet() {
+    public function testCanFormatAnImagesModelWithNoMetadataSet() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getMetadata')->will($this->returnValue(null));
         $image->expects($this->once())->method('getAddedDate')->will($this->returnValue(new DateTime()));
@@ -217,7 +217,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatImages
      */
-    public function testCanFormatAnImagesModelWithNoMetadata() {
+    public function testCanFormatAnImagesModelWithNoMetadata() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getMetadata')->will($this->returnValue([]));
         $image->expects($this->once())->method('getAddedDate')->will($this->returnValue(new DateTime()));
@@ -240,7 +240,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatImages
      */
-    public function testCanFormatAnImagesModelWithNoImages() {
+    public function testCanFormatAnImagesModelWithNoImages() : void {
         $model = $this->createMock('Imbo\Model\Images');
         $model->expects($this->once())->method('getImages')->will($this->returnValue([]));
 
@@ -254,7 +254,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatImages
      */
-    public function testCanFormatAnImagesModelWithSomefields() {
+    public function testCanFormatAnImagesModelWithSomefields() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getAddedDate')->will($this->returnValue(new DateTime()));
         $image->expects($this->once())->method('getUpdatedDate')->will($this->returnValue(new DateTime()));
@@ -282,7 +282,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatMetadataModel
      */
-    public function testCanFormatAMetadataModel() {
+    public function testCanFormatAMetadataModel() : void {
         $metadata = [
             'some key' => 'some value',
             'some other key' => 'some other value',
@@ -300,7 +300,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatMetadataModel
      */
-    public function testCanFormatAMetadataModelWithNoMetadata() {
+    public function testCanFormatAMetadataModelWithNoMetadata() : void {
         $model = $this->createMock('Imbo\Model\Metadata');
         $model->expects($this->once())->method('getData')->will($this->returnValue([]));
 
@@ -314,7 +314,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatArrayModel
      */
-    public function testCanFormatAnArrayModel() {
+    public function testCanFormatAnArrayModel() : void {
         $data = [
             'some key' => 'some value',
             'some other key' => 'some other value',
@@ -336,7 +336,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatArrayModel
      */
-    public function testCanFormatAnEmptyArrayModel() {
+    public function testCanFormatAnEmptyArrayModel() : void {
         $model = $this->createMock('Imbo\Model\ArrayModel');
         $model->expects($this->once())->method('getData')->will($this->returnValue([]));
 
@@ -350,7 +350,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatListModel
      */
-    public function testCanFormatAListModel() {
+    public function testCanFormatAListModel() : void {
         $list = [1, 2, 3];
         $container = 'foo';
         $model = $this->createMock('Imbo\Model\ListModel');
@@ -364,7 +364,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatListModel
      */
-    public function testCanFormatAnEmptyListModel() {
+    public function testCanFormatAnEmptyListModel() : void {
         $list = [];
         $container = 'foo';
         $model = $this->createMock('Imbo\Model\ListModel');
@@ -378,7 +378,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatGroups
      */
-    public function testCanFormatGroupsModel() {
+    public function testCanFormatGroupsModel() : void {
         $groups = ['group', 'othergroup'];
         $count = count($groups);
         $hits = 2;
@@ -399,7 +399,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatGroup
      */
-    public function testCanFormatAGroupModel() {
+    public function testCanFormatAGroupModel() : void {
         $name = 'group';
         $resources = [
             'user.get',
@@ -417,7 +417,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatAccessRule
      */
-    public function testCanFormatAnAccessRuleModelWithGroup() {
+    public function testCanFormatAnAccessRuleModelWithGroup() : void {
         $id = 1;
         $users = ['user1', 'user2'];
         $group = 'group';
@@ -434,7 +434,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatAccessRule
      */
-    public function testCanFormatAnAccessRuleModelWithResource() {
+    public function testCanFormatAnAccessRuleModelWithResource() : void {
         $id = 1;
         $users = ['user1', 'user2'];
         $resources = ['resource1', 'resource2'];
@@ -451,7 +451,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatAccessRules
      */
-    public function testCanFormatAccessRulesModel() {
+    public function testCanFormatAccessRulesModel() : void {
         $rules = [
             [
                 'id' => 1,
@@ -504,7 +504,7 @@ class JSONTest extends TestCase {
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers Imbo\Http\Response\Formatter\JSON::formatStats
      */
-    public function testCanFormatAStatsModel($images, $users, $bytes, $customStats, $expectedJson) {
+    public function testCanFormatAStatsModel($images, $users, $bytes, $customStats, $expectedJson) : void {
         $model = $this->createMock('Imbo\Model\Stats');
         $model->expects($this->once())->method('getNumImages')->will($this->returnValue($images));
         $model->expects($this->once())->method('getNumUsers')->will($this->returnValue($users));

@@ -69,7 +69,7 @@ class ClipTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testExceptionIfMissingNamedPath() {
+    public function testExceptionIfMissingNamedPath() : void {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageRegExp('/clipping path .* not found/');
         $this->expectExceptionCode(400);
@@ -79,7 +79,7 @@ class ClipTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testNoExceptionIfMissingNamedPathButIgnoreSet() {
+    public function testNoExceptionIfMissingNamedPathButIgnoreSet() : void {
         $this->assertNull(
             $this->transformation->transform([
                 'path' => 'foo',
@@ -92,7 +92,7 @@ class ClipTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testTransformationHappensWithMatchingPath() {
+    public function testTransformationHappensWithMatchingPath() : void {
         $this->image->expects($this->once())
                     ->method('hasBeenTransformed')
                     ->with(true);
@@ -103,7 +103,7 @@ class ClipTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testTransformationHappensWithoutExplicitPath() {
+    public function testTransformationHappensWithoutExplicitPath() : void {
         $this->image->expects($this->once())
                     ->method('hasBeenTransformed')
                     ->with(true);
@@ -114,7 +114,7 @@ class ClipTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testTransformationDoesntHappenWhenNoPathIsPresent() {
+    public function testTransformationDoesntHappenWhenNoPathIsPresent() : void {
         $this->imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.jpg'));
         $this->image->expects($this->never())
                     ->method('hasBeenTransformed');
@@ -125,7 +125,7 @@ class ClipTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testWillResetAlphaChannelWhenTheImageDoesNotHaveAClippingPath() {
+    public function testWillResetAlphaChannelWhenTheImageDoesNotHaveAClippingPath() : void {
         $imagick = $this->createMock('Imagick');
         $imagick->expects($this->once())
                 ->method('getImageAlphaChannel')
@@ -149,7 +149,7 @@ class ClipTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testThrowsExceptionWhenImagickFailsWithAFatalError() {
+    public function testThrowsExceptionWhenImagickFailsWithAFatalError() : void {
         $imagick = $this->createMock('Imagick');
         $imagick->expects($this->once())
                 ->method('getImageAlphaChannel')

@@ -42,7 +42,7 @@ class ModulateTest extends TestCase {
     /**
      * @dataProvider getModulateParams
      */
-    public function testUsesDefaultValuesWhenParametersAreNotSpecified(array $params, $brightness, $saturation, $hue) {
+    public function testUsesDefaultValuesWhenParametersAreNotSpecified(array $params, $brightness, $saturation, $hue) : void {
         $image = $this->createMock('Imbo\Model\Image');
 
         $imagick = $this->createMock('Imagick');

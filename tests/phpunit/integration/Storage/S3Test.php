@@ -48,7 +48,7 @@ class S3Test extends StorageTests {
     /**
      * @covers ::getStatus
      */
-    public function testGetStatus() {
+    public function testGetStatus() : void {
         $this->assertTrue($this->getDriver()->getStatus());
 
         $driver = new S3([

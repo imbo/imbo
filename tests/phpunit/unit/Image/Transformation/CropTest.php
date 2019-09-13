@@ -12,7 +12,7 @@ class CropTest extends TestCase {
     /**
      * @covers Imbo\Image\Transformation\Crop::transform
      */
-    public function testThrowsExceptionWhenWidthIsMissing() {
+    public function testThrowsExceptionWhenWidthIsMissing() : void {
         $transformation = new Crop();
         $transformation->setImage($this->createMock('Imbo\Model\Image'));
         $this->expectExceptionObject(new TransformationException(
@@ -25,7 +25,7 @@ class CropTest extends TestCase {
     /**
      * @covers Imbo\Image\Transformation\Crop::transform
      */
-    public function testThrowsExceptionWhenHeightIsMissing() {
+    public function testThrowsExceptionWhenHeightIsMissing() : void {
         $transformation = new Crop();
         $transformation->setImage($this->createMock('Imbo\Model\Image'));
         $this->expectExceptionObject(new TransformationException(
@@ -52,7 +52,7 @@ class CropTest extends TestCase {
      * @dataProvider getImageParams
      * @covers Imbo\Image\Transformation\Crop::transform
      */
-    public function testUsesAllParams($params, $originalWidth, $originalHeight, $width, $height, $x = 0, $y = 0, $shouldCrop = true) {
+    public function testUsesAllParams($params, $originalWidth, $originalHeight, $width, $height, $x = 0, $y = 0, $shouldCrop = true) : void {
         $image = $this->createMock('Imbo\Model\Image');
         $imagick = $this->createMock('Imagick');
 
@@ -95,7 +95,7 @@ class CropTest extends TestCase {
      * @dataProvider getInvalidImageParams
      * @covers Imbo\Image\Transformation\Crop::transform
      */
-    public function testThrowsOnInvalidCropParams($params, $originalWidth, $originalHeight, $errRegex) {
+    public function testThrowsOnInvalidCropParams($params, $originalWidth, $originalHeight, $errRegex) : void {
         $image = $this->createMock('Imbo\Model\Image');
         $imagick = $this->createMock('Imagick');
 

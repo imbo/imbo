@@ -12,7 +12,7 @@ class CliApplicationTest extends TestCase {
     /**
      * @covers ::__construct
      */
-    public function testAddsCommands() {
+    public function testAddsCommands() : void {
         $application = new CliApplication();
         $application->setAutoExit(false);
 

@@ -24,7 +24,7 @@ class GroupTest extends TestCase {
      * @covers Imbo\Model\Group::getName
      * @covers Imbo\Model\Group::setName
      */
-    public function testSetAndGetName() {
+    public function testSetAndGetName() : void {
         $this->assertNull($this->model->getName());
         $this->assertSame($this->model, $this->model->setName('name'));
         $this->assertSame('name', $this->model->getName());
@@ -34,7 +34,7 @@ class GroupTest extends TestCase {
      * @covers Imbo\Model\Group::getResources
      * @covers Imbo\Model\Group::setResources
      */
-    public function testSetAndGetResources() {
+    public function testSetAndGetResources() : void {
         $this->assertSame([], $this->model->getResources());
         $this->assertSame($this->model, $this->model->setResources(['image.get', 'image.head']));
         $this->assertSame(['image.get', 'image.head'], $this->model->getResources());
@@ -43,7 +43,7 @@ class GroupTest extends TestCase {
     /**
      * @covers Imbo\Model\Group::getData
      */
-    public function testGetData() {
+    public function testGetData() : void {
         $this->model
             ->setName('name')
             ->setResources(['image.get', 'image.head']);

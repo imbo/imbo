@@ -25,7 +25,7 @@ class WatermarkTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testTransformThrowsExceptionIfNoImageSpecified() {
+    public function testTransformThrowsExceptionIfNoImageSpecified() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $this->expectExceptionObject(new TransformationException(
             'You must specify an image identifier to use for the watermark',
@@ -37,7 +37,7 @@ class WatermarkTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testThrowsExceptionIfSpecifiedImageIsNotFound() {
+    public function testThrowsExceptionIfSpecifiedImageIsNotFound() : void {
         $e = new StorageException('File not found', 404);
 
         $storage = $this->createMock('Imbo\Storage\StorageInterface');

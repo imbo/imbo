@@ -42,7 +42,7 @@ class AddPublicKeyTest extends TestCase {
     /**
      * @covers Imbo\CliCommand\AddPublicKey::getAclAdapter
      */
-    public function testThrowsWhenAccessControlIsNotValid() {
+    public function testThrowsWhenAccessControlIsNotValid() : void {
         $command = new AddPublicKey();
         $command->setConfig([
             'accessControl' => new \Exception()
@@ -56,7 +56,7 @@ class AddPublicKeyTest extends TestCase {
     /**
      * @covers Imbo\CliCommand\AddPublicKey::getAclAdapter
      */
-    public function testThrowsWhenCallableReturnsInvalidAccessControl() {
+    public function testThrowsWhenCallableReturnsInvalidAccessControl() : void {
         $command = new AddPublicKey();
         $command->setConfig([
             'accessControl' => function() {
@@ -72,7 +72,7 @@ class AddPublicKeyTest extends TestCase {
     /**
      * @covers Imbo\CliCommand\AddPublicKey::getAclAdapter
      */
-    public function testThrowsOnImmutableAdapter() {
+    public function testThrowsOnImmutableAdapter() : void {
         $command = new AddPublicKey();
         $command->setConfig([
             'accessControl' => $this->createMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface')
@@ -86,7 +86,7 @@ class AddPublicKeyTest extends TestCase {
     /**
      * @covers Imbo\CliCommand\AddPublicKey::execute
      */
-    public function testThrowsOnDuplicatePublicKeyName() {
+    public function testThrowsOnDuplicatePublicKeyName() : void {
         $this->adapter
             ->expects($this->once())
             ->method('publicKeyExists')
@@ -101,7 +101,7 @@ class AddPublicKeyTest extends TestCase {
     /**
      * @covers Imbo\CliCommand\AddPublicKey::askForPrivateKey
      */
-    public function testWillAskForPrivateKeyIfNotSpecified() {
+    public function testWillAskForPrivateKeyIfNotSpecified() : void {
         $this->adapter
             ->expects($this->once())
             ->method('addKeyPair')
@@ -120,7 +120,7 @@ class AddPublicKeyTest extends TestCase {
     /**
      * @covers Imbo\CliCommand\AddPublicKey::askForUsers
      */
-    public function testWillNotAcceptEmptyUserSpecification() {
+    public function testWillNotAcceptEmptyUserSpecification() : void {
         $commandTester = new CommandTester($this->command);
         $commandTester->setInputs([
             '0',
@@ -136,7 +136,7 @@ class AddPublicKeyTest extends TestCase {
     /**
      * @covers Imbo\CliCommand\AddPublicKey::askForCustomResources
      */
-    public function testWillNotAcceptEmptyCustomResourceSpecification() {
+    public function testWillNotAcceptEmptyCustomResourceSpecification() : void {
         $commandTester = new CommandTester($this->command);
         $commandTester->setInputs([
             '4',
@@ -159,7 +159,7 @@ class AddPublicKeyTest extends TestCase {
      * @covers Imbo\CliCommand\AddPublicKey::askForResources
      * @covers Imbo\CliCommand\AddPublicKey::askForUsers
      */
-    public function testContinuesAskingForAclRulesIfUserSaysThereAreMoreRulesToAdd() {
+    public function testContinuesAskingForAclRulesIfUserSaysThereAreMoreRulesToAdd() : void {
         $this->adapter
             ->expects($this->exactly(3))
             ->method('addAccessRule')
@@ -214,7 +214,7 @@ class AddPublicKeyTest extends TestCase {
      * @covers Imbo\CliCommand\AddPublicKey::askForResources
      * @covers Imbo\CliCommand\AddPublicKey::askForUsers
      */
-    public function testPromptsForListOfSpecificResourcesIfOptionIsSelected() {
+    public function testPromptsForListOfSpecificResourcesIfOptionIsSelected() : void {
         $allResources = Resource::getAllResources();
         sort($allResources);
 
@@ -244,7 +244,7 @@ class AddPublicKeyTest extends TestCase {
      * @covers Imbo\CliCommand\AddPublicKey::askForAnotherAclRule
      * @covers Imbo\CliCommand\AddPublicKey::askForCustomResources
      */
-    public function testPromtpsForListOfCustomResourcesIfOptionIsSelected() {
+    public function testPromtpsForListOfCustomResourcesIfOptionIsSelected() : void {
         $allResources = Resource::getAllResources();
         sort($allResources);
 

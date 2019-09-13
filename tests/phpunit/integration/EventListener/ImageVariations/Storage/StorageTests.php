@@ -24,7 +24,7 @@ abstract class StorageTests extends TestCase {
         $this->adapter = $this->getAdapter();
     }
 
-    public function testCanStoreAndFetchImageVariations() {
+    public function testCanStoreAndFetchImageVariations() : void {
         $key = 'key';
         $id  = 'imageId';
         $width = 200;
@@ -47,7 +47,7 @@ abstract class StorageTests extends TestCase {
         );
     }
 
-    public function testCanDeleteOneOrMoreImageVariations() {
+    public function testCanDeleteOneOrMoreImageVariations() : void {
         $key = 'key';
         $id  = 'imageId';
         $blob = file_get_contents(FIXTURES_DIR . '/colors.png');

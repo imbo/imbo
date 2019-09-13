@@ -23,7 +23,7 @@ class ConvertTest extends TestCase {
     /**
      * @covers Imbo\Image\Transformation\Convert::transform
      */
-    public function testWillNotConvertImageIfNotNeeded() {
+    public function testWillNotConvertImageIfNotNeeded() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
         $image->expects($this->never())->method('getBlob');

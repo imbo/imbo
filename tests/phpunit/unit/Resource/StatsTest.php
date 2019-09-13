@@ -36,7 +36,7 @@ class StatsTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Stats::get
      */
-    public function testTriggersTheCorrectEvent() {
+    public function testTriggersTheCorrectEvent() : void {
         $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
         $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
 
