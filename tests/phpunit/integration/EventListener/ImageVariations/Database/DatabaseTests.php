@@ -41,7 +41,7 @@ abstract class DatabaseTests extends TestCase {
     /**
      * @dataProvider getVariationData
      */
-    public function testCanFetchTheBestMatch($imageWidth, $bestMatch) {
+    public function testCanFetchTheBestMatch($imageWidth, $bestMatch) : void {
         $variations = [
             [
                 'width' => 770,
@@ -64,7 +64,7 @@ abstract class DatabaseTests extends TestCase {
         $this->assertSame($bestMatch, $this->adapter->getBestMatch('key', 'id', $imageWidth));
     }
 
-    public function testCanDeleteOneOrMoreVariations() {
+    public function testCanDeleteOneOrMoreVariations() : void {
         $variations = [
             [
                 'width' => 770,
@@ -96,7 +96,7 @@ abstract class DatabaseTests extends TestCase {
         $this->assertSame(null, $this->adapter->getBestMatch('key', 'id', 100));
     }
 
-    public function testCanDeleteAllTransformations() {
+    public function testCanDeleteAllTransformations() : void {
         $variations = [
             [
                 'width' => 770,

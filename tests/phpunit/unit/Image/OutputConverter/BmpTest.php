@@ -25,7 +25,7 @@ class BmpTest extends TestCase {
     /**
      * @covers ::getSupportedMimeTypes
      */
-    public function testReturnsSupportedMimeTypes() {
+    public function testReturnsSupportedMimeTypes() : void {
         $types = $this->converter->getSupportedMimeTypes();
 
         $this->assertIsArray($types);
@@ -36,7 +36,7 @@ class BmpTest extends TestCase {
     /**
      * @covers ::convert
      */
-    public function testCanConvertImage() {
+    public function testCanConvertImage() : void {
         $extension = 'bmp';
         $mimeType = 'image/bmp';
 
@@ -56,7 +56,7 @@ class BmpTest extends TestCase {
     /**
      * @covers ::convert
      */
-    public function testThrowsExceptionOnImagickFailure() {
+    public function testThrowsExceptionOnImagickFailure() : void {
         $extension = 'bmp';
 
         $imagick = $this->createMock('Imagick');

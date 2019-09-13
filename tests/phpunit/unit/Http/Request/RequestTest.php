@@ -25,14 +25,14 @@ class RequestTest extends TestCase {
     /**
      * @covers Imbo\Http\Request\Request::getTransformations
      */
-    public function testGetTransformationsWithNoTransformationsPresent() {
+    public function testGetTransformationsWithNoTransformationsPresent() : void {
         $this->assertEquals([], $this->request->getTransformations());
     }
 
     /**
      * @covers Imbo\Http\Request\Request::getTransformations
      */
-    public function testGetTransformationsWithCorrectOrder() {
+    public function testGetTransformationsWithCorrectOrder() : void {
         $query = [
             't' => [
                 'flipHorizontally',
@@ -49,7 +49,7 @@ class RequestTest extends TestCase {
     /**
      * @covers Imbo\Http\Request\Request::getTransformations
      */
-    public function testGetTransformations() {
+    public function testGetTransformations() : void {
         $query = [
             't' => [
                 // Valid transformations with all options
@@ -102,7 +102,7 @@ class RequestTest extends TestCase {
     /**
      * @covers Imbo\Http\Request\Request::getImageIdentifier
      */
-    public function testSetGetImageIdentifier() {
+    public function testSetGetImageIdentifier() : void {
         $identifier = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
         $this->assertNull($this->request->getImageIdentifier());
 
@@ -117,7 +117,7 @@ class RequestTest extends TestCase {
     /**
      * @covers Imbo\Http\Request\Request::getExtension
      */
-    public function testSetGetExtension() {
+    public function testSetGetExtension() : void {
         $extension = 'jpg';
         $this->assertNull($this->request->getExtension());
 
@@ -132,7 +132,7 @@ class RequestTest extends TestCase {
     /**
      * @covers Imbo\Http\Request\Request::getUser
      */
-    public function testSetGetUser() {
+    public function testSetGetUser() : void {
         $user = 'christer';
         $this->assertNull($this->request->getUser());
 
@@ -147,7 +147,7 @@ class RequestTest extends TestCase {
     /**
      * @covers Imbo\Http\Request\Request::getPublicKey
      */
-    public function testSetGetPublicKeyThroughRoute() {
+    public function testSetGetPublicKeyThroughRoute() : void {
         $pubkey = 'pubkey';
         $this->assertNull($this->request->getPublicKey());
 
@@ -162,7 +162,7 @@ class RequestTest extends TestCase {
     /**
      * @covers Imbo\Http\Request\Request::getPublicKey
      */
-    public function testSetGetPublicKeyThroughQuery() {
+    public function testSetGetPublicKeyThroughQuery() : void {
         $pubkey = 'pubkey';
         $this->assertNull($this->request->getPublicKey());
 
@@ -173,7 +173,7 @@ class RequestTest extends TestCase {
     /**
      * @covers Imbo\Http\Request\Request::getPublicKey
      */
-    public function testSetGetPublicKeyThroughHeader() {
+    public function testSetGetPublicKeyThroughHeader() : void {
         $pubkey = 'pubkey';
         $this->assertNull($this->request->getPublicKey());
 
@@ -185,7 +185,7 @@ class RequestTest extends TestCase {
      * @covers Imbo\Http\Request\Request::getImage
      * @covers Imbo\Http\Request\Request::setImage
      */
-    public function testCanSetAndGetAnImage() {
+    public function testCanSetAndGetAnImage() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $this->assertSame($this->request, $this->request->setImage($image));
         $this->assertSame($image, $this->request->getImage());
@@ -195,7 +195,7 @@ class RequestTest extends TestCase {
      * @covers Imbo\Http\Request\Request::getRoute
      * @covers Imbo\Http\Request\Request::setRoute
      */
-    public function testCanSetAndGetARoute() {
+    public function testCanSetAndGetARoute() : void {
         $this->assertNull($this->request->getRoute());
         $route = $this->createMock('Imbo\Router\Route');
         $this->assertSame($this->request, $this->request->setRoute($route));
@@ -205,7 +205,7 @@ class RequestTest extends TestCase {
     /**
      * @covers Imbo\Http\Request\Request::getTransformations
      */
-    public function testRequiresTransformationsToBeSpecifiedAsAnArray() {
+    public function testRequiresTransformationsToBeSpecifiedAsAnArray() : void {
         $request = new Request([
             't' => 'desaturate',
         ]);
@@ -219,7 +219,7 @@ class RequestTest extends TestCase {
     /**
      * @covers Imbo\Http\Request\Request::getTransformations
      */
-    public function testDoesNotGenerateWarningWhenTransformationIsNotAString() {
+    public function testDoesNotGenerateWarningWhenTransformationIsNotAString() : void {
         $query = [
             't' => [
                 [
@@ -253,7 +253,7 @@ class RequestTest extends TestCase {
     /**
      * @dataProvider getQueryStrings
      */
-    public function testGetRawUriDecodesUri($queryString, $expectedQueryString) {
+    public function testGetRawUriDecodesUri($queryString, $expectedQueryString) : void {
         $request = new Request([], [], [], [], [], [
             'SERVER_NAME' => 'imbo',
             'SERVER_PORT' => 80,

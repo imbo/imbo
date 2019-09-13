@@ -326,7 +326,7 @@ class WatermarkTest extends TransformationTests {
      * @covers ::transform
      * @covers ::setDefaultImage
      */
-    public function testApplyToImageTopLeftWithOnlyWidthAndDefaultWatermark($params, $colors) {
+    public function testApplyToImageTopLeftWithOnlyWidthAndDefaultWatermark($params, $colors) : void {
         $blob = file_get_contents(FIXTURES_DIR . '/white.png');
 
         $image = new Image();

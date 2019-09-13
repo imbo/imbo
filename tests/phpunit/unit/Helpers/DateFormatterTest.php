@@ -37,7 +37,7 @@ class DateFormatterTest extends TestCase {
      * @dataProvider getDates
      * @covers Imbo\Helpers\DateFormatter::formatDate
      */
-    public function testCanFormatADateTimeInstance($datetime, $expected) {
+    public function testCanFormatADateTimeInstance($datetime, $expected) : void {
         $this->assertSame($expected, $this->helper->formatDate($datetime));
     }
 }

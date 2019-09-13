@@ -45,7 +45,7 @@ class TransformationTest extends TestCase {
      * @dataProvider getColors
      * @covers Imbo\Image\Transformation\Transformation::formatColor
      */
-    public function testCanFormatColors($color, $expected) {
+    public function testCanFormatColors($color, $expected) : void {
         $method = new ReflectionMethod('Imbo\Image\Transformation\Transformation', 'formatColor');
         $method->setAccessible(true);
 

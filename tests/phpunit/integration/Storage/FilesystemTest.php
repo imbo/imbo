@@ -42,7 +42,7 @@ class FilesystemTest extends StorageTests {
         parent::tearDown();
     }
 
-    public function testStoringEmptyDataFails() {
+    public function testStoringEmptyDataFails() : void {
         $this->expectExceptionObject(new StorageException(
             'Failed writing file (disk full? zero bytes input?) to disk:',
             507

@@ -21,7 +21,7 @@ abstract class TransformationTests extends TestCase {
         }
     }
 
-    public function testReturnsACorrectEventSubscriptionArray() {
+    public function testReturnsACorrectEventSubscriptionArray() : void {
         $transformation = $this->getTransformation();
         $this->assertIsArray($transformation::getSubscribedEvents());
     }

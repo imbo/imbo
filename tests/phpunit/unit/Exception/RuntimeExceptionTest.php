@@ -26,7 +26,7 @@ class RuntimeExceptionTest extends TestCase {
      * @covers Imbo\Exception\RuntimeException::getImboErrorCode
      * @dataProvider getErrorCodes
      */
-    public function testSetAndGetImboErrorCode($actual, $expected) {
+    public function testSetAndGetImboErrorCode($actual, $expected) : void {
         $exception = new RuntimeException();
         $this->assertSame($exception, $exception->setImboErrorCode($actual));
         $this->assertSame($expected, $exception->getImboErrorCode());

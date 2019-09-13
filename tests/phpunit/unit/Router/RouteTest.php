@@ -23,7 +23,7 @@ class RouteTest extends TestCase {
     /**
      * @covers Imbo\Router\Route::__toString
      */
-    public function testReturnsNullWhenNameIsNotSet() {
+    public function testReturnsNullWhenNameIsNotSet() : void {
         $this->assertSame('', (string) $this->route);
     }
 
@@ -31,7 +31,7 @@ class RouteTest extends TestCase {
      * @covers Imbo\Router\Route::setName
      * @covers Imbo\Router\Route::__toString
      */
-    public function testReturnsTheSetName() {
+    public function testReturnsTheSetName() : void {
         $this->assertSame($this->route, $this->route->setName('name'));
         $this->assertSame('name', (string) $this->route);
     }

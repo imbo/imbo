@@ -28,7 +28,7 @@ class ApplicationTest extends TestCase {
     /**
      * @covers ::run
      */
-    public function testThrowsExceptionWhenConfigurationHasInvalidDatabaseAdapter() {
+    public function testThrowsExceptionWhenConfigurationHasInvalidDatabaseAdapter() : void {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid database adapter', 500));
         $this->application->run([
             'database' => function() { return new \stdClass(); },
@@ -39,7 +39,7 @@ class ApplicationTest extends TestCase {
     /**
      * @covers ::run
      */
-    public function testThrowsExceptionWhenConfigurationHasInvalidStorageAdapter() {
+    public function testThrowsExceptionWhenConfigurationHasInvalidStorageAdapter() : void {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid storage adapter', 500));
         $this->application->run([
             'database' => $this->createMock('Imbo\Database\DatabaseInterface'),
@@ -51,7 +51,7 @@ class ApplicationTest extends TestCase {
     /**
      * @covers ::run
      */
-    public function testThrowsExceptionWhenConfigurationHasInvalidAccessControlAdapter() {
+    public function testThrowsExceptionWhenConfigurationHasInvalidAccessControlAdapter() : void {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid access control adapter', 500));
         $this->application->run([
             'database' => $this->createMock('Imbo\Database\DatabaseInterface'),
@@ -65,7 +65,7 @@ class ApplicationTest extends TestCase {
     /**
      * @covers ::run
      */
-    public function testApplicationSetsTrustedProxies() {
+    public function testApplicationSetsTrustedProxies() : void {
         $this->expectOutputRegex('|^{.*}$|');
 
         $this->assertEmpty(Request::getTrustedProxies());
@@ -87,7 +87,7 @@ class ApplicationTest extends TestCase {
     /**
      * @covers ::run
      */
-    public function testApplicationPassesRequestAndResponseToCallbacks() {
+    public function testApplicationPassesRequestAndResponseToCallbacks() : void {
         // We just want to swallow the output, since we're testing it explicitly below.
         $this->expectOutputRegex('|.*}|');
 
@@ -143,7 +143,7 @@ class ApplicationTest extends TestCase {
     /**
      * @covers ::run
      */
-    public function testCanRunWithDefaultConfiguration() {
+    public function testCanRunWithDefaultConfiguration() : void {
         $this->expectOutputRegex('|^{.*}$|');
         $this->application->run(require __DIR__ . '/../../../config/config.default.php');
     }
@@ -151,7 +151,7 @@ class ApplicationTest extends TestCase {
     /**
      * @covers ::run
      */
-    public function testThrowsExceptionIfTransformationsIsSetAndIsNotAnArray() {
+    public function testThrowsExceptionIfTransformationsIsSetAndIsNotAnArray() : void {
         $defaultConfig = require __DIR__ . '/../../../config/config.default.php';
         $defaultConfig['transformations'] = function() {};
         $this->expectExceptionObject(new InvalidArgumentException(

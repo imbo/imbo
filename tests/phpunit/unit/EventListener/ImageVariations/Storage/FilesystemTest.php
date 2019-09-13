@@ -23,7 +23,7 @@ class FilesystemTest extends TestCase {
     /**
      * @covers ::storeImageVariation
      */
-    public function testThrowsExceptionWhenNotAbleToWriteToDirectory() {
+    public function testThrowsExceptionWhenNotAbleToWriteToDirectory() : void {
         $dir = 'unwritableDirectory';
 
         // Create the virtual directory with no permissions
@@ -40,7 +40,7 @@ class FilesystemTest extends TestCase {
     /**
      * @covers ::deleteImageVariations
      */
-    public function testDoesNotThrowWhenDeletingNonExistantVariation() {
+    public function testDoesNotThrowWhenDeletingNonExistantVariation() : void {
         $dir = 'basedir';
         vfsStream::setup($dir);
 

@@ -25,7 +25,7 @@ class StatusTest extends TestCase {
      * @covers Imbo\Model\Status::getDate
      * @covers Imbo\Model\Status::setDate
      */
-    public function testCanSetAndGetDate() {
+    public function testCanSetAndGetDate() : void {
         $date = new DateTime();
         $this->assertNull($this->model->getDate());
         $this->assertSame($this->model, $this->model->setDate($date));
@@ -36,7 +36,7 @@ class StatusTest extends TestCase {
      * @covers Imbo\Model\Status::getDatabaseStatus
      * @covers Imbo\Model\Status::setDatabaseStatus
      */
-    public function testCanSetAndGetDatabaseStatus() {
+    public function testCanSetAndGetDatabaseStatus() : void {
         $this->assertNull($this->model->getDatabaseStatus());
         $this->assertSame($this->model, $this->model->setDatabaseStatus(true));
         $this->assertTrue($this->model->getDatabaseStatus());
@@ -46,7 +46,7 @@ class StatusTest extends TestCase {
      * @covers Imbo\Model\Status::getStorageStatus
      * @covers Imbo\Model\Status::setStorageStatus
      */
-    public function testCanSetAndGetStorageStatus() {
+    public function testCanSetAndGetStorageStatus() : void {
         $this->assertNull($this->model->getStorageStatus());
         $this->assertSame($this->model, $this->model->setStorageStatus(true));
         $this->assertTrue($this->model->getStorageStatus());
@@ -55,7 +55,7 @@ class StatusTest extends TestCase {
     /**
      * @covers Imbo\Model\Status::getData
      */
-    public function testGetData() {
+    public function testGetData() : void {
         $date = new DateTime();
 
         $this->model

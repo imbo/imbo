@@ -24,7 +24,7 @@ class ListModelTest extends TestCase {
      * @covers Imbo\Model\ListModel::setList
      * @covers Imbo\Model\ListModel::getList
      */
-    public function testCanSetAndGetAList() {
+    public function testCanSetAndGetAList() : void {
         $this->assertSame([], $this->model->getList());
         $list = [1, 2, 3];
         $this->assertSame($this->model, $this->model->setList($list));
@@ -35,7 +35,7 @@ class ListModelTest extends TestCase {
      * @covers Imbo\Model\ListModel::setContainer
      * @covers Imbo\Model\ListModel::getContainer
      */
-    public function testCanSetAndGetTheContainerValue() {
+    public function testCanSetAndGetTheContainerValue() : void {
         $this->assertNull($this->model->getContainer());
         $container = 'container';
         $this->assertSame($this->model, $this->model->setContainer($container));
@@ -46,7 +46,7 @@ class ListModelTest extends TestCase {
      * @covers Imbo\Model\ListModel::__construct
      * @covers Imbo\Model\ListModel::getData
      */
-    public function testGetData() {
+    public function testGetData() : void {
         $container = 'container';
         $list = [1, 2, 3];
 

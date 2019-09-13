@@ -41,7 +41,7 @@ class TransformationManagerTest extends TestCase {
     /**
      * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
      */
-    public function testFindsTheMinimumImageInputSizeForSingleTransformation() {
+    public function testFindsTheMinimumImageInputSizeForSingleTransformation() : void {
         $this->query->set('t', ['maxSize:width=1024']);
         $minimum = $this->manager->getMinimumImageInputSize($this->event);
 
@@ -52,7 +52,7 @@ class TransformationManagerTest extends TestCase {
     /**
      * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
      */
-    public function testFindsTheMinimumImageInputSizeForMultipleTransformations() {
+    public function testFindsTheMinimumImageInputSizeForMultipleTransformations() : void {
         $this->query->set('t', ['maxSize:width=1024', 'maxSize:height=620']);
         $minimum = $this->manager->getMinimumImageInputSize($this->event);
 
@@ -70,7 +70,7 @@ class TransformationManagerTest extends TestCase {
     /**
      * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
      */
-    public function testFindsTheMinimumImageInputSizeForRotatedImages() {
+    public function testFindsTheMinimumImageInputSizeForRotatedImages() : void {
         $this->query->set('t', ['rotate:angle=90', 'maxSize:width=600']);
         $minimum = $this->manager->getMinimumImageInputSize($this->event);
 
@@ -81,7 +81,7 @@ class TransformationManagerTest extends TestCase {
     /**
      * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
      */
-    public function testFindsTheMinimumImageInputSizeForDoublyRotatedImages() {
+    public function testFindsTheMinimumImageInputSizeForDoublyRotatedImages() : void {
         $this->query->set('t', [
             'rotate:angle=90',
             'maxSize:width=500',
@@ -98,7 +98,7 @@ class TransformationManagerTest extends TestCase {
     /**
      * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
      */
-    public function testReturnsFalseIfMinimumSizeIsLargerThanOriginal() {
+    public function testReturnsFalseIfMinimumSizeIsLargerThanOriginal() : void {
         $this->query->set('t', ['resize:width=3800,height=1800']);
         $this->assertFalse($this->manager->getMinimumImageInputSize($this->event));
     }
@@ -106,7 +106,7 @@ class TransformationManagerTest extends TestCase {
     /**
      * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
      */
-    public function testSkipsTransformationsThatReturnNullAsMinInputSize() {
+    public function testSkipsTransformationsThatReturnNullAsMinInputSize() : void {
         $this->query->set('t', ['maxSize:width=10000']);
         $this->assertFalse($this->manager->getMinimumImageInputSize($this->event));
     }
@@ -114,7 +114,7 @@ class TransformationManagerTest extends TestCase {
     /**
      * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
      */
-    public function testReturnsCorrectSizeIfChainIsNotStopped() {
+    public function testReturnsCorrectSizeIfChainIsNotStopped() : void {
         // Sanity check for the test that follows
         $this->query->set('t', ['maxSize:width=750', 'maxSize:width=320']);
         $minimum = $this->manager->getMinimumImageInputSize($this->event);
@@ -124,7 +124,7 @@ class TransformationManagerTest extends TestCase {
     /**
      * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
      */
-    public function testStopsMinSizeChainIfTransformationReturnsFalse() {
+    public function testStopsMinSizeChainIfTransformationReturnsFalse() : void {
         $this->query->set('t', ['maxSize:width=750', 'rotate:angle=17.3', 'maxSize:width=320']);
 
         $minimum = $this->manager->getMinimumImageInputSize($this->event);
@@ -135,7 +135,7 @@ class TransformationManagerTest extends TestCase {
     /**
      * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
      */
-    public function testFindsRightSizeWhenRegionIsExtracted() {
+    public function testFindsRightSizeWhenRegionIsExtracted() : void {
         $this->query->set('t', ['crop:width=784,height=700,x=384,y=200', 'maxSize:width=320']);
 
         $minimum = $this->manager->getMinimumImageInputSize($this->event);

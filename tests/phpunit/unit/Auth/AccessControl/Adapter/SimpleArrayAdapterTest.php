@@ -14,13 +14,13 @@ class SimpleArrayAdapterTest extends TestCase {
     /**
      * @dataProvider getAuthConfig
      */
-    public function testCanSetKeys(array $users, $publicKey, $privateKey) {
+    public function testCanSetKeys(array $users, $publicKey, $privateKey) : void {
         $accessControl = new SimpleArrayAdapter($users);
 
         $this->assertSame($privateKey, $accessControl->getPrivateKey($publicKey));
     }
 
-    public function testThrowsOnMultiplePrivateKeysPerPublicKey() {
+    public function testThrowsOnMultiplePrivateKeysPerPublicKey() : void {
         $this->expectExceptionObject(new InvalidArgumentException(
             'A public key can only have a single private key (as of 2.0.0)',
             500
@@ -30,7 +30,7 @@ class SimpleArrayAdapterTest extends TestCase {
         ]);
     }
 
-    public function testLegacyConfigKeysHaveWriteAccess() {
+    public function testLegacyConfigKeysHaveWriteAccess() : void {
         $accessControl = new SimpleArrayAdapter([
             'publicKey' => 'privateKey',
         ]);
@@ -44,12 +44,12 @@ class SimpleArrayAdapterTest extends TestCase {
         );
     }
 
-    public function testExtendsArrayAdapter() {
+    public function testExtendsArrayAdapter() : void {
         $accessControl = new SimpleArrayAdapter(['publicKey' => 'key']);
         $this->assertTrue($accessControl instanceof ArrayAdapter);
     }
 
-    public function testIsEmpty() {
+    public function testIsEmpty() : void {
         $accessControl = new SimpleArrayAdapter();
         $this->assertTrue($accessControl->isEmpty());
 

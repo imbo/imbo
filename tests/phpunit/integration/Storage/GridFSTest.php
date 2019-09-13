@@ -45,7 +45,7 @@ class GridFSTest extends StorageTests {
     /**
      * @covers ::getStatus
      */
-    public function testReturnsFalseWhenFetchingStatusAndTheHostnameIsNotCorrect() {
+    public function testReturnsFalseWhenFetchingStatusAndTheHostnameIsNotCorrect() : void {
         $storage = new GridFS([
             'uri' => 'mongodb://localhost:1',
         ]);

@@ -12,7 +12,7 @@ abstract class ListenerTests extends TestCase {
      */
     abstract protected function getListener();
 
-    public function testReturnsCorrectEventSubscriptions() {
+    public function testReturnsCorrectEventSubscriptions() : void {
         $listener = $this->getListener();
         $className = get_class($listener);
         $events = $className::getSubscribedEvents();

@@ -24,7 +24,7 @@ class AccessRuleTest extends TestCase {
      * @covers Imbo\Model\AccessRule::getId
      * @covers Imbo\Model\AccessRule::setId
      */
-    public function testSetAndGetId() {
+    public function testSetAndGetId() : void {
         $this->assertNull($this->model->getId());
         $this->assertSame($this->model, $this->model->setId(1));
         $this->assertSame(1, $this->model->getId());
@@ -34,7 +34,7 @@ class AccessRuleTest extends TestCase {
      * @covers Imbo\Model\AccessRule::getGroup
      * @covers Imbo\Model\AccessRule::setGroup
      */
-    public function testSetAndGetGroup() {
+    public function testSetAndGetGroup() : void {
         $this->assertNull($this->model->getGroup());
         $this->assertSame($this->model, $this->model->setGroup('name'));
         $this->assertSame('name', $this->model->getGroup());
@@ -44,7 +44,7 @@ class AccessRuleTest extends TestCase {
      * @covers Imbo\Model\AccessRule::getResources
      * @covers Imbo\Model\AccessRule::setResources
      */
-    public function testSetAndGetResources() {
+    public function testSetAndGetResources() : void {
         $this->assertSame([], $this->model->getResources());
         $this->assertSame($this->model, $this->model->setResources(['r1', 'r2']));
         $this->assertSame(['r1', 'r2'], $this->model->getResources());
@@ -54,7 +54,7 @@ class AccessRuleTest extends TestCase {
      * @covers Imbo\Model\AccessRule::getUsers
      * @covers Imbo\Model\AccessRule::setUsers
      */
-    public function testSetAndGetUsers() {
+    public function testSetAndGetUsers() : void {
         $this->assertSame([], $this->model->getUsers());
         $this->assertSame($this->model, $this->model->setUsers(['u1', 'u2']));
         $this->assertSame(['u1', 'u2'], $this->model->getUsers());
@@ -63,7 +63,7 @@ class AccessRuleTest extends TestCase {
     /**
      * @covers Imbo\Model\AccessRule::getData
      */
-    public function testGetData() {
+    public function testGetData() : void {
         $this->model
             ->setId(1)
             ->setGroup('name')

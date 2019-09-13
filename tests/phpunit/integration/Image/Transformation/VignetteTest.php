@@ -15,7 +15,7 @@ class VignetteTest extends TransformationTests {
     /**
      * @covers ::transform
      */
-    public function testCanVignetteImages() {
+    public function testCanVignetteImages() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
         $image->expects($this->once())->method('getWidth')->will($this->returnValue(640));

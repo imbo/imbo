@@ -25,7 +25,7 @@ class UserTest extends TestCase {
      * @covers Imbo\Model\User::getUserId
      * @covers Imbo\Model\User::setUserId
      */
-    public function testCanSetAndGetUserId() {
+    public function testCanSetAndGetUserId() : void {
         $this->assertNull($this->model->getUserId());
         $this->assertSame($this->model, $this->model->setUserId('key'));
         $this->assertSame('key', $this->model->getUserId());
@@ -35,7 +35,7 @@ class UserTest extends TestCase {
      * @covers Imbo\Model\User::getNumImages
      * @covers Imbo\Model\User::setNumImages
      */
-    public function testCanSetAndGetNumImages() {
+    public function testCanSetAndGetNumImages() : void {
         $this->assertNull($this->model->getNumImages());
         $this->assertSame($this->model, $this->model->setNumImages(10));
         $this->assertSame(10, $this->model->getNumImages());
@@ -45,7 +45,7 @@ class UserTest extends TestCase {
      * @covers Imbo\Model\User::getLastModified
      * @covers Imbo\Model\User::setLastModified
      */
-    public function testCanSetAndGetLastModified() {
+    public function testCanSetAndGetLastModified() : void {
         $date = new DateTime();
         $this->assertNull($this->model->getLastModified());
         $this->assertSame($this->model, $this->model->setLastModified($date));
@@ -55,7 +55,7 @@ class UserTest extends TestCase {
     /**
      * @covers Imbo\Model\User::getData
      */
-    public function testGetData() {
+    public function testGetData() : void {
         $date = new DateTime();
         $this->model
             ->setUserId('id')

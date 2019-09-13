@@ -44,7 +44,7 @@ class UserTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\User::get
      */
-    public function testSupportsHttpGet() {
+    public function testSupportsHttpGet() : void {
         $date = new DateTime('@1361628679', new DateTimeZone('UTC'));
         $manager = $this->createMock('Imbo\EventManager\EventManager');
         $manager->expects($this->once())->method('trigger')->with('db.user.load');

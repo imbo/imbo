@@ -23,7 +23,7 @@ class GroupQueryTest extends TestCase {
     /**
      * @covers ::limit
      */
-    public function testSetAndGetLimit() {
+    public function testSetAndGetLimit() : void {
         $this->assertSame(20, $this->query->limit());
         $this->assertSame($this->query, $this->query->limit(10));
         $this->assertSame(10, $this->query->limit());
@@ -32,7 +32,7 @@ class GroupQueryTest extends TestCase {
     /**
      * @covers ::page
      */
-    public function testSetAndGetPage() {
+    public function testSetAndGetPage() : void {
         $this->assertSame(1, $this->query->page());
         $this->assertSame($this->query, $this->query->page(2));
         $this->assertSame(2, $this->query->page());

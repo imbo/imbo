@@ -19,13 +19,13 @@ class CliCommandTest extends TestCase {
         $this->command = $this->getMockBuilder('Imbo\CliCommand\CliCommand')->disableOriginalConstructor()->getMockForAbstractClass();
     }
 
-    public function testCanSetAndGetConfiguration() {
+    public function testCanSetAndGetConfiguration() : void {
         $config = ['some' => 'config'];
         $this->command->setConfig($config);
         $this->assertSame($config, $this->command->getConfig());
     }
 
-    public function testFetchesTheDefaultConfigurationIfNoneHasBeenSet() {
+    public function testFetchesTheDefaultConfigurationIfNoneHasBeenSet() : void {
         $this->assertEquals(require __DIR__ . '/../../../../config/config.default.php', $this->command->getConfig());
     }
 }

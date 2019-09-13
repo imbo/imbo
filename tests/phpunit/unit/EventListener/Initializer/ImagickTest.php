@@ -11,7 +11,7 @@ class ImagickTest extends TestCase {
     /**
      * @covers ::initialize
      */
-    public function testInjectsImagickIntoEventListeners() {
+    public function testInjectsImagickIntoEventListeners() : void {
         $imagick = $this->createMock('Imagick');
 
         $listener = $this->createMock('Imbo\EventListener\Imagick');
@@ -26,7 +26,7 @@ class ImagickTest extends TestCase {
      * @covers ::__construct
      * @covers ::initialize
      */
-    public function testCanCreateAnImagickInstanceByItself() {
+    public function testCanCreateAnImagickInstanceByItself() : void {
         $listener = $this->createMock('Imbo\Image\Transformation\Border');
         $listener->expects($this->once())->method('setImagick')->with($this->isInstanceOf('Imagick'));
 

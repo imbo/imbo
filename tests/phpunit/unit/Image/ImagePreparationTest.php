@@ -57,7 +57,7 @@ class ImagePreparationTest extends TestCase {
     /**
      * @covers Imbo\Image\ImagePreparation::getSubscribedEvents
      */
-    public function testReturnsACorrectDefinition() {
+    public function testReturnsACorrectDefinition() : void {
         $class = get_class($this->prepare);
         $this->assertIsArray($class::getSubscribedEvents());
     }
@@ -65,7 +65,7 @@ class ImagePreparationTest extends TestCase {
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
      */
-    public function testThrowsExceptionWhenNoImageIsAttached() {
+    public function testThrowsExceptionWhenNoImageIsAttached() : void {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue(''));
         $this->expectExceptionObject(new ImageException('No image attached', 400));
         $this->prepare->prepareImage($this->event);
@@ -74,7 +74,7 @@ class ImagePreparationTest extends TestCase {
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
      */
-    public function testThrowsExceptionWhenImageTypeIsNotSupported() {
+    public function testThrowsExceptionWhenImageTypeIsNotSupported() : void {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue(file_get_contents(__FILE__)));
         $this->inputLoaderManager->expects($this->any())->method('load')->will($this->returnValue(null));
         $this->expectExceptionObject(new ImageException('Unsupported image type: text/x-php', 415));
@@ -84,7 +84,7 @@ class ImagePreparationTest extends TestCase {
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
      */
-    public function testThrowsExceptionWhenImageIsBroken() {
+    public function testThrowsExceptionWhenImageIsBroken() : void {
         $filePath = FIXTURES_DIR . '/broken-image.jpg';
 
         $this->inputLoaderManager->expects($this->any())->method('load')->will($this->returnCallback($this->imagickLoader));
@@ -96,7 +96,7 @@ class ImagePreparationTest extends TestCase {
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
      */
-    public function testThrowsExceptionWhenImageIsSlightlyBroken() {
+    public function testThrowsExceptionWhenImageIsSlightlyBroken() : void {
         $this->markTestSkipped('Test causes seg fault');
 
         $filePath = FIXTURES_DIR . '/slightly-broken-image.png';
@@ -110,7 +110,7 @@ class ImagePreparationTest extends TestCase {
     /**
      * @covers Imbo\Image\ImagePreparation::prepareImage
      */
-    public function testPopulatesRequestWhenImageIsValid() {
+    public function testPopulatesRequestWhenImageIsValid() : void {
         $imagePath = FIXTURES_DIR . '/image.png';
         $imageData = file_get_contents($imagePath);
 

@@ -12,7 +12,7 @@ class B2Test extends TestCase {
     /**
      * Test that we don't get an exception with required parameters present
      */
-    public function testConstructorWithAllRequiredParameters() {
+    public function testConstructorWithAllRequiredParameters() : void {
         $b2 = new B2([
             'accountId' => 'foo',
             'applicationKey' => 'bar',
@@ -26,7 +26,7 @@ class B2Test extends TestCase {
     /**
      * Test that we _do_ get an exception with required parameters present
      */
-    public function testConstructorMissingRequiredParameters() {
+    public function testConstructorMissingRequiredParameters() : void {
         $this->expectException(ConfigurationException::class);
         $this->expectExceptionMessageRegExp('/: accountId, bucketId/');
         $this->expectExceptionCode(500);
@@ -42,7 +42,7 @@ class B2Test extends TestCase {
     /**
      * Test that we _do_ get exceptions for each single missing parameter
      */
-    public function testConstructorEachMissingRequiredParameters() {
+    public function testConstructorEachMissingRequiredParameters() : void {
         $params = [
             'accountId' => 'foo',
             'applicationKey' => 'bar',

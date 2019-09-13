@@ -23,7 +23,7 @@ class AutoRotateImageTest extends TestCase {
     /**
      * @covers ::getSubscribedEvents
      */
-    public function testReturnsCorrectSubscriptionData() {
+    public function testReturnsCorrectSubscriptionData() : void {
         $className = get_class($this->listener);
         $events = $className::getSubscribedEvents();
 
@@ -34,7 +34,7 @@ class AutoRotateImageTest extends TestCase {
     /**
      * @covers ::autoRotate
      */
-    public function testTriggersTransformationForRotating() {
+    public function testTriggersTransformationForRotating() : void {
         $image = $this->createMock('Imbo\Model\Image');
 
         $request = $this->createMock('Imbo\Http\Request\Request');

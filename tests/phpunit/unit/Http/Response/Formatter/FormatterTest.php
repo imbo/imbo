@@ -12,7 +12,7 @@ class FormatterTest extends TestCase {
     /**
      * @covers ::format
      */
-    public function testThrowsExceptionWhenModelIsNotSupported() {
+    public function testThrowsExceptionWhenModelIsNotSupported() : void {
         $formatter = new JSON($this->createMock('Imbo\Helpers\DateFormatter'));
         $this->expectExceptionObject(new InvalidArgumentException('Unsupported model type', 500));
         $formatter->format($this->createMock('Imbo\Model\ModelInterface'));

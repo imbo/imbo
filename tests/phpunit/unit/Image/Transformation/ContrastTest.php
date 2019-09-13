@@ -49,7 +49,7 @@ class ContrastTest extends TestCase {
     /**
      * @dataProvider getContrastParams
      */
-    public function testSetsTheCorrectContrast(array $params, $shouldTransform) {
+    public function testSetsTheCorrectContrast(array $params, $shouldTransform) : void {
         $image = $this->createMock('Imbo\Model\Image');
 
         $imagick = new \Imagick();

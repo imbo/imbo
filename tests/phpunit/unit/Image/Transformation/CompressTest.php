@@ -21,7 +21,7 @@ class CompressTest extends TestCase {
         $this->transformation = new Compress();
     }
 
-    public function testThrowsExceptionOnMissingLevelParameter() {
+    public function testThrowsExceptionOnMissingLevelParameter() : void {
         $this->expectExceptionObject(new TransformationException(
             'Missing required parameter: level',
             400
@@ -29,7 +29,7 @@ class CompressTest extends TestCase {
         $this->transformation->transform([]);
     }
 
-    public function testThrowsExceptionOnInvalidLevel() {
+    public function testThrowsExceptionOnInvalidLevel() : void {
         $this->expectExceptionObject(new TransformationException(
             'level must be between 0 and 100',
             400

@@ -37,7 +37,7 @@ class ContentNegotiationTest extends TestCase {
      * @dataProvider getIsAcceptableData
      * @covers Imbo\Http\ContentNegotiation::isAcceptable
      */
-    public function testCanCheckIfAMimeTypeIsAcceptable($mimeType, $acceptable, $result) {
+    public function testCanCheckIfAMimeTypeIsAcceptable($mimeType, $acceptable, $result) : void {
         $this->assertSame($result, $this->cn->isAcceptable($mimeType, $acceptable));
     }
 
@@ -58,7 +58,7 @@ class ContentNegotiationTest extends TestCase {
      * @covers Imbo\Http\ContentNegotiation::bestMatch
      * @covers Imbo\Http\ContentNegotiation::isAcceptable
      */
-    public function testCanPickTheBestMatchFromASetOfMimeTypes($mimeTypes, $acceptable, $result) {
+    public function testCanPickTheBestMatchFromASetOfMimeTypes($mimeTypes, $acceptable, $result) : void {
         $this->assertSame($result, $this->cn->bestMatch($mimeTypes, $acceptable));
     }
 }

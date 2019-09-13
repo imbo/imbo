@@ -24,7 +24,7 @@ class ImagesTest extends TestCase {
      * @covers ::getImages
      * @covers ::setImages
      */
-    public function testCanSetAndGetImages() {
+    public function testCanSetAndGetImages() : void {
         $images = [
             $this->createMock('Imbo\Model\Image'),
             $this->createMock('Imbo\Model\Image'),
@@ -39,7 +39,7 @@ class ImagesTest extends TestCase {
      * @covers ::setFields
      * @covers ::getFields
      */
-    public function testCanSetAndGetFields() {
+    public function testCanSetAndGetFields() : void {
         $this->assertSame([], $this->model->getFields());
         $this->assertSame($this->model, $this->model->setFields(['width', 'height']));
         $this->assertSame(['width', 'height'], $this->model->getFields());
@@ -49,7 +49,7 @@ class ImagesTest extends TestCase {
      * @covers ::setHits
      * @covers ::getHits
      */
-    public function testCanSetAndGetHits() {
+    public function testCanSetAndGetHits() : void {
         $this->assertSame(0, $this->model->getHits(), 'Default value has changed');
         $this->assertSame($this->model, $this->model->setHits(10));
         $this->assertSame(10, $this->model->getHits());
@@ -59,7 +59,7 @@ class ImagesTest extends TestCase {
      * @covers ::setPage
      * @covers ::getPage
      */
-    public function testCanSetAndGetPage() {
+    public function testCanSetAndGetPage() : void {
         $this->assertSame(1, $this->model->getPage(), 'Default value has changed');
         $this->assertSame($this->model, $this->model->setPage(10));
         $this->assertSame(10, $this->model->getPage());
@@ -69,7 +69,7 @@ class ImagesTest extends TestCase {
      * @covers ::setLimit
      * @covers ::getLimit
      */
-    public function testCanSetAndGetLimit() {
+    public function testCanSetAndGetLimit() : void {
         $this->assertSame(20, $this->model->getLimit(), 'Default value has changed');
         $this->assertSame($this->model, $this->model->setLimit(10));
         $this->assertSame(10, $this->model->getLimit());
@@ -78,7 +78,7 @@ class ImagesTest extends TestCase {
     /**
      * @covers ::getCount
      */
-    public function testCanCountImages() {
+    public function testCanCountImages() : void {
         $this->assertSame(0, $this->model->getCount());
         $images = [
             $this->createMock('Imbo\Model\Image'),
@@ -92,7 +92,7 @@ class ImagesTest extends TestCase {
     /**
      * @covers ::getData
      */
-    public function testGetData() {
+    public function testGetData() : void {
         $images = [
             $this->createMock('Imbo\Model\Image'),
             $this->createMock('Imbo\Model\Image'),

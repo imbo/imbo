@@ -24,7 +24,7 @@ class QueryTest extends TestCase {
     /**
      * @covers Imbo\Resource\Images\Query::page
      */
-    public function testPage() {
+    public function testPage() : void {
         $value = 2;
         $this->assertSame(1, $this->query->page());
         $this->assertSame($this->query, $this->query->page($value));
@@ -34,7 +34,7 @@ class QueryTest extends TestCase {
     /**
      * @covers Imbo\Resource\Images\Query::limit
      */
-    public function testLimit() {
+    public function testLimit() : void {
         $value = 30;
         $this->assertSame(20, $this->query->limit());
         $this->assertSame($this->query, $this->query->limit($value));
@@ -44,7 +44,7 @@ class QueryTest extends TestCase {
     /**
      * @covers Imbo\Resource\Images\Query::returnMetadata
      */
-    public function testReturnMetadata() {
+    public function testReturnMetadata() : void {
         $this->assertFalse($this->query->returnMetadata());
         $this->assertSame($this->query, $this->query->returnMetadata(true));
         $this->assertTrue($this->query->returnMetadata());
@@ -53,7 +53,7 @@ class QueryTest extends TestCase {
     /**
      * @covers Imbo\Resource\Images\Query::from
      */
-    public function testFrom() {
+    public function testFrom() : void {
         $value = 123123123;
         $this->assertNull($this->query->from());
         $this->assertSame($this->query, $this->query->from($value));
@@ -63,7 +63,7 @@ class QueryTest extends TestCase {
     /**
      * @covers Imbo\Resource\Images\Query::to
      */
-    public function testTo() {
+    public function testTo() : void {
         $value = 123123123;
         $this->assertNull($this->query->to());
         $this->assertSame($this->query, $this->query->to($value));
@@ -73,7 +73,7 @@ class QueryTest extends TestCase {
     /**
      * @covers Imbo\Resource\Images\Query::imageIdentifiers
      */
-    public function testImageIdentifiers() {
+    public function testImageIdentifiers() : void {
         $value = ['id1', 'id2'];
         $this->assertSame([], $this->query->imageIdentifiers());
         $this->assertSame($this->query, $this->query->imageIdentifiers($value));
@@ -83,7 +83,7 @@ class QueryTest extends TestCase {
     /**
      * @covers Imbo\Resource\Images\Query::checksums
      */
-    public function testChecksums() {
+    public function testChecksums() : void {
         $value = ['sum1', 'sum2'];
         $this->assertSame([], $this->query->checksums());
         $this->assertSame($this->query, $this->query->checksums($value));
@@ -93,7 +93,7 @@ class QueryTest extends TestCase {
     /**
      * @covers Imbo\Resource\Images\Query::originalChecksums
      */
-    public function testOriginalChecksums() {
+    public function testOriginalChecksums() : void {
         $value = ['sum1', 'sum2'];
         $this->assertSame([], $this->query->originalChecksums());
         $this->assertSame($this->query, $this->query->originalChecksums($value));
@@ -149,7 +149,7 @@ class QueryTest extends TestCase {
      * @dataProvider getSortData
      * @covers Imbo\Resource\Images\Query::sort
      */
-    public function testSort(array $value, $formatted) {
+    public function testSort(array $value, $formatted) : void {
         $this->assertSame([], $this->query->sort());
         $this->assertSame($this->query, $this->query->sort($value));
         $this->assertSame($formatted, $this->query->sort());
@@ -158,12 +158,12 @@ class QueryTest extends TestCase {
     /**
      * @covers Imbo\Resource\Images\Query::sort
      */
-    public function testSortThrowsExceptionOnInvalidSortValues() {
+    public function testSortThrowsExceptionOnInvalidSortValues() : void {
         $this->expectExceptionObject(new RuntimeException('Invalid sort value: field:foo', 400));
         $this->query->sort(['field:foo']);
     }
 
-    public function testSortThrowsExceptionWhenTheStortStringIsBadlyFormatted() {
+    public function testSortThrowsExceptionWhenTheStortStringIsBadlyFormatted() : void {
         $this->expectExceptionObject(new RuntimeException('Badly formatted sort', 400));
         $this->query->sort(['field:asc', '']);
     }

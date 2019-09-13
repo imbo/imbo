@@ -14,7 +14,7 @@ class DrawPoisTest extends TestCase {
     /**
      * @covers Imbo\Image\Transformation\DrawPois::transform
      */
-    public function testDoesNotModifyImageIfNoPoisAreFound() {
+    public function testDoesNotModifyImageIfNoPoisAreFound() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $database = $this->createMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('getMetadata')->will($this->returnValue([]));
@@ -31,7 +31,7 @@ class DrawPoisTest extends TestCase {
     /**
      * @covers Imbo\Image\Transformation\DrawPois::transform
      */
-    public function testDoesNotModifyImageIfNoPoiMetadataKeyIsNotAnArray() {
+    public function testDoesNotModifyImageIfNoPoiMetadataKeyIsNotAnArray() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $database = $this->createMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('getMetadata')->will($this->returnValue(['poi' => 'wat']));
@@ -48,7 +48,7 @@ class DrawPoisTest extends TestCase {
     /**
      * @covers Imbo\Image\Transformation\DrawPois::transform
      */
-    public function testThrowsExceptionOnInvalidPoi() {
+    public function testThrowsExceptionOnInvalidPoi() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $database = $this->createMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('getMetadata')->will($this->returnValue([
@@ -70,7 +70,7 @@ class DrawPoisTest extends TestCase {
     /**
      * @covers Imbo\Image\Transformation\DrawPois::transform
      */
-    public function testDrawsSameAmountOfTimesAsPoisArePresent() {
+    public function testDrawsSameAmountOfTimesAsPoisArePresent() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $database = $this->createMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('getMetadata')->will($this->returnValue([

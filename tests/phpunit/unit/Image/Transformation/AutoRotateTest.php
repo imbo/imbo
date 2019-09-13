@@ -12,7 +12,7 @@ class AutoRotateTest extends TestCase {
     /**
      * @covers Imbo\Image\Transformation\AutoRotate::transform
      */
-    public function testWillNotUpdateTheImageWhenNotNeeded() {
+    public function testWillNotUpdateTheImageWhenNotNeeded() : void {
         $image = $this->createMock('Imbo\Model\Image');
 
         $imagick = $this->createMock('Imagick');
@@ -27,7 +27,7 @@ class AutoRotateTest extends TestCase {
     /**
      * @covers Imbo\Image\Transformation\AutoRotate::transform
      */
-    public function testWillRotateWhenNeeded() {
+    public function testWillRotateWhenNeeded() : void {
         $imagick = $this->createMock('Imagick');
         $imagick->expects($this->once())->method('getImageOrientation')->will($this->returnValue(
             Imagick::ORIENTATION_TOPRIGHT

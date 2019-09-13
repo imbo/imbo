@@ -23,7 +23,7 @@ class BasicTest extends TestCase {
     /**
      * @covers ::getSupportedMimeTypes
      */
-    public function testReturnsSupportedMimeTypes() {
+    public function testReturnsSupportedMimeTypes() : void {
         $types = $this->loader->getSupportedMimeTypes();
 
         $this->assertIsArray($types);
@@ -37,7 +37,7 @@ class BasicTest extends TestCase {
     /**
      * @covers ::load
      */
-    public function testLoadsImage() {
+    public function testLoadsImage() : void {
         $blob = file_get_contents(FIXTURES_DIR . '/1024x256.png');
 
         $imagick = $this->createMock('Imagick');

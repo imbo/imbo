@@ -13,7 +13,7 @@ class PriorityQueueTest extends TestCase {
      */
     private $queue;
 
-    public function testUsesAPredictableOrder() {
+    public function testUsesAPredictableOrder() : void {
         $queue = new PriorityQueue();
 
         for ($i = 0; $i < 10; $i++) {

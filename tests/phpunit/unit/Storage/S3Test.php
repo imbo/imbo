@@ -12,7 +12,7 @@ class S3Test extends TestCase {
     /**
      * Test that we don't get an exception with required parameters present
      */
-    public function testConstructorWithAllRequiredParameters() {
+    public function testConstructorWithAllRequiredParameters() : void {
         $s3 = new S3([
             'key' => 'foo',
             'secret' => 'bar',
@@ -26,7 +26,7 @@ class S3Test extends TestCase {
     /**
      * Test that we _do_ get an exception with required parameters present
      */
-    public function testConstructorMissingRequiredParameters() {
+    public function testConstructorMissingRequiredParameters() : void {
         $this->expectExceptionObject(new ConfigurationException(
             'Missing required configuration parameters in Imbo\Storage\S3: key, bucket',
             500
@@ -43,7 +43,7 @@ class S3Test extends TestCase {
     /**
      * Test that we _do_ get exceptions for each single missing parameter
      */
-    public function testConstructorEachMissingRequiredParameters() {
+    public function testConstructorEachMissingRequiredParameters() : void {
         $params = [
             'key' => 'foo',
             'secret' => 'bar',

@@ -25,7 +25,7 @@ class WebpTest extends TestCase {
     /**
      * @covers ::getSupportedMimeTypes
      */
-    public function testReturnsSupportedMimeTypes() {
+    public function testReturnsSupportedMimeTypes() : void {
         $types = $this->converter->getSupportedMimeTypes();
 
         $this->assertIsArray($types);
@@ -36,7 +36,7 @@ class WebpTest extends TestCase {
     /**
      * @covers ::convert
      */
-    public function testCanConvertImage() {
+    public function testCanConvertImage() : void {
         $extension = 'webp';
         $mimeType = 'image/webp';
 
@@ -56,7 +56,7 @@ class WebpTest extends TestCase {
     /**
      * @covers ::convert
      */
-    public function testThrowsExceptionOnImagickFailure() {
+    public function testThrowsExceptionOnImagickFailure() : void {
         $extension = 'webp';
 
         $imagick = $this->createMock('Imagick');

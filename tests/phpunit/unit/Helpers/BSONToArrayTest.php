@@ -99,7 +99,7 @@ class BSONToArrayTest extends TestCase {
      * @covers Imbo\Helpers\BSONToArray::toArray
      * @covers Imbo\Helpers\BSONToArray::isBSONModel
      */
-    public function testCanConvertValuesToArray($document, $expected) {
+    public function testCanConvertValuesToArray($document, $expected) : void {
         $this->assertSame($expected, $this->helper->toArray($document));
     }
 }
