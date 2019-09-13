@@ -13,14 +13,10 @@ class StatsTest extends ResourceTests {
     private $resource;
 
     private $response;
-    private $database;
-    private $storage;
+    private $eventManager;
     private $event;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getNewResource() {
+    protected function getNewResource() : Stats {
         return new Stats();
     }
 

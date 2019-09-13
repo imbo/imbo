@@ -8,29 +8,11 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\Canvas
  */
 class CanvasTest extends TransformationTests {
-    /**
-     * @var int
-     */
-    private $width = 700;
-
-    /**
-     * @var int
-     */
-    private $height = 500;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : Canvas {
         return new Canvas();
     }
 
-    /**
-     * Fetch different canvas parameters
-     *
-     * @return array[]
-     */
-    public function getCanvasParameters() {
+    public function getCanvasParameters() : array {
         return [
             // free mode with only width
             [1000, null, 'free', 1000, 463],
@@ -69,7 +51,7 @@ class CanvasTest extends TransformationTests {
     /**
      * @dataProvider getCanvasParameters
      */
-    public function testTransformWithDifferentParameters($width, $height, $mode = 'free', $resultingWidth = 665, $resultingHeight = 463) {
+    public function testTransformWithDifferentParameters(?int $width, ?int $height, string $mode, int $resultingWidth, int $resultingHeight) : void {
         $blob = file_get_contents(FIXTURES_DIR . '/image.png');
 
         $image = $this->createMock('Imbo\Model\Image');

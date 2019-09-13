@@ -19,16 +19,10 @@ class ShortUrlTest extends ResourceTests {
     private $database;
     private $event;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getNewResource() {
+    protected function getNewResource() : ShortUrl {
         return new ShortUrl();
     }
 
-    /**
-     * Set up the resource
-     */
     public function setUp() : void {
         $this->resource = $this->getNewResource();
         $this->route = $this->createMock('Imbo\Router\Route');
@@ -43,7 +37,7 @@ class ShortUrlTest extends ResourceTests {
         $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
     }
 
-    public function testThrowsAnExceptionWhenTheShortUrlDoesNotExist() {
+    public function testThrowsAnExceptionWhenTheShortUrlDoesNotExist() : void {
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->route->expects($this->once())->method('get')->with('shortUrlId')->will($this->returnValue('aaaaaaa'));
@@ -53,7 +47,7 @@ class ShortUrlTest extends ResourceTests {
         $this->getNewResource()->deleteShortUrl($this->event);
     }
 
-    public function testThrowsAnExceptionWhenUserOrPrivateKeyDoesNotMatch() {
+    public function testThrowsAnExceptionWhenUserOrPrivateKeyDoesNotMatch() : void {
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->route->expects($this->once())->method('get')->with('shortUrlId')->will($this->returnValue('aaaaaaa'));
@@ -66,7 +60,7 @@ class ShortUrlTest extends ResourceTests {
         $this->getNewResource()->deleteShortUrl($this->event);
     }
 
-    public function testCanDeleteAShortUrl() {
+    public function testCanDeleteAShortUrl() : void {
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
         $this->route->expects($this->once())->method('get')->with('shortUrlId')->will($this->returnValue('aaaaaaa'));

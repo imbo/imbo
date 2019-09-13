@@ -1,13 +1,14 @@
 <?php
 namespace ImboIntegrationTest\Image\Transformation;
 
+use Imbo\Image\Transformation\Transformation;
 use PHPUnit\Framework\TestCase;
 
 abstract class TransformationTests extends TestCase {
     /**
      * Get the transformation to test
      *
-     * @return Imbo\Image\Transformation\Transformation
+     * @return Transformation
      */
     abstract protected function getTransformation();
 

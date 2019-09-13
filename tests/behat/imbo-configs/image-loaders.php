@@ -16,9 +16,6 @@ class Text implements InputLoaderInterface {
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(\Imagick $imagick, $blob, $mimeType) {
         $im = imagecreatetruecolor(300, 300);
         $textColor = imagecolorallocate($im, 0x00, 0x00, 0x00);

@@ -1,9 +1,8 @@
 <?php
-namespace ImboUnitTest;
+namespace ImboUnitTest\Helpers;
 
 use Imbo\Helpers\DateFormatter;
 use DateTime;
-use DateTimeZone;
 use PHPUnit\Framework\TestCase;
 
 /**

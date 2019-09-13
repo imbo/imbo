@@ -36,10 +36,7 @@ class GridFS implements AdapterTest {
         (new MongoClient())->{$databaseName}->drop();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    static public function getAdapter(array $config) {
+    static public function getAdapter(array $config) : Storage {
         return new Storage([
             'databaseName' => $config['databaseName'],
         ]);

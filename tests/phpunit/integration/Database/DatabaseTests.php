@@ -7,20 +7,21 @@ use Imbo\Resource\Images\Query;
 use Imbo\Database\Doctrine;
 use Imbo\Exception\DuplicateImageIdentifierException;
 use Imbo\Exception\DatabaseException;
+use Imbo\Database\DatabaseInterface;
 use DateTime;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
 
 abstract class DatabaseTests extends TestCase {
     /**
-     * @var Imbo\Database\DatabaseInterface
+     * @var DatabaseInterface
      */
     private $adapter;
 
     /**
      * Get the adapter we want to test
      *
-     * @return Imbo\Database\DatabaseInterface
+     * @return DatabaseInterface
      */
     abstract protected function getAdapter();
 

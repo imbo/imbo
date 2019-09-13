@@ -8,10 +8,7 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\Vignette
  */
 class VignetteTest extends TransformationTests {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : Vignette {
         return new Vignette();
     }
 

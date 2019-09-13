@@ -15,19 +15,13 @@ class MongoDBTest extends DatabaseTests {
      */
     protected $databaseName = 'imboIntegrationTestDatabase';
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAdapter() {
+    protected function getAdapter() : MongoDB {
         return new MongoDB([
             'databaseName' => $this->databaseName,
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function insertImage(array $image) {
+    protected function insertImage(array $image) : void {
         (new MongoClient)->selectCollection($this->databaseName, 'image')->insertOne([
             'user'             => $image['user'],
             'imageIdentifier'  => $image['imageIdentifier'],
@@ -43,9 +37,6 @@ class MongoDBTest extends DatabaseTests {
         ]);
     }
 
-    /**
-     * Make sure we have the mongo extension available and drop the test database just in case
-     */
     public function setUp() : void {
         if (!class_exists('MongoDB\Client')) {
             $this->markTestSkipped('pecl/mongodb >= 1.1.3 is required to run this test');
@@ -61,9 +52,6 @@ class MongoDBTest extends DatabaseTests {
         parent::setUp();
     }
 
-    /**
-     * Drop the test database after each test
-     */
     protected function tearDown() : void {
         if (class_exists('MongoDB\Client')) {
             (new MongoClient())->dropDatabase($this->databaseName);
@@ -75,7 +63,7 @@ class MongoDBTest extends DatabaseTests {
     /**
      * @covers ::getStatus
      */
-    public function testReturnsFalseWhenFetchingStatusAndTheHostnameIsNotCorrect() {
+    public function testReturnsFalseWhenFetchingStatusAndTheHostnameIsNotCorrect() : void {
         $db = new MongoDB([
             'server' => 'mongodb://localhost:11111',
         ]);

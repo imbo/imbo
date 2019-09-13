@@ -8,19 +8,11 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\Resize
  */
 class ResizeTest extends TransformationTests {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : Resize {
         return new Resize();
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getResizeParams() {
+    public function getResizeParams() : array {
         return [
             'only width' => [
                 'params'         => ['width' => 100],
@@ -51,7 +43,7 @@ class ResizeTest extends TransformationTests {
      * @dataProvider getResizeParams
      * @covers ::transform
      */
-    public function testCanTransformImage($params, $transformation, $resizedWidth = null, $resizedHeight = null) {
+    public function testCanTransformImage(array $params, bool $transformation, int $resizedWidth = null, int $resizedHeight = null) : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getWidth')->will($this->returnValue(665));
         $image->expects($this->once())->method('getHeight')->will($this->returnValue(463));

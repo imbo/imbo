@@ -45,16 +45,10 @@ class GlobalShortUrlTest extends ResourceTests {
      */
     private $event;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getNewResource() {
+    protected function getNewResource() : GlobalShortUrl {
         return new GlobalShortUrl();
     }
 
-    /**
-     * Set up the resource
-     */
     public function setUp() : void {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
@@ -74,7 +68,7 @@ class GlobalShortUrlTest extends ResourceTests {
     /**
      * @covers ::getImage
      */
-    public function testCanTriggerAnImageGetEventWhenRequestedWithAValidShortUrl() {
+    public function testCanTriggerAnImageGetEventWhenRequestedWithAValidShortUrl() : void {
         $id = 'aaaaaaa';
         $user = 'christer';
         $imageIdentifier = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
@@ -139,7 +133,7 @@ class GlobalShortUrlTest extends ResourceTests {
     /**
      * @covers ::getImage
      */
-    public function testRespondsWith404WhenShortUrlDoesNotExist() {
+    public function testRespondsWith404WhenShortUrlDoesNotExist() : void {
         $route = $this->createMock(Route::class);
         $route->expects($this->once())
               ->method('get')

@@ -19,10 +19,7 @@ class ShortUrlsTest extends ResourceTests {
     private $event;
     private $outputConverterManager;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getNewResource() {
+    protected function getNewResource() : ShortUrls {
         return new ShortUrls();
     }
 

@@ -8,19 +8,11 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\MaxSize
  */
 class MaxSizeTest extends TransformationTests {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : MaxSize {
         return new MaxSize();
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getMaxSizeParams() {
+    public function getMaxSizeParams() : array {
         return [
             'landscape image with only width in params' => [
                 'file' => FIXTURES_DIR . '/image.png',
@@ -95,7 +87,7 @@ class MaxSizeTest extends TransformationTests {
      * @dataProvider getMaxSizeParams
      * @covers ::transform
      */
-    public function testCanTransformImages($file, $params, $width, $height, $transformedWidth, $transformedHeight, $transformation = true) {
+    public function testCanTransformImages(string $file, array $params, int $width, int $height, ?int $transformedWidth, ?int $transformedHeight, ?bool $transformation = true) : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getWidth')->will($this->returnValue($width));
         $image->expects($this->once())->method('getHeight')->will($this->returnValue($height));

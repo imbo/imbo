@@ -20,10 +20,7 @@ class UserTest extends ResourceTests {
     private $storage;
     private $event;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getNewResource() {
+    protected function getNewResource() : User {
         return new User();
     }
 

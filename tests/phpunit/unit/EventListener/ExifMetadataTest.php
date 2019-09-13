@@ -13,28 +13,15 @@ class ExifMetadataTest extends ListenerTests {
      */
     private $listener;
 
-    private $imagick;
-
-    /**
-     * Set up the listener
-     */
     public function setUp() : void {
         $this->listener = new ExifMetadata();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getListener() {
+    protected function getListener() : ExifMetadata {
         return $this->listener;
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getFilterData() {
+    public function getFilterData() : array {
         $data = [
             'date:create' => '2013-11-26T19:42:48+01:00',
             'date:modify' => '2013-11-26T19:42:48+01:00',
@@ -117,7 +104,7 @@ class ExifMetadataTest extends ListenerTests {
      * @covers ::filterProperties
      * @covers ::parseProperties
      */
-    public function testCanFilterData($data, $tags, $expectedData) {
+    public function testCanFilterData(array $data, ?array $tags, array $expectedData) : void {
         $user = 'user';
         $imageIdentifier = 'imageIdentifier';
         $blob = 'blob';
@@ -150,7 +137,7 @@ class ExifMetadataTest extends ListenerTests {
     /**
      * @covers ::save
      */
-    public function testWillDeleteImageWhenUpdatingMetadataFails() {
+    public function testWillDeleteImageWhenUpdatingMetadataFails() : void {
         $databaseException = $this->createMock('Imbo\Exception\DatabaseException');
         $database = $this->createMock('Imbo\Database\DatabaseInterface');
         $database->expects($this->once())->method('updateMetadata')->with('user', 'imageidentifier', [])->will($this->throwException($databaseException));
@@ -173,7 +160,7 @@ class ExifMetadataTest extends ListenerTests {
     /**
      * @covers ::getImagick
      */
-    public function testCanInstantiateImagickItself() {
+    public function testCanInstantiateImagickItself() : void {
         $this->assertInstanceOf('Imagick', $this->listener->getImagick());
     }
 }

@@ -8,19 +8,11 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\Border
  */
 class BorderTest extends TransformationTests {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : Border {
         return new Border();
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getBorderParams() {
+    public function getBorderParams() : array {
         return [
             'inline border' => [665, 463, 3, 4, 'inset'],
             'outbound border' => [671, 471, 3, 4, 'outbound'],
@@ -30,7 +22,7 @@ class BorderTest extends TransformationTests {
     /**
      * @dataProvider getBorderParams
      */
-    public function testTransformationSupportsDifferentModes($expectedWidth, $expectedHeight, $borderWidth, $borderHeight, $borderMode) {
+    public function testTransformationSupportsDifferentModes(int $expectedWidth, int $expectedHeight, int $borderWidth, int $borderHeight, string $borderMode) : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('setWidth')->with($expectedWidth)->will($this->returnValue($image));
         $image->expects($this->once())->method('setHeight')->with($expectedHeight)->will($this->returnValue($image));

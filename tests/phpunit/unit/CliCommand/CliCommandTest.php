@@ -1,7 +1,6 @@
 <?php
 namespace ImboUnitTest\CliCommand;
 
-use Imbo\CliCommand\CliCommand;
 use PHPUnit\Framework\TestCase;
 
 /**

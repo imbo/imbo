@@ -1,19 +1,20 @@
 <?php
 namespace ImboIntegrationTest\Auth\AccessControl\Adapter;
 
+use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
 use Imbo\Exception\DatabaseException;
 use PHPUnit\Framework\TestCase;
 
 abstract class AdapterTests extends TestCase {
     /**
-     * @var Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface
+     * @var MutableAdapterInterface
      */
     private $adapter;
 
     /**
      * Get the adapter we want to test
      *
-     * @return Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface
+     * @return MutableAdapterInterface
      */
     abstract protected function getAdapter();
 

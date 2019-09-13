@@ -1,13 +1,14 @@
 <?php
 namespace ImboUnitTest\Resource;
 
+use Imbo\Resource\ResourceInterface;
 use PHPUnit\Framework\TestCase;
 
 abstract class ResourceTests extends TestCase {
     /**
      * Return a resource that can be tested
      *
-     * @return Imbo\Resource\ResourceInterface
+     * @return ResourceInterface
      */
     abstract protected function getNewResource();
 
