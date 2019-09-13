@@ -31,7 +31,7 @@ class Application {
     public function run(array $config) {
         // Request and response objects
         $request = Request::createFromGlobals();
-        Request::setTrustedProxies($config['trustedProxies']);
+        Request::setTrustedProxies($config['trustedProxies'], Request::HEADER_X_FORWARDED_ALL);
 
         $response = new Response();
         $response->setPublic();

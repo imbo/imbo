@@ -53,7 +53,7 @@ class ResponseTest extends TestCase {
     public function testUpdatesResponseWhenSettingAnErrorModel() {
         $message = 'You wronged';
         $code = 404;
-        $imboErrorCode = 123;
+        $imboErrorCode = '123';
         $date = new DateTime('@1361614522', new DateTimeZone('UTC'));
 
         $error = $this->createMock('Imbo\Model\Error');
