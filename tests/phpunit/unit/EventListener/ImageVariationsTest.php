@@ -25,7 +25,6 @@ class ImageVariationsTest extends ListenerTests {
     private $config;
     private $storage;
     private $event;
-    private $userLookup;
     private $request;
     private $response;
     private $responseHeaders;
@@ -39,10 +38,7 @@ class ImageVariationsTest extends ListenerTests {
     private $imageIdentifier = 'imgid';
     private $transformation;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getListener() {
+    protected function getListener() : ImageVariations {
         return new ImageVariations([
             'database' => [
                 'adapter' => $this->db,
@@ -53,9 +49,6 @@ class ImageVariationsTest extends ListenerTests {
         ]);
     }
 
-    /**
-     * Set up the listener
-     */
     public function setUp() : void {
         $this->db = $this->createMock('Imbo\EventListener\ImageVariations\Database\DatabaseInterface');
         $this->storage = $this->createMock('Imbo\EventListener\ImageVariations\Storage\StorageInterface');
@@ -102,7 +95,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers ::__construct
      */
-    public function testThrowsOnInvalidScaleFactor() {
+    public function testThrowsOnInvalidScaleFactor() : void {
         $this->expectExceptionObject(new InvalidArgumentException('Scale factor must be below 1', 503));
         new ImageVariations([
             'database' => [
@@ -119,7 +112,7 @@ class ImageVariationsTest extends ListenerTests {
      * @covers ::__construct
      * @covers ::configureDatabase
      */
-    public function testThrowsOnMissingDatabaseAdapter() {
+    public function testThrowsOnMissingDatabaseAdapter() : void {
         $this->expectExceptionObject(new InvalidArgumentException(
             'Missing database adapter configuration for the image variations event listener',
             500
@@ -133,7 +126,7 @@ class ImageVariationsTest extends ListenerTests {
      * @covers ::__construct
      * @covers ::configureDatabase
      */
-    public function testThrowsOnInvalidDatabaseFromCallable() {
+    public function testThrowsOnInvalidDatabaseFromCallable() : void {
         $this->expectExceptionObject(new InvalidArgumentException(
             'Invalid database adapter for the image variations event listener',
             500
@@ -148,7 +141,7 @@ class ImageVariationsTest extends ListenerTests {
      * @covers ::__construct
      * @covers ::configureDatabase
      */
-    public function testThrowsOnInvalidDatabaseFromString() {
+    public function testThrowsOnInvalidDatabaseFromString() : void {
         $this->expectExceptionObject(new InvalidArgumentException(
             'Invalid database adapter for the image variations event listener',
             500
@@ -163,7 +156,7 @@ class ImageVariationsTest extends ListenerTests {
      * @covers ::__construct
      * @covers ::configureStorage
      */
-    public function testThrowsOnMissingStorageAdapter() {
+    public function testThrowsOnMissingStorageAdapter() : void {
         $this->expectExceptionObject(new InvalidArgumentException(
             'Missing storage adapter configuration for the image variations event listener',
             500
@@ -177,7 +170,7 @@ class ImageVariationsTest extends ListenerTests {
      * @covers ::__construct
      * @covers ::configureStorage
      */
-    public function testThrowsOnInvalidStorageFromCallable() {
+    public function testThrowsOnInvalidStorageFromCallable() : void {
         $this->expectExceptionObject(new InvalidArgumentException(
             'Invalid storage adapter for the image variations event listener',
             500
@@ -192,7 +185,7 @@ class ImageVariationsTest extends ListenerTests {
      * @covers ::__construct
      * @covers ::configureStorage
      */
-    public function testThrowsOnInvalidStorageFromString() {
+    public function testThrowsOnInvalidStorageFromString() : void {
         $this->expectExceptionObject(new InvalidArgumentException(
             'Invalid storage adapter for the image variations event listener',
             500
@@ -206,7 +199,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers ::chooseVariation
      */
-    public function testFallsBackIfNoTransformationsAreApplied() {
+    public function testFallsBackIfNoTransformationsAreApplied() : void {
         $this->request->expects($this->any())->method('getTransformations')->will($this->returnValue([]));
         $this->eventManager->expects($this->never())->method('trigger');
 
@@ -216,7 +209,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers ::chooseVariation
      */
-    public function testFallsBackIfNoRelevantTransformationsApplied() {
+    public function testFallsBackIfNoRelevantTransformationsApplied() : void {
         $width  = 1024;
         $height = 768;
         $transformations = [[
@@ -235,7 +228,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers ::chooseVariation
      */
-    public function testFallsBackIfSizeIsLargerThanOriginal() {
+    public function testFallsBackIfSizeIsLargerThanOriginal() : void {
         $width  = 1024;
         $height = 768;
         $transformations = [[
@@ -254,7 +247,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers ::chooseVariation
      */
-    public function testFallsBackIfDatabaseDoesNotReturnAnyVariation() {
+    public function testFallsBackIfDatabaseDoesNotReturnAnyVariation() : void {
         $width  = 1024;
         $height = 768;
         $transformations = [[
@@ -279,7 +272,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers ::chooseVariation
      */
-    public function testTriggersWarningIfVariationFoundInDbButNotStorage() {
+    public function testTriggersWarningIfVariationFoundInDbButNotStorage() : void {
         $width  = 1024;
         $height = 768;
         $transformationWidth = 512;
@@ -329,7 +322,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers ::chooseVariation
      */
-    public function testUpdatesResponseAndImageModelOnSuccess() {
+    public function testUpdatesResponseAndImageModelOnSuccess() : void {
         $width  = 1024;
         $height = 768;
         $transformationWidth = 512;
@@ -390,7 +383,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers ::deleteVariations
      */
-    public function testTriggersWarningOnFailedDeleteFromDatabase() {
+    public function testTriggersWarningOnFailedDeleteFromDatabase() : void {
         $this->db->expects($this->once())->method('deleteImageVariations')->with(
             $this->user,
             $this->imageIdentifier
@@ -407,7 +400,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers ::deleteVariations
      */
-    public function testTriggersWarningOnFailedDeleteFromStorage() {
+    public function testTriggersWarningOnFailedDeleteFromStorage() : void {
         $this->storage->expects($this->once())->method('deleteImageVariations')->with(
             $this->user,
             $this->imageIdentifier
@@ -424,7 +417,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers ::deleteVariations
      */
-    public function testDoesNotTriggerWarningsOnSuccessfulVariationsDelete() {
+    public function testDoesNotTriggerWarningsOnSuccessfulVariationsDelete() : void {
         $this->db->expects($this->once())->method('deleteImageVariations')->with(
             $this->user,
             $this->imageIdentifier
@@ -441,7 +434,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers ::generateVariations
      */
-    public function testGenerateVariationsCallsStoreImageVariationForEveryWidth() {
+    public function testGenerateVariationsCallsStoreImageVariationForEveryWidth() : void {
         $listener = new ImageVariations([
             'database'  => [ 'adapter' => $this->db ],
             'storage'   => [ 'adapter' => $this->storage ],
@@ -470,7 +463,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers ::generateVariations
      */
-    public function testGenerateVariationsWithLosslessParamTriggersPngConversion() {
+    public function testGenerateVariationsWithLosslessParamTriggersPngConversion() : void {
         $listener = new ImageVariations([
             'database'  => [ 'adapter' => $this->db ],
             'storage'   => [ 'adapter' => $this->storage ],
@@ -496,7 +489,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers ::generateVariations
      */
-    public function testGenerateVariationsAutoScalesRespectingMaxMinWidth() {
+    public function testGenerateVariationsAutoScalesRespectingMaxMinWidth() : void {
         $listener = new ImageVariations([
             'database'    => [ 'adapter' => $this->db ],
             'storage'     => [ 'adapter' => $this->storage ],
@@ -523,7 +516,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers ::generateVariations
      */
-    public function testGenerateVariationsIncludesSpecifiedWidths() {
+    public function testGenerateVariationsIncludesSpecifiedWidths() : void {
         $listener = new ImageVariations([
             'database'    => [ 'adapter' => $this->db ],
             'storage'     => [ 'adapter' => $this->storage ],
@@ -547,7 +540,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers ::generateVariations
      */
-    public function testGenerateVariationsTriggersWarningOnTransformationException() {
+    public function testGenerateVariationsTriggersWarningOnTransformationException() : void {
         $this->imageModel->method('getWidth')->willReturn(1024);
 
         $this->transformation = $this->createMock('Imbo\Image\Transformation\Transformation');
@@ -570,7 +563,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers ::generateVariations
      */
-    public function testGenerateVariationsTriggersWarningOnStorageException() {
+    public function testGenerateVariationsTriggersWarningOnStorageException() : void {
         $this->imageModel->method('getWidth')->willReturn(1024);
 
         $this->storage->expects($this->once())
@@ -588,7 +581,7 @@ class ImageVariationsTest extends ListenerTests {
     /**
      * @covers ::generateVariations
      */
-    public function testGenerateVariationsTriggersWarningOnDatabaseException() {
+    public function testGenerateVariationsTriggersWarningOnDatabaseException() : void {
         $this->imageModel->method('getWidth')->willReturn(1024);
 
         $this->db->expects($this->once())
@@ -601,256 +594,5 @@ class ImageVariationsTest extends ListenerTests {
         );
 
         $this->listener->generateVariations($this->event);
-    }
-
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getAdjustmentTransformations() {
-        return [
-            'crop' => [
-                [
-                    [
-                        'name'   => 'crop',
-                        'params' => ['width' => 5, 'height' => 10, 'x' => 15, 'y' => 20]
-                    ], [
-                        'name'   => 'desaturate',
-                        'params' => []
-                    ]
-                ],
-                1,   // Index
-                1.5, // Ratio
-                1,   // Expected index
-                [    // Expected adjusted values
-                    'width'  => 3,
-                    'height' => 7,
-                    'x'      => 10,
-                    'y'      => 13,
-                ]
-            ],
-            'border' => [
-                [
-                    [
-                        'name'   => 'border',
-                        'params' => ['width' => 5, 'height' => 10]
-                    ]
-                ],
-                0,   // Index
-                1.5, // Ratio
-                0,   // Expected index
-                [    // Expected adjusted values
-                    'width'  => 3,
-                    'height' => 7
-                ]
-            ],
-            'canvas' => [
-                [
-                    [
-                        'name'   => 'canvas',
-                        'params' => ['width' => 20, 'height' => 15, 'x' => 10, 'y' => 5]
-                    ]
-                ],
-                0,   // Index
-                1.5, // Ratio
-                0,   // Expected index
-                [    // Expected adjusted values
-                    'width'  => 13,
-                    'height' => 10,
-                    'x'      => 7,
-                    'y'      => 3,
-                ]
-            ],
-            'watermark' => [
-                [
-                    [
-                        'name'   => 'watermark',
-                        'params' => ['width' => 20, 'height' => 15, 'x' => 10, 'y' => 5]
-                    ]
-                ],
-                0,   // Index
-                1.5, // Ratio
-                0,   // Expected index
-                [    // Expected adjusted values
-                    'width'  => 13,
-                    'height' => 10,
-                    'x'      => 7,
-                    'y'      => 3,
-                ]
-            ],
-        ];
-    }
-
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getTransformations() {
-        return [
-            'no transformations' => [
-                800,
-                600,
-                [],
-                null,
-            ],
-            'resize with width' => [
-                800,
-                600,
-                [
-                    [
-                        'name' => 'resize',
-                        'params' => [
-                            'width' => 200,
-                        ],
-                    ],
-                ],
-                [200],
-            ],
-            'resize with height' => [
-                800,
-                600,
-                [
-                    [
-                        'name' => 'resize',
-                        'params' => [
-                            'height' => 200,
-                        ],
-                    ],
-                ],
-                [200 * (800 / 600)], // height * aspect ratio
-            ],
-            'maxSize with width' => [
-                1024,
-                768,
-                [
-                    [
-                        'name' => 'maxSize',
-                        'params' => [
-                            'width' => 150,
-                        ],
-                    ],
-                ],
-                [150],
-            ],
-            'maxSize with height' => [
-                1024,
-                768,
-                [
-                    [
-                        'name' => 'maxSize',
-                        'params' => [
-                            'height' => 150,
-                        ],
-                    ],
-                ],
-                [150 * (1024 / 768)], // height * aspect ratio
-            ],
-            'thumbnail with width' => [
-                500,
-                500,
-                [
-                    [
-                        'name' => 'thumbnail',
-                        'params' => [
-                            'width' => 25,
-                        ],
-                    ],
-                ],
-                [25],
-            ],
-            'thumbnail with height' => [
-                500,
-                500,
-                [
-                    [
-                        'name' => 'thumbnail',
-                        'params' => [
-                            'height' => 25,
-                        ],
-                    ],
-                ],
-                [50], // default for thumbnail
-            ],
-            'thumbnail with height and inset fit' => [
-                500,
-                500,
-                [
-                    [
-                        'name' => 'thumbnail',
-                        'params' => [
-                            'height' => 25,
-                            'fit' => 'inset',
-                        ],
-                    ],
-                ],
-                [25 * (500 / 500)], // height * aspect ratio
-            ],
-            'thumbnail with no params' => [
-                500,
-                500,
-                [
-                    [
-                        'name' => 'thumbnail',
-                        'params' => [],
-                    ],
-                ],
-                [50], // default for thumbnail
-            ],
-            'pick a value that is not in the first index' => [
-                800,
-                600,
-                [
-                    [
-                        'name' => 'thumbnail',
-                        'params' => [],
-                    ],
-                    [
-                        'name' => 'resize',
-                        'params' => [
-                            'width' => 250,
-                        ],
-                    ],
-                    [
-                        'name' => 'maxSize',
-                        'params' => [
-                            'width' => 100,
-                        ],
-                    ],
-                ],
-                [1 => 250],
-            ],
-            'maxsize + crop' => [
-                1024,
-                768,
-                [
-                    [
-                        'name' => 'maxSize',
-                        'params' => ['width' => 600],
-                    ],
-                    [
-                        'name' => 'crop',
-                        'params' => ['width' => 100, 'height' => 100, 'x' => 924, 'y' => 668],
-                    ],
-                ],
-                [600],
-            ],
-            'crop + maxsize' => [
-                1024,
-                768,
-                [
-                    [
-                        'name' => 'crop',
-                        'params' => ['width' => 500, 'height' => 500, 'x' => 262, 'y' => 134],
-                    ],
-                    [
-                        'name' => 'maxSize',
-                        'params' => ['width' => 250],
-                    ],
-                ],
-                [512],
-            ],
-        ];
     }
 }

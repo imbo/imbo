@@ -8,14 +8,11 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\Convert
  */
 class ConvertTest extends TransformationTests {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : Convert {
         return new Convert();
     }
 
-    public function testCanConvertAnImage() {
+    public function testCanConvertAnImage() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getExtension')->will($this->returnValue('png'));
         $image->expects($this->once())->method('setMimeType')->with('image/gif')->will($this->returnValue($image));

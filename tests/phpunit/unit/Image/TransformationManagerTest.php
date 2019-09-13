@@ -16,6 +16,7 @@ class TransformationManagerTest extends TestCase {
     protected $event;
     protected $query;
     protected $image;
+    private $config;
 
     public function setUp() : void {
         $this->config = require __DIR__ . '/../../../../config/config.default.php';

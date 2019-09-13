@@ -8,17 +8,14 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\Desaturate
  */
 class DesaturateTest extends TransformationTests {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : Desaturate {
         return new Desaturate();
     }
 
     /**
      * @covers ::transform
      */
-    public function testCanDesaturateImages() {
+    public function testCanDesaturateImages() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
 

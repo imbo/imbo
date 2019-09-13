@@ -19,9 +19,6 @@ class StatsAccessTest extends ListenerTests {
     private $event;
     private $request;
 
-    /**
-     * Set up the listener
-     */
     public function setUp() : void {
         $this->request = $this->createMock('Imbo\Http\Request\Request');
 
@@ -31,32 +28,24 @@ class StatsAccessTest extends ListenerTests {
         $this->listener = new StatsAccess();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getListener() {
+    protected function getListener() : StatsAccess {
         return $this->listener;
     }
 
     /**
      * @covers ::checkAccess
      */
-    public function testDoesNotAllowAnyIpAddressPerDefault() {
+    public function testDoesNotAllowAnyIpAddressPerDefault() : void {
         $this->expectExceptionObject(new RuntimeException('Access denied', 403));
         $this->listener->checkAccess($this->event);
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getFilterData() {
+    public function getFilterData() : array {
         return [
             'IPv4 in whitelist' => [
-                '127.0.0.1',        // IP
-                ['127.0.0.1'], // Allow
-                true                // Access?
+                '127.0.0.1',
+                ['127.0.0.1'],
+                true
             ],
             'IPv4 not in whitelist' => [
                 '127.0.0.2',
@@ -119,7 +108,7 @@ class StatsAccessTest extends ListenerTests {
     /**
      * @dataProvider getFilterData
      */
-    public function testCanUseDifferentFilters($clientIp, $allow, $hasAccess) {
+    public function testCanUseDifferentFilters(string $clientIp, array $allow, bool $hasAccess) : void {
         $this->request->expects($this->once())
                       ->method('getClientIp')
                       ->will($this->returnValue($clientIp));
@@ -138,7 +127,7 @@ class StatsAccessTest extends ListenerTests {
     /**
      * @see https://github.com/imbo/imbo/issues/249
      */
-    public function testListensToTheSameEventsAsTheStatsResource() {
+    public function testListensToTheSameEventsAsTheStatsResource() : void {
         $this->assertSame(
             array_keys(StatsAccess::getSubscribedEvents()),
             array_keys(StatsResource::getSubscribedEvents()),
@@ -148,10 +137,8 @@ class StatsAccessTest extends ListenerTests {
 
     /**
      * @see https://github.com/imbo/imbo/issues/251
-     *
-     * This test is best run with "In the Ghetto" blasting on the stereo
      */
-    public function testHasHigherPriorityThanTheStatsResource() {
+    public function testHasHigherPriorityThanTheStatsResource() : void {
         $statsAccess = new StatsAccess();
         $statsResource = new StatsResource();
 

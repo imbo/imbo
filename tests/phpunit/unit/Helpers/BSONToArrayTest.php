@@ -1,5 +1,5 @@
 <?php
-namespace ImboUnitTest;
+namespace ImboUnitTest\Helpers;
 
 use Imbo\Helpers\BSONToArray;
 use MongoDB\Model\BSONArray;

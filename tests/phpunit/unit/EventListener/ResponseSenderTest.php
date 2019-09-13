@@ -7,29 +7,20 @@ use Imbo\EventListener\ResponseSender;
  * @coversDefaultClass Imbo\EventListener\ResponseSender
  */
 class ResponseSenderTest extends ListenerTests {
-    /**
-     * @var ResponseSender
-     */
     private $listener;
 
-    /**
-     * Set up the listener
-     */
     public function setUp() : void {
         $this->listener = new ResponseSender();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getListener() {
+    protected function getListener() : ResponseSender {
         return $this->listener;
     }
 
     /**
      * @covers ::send
      */
-    public function testCanSendTheResponse() {
+    public function testCanSendTheResponse() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('checksum'));
 
@@ -52,7 +43,7 @@ class ResponseSenderTest extends ListenerTests {
     /**
      * @covers ::send
      */
-    public function testCanSendTheResponseAndInjectTheCorrectImageIdentifier() {
+    public function testCanSendTheResponseAndInjectTheCorrectImageIdentifier() : void {
         $request = $this->createMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('checksum'));
 

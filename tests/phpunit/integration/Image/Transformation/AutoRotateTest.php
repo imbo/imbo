@@ -9,19 +9,11 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\AutoRotate
  */
 class AutoRotateTest extends TransformationTests {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : AutoRotate {
         return new AutoRotate();
     }
 
-    /**
-     * Return different files to test with
-     *
-     * @return array[]
-     */
-    public function getFiles() {
+    public function getFiles() : array {
         return [
             'orientation1.jpeg' => [FIXTURES_DIR . '/autoRotate/orientation1.jpeg', false, false],
             'orientation2.jpeg' => [FIXTURES_DIR . '/autoRotate/orientation2.jpeg', false, true],
@@ -37,7 +29,7 @@ class AutoRotateTest extends TransformationTests {
     /**
      * @dataProvider getFiles
      */
-    public function testAutoRotatesAllOrientations($file, $changeDimensions, $transformed) {
+    public function testAutoRotatesAllOrientations(string $file, bool $changeDimensions, bool $transformed) : void {
         $colorValues = [
             [
                 'x' => 0,

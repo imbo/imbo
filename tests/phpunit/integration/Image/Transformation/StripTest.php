@@ -8,17 +8,14 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\Strip
  */
 class StripTest extends TransformationTests {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : Strip {
         return new Strip();
     }
 
     /**
      * @covers ::transform
      */
-    public function testStripMetadata() {
+    public function testStripMetadata() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
 

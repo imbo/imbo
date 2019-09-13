@@ -8,19 +8,11 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\Modulate
  */
 class ModulateTest extends TransformationTests {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : Modulate {
         return new Modulate();
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getModulateParams() {
+    public function getModulateParams() : array {
         return [
             'no params' => [
                 [],
@@ -37,7 +29,7 @@ class ModulateTest extends TransformationTests {
     /**
      * @dataProvider getModulateParams
      */
-    public function testCanModulateImages(array $params) {
+    public function testCanModulateImages(array $params) : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
 

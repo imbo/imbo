@@ -24,17 +24,11 @@ class DoctrineSQLite implements AdapterTest {
         return ['path' => $path];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     static public function tearDown(array $config) {
         unlink($config['path']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    static public function getAdapter(array $config) {
+    static public function getAdapter(array $config) : Database {
         return new Database([
             'path' => $config['path'],
             'driver' => 'pdo_sqlite',

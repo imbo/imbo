@@ -36,10 +36,7 @@ class MongoDB implements AdapterTest {
         (new MongoClient())->{$databaseName}->drop();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    static public function getAdapter(array $config) {
+    static public function getAdapter(array $config) : Database {
         return new Database([
             'databaseName' => $config['databaseName'],
         ]);

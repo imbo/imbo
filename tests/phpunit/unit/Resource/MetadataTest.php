@@ -3,8 +3,6 @@ namespace ImboUnitTest\Resource;
 
 use Imbo\Resource\Metadata;
 use Imbo\Exception\InvalidArgumentException;
-use DateTime;
-use DateTimeZone;
 
 /**
  * @coversDefaultClass Imbo\Resource\Metadata
@@ -22,16 +20,10 @@ class MetadataTest extends ResourceTests {
     private $manager;
     private $event;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getNewResource() {
+    protected function getNewResource() : Metadata {
         return new Metadata();
     }
 
-    /**
-     * Set up the resource
-     */
     public function setUp() : void {
         $this->request = $this->createMock('Imbo\Http\Request\Request');
         $this->response = $this->createMock('Imbo\Http\Response\Response');
@@ -51,7 +43,7 @@ class MetadataTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Metadata::delete
      */
-    public function testSupportsHttpDelete() {
+    public function testSupportsHttpDelete() : void {
         $this->manager->expects($this->once())->method('trigger')->with('db.metadata.delete');
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
 
@@ -61,7 +53,7 @@ class MetadataTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Metadata::put
      */
-    public function testSupportsHttpPut() {
+    public function testSupportsHttpPut() : void {
         $metadata = ['foo' => 'bar'];
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"foo":"bar"}'));
         $this->manager->expects($this->at(0))->method('trigger')->with('db.metadata.delete')->will($this->returnSelf());
@@ -74,7 +66,7 @@ class MetadataTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Metadata::post
      */
-    public function testSupportsHttpPost() {
+    public function testSupportsHttpPost() : void {
         $metadata = ['foo' => 'bar'];
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"foo":"bar"}'));
         $this->manager->expects($this->once())->method('trigger')->with('db.metadata.update', ['metadata' => $metadata]);
@@ -89,7 +81,7 @@ class MetadataTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Metadata::get
      */
-    public function testSupportsHttpGet() {
+    public function testSupportsHttpGet() : void {
         $this->manager->expects($this->once())->method('trigger')->with('db.metadata.load');
         $this->resource->get($this->event);
     }
@@ -97,7 +89,7 @@ class MetadataTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Metadata::validateMetadata
      */
-    public function testThrowsExceptionWhenValidatingMissingJsonData() {
+    public function testThrowsExceptionWhenValidatingMissingJsonData() : void {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue(null));
         $this->expectExceptionObject(new InvalidArgumentException('Missing JSON data', 400));
         $this->resource->validateMetadata($this->event);
@@ -106,7 +98,7 @@ class MetadataTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Metadata::validateMetadata
      */
-    public function testThrowsExceptionWhenValidatingInvalidJsonData() {
+    public function testThrowsExceptionWhenValidatingInvalidJsonData() : void {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('some string'));
         $this->expectExceptionObject(new InvalidArgumentException('Invalid JSON data', 400));
         $this->resource->validateMetadata($this->event);
@@ -115,7 +107,7 @@ class MetadataTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Metadata::validateMetadata
      */
-    public function testAllowsValidJsonData() {
+    public function testAllowsValidJsonData() : void {
         $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"foo":"bar"}'));
         $this->resource->validateMetadata($this->event);
     }

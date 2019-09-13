@@ -8,19 +8,11 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\Crop
  */
 class CropTest extends TransformationTests {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : Crop {
         return new Crop();
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getCropParams() {
+    public function getCropParams() : array {
         return [
             'cropped area smaller than the image' => [['width' => 100, 'height' => 50], 100, 50, true],
             'cropped area smaller than the image with x and y offset' => [['width' => 100, 'height' => 63, 'x' => 565, 'y' => 400], 100, 63, true],
@@ -33,7 +25,7 @@ class CropTest extends TransformationTests {
     /**
      * @dataProvider getCropParams
      */
-    public function testCanCropImages($params, $endWidth, $endHeight, $transformed) {
+    public function testCanCropImages(array $params, int $endWidth, int $endHeight, bool $transformed) : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->any())->method('getWidth')->will($this->returnValue(665));
         $image->expects($this->any())->method('getHeight')->will($this->returnValue(463));

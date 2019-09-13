@@ -8,14 +8,11 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\Compress
  */
 class CompressTest extends TransformationTests {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : Compress {
         return new Compress();
     }
 
-    public function testCanTransformTheImage() {
+    public function testCanTransformTheImage() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('setOutputQualityCompression')->with(50);
         $event = $this->createMock('Imbo\EventManager\Event');

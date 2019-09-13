@@ -21,9 +21,6 @@ class StorageOperationsTest extends ListenerTests {
     private $imageIdentifier = 'id';
     private $storage;
 
-    /**
-     * Set up the listener
-     */
     public function setUp() : void {
         $this->response = $this->createMock('Imbo\Http\Response\Response');
         $this->request = $this->createMock('Imbo\Http\Request\Request');
@@ -38,17 +35,14 @@ class StorageOperationsTest extends ListenerTests {
         $this->listener = new StorageOperations();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getListener() {
+    protected function getListener() : StorageOperations {
         return $this->listener;
     }
 
     /**
      * @covers ::deleteImage
      */
-    public function testCanDeleteAnImage() {
+    public function testCanDeleteAnImage() : void {
         $this->storage->expects($this->once())->method('delete')->with($this->user, $this->imageIdentifier);
         $this->listener->deleteImage($this->event);
     }
@@ -56,7 +50,7 @@ class StorageOperationsTest extends ListenerTests {
     /**
      * @covers ::loadImage
      */
-    public function testCanLoadImage() {
+    public function testCanLoadImage() : void {
         $date = new DateTime();
         $this->storage->expects($this->once())->method('getImage')->with($this->user, $this->imageIdentifier)->will($this->returnValue('image data'));
         $this->storage->expects($this->once())->method('getLastModified')->with($this->user, $this->imageIdentifier)->will($this->returnValue($date));
@@ -75,7 +69,7 @@ class StorageOperationsTest extends ListenerTests {
     /**
      * @covers ::loadImage
      */
-    public function testExceptionIfLoadImageFails() {
+    public function testExceptionIfLoadImageFails() : void {
         $this->storage->expects($this->once())->method('getImage')->with($this->user, $this->imageIdentifier)->will($this->returnValue(false));
         $this->expectException(StorageException::class);
         $this->expectExceptionCode(503);
@@ -86,7 +80,7 @@ class StorageOperationsTest extends ListenerTests {
     /**
      * @covers ::insertImage
      */
-    public function testCanInsertImage() {
+    public function testCanInsertImage() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue('image data'));
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageId'));
@@ -101,7 +95,7 @@ class StorageOperationsTest extends ListenerTests {
     /**
      * @covers ::insertImage
      */
-    public function testCanInsertImageThatAlreadyExists() {
+    public function testCanInsertImageThatAlreadyExists() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue('image data'));
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageId'));
@@ -116,7 +110,7 @@ class StorageOperationsTest extends ListenerTests {
     /**
      * @covers ::insertImage
      */
-    public function testWillDeleteImageFromDatabaseAndThrowExceptionWhenStoringFails() {
+    public function testWillDeleteImageFromDatabaseAndThrowExceptionWhenStoringFails() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue('image data'));
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageId'));

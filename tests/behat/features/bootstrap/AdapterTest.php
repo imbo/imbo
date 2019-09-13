@@ -1,6 +1,9 @@
 <?php
 namespace ImboBehatFeatureContext;
 
+use Imbo\Database\DatabaseInterface;
+use Imbo\Storage\StorageInterface;
+
 /**
  * Interface for adapter test classes
  */
@@ -35,7 +38,7 @@ interface AdapterTest {
      * installation as a request header.
      *
      * @param array $config Configuration returned from the setUp method
-     * @return Imbo\Database\DatabaseInterface|Imbo\Storage\StorageInterface
+     * @return DatabaseInterface|StorageInterface
      */
     static public function getAdapter(array $config);
 }

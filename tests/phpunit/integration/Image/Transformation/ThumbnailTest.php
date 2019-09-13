@@ -8,19 +8,11 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\Thumbnail
  */
 class ThumbnailTest extends TransformationTests {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : Thumbnail {
         return new Thumbnail();
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getThumbnailParams() {
+    public function getThumbnailParams() : array {
         return [
             'no params' => [
                 'params' => [],
@@ -66,7 +58,7 @@ class ThumbnailTest extends TransformationTests {
      * @dataProvider getThumbnailParams
      * @covers ::transform
      */
-    public function testCanTransformImage($params, $width, $height, $diff = 0) {
+    public function testCanTransformImage(array $params, int $width, int $height, int $diff = 0) : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('setWidth')->with($this->callback(function($setWidth) use ($width, $diff) {
             return $setWidth <= ($width + $diff) && $setWidth >= ($width - $diff);

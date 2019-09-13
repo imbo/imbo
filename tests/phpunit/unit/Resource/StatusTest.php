@@ -17,10 +17,7 @@ class StatusTest extends ResourceTests {
     private $storage;
     private $event;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getNewResource() {
+    protected function getNewResource() : Status {
         return new Status();
     }
 

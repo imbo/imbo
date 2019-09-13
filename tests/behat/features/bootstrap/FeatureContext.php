@@ -1466,7 +1466,7 @@ class FeatureContext extends ApiContext {
 
         if ($num < 2) {
             throw new InvalidArgumentException(sprintf(
-                'Need to compare at least 2 responses.',
+                'Need to compare at least 2 responses, got %d.',
                 $num
             ));
         }

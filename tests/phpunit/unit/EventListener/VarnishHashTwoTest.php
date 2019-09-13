@@ -34,17 +34,14 @@ class VarnishHashTwoTest extends ListenerTests {
         $this->listener = new VarnishHashTwo();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getListener() {
+    protected function getListener() : VarnishHashTwo {
         return $this->listener;
     }
 
     /**
      * @covers ::addHeader
      */
-    public function testCanSendAHashTwoHeader() {
+    public function testCanSendAHashTwoHeader() : void {
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
@@ -61,7 +58,7 @@ class VarnishHashTwoTest extends ListenerTests {
      * @covers ::__construct
      * @covers ::addHeader
      */
-    public function testCanSpecifyACustomHeaderName() {
+    public function testCanSpecifyACustomHeaderName() : void {
         $listener = new VarnishHashTwo(['headerName' => 'X-CustomHeader']);
 
         $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));

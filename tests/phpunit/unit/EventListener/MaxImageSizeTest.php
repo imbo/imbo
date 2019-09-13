@@ -12,26 +12,15 @@ class MaxImageSizeTest extends ListenerTests {
      */
     private $listener;
 
-    /**
-     * Set up the listener
-     */
     public function setUp() : void {
         $this->listener = new MaxImageSize([]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getListener() {
+    protected function getListener() : MaxImageSize {
         return $this->listener;
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getImageDimensions() {
+    public function getImageDimensions() : array {
         return [
             'below limit' => [100, 100, 200, 200, false],
             'width above' => [300, 100, 200, 200, true],
@@ -44,7 +33,7 @@ class MaxImageSizeTest extends ListenerTests {
      * @dataProvider getImageDimensions
      * @covers ::enforceMaxSize
      */
-    public function testWillTriggerTransformationWhenImageIsAboveTheLimits($imageWidth, $imageHeight, $maxWidth, $maxHeight, $willTrigger) {
+    public function testWillTriggerTransformationWhenImageIsAboveTheLimits(int $imageWidth, int $imageHeight, int $maxWidth, int $maxHeight, bool $willTrigger) : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getWidth')->will($this->returnValue($imageWidth));
         $image->expects($this->once())->method('getHeight')->will($this->returnValue($imageHeight));

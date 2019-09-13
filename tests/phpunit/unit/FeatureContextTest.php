@@ -860,8 +860,8 @@ class FeatureContextTest extends TestCase {
 
         $this->assertCount(
             2,
-            $this->history, 'There should exist exactly 2 requests in the history, found %d.',
-            count($this->history)
+            $this->history,
+            'There should exist exactly 2 requests in the history, found %d.'
         );
 
         $request = $this->history[1]['request'];
@@ -2544,7 +2544,7 @@ class FeatureContextTest extends TestCase {
         $this->mockHandler->append(new Response(200));
         $this->context->requestPath('/path');
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Need to compare at least 2 responses.'
+            'Need to compare at least 2 responses, got 1.'
         ));
         $this->context->assertLastResponseHeaders(1, 'content-length');
     }

@@ -4,8 +4,6 @@ namespace ImboUnitTest\Resource;
 use Imbo\Resource\Images;
 use Imbo\Exception\DuplicateImageIdentifierException;
 use Imbo\Exception\ImageException;
-use DateTime;
-use DateTimeZone;
 
 /**
  * @coversDefaultClass Imbo\Resource\Images
@@ -25,16 +23,10 @@ class ImagesTest extends ResourceTests {
     private $imageIdentifierGenerator;
     private $config;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getNewResource() {
+    protected function getNewResource() : Images {
         return new Images();
     }
 
-    /**
-     * Set up the resource
-     */
     public function setUp() : void {
         $this->request = $this->createMock('Imbo\Http\Request\Request');
         $this->response = $this->createMock('Imbo\Http\Response\Response');
@@ -58,7 +50,7 @@ class ImagesTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Images::addImage
      */
-    public function testSupportsHttpPost() {
+    public function testSupportsHttpPost() : void {
         $this->imageIdentifierGenerator->expects($this->any())->method('isDeterministic')->will($this->returnValue(false));
         $this->manager->expects($this->at(0))->method('trigger')->with('db.image.insert', ['updateIfDuplicate' => false]);
         $this->manager->expects($this->at(1))->method('trigger')->with('storage.image.insert');
@@ -75,7 +67,7 @@ class ImagesTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Images::addImage
      */
-    public function testThrowsExceptionWhenItFailsToGenerateUniqueImageIdentifier() {
+    public function testThrowsExceptionWhenItFailsToGenerateUniqueImageIdentifier() : void {
         $this->manager->expects($this->any())->method('trigger')->with('db.image.insert', ['updateIfDuplicate' => false])->will($this->throwException(new DuplicateImageIdentifierException()));
 
         $headers = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
@@ -96,7 +88,7 @@ class ImagesTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Images::getImages
      */
-    public function testSupportsHttpGet() {
+    public function testSupportsHttpGet() : void {
         $this->manager->expects($this->once())->method('trigger')->with('db.images.load');
         $this->resource->getImages($this->event);
     }

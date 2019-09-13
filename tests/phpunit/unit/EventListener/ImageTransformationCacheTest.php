@@ -60,7 +60,6 @@ class ImageTransformationCacheTest extends ListenerTests {
      */
     private $imageIdentifier = '7bf2e67f09de203da740a86cd37bbe8d';
 
-
     /**
      * @var ResponseHeaderBag
      */
@@ -76,9 +75,6 @@ class ImageTransformationCacheTest extends ListenerTests {
      */
     private $cacheDir;
 
-    /**
-     * Set up the listener
-     */
     public function setUp() : void {
         if (!class_exists(vfsStream::class)) {
             $this->markTestSkipped('This testcase requires mikey179/vfsStream to run');
@@ -108,10 +104,7 @@ class ImageTransformationCacheTest extends ListenerTests {
         $this->listener = new ImageTransformationCache(['path' => vfsStream::url($this->path)]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getListener() {
+    protected function getListener() : ImageTransformationCache {
         return $this->listener;
     }
 
@@ -121,7 +114,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers ::getCacheKey
      * @covers ::getCacheFilePath
      */
-    public function testChangesTheImageInstanceOnCacheHit() {
+    public function testChangesTheImageInstanceOnCacheHit() : void {
         $imageFromCache = $this->createMock(Image::class);
         $headersFromCache = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $cachedData = serialize([
@@ -174,7 +167,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers ::getCacheKey
      * @covers ::getCacheFilePath
      */
-    public function testRemovesCorruptCachedDataOnCacheHit() {
+    public function testRemovesCorruptCachedDataOnCacheHit() : void {
         $this->request->method('getUser')
                       ->willReturn($this->user);
 
@@ -215,7 +208,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers ::getCacheKey
      * @covers ::getCacheFilePath
      */
-    public function testAddsCorrectResponseHeaderOnCacheMiss() {
+    public function testAddsCorrectResponseHeaderOnCacheMiss() : void {
         $this->requestHeaders->expects($this->once())
                              ->method('get')
                              ->with('Accept', '*/*')
@@ -231,7 +224,7 @@ class ImageTransformationCacheTest extends ListenerTests {
     /**
      * @covers ::storeInCache
      */
-    public function testDoesNotStoreNonImageModelsInTheCache() {
+    public function testDoesNotStoreNonImageModelsInTheCache() : void {
         $this->response->expects($this->once())
                        ->method('getModel')
                        ->willReturn($this->createMock(Error::class));
@@ -248,7 +241,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers ::getCacheKey
      * @covers ::getCacheFilePath
      */
-    public function testStoresImageInCache() {
+    public function testStoresImageInCache() : void {
         $image = $this->createMock(Image::class);
 
         $this->response->expects($this->once())
@@ -278,7 +271,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers ::getCacheKey
      * @covers ::getCacheFilePath
      */
-    public function testDoesNotStoreIfCachedVersionAlreadyExists() {
+    public function testDoesNotStoreIfCachedVersionAlreadyExists() : void {
         // Reusing the same logic as this test
         $this->testChangesTheImageInstanceOnCacheHit();
 
@@ -304,7 +297,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers ::getCacheDir
      * @covers ::rmdir
      */
-    public function testCanDeleteAllImageVariationsFromCache() {
+    public function testCanDeleteAllImageVariationsFromCache() : void {
         $cachedFiles = [
             'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/f/30f0763c8422360d10fd84573dd58293',
             'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/e/30e0763c8422360d10fd84573dd58293',
@@ -330,7 +323,7 @@ class ImageTransformationCacheTest extends ListenerTests {
     /**
      * @covers ::__construct
      */
-    public function testThrowsAnExceptionWhenPathIsMissingFromTheParameters() {
+    public function testThrowsAnExceptionWhenPathIsMissingFromTheParameters() : void {
         $this->expectExceptionObject(new InvalidArgumentException(
             'The image transformation cache path is missing from the configuration',
             500
@@ -341,7 +334,7 @@ class ImageTransformationCacheTest extends ListenerTests {
     /**
      * @covers ::__construct
      */
-    public function testThrowsExceptionWhenCacheDirIsNotWritable() {
+    public function testThrowsExceptionWhenCacheDirIsNotWritable() : void {
         $dir = new vfsStreamDirectory('dir', 0);
         $this->cacheDir->addChild($dir);
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -354,7 +347,7 @@ class ImageTransformationCacheTest extends ListenerTests {
     /**
      * @covers ::__construct
      */
-    public function testDoesNotTriggerWarningIfCachePathDoesNotExistAndParentIsWritable() {
+    public function testDoesNotTriggerWarningIfCachePathDoesNotExistAndParentIsWritable() : void {
         $this->assertNotNull(
             new ImageTransformationCache(['path' => 'vfs://cacheDir/some/dir/that/does/not/exist'])
         );

@@ -8,19 +8,11 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\Histogram
  */
 class HistogramTest extends TransformationTests {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : Histogram {
         return new Histogram();
     }
 
-    /**
-     * Fetch different histogram parameters
-     *
-     * @return array[]
-     */
-    public function getHistogramParameters() {
+    public function getHistogramParameters() : array {
         return [
             [1, 256],
             [2, 512],
@@ -32,7 +24,7 @@ class HistogramTest extends TransformationTests {
     /**
      * @dataProvider getHistogramParameters
      */
-    public function testTransformWithDifferentParameters($scale, $resultingWidth = 256) {
+    public function testTransformWithDifferentParameters(int $scale, int $resultingWidth) : void {
         $blob = file_get_contents(FIXTURES_DIR . '/512x512.png');
 
         $image = $this->createMock('Imbo\Model\Image');

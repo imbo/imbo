@@ -16,11 +16,6 @@ class CorsTest extends ListenerTests {
     private $request;
     private $response;
 
-    /**
-     * Set up the listener
-     *
-     * @covers ::__construct
-     */
     public function setUp() : void {
         $requestHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
         $requestHeaders->expects($this->any())->method('get')->with('Origin')->will($this->returnValue('http://imbo-project.org'));
@@ -38,10 +33,7 @@ class CorsTest extends ListenerTests {
         $this->listener = new Cors();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getListener() {
+    protected function getListener() : Cors {
         return $this->listener;
     }
 
@@ -49,7 +41,7 @@ class CorsTest extends ListenerTests {
      * @covers ::__construct
      * @covers ::getAllowedOrigins
      */
-    public function testCleansUpOrigins() {
+    public function testCleansUpOrigins() : void {
         $listener = new Cors([
             'allowedOrigins' => [
                 'HTTP://www.rexxars.com:8080/',
@@ -75,7 +67,7 @@ class CorsTest extends ListenerTests {
      * @covers ::options
      * @covers ::originIsAllowed
      */
-    public function testDoesNotAddHeadersWhenOriginIsDisallowedAndHttpMethodIsOptions() {
+    public function testDoesNotAddHeadersWhenOriginIsDisallowedAndHttpMethodIsOptions() : void {
         $headers = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
         $headers->expects($this->never())->method('add');
         $this->response->headers = $headers;
@@ -87,7 +79,7 @@ class CorsTest extends ListenerTests {
      * @covers ::invoke
      * @covers ::originIsAllowed
      */
-    public function testDoesNotAddHeadersWhenOriginIsDisallowedAndHttpMethodIsOtherThanOptions() {
+    public function testDoesNotAddHeadersWhenOriginIsDisallowedAndHttpMethodIsOtherThanOptions() : void {
         $this->event->expects($this->never())->method('getResponse');
         $this->listener->invoke($this->event);
     }
@@ -96,7 +88,7 @@ class CorsTest extends ListenerTests {
      * @covers ::invoke
      * @covers ::originIsAllowed
      */
-    public function testAddsHeadersIfWildcardOriginIsDefined() {
+    public function testAddsHeadersIfWildcardOriginIsDefined() : void {
         $listener = new Cors([
             'allowedOrigins' => ['*']
         ]);
@@ -118,7 +110,7 @@ class CorsTest extends ListenerTests {
      * @covers ::invoke
      * @covers ::originIsAllowed
      */
-    public function testAddsHeadersIfOriginIsDefinedAndAllowed() {
+    public function testAddsHeadersIfOriginIsDefinedAndAllowed() : void {
         $listener = new Cors([
             'allowedOrigins' => ['http://imbo-project.org']
         ]);
@@ -141,7 +133,7 @@ class CorsTest extends ListenerTests {
      * @covers ::invoke
      * @covers ::setExposedHeaders
      */
-    public function testIncludesAllImboHeadersAsExposedHeaders() {
+    public function testIncludesAllImboHeadersAsExposedHeaders() : void {
         $listener = new Cors([
             'allowedOrigins' => ['http://imbo-project.org']
         ]);
@@ -169,7 +161,7 @@ class CorsTest extends ListenerTests {
     /**
      * @covers ::setExposedHeaders
      */
-    public function testDoesNotAddExposeHeadersHeaderWhenOriginIsInvalid() {
+    public function testDoesNotAddExposeHeadersHeaderWhenOriginIsInvalid() : void {
         $listener = new Cors([]);
 
         $headers = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
@@ -182,7 +174,7 @@ class CorsTest extends ListenerTests {
     /**
      * @covers ::options
      */
-    public function testSetsCorrectResposeHeadersOnOptionsRequestWhenOriginIsAllowed() {
+    public function testSetsCorrectResposeHeadersOnOptionsRequestWhenOriginIsAllowed() : void {
         $listener = new Cors([
             'allowedOrigins' => ['*'],
             'allowedMethods' => [
@@ -225,7 +217,7 @@ class CorsTest extends ListenerTests {
     /**
      * @covers ::getSubscribedEvents
      */
-    public function testReturnsSubscribedEvents() {
+    public function testReturnsSubscribedEvents() : void {
         $className = get_class($this->listener);
         $this->assertIsArray($className::getSubscribedEvents());
     }
@@ -233,7 +225,7 @@ class CorsTest extends ListenerTests {
     /**
      * @covers ::invoke
      */
-    public function testDoesNotAddAccessControlHeadersWhenOriginIsNotAllowed() {
+    public function testDoesNotAddAccessControlHeadersWhenOriginIsNotAllowed() : void {
         $route = $this->createMock('Imbo\Router\Route');
         $route->expects($this->once())->method('__toString')->will($this->returnValue('image'));
 
@@ -255,12 +247,7 @@ class CorsTest extends ListenerTests {
         $listener->invoke($event);
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getAllowedMethodsParams() {
+    public function getAllowedMethodsParams() : array {
         return [
             'default' => [
                 'params' => [],
@@ -331,7 +318,7 @@ class CorsTest extends ListenerTests {
      * @dataProvider getAllowedMethodsParams
      * @covers ::subscribe
      */
-    public function testWillSubscribeToTheCorrectEventsBasedOnParams($params, $events) {
+    public function testWillSubscribeToTheCorrectEventsBasedOnParams(array $params, array $events) : void {
         $listener = new Cors($params);
 
         $headers = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
@@ -354,7 +341,7 @@ class CorsTest extends ListenerTests {
     /**
      * @covers ::invoke
      */
-    public function testAddsVaryHeaderContainingOriginRegardlessOfAllowedStatus() {
+    public function testAddsVaryHeaderContainingOriginRegardlessOfAllowedStatus() : void {
         $this->request->expects($this->any())->method('getMethod')->will($this->returnValue('GET'));
         $route = $this->createMock('Imbo\Router\Route');
         $route->expects($this->any())->method('__toString')->will($this->returnValue('index'));

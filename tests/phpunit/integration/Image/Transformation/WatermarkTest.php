@@ -25,10 +25,7 @@ class WatermarkTest extends TransformationTests {
      */
     private $watermarkImg = 'f5f7851c40e2b76a01af9482f67bbf3f';
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : Watermark {
         return new Watermark();
     }
 

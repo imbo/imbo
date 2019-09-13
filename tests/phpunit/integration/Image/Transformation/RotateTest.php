@@ -8,14 +8,11 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\Rotate
  */
 class RotateTest extends TransformationTests {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : Rotate {
         return new Rotate();
     }
 
-    public function getRotateParams() {
+    public function getRotateParams() : array {
         return [
             '90 angle' => [90, 463, 665],
             '180 angle' => [180, 665, 463],
@@ -26,7 +23,7 @@ class RotateTest extends TransformationTests {
      * @dataProvider getRotateParams
      * @covers ::transform
      */
-    public function testCanTransformImage($angle, $width, $height) {
+    public function testCanTransformImage(int $angle, int $width, int $height) : void {
         $image = $this->createMock('Imbo\Model\Image');
 
         $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnValue($image));

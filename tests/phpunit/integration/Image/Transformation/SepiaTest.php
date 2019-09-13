@@ -8,17 +8,14 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\Sepia
  */
 class SepiaTest extends TransformationTests {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : Sepia {
         return new Sepia();
     }
 
     /**
      * @covers ::transform
      */
-    public function testCanTransformImageWithoutParams() {
+    public function testCanTransformImageWithoutParams() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
@@ -31,7 +28,7 @@ class SepiaTest extends TransformationTests {
     /**
      * @covers ::transform
      */
-    public function testCanTransformImageWithParams() {
+    public function testCanTransformImageWithParams() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 

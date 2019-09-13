@@ -22,19 +22,13 @@ class DoctrineTest extends DatabaseTests {
      */
     private $pdo;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAdapter() {
+    protected function getAdapter() : Doctrine {
         return new Doctrine([
             'path' => $this->dbPath,
             'driver' => 'pdo_sqlite',
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function insertImage(array $image) {
         $stmt = $this->pdo->prepare("
             INSERT INTO imageinfo (

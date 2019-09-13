@@ -19,16 +19,10 @@ class ImageTest extends ResourceTests {
     private $manager;
     private $event;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getNewResource() {
+    protected function getNewResource() : Image {
         return new Image();
     }
 
-    /**
-     * Set up the resource
-     */
     public function setUp() : void {
         $this->request = $this->createMock('Imbo\Http\Request\Request');
         $this->response = $this->createMock('Imbo\Http\Response\Response');
@@ -48,7 +42,7 @@ class ImageTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Image::deleteImage
      */
-    public function testSupportsHttpDelete() {
+    public function testSupportsHttpDelete() : void {
         $this->manager->expects($this->at(0))->method('trigger')->with('db.image.delete');
         $this->manager->expects($this->at(1))->method('trigger')->with('storage.image.delete');
         $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
@@ -60,7 +54,7 @@ class ImageTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Image::getImage
      */
-    public function testSupportsHttpGet() {
+    public function testSupportsHttpGet() : void {
         $user = 'christer';
         $imageIdentifier = 'imageIdentifier';
 

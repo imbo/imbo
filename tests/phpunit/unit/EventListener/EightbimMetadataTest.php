@@ -14,18 +14,12 @@ class EightbimMetadataTest extends ListenerTests {
      */
     protected $listener;
 
-    /**
-     * Set up the listener
-     */
     public function setUp() : void {
         $this->listener = new EightbimMetadata();
         $this->listener->setImagick(new \Imagick());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getListener() {
+    protected function getListener() : EightbimMetadata {
         return $this->listener;
     }
 
@@ -33,7 +27,7 @@ class EightbimMetadataTest extends ListenerTests {
      * @covers ::populate
      * @covers ::save
      */
-    public function testCanExtractMetadata() {
+    public function testCanExtractMetadata() : void {
         $user = 'user';
         $imageIdentifier = 'imageIdentifier';
         $blob = file_get_contents(FIXTURES_DIR . '/jpeg-with-multiple-paths.jpg');
@@ -67,7 +61,7 @@ class EightbimMetadataTest extends ListenerTests {
     /**
      * @covers ::save
      */
-    public function testReturnsEarlyOnMissingProperties() {
+    public function testReturnsEarlyOnMissingProperties() : void {
         $event = $this->createMock('Imbo\EventManager\Event');
         $event->expects($this->never())->method('getRequest');
         $this->assertNull($this->listener->save($event), 'Did not expect method to return anything');
@@ -76,7 +70,7 @@ class EightbimMetadataTest extends ListenerTests {
     /**
      * @covers ::save
      */
-    public function testDeletesImageWhenStoringMetadataFails() {
+    public function testDeletesImageWhenStoringMetadataFails() : void {
         $user = 'user';
         $imageIdentifier = 'imageIdentifier';
         $blob = file_get_contents(FIXTURES_DIR . '/jpeg-with-multiple-paths.jpg');

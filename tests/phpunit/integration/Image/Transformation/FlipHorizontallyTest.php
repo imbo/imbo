@@ -8,17 +8,14 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\FlipHorizontally
  */
 class FlipHorizontallyTest extends TransformationTests {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : FlipHorizontally {
         return new FlipHorizontally();
     }
 
     /**
      * @covers ::transform
      */
-    public function testCanFlipTheImage() {
+    public function testCanFlipTheImage() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
 

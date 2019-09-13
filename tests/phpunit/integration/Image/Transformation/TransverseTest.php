@@ -8,10 +8,7 @@ use Imagick;
  * @coversDefaultClass Imbo\Image\Transformation\Transverse
  */
 class TransverseTest extends TransformationTests {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTransformation() {
+    protected function getTransformation() : Transverse {
         return new Transverse();
     }
 

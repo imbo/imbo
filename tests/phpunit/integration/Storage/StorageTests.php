@@ -2,6 +2,7 @@
 namespace ImboIntegrationTest\Storage;
 
 use Imbo\Exception\StorageException;
+use Imbo\Storage\StorageInterface;
 use DateTime;
 use PHPUnit\Framework\TestCase;
 
@@ -31,16 +32,14 @@ abstract class StorageTests extends TestCase {
     /**
      * Get the driver we want to test
      *
-     * @return Imbo\Storage\StorageInterface
+     * @return StorageInterface
      */
     abstract protected function getDriver();
 
     /**
      * Get the currently instanced, active driver in inherited tests
-     *
-     * @return string
      */
-    protected function getDriverActive() {
+    protected function getDriverActive() : StorageInterface {
         return $this->driver;
     }
 

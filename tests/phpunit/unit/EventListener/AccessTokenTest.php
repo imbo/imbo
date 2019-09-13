@@ -52,9 +52,6 @@ class AccessTokenTest extends ListenerTests {
      */
     private $query;
 
-    /**
-     * Set up the listener
-     */
     public function setUp() : void {
         $this->query = $this->createMock(ParameterBag::class);
 
@@ -72,17 +69,14 @@ class AccessTokenTest extends ListenerTests {
         $this->listener = new AccessToken();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getListener() {
+    protected function getListener() : AccessToken {
         return $this->listener;
     }
 
     /**
      * @covers ::checkAccessToken
      */
-    public function testRequestWithBogusAccessToken() {
+    public function testRequestWithBogusAccessToken() : void {
         $this->query->expects($this->once())
                     ->method('has')
                     ->with('accessToken')
@@ -101,7 +95,7 @@ class AccessTokenTest extends ListenerTests {
      * @covers ::checkAccessToken
      * @covers ::isWhitelisted
      */
-    public function testThrowsExceptionIfAnAccessTokenIsMissingFromTheRequestWhenNotWhitelisted() {
+    public function testThrowsExceptionIfAnAccessTokenIsMissingFromTheRequestWhenNotWhitelisted() : void {
         $this->event->expects($this->once())
                     ->method('getName')
                     ->willReturn('image.get');
@@ -115,81 +109,76 @@ class AccessTokenTest extends ListenerTests {
         $this->listener->checkAccessToken($this->event);
     }
 
-    /**
-     * Different filter combinations
-     *
-     * @return array[]
-     */
-    public function getFilterData() {
+    public function getFilterData() : array {
         return [
             'no filter and no transformations' => [
-                $filter = [],
-                $transformations = [],
-                $whitelisted = false,
+                [],
+                [],
+                false,
             ],
             // @see https://github.com/imbo/imbo/issues/258
             'configured filters, but no transformations in the request' => [
-                $filter = ['transformations' => ['whitelist' => ['border']]],
-                $transformations = [],
-                $whitelisted = false,
+                ['transformations' => ['whitelist' => ['border']]],
+                [],
+                false,
             ],
             [
-                $filter = [],
-                $transformations = [
+                [],
+                [
                     ['name' => 'border', 'params' => []],
                 ],
-                $whitelisted = false,
+                false,
             ],
             [
-                $filter = ['transformations' => ['whitelist' => ['border']]],
-                $transformations = [
+                ['transformations' => ['whitelist' => ['border']]],
+                [
                     ['name' => 'border', 'params' => []],
                 ],
-                $whitelisted = true,
+                true,
             ],
             [
-                $filter = ['transformations' => ['whitelist' => ['border']]],
-                $transformations = [
-                    ['name' => 'border', 'params' => []],
-                    ['name' => 'thumbnail', 'params' => []],
-                ],
-                $whitelisted = false,
-            ],
-            [
-                $filter = ['transformations' => ['blacklist' => ['border']]],
-                $transformations = [
-                    ['name' => 'thumbnail', 'params' => []],
-                ],
-                $whitelisted = true,
-            ],
-            [
-                $filter = ['transformations' => ['blacklist' => ['border']]],
-                $transformations = [
+                ['transformations' => ['whitelist' => ['border']]],
+                [
                     ['name' => 'border', 'params' => []],
                     ['name' => 'thumbnail', 'params' => []],
                 ],
-                $whitelisted = false,
+                false,
             ],
             [
-                $filter = ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['thumbnail']]],
-                $transformations = [
+                ['transformations' => ['blacklist' => ['border']]],
+                [
+                    ['name' => 'thumbnail', 'params' => []],
+                ],
+                true,
+            ],
+            [
+                ['transformations' => ['blacklist' => ['border']]],
+                [
+                    ['name' => 'border', 'params' => []],
+                    ['name' => 'thumbnail', 'params' => []],
+                ],
+                false,
+            ],
+            [
+                ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['thumbnail']]],
+                [
                     ['name' => 'border', 'params' => []],
                 ],
-                $whitelisted = true,
+                true,
             ],
             [
-                $filter = ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['thumbnail']]],
-                $transformations = [
+                ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['thumbnail']]],
+                [
                     ['name' => 'canvas', 'params' => []],
                 ],
-                $whitelisted = false,
+                false,
             ],
             [
-                $filter = ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['border']]],
-                $transformations = [
+                ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['border']]],
+                [
                     ['name' => 'border', 'params' => []],
                 ],
-                $whitelisted = false,
+                false,
             ],
         ];
     }
@@ -200,7 +189,7 @@ class AccessTokenTest extends ListenerTests {
      * @covers ::checkAccessToken
      * @covers ::isWhitelisted
      */
-    public function testSupportsFilters($filter, $transformations, $whitelisted) {
+    public function testSupportsFilters(array $filter, array $transformations, bool $whitelisted) : void {
         $listener = new AccessToken($filter);
 
         if (!$whitelisted) {
@@ -217,12 +206,7 @@ class AccessTokenTest extends ListenerTests {
         $listener->checkAccessToken($this->event);
     }
 
-    /**
-     * Get access tokens
-     *
-     * @return array[]
-     */
-    public function getAccessTokens() {
+    public function getAccessTokens() : array {
         return [
             [
                 'http://imbo/users/christer',
@@ -283,7 +267,7 @@ class AccessTokenTest extends ListenerTests {
      * @dataProvider getAccessTokens
      * @covers ::checkAccessToken
      */
-    public function testThrowsExceptionOnIncorrectToken($url, $token, $privateKey, $correct) {
+    public function testThrowsExceptionOnIncorrectToken(string $url, string $token, string $privateKey, bool $correct) : void {
         if (!$correct) {
             $this->expectExceptionObject(new RuntimeException('Incorrect access token', 400));
         }
@@ -316,7 +300,7 @@ class AccessTokenTest extends ListenerTests {
     /**
      * @covers ::checkAccessToken
      */
-    public function testWillSkipValidationWhenShortUrlHeaderIsPresent() {
+    public function testWillSkipValidationWhenShortUrlHeaderIsPresent() : void {
         $this->responseHeaders->expects($this->once())
                               ->method('has')
                               ->with('X-Imbo-ShortUrl')
@@ -331,7 +315,7 @@ class AccessTokenTest extends ListenerTests {
     /**
      * @covers ::checkAccessToken
      */
-    public function testWillAcceptBothProtocolsIfConfiguredTo() {
+    public function testWillAcceptBothProtocolsIfConfiguredTo() : void {
         $privateKey = 'foobar';
         $baseUrl = '//imbo.host/users/some-user/imgUrl.png?t[]=smartSize:width=320,height=240';
 
@@ -378,10 +362,7 @@ class AccessTokenTest extends ListenerTests {
         }
     }
 
-    /**
-     * Test that we can configure the access token argument key
-     */
-    public function testAccessTokenArgumentKey() {
+    public function testAccessTokenArgumentKey() : void {
         $url = 'http://imbo/users/christer';
         $token = '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a';
         $privateKey = 'private key';
@@ -415,8 +396,8 @@ class AccessTokenTest extends ListenerTests {
         $listener->checkAccessToken($this->event);
     }
 
-    public function getAccessTokensForMultipleGenerator() {
-        $tokens = array();
+    public function getAccessTokensForMultipleGenerator() : array {
+        $tokens = [];
 
         foreach ($this->getAccessTokens() as $token) {
             $token[] = 'accessToken';
@@ -451,11 +432,9 @@ class AccessTokenTest extends ListenerTests {
     }
 
     /**
-     * Test using the multiple access token generators generator
-     *
      * @dataProvider getAccessTokensForMultipleGenerator
      */
-    public function testMultipleAccessTokensGenerator($url, $token, $privateKey, $correct, $argumentKey) {
+    public function testMultipleAccessTokensGenerator(string $url, string $token, string $privateKey, bool $correct, string $argumentKey) : void {
         if (!$correct) {
             $this->expectExceptionObject(new RuntimeException('Incorrect access token', 400));
         }
@@ -505,22 +484,14 @@ class AccessTokenTest extends ListenerTests {
         $listener->checkAccessToken($this->event);
     }
 
-    /**
-     * Test that we can configure the access token argument key
-     */
-    public function testConfigurationExceptionOnInvalidAccessTokenGenerator() {
+    public function testConfigurationExceptionOnInvalidAccessTokenGenerator() : void {
         $this->expectExceptionObject(new ConfigurationException('Invalid accessTokenGenerator', 500));
 
         new AccessToken(['accessTokenGenerator' => new StdClass()]);
     }
 
-    /**
-     * Get access tokens with rewritten URLs
-     *
-     * @return array[]
-     */
-    public function getRewrittenAccessTokenData() {
-        $getAccessToken = function($url) {
+    public function getRewrittenAccessTokenData() : array {
+        $getAccessToken = function(string $url) : string {
             return hash_hmac('sha256', $url, 'foobar');
         };
 
@@ -578,7 +549,7 @@ class AccessTokenTest extends ListenerTests {
      * @dataProvider getRewrittenAccessTokenData
      * @covers ::checkAccessToken
      */
-    public function testWillRewriteIncomingUrlToConfiguredProtocol($accessToken, $url, $protocol, $correct) {
+    public function testWillRewriteIncomingUrlToConfiguredProtocol(string $accessToken, string $url, string $protocol, bool $correct) : void {
         if (!$correct) {
             $this->expectExceptionObject(new RuntimeException('Incorrect access token', 400));
         }
@@ -614,12 +585,7 @@ class AccessTokenTest extends ListenerTests {
         );
     }
 
-    /**
-     * Get an event mock
-     *
-     * @param array $config Configuration to be returned from the getConfig method
-     */
-    protected function getEventMock(array $config = null) {
+    protected function getEventMock(array $config = null) : Event {
         return $this->createConfiguredMock(Event::class, [
             'getAccessControl' => $this->accessControl,
             'getRequest' => $this->request,

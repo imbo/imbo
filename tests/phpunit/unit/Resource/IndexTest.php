@@ -15,17 +15,12 @@ class IndexTest extends ResourceTests {
     private $request;
     private $response;
     private $event;
+    private $responseHeaders;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getNewResource() {
+    protected function getNewResource() : Index {
         return new Index();
     }
 
-    /**
-     * Set up the resource
-     */
     public function setUp() : void {
         $this->request = $this->createMock('Imbo\Http\Request\Request');
         $this->response = $this->createMock('Imbo\Http\Response\Response');
@@ -40,7 +35,7 @@ class IndexTest extends ResourceTests {
     /**
      * @covers Imbo\Resource\Index::get
      */
-    public function testSupportsHttpGet() {
+    public function testSupportsHttpGet() : void {
         $this->request->expects($this->once())->method('getSchemeAndHttpHost')->will($this->returnValue('http://imbo'));
         $this->request->expects($this->once())->method('getBaseUrl')->will($this->returnValue(''));
         $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
@@ -56,7 +51,7 @@ class IndexTest extends ResourceTests {
         $this->resource->get($this->event);
     }
 
-    public function testRedirectsIfConfigurationOptionHasBeenSet() {
+    public function testRedirectsIfConfigurationOptionHasBeenSet() : void {
         $url = 'http://imbo.io';
         $this->event->expects($this->any())->method('getConfig')->will($this->returnValue(['indexRedirect' => $url]));
 

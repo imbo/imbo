@@ -12,26 +12,15 @@ class ResponseETagTest extends ListenerTests {
      */
     private $listener;
 
-    /**
-     * Set up the listener
-     */
     public function setUp() : void {
         $this->listener = new ResponseETag();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getListener() {
+    protected function getListener() : ResponseETag {
         return $this->listener;
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getTaintedHeaders() {
+    public function getTaintedHeaders() : array {
         return [
             'non-tainted' => ['"be7d5bb2f29494c0a1c95c81e8ae8b99"', '"be7d5bb2f29494c0a1c95c81e8ae8b99"', false],
             'tainted' => ['"be7d5bb2f29494c0a1c95c81e8ae8b99-gzip"', '"be7d5bb2f29494c0a1c95c81e8ae8b99"', true],
@@ -41,7 +30,7 @@ class ResponseETagTest extends ListenerTests {
     /**
      * @dataProvider getTaintedHeaders
      */
-    public function testCanFixATaintedInNoneMatchHeader($incoming, $real, $willFix) {
+    public function testCanFixATaintedInNoneMatchHeader(string $incoming, string $real, bool $willFix) : void {
         $requestHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
         $requestHeaders->expects($this->once())->method('get')->with('if-none-match', false)->will($this->returnValue($incoming));
 
@@ -60,12 +49,7 @@ class ResponseETagTest extends ListenerTests {
         $this->listener->fixIfNoneMatchHeader($event);
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getRoutesForETags() {
+    public function getRoutesForETags() : array {
         return [
             'index route has no ETag' => ['index', false],
             'stats route has no ETag' => ['stats', false],
@@ -82,7 +66,7 @@ class ResponseETagTest extends ListenerTests {
     /**
      * @dataProvider getRoutesForETags
      */
-    public function testWillSetETagForSomeRoutes($route, $hasETag, $isOk = false, $content = null) {
+    public function testWillSetETagForSomeRoutes(string $route, bool $hasETag, bool $isOk = false, string $content = null) : void {
         $request = $this->createMock('Imbo\Http\Request\Request');
         $request->expects($this->once())->method('getRoute')->will($this->returnValue($route));
         $response = $this->createMock('Imbo\Http\Response\Response');

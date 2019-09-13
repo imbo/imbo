@@ -46,10 +46,7 @@ class DoctrineMySQL implements AdapterTest {
         $pdo->query('DROP TABLE IF EXISTS `imageinfo`, `imagevariations`, `metadata`, `shorturl`');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    static public function getAdapter(array $config) {
+    static public function getAdapter(array $config) : Database {
         return new Database([
             'dbname'   => $config['database.database'],
             'user'     => $config['database.username'],

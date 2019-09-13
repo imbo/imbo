@@ -68,10 +68,7 @@ class Filesystem implements AdapterTest {
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    static public function getAdapter(array $config) {
+    static public function getAdapter(array $config) : Storage {
         return new Storage([
             'dataDir' => $config['dataDir'],
         ]);

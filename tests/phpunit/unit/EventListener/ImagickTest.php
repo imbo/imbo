@@ -18,9 +18,6 @@ class ImagickTest extends ListenerTests {
     private $transformationManager;
     private $inputLoaderManager;
 
-    /**
-     * Set up the listener
-     */
     public function setUp() : void {
         $this->request = $this->createMock('Imbo\Http\Request\Request');
         $this->response = $this->createMock('Imbo\Http\Response\Response');
@@ -35,10 +32,7 @@ class ImagickTest extends ListenerTests {
         $this->listener = new Imagick();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getListener() {
+    protected function getListener() : Imagick {
         return $this->listener;
     }
 
@@ -47,7 +41,7 @@ class ImagickTest extends ListenerTests {
      * @covers ::readImageBlob
      * @covers ::setImagick
      */
-    public function testFetchesImageFromRequest() {
+    public function testFetchesImageFromRequest() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue('image'));
         $image->expects($this->any())->method('getMimeType')->will($this->returnValue('image/jpeg'));
@@ -64,7 +58,7 @@ class ImagickTest extends ListenerTests {
      * @covers ::readImageBlob
      * @covers ::setImagick
      */
-    public function testFetchesImageFromResponse() {
+    public function testFetchesImageFromResponse() : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('getBlob')->will($this->returnValue('image'));
         $image->expects($this->any())->method('getMimeType')->will($this->returnValue('image/jpeg'));
@@ -78,12 +72,7 @@ class ImagickTest extends ListenerTests {
         $this->listener->readImageBlob($this->event);
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function hasImageBeenTransformed() {
+    public function hasImageBeenTransformed() : array {
         return [
             'has been transformed' => [true],
             'has not been transformed' => [false],
@@ -95,7 +84,7 @@ class ImagickTest extends ListenerTests {
      * @covers ::setImagick
      * @dataProvider hasImageBeenTransformed
      */
-    public function testUpdatesModelBeforeStoring($hasBeenTransformed) {
+    public function testUpdatesModelBeforeStoring(bool $hasBeenTransformed) : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->will($this->returnValue($hasBeenTransformed));
 
@@ -120,7 +109,7 @@ class ImagickTest extends ListenerTests {
      * @covers ::setImagick
      * @dataProvider hasImageBeenTransformed
      */
-    public function testUpdatesModelBeforeSendingResponse($hasBeenTransformed) {
+    public function testUpdatesModelBeforeSendingResponse(bool $hasBeenTransformed) : void {
         $image = $this->createMock('Imbo\Model\Image');
         $image->expects($this->once())->method('hasBeenTransformed')->will($this->returnValue($hasBeenTransformed));
 
