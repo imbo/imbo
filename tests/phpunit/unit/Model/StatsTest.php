@@ -1,7 +1,6 @@
-<?php
-namespace ImboUnitTest\Model;
+<?php declare(strict_types=1);
+namespace Imbo\Model;
 
-use Imbo\Model\Stats;
 use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -9,84 +8,75 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass Imbo\Model\Stats
  */
 class StatsTest extends TestCase {
-    /**
-     * @var Stats
-     */
     private $model;
 
-    /**
-     * Set up the model
-     */
     public function setUp() : void {
         $this->model = new Stats();
     }
 
-    /**
-     * Get stats data
-     *
-     * @return array[]
-     */
-    public function getStatsData() {
+    public function getNumUsers() : array {
         return [
-            [
-                0,
-                0,
-                0
-            ],
-            [
-                1,
-                2,
-                1349
-            ],
-            [
-                2,
-                44,
-                100114
-            ],
-            [
-                4,
-                14,
-                1000
-            ],
+            [0],
+            [1],
+            [2],
+            [4],
+        ];
+    }
+
+    public function getNumImages() : array {
+        return [
+            [0],
+            [2],
+            [44],
+            [14],
+        ];
+    }
+
+    public function getNumBytes() : array {
+        return [
+            [0],
+            [1349],
+            [100114],
+            [1000],
         ];
     }
 
     /**
-     * @dataProvider getStatsData
-     * @covers Imbo\Model\Stats::setNumUsers
-     * @covers Imbo\Model\Stats::getNumUsers
+     * @dataProvider getNumUsers
+     * @covers ::setNumUsers
+     * @covers ::getNumUsers
      */
-    public function testCanSetAndGetNumberOfUsers($users, $images, $bytes) : void {
+    public function testCanSetAndGetNumberOfUsers(int $users) : void {
         $this->model->setNumUsers($users);
         $this->assertSame($users, $this->model->getNumUsers());
     }
 
     /**
-     * @dataProvider getStatsData
-     * @covers Imbo\Model\Stats::setNumImages
-     * @covers Imbo\Model\Stats::getNumImages
+     * @dataProvider getNumImages
+     * @covers ::setNumImages
+     * @covers ::getNumImages
      */
-    public function testCanSetAndGetAmountOfImages($users, $images, $bytes) : void {
+    public function testCanSetAndGetAmountOfImages(int $images) : void {
         $this->model->setNumImages($images);
         $this->assertSame($images, $this->model->getNumImages());
     }
 
     /**
-     * @dataProvider getStatsData
-     * @covers Imbo\Model\Stats::setNumBytes
-     * @covers Imbo\Model\Stats::getNumBytes
+     * @dataProvider getNumBytes
+     * @covers ::setNumBytes
+     * @covers ::getNumBytes
      */
-    public function testCanSetAndGetAmountOfBytes($users, $images, $bytes) : void {
+    public function testCanSetAndGetAmountOfBytes(int $bytes) : void {
         $this->model->setNumBytes($bytes);
         $this->assertSame($bytes, $this->model->getNumBytes());
     }
 
     /**
-     * @covers Imbo\Model\Stats::getCustomStats
-     * @covers Imbo\Model\Stats::offsetExists
-     * @covers Imbo\Model\Stats::offsetSet
-     * @covers Imbo\Model\Stats::offsetGet
-     * @covers Imbo\Model\Stats::offsetUnset
+     * @covers ::getCustomStats
+     * @covers ::offsetExists
+     * @covers ::offsetSet
+     * @covers ::offsetGet
+     * @covers ::offsetUnset
      */
     public function testSupportsCustomStats() : void {
         $this->assertSame([], $this->model->getCustomStats());
@@ -105,7 +95,7 @@ class StatsTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Stats::offsetSet
+     * @covers ::offsetSet
      */
     public function testThrowsExceptionWhenUsedAsArrayWithoutAKey() : void {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -116,7 +106,7 @@ class StatsTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Stats::getData
+     * @covers ::getData
      */
     public function testGetData() : void {
         $this->model

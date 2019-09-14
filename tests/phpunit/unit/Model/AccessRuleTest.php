@@ -1,28 +1,21 @@
-<?php
-namespace ImboUnitTest\Model;
+<?php declare(strict_types=1);
+namespace Imbo\Model;
 
-use Imbo\Model\AccessRule;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Model\AccessRule
  */
 class AccessRuleTest extends TestCase {
-    /**
-     * @var AccessRule
-     */
     private $model;
 
-    /**
-     * Set up the model
-     */
     public function setUp() : void {
         $this->model = new AccessRule();
     }
 
     /**
-     * @covers Imbo\Model\AccessRule::getId
-     * @covers Imbo\Model\AccessRule::setId
+     * @covers ::getId
+     * @covers ::setId
      */
     public function testSetAndGetId() : void {
         $this->assertNull($this->model->getId());
@@ -31,8 +24,8 @@ class AccessRuleTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\AccessRule::getGroup
-     * @covers Imbo\Model\AccessRule::setGroup
+     * @covers ::getGroup
+     * @covers ::setGroup
      */
     public function testSetAndGetGroup() : void {
         $this->assertNull($this->model->getGroup());
@@ -41,8 +34,8 @@ class AccessRuleTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\AccessRule::getResources
-     * @covers Imbo\Model\AccessRule::setResources
+     * @covers ::getResources
+     * @covers ::setResources
      */
     public function testSetAndGetResources() : void {
         $this->assertSame([], $this->model->getResources());
@@ -51,8 +44,8 @@ class AccessRuleTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\AccessRule::getUsers
-     * @covers Imbo\Model\AccessRule::setUsers
+     * @covers ::getUsers
+     * @covers ::setUsers
      */
     public function testSetAndGetUsers() : void {
         $this->assertSame([], $this->model->getUsers());
@@ -61,7 +54,7 @@ class AccessRuleTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\AccessRule::getData
+     * @covers ::getData
      */
     public function testGetData() : void {
         $this->model

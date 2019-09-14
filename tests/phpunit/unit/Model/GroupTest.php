@@ -1,28 +1,21 @@
-<?php
-namespace ImboUnitTest\Model;
+<?php declare(strict_types=1);
+namespace Imbo\Model;
 
-use Imbo\Model\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Model\Group
  */
 class GroupTest extends TestCase {
-    /**
-     * @var Group
-     */
     private $model;
 
-    /**
-     * Set up the model
-     */
     public function setUp() : void {
         $this->model = new Group();
     }
 
     /**
-     * @covers Imbo\Model\Group::getName
-     * @covers Imbo\Model\Group::setName
+     * @covers ::getName
+     * @covers ::setName
      */
     public function testSetAndGetName() : void {
         $this->assertNull($this->model->getName());
@@ -31,8 +24,8 @@ class GroupTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Group::getResources
-     * @covers Imbo\Model\Group::setResources
+     * @covers ::getResources
+     * @covers ::setResources
      */
     public function testSetAndGetResources() : void {
         $this->assertSame([], $this->model->getResources());
@@ -41,7 +34,7 @@ class GroupTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Group::getData
+     * @covers ::getData
      */
     public function testGetData() : void {
         $this->model

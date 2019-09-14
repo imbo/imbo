@@ -1,28 +1,21 @@
-<?php
-namespace ImboUnitTest\Model;
+<?php declare(strict_types=1);
+namespace Imbo\Model;
 
-use Imbo\Model\ArrayModel;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Model\ArrayModel
  */
 class ArrayModelTest extends TestCase {
-    /**
-     * @var ArrayModel
-     */
     private $model;
 
-    /**
-     * Set up the model
-     */
     public function setUp() : void {
         $this->model = new ArrayModel();
     }
 
     /**
-     * @covers Imbo\Model\ArrayModel::getData
-     * @covers Imbo\Model\ArrayModel::setData
+     * @covers ::getData
+     * @covers ::setData
      */
     public function testCanSetAndGetData() : void {
         $this->assertSame([], $this->model->getData());
@@ -31,8 +24,8 @@ class ArrayModelTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\ArrayModel::setTitle
-     * @covers Imbo\Model\ArrayModel::getTitle
+     * @covers ::setTitle
+     * @covers ::getTitle
      */
     public function testCanSetAndGetTitle() : void {
         $this->assertNull($this->model->getTitle());

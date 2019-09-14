@@ -1,31 +1,25 @@
-<?php
-namespace ImboUnitTest\Model;
+<?php declare(strict_types=1);
+namespace Imbo\Model;
 
-use Imbo\Model\Error;
+use Imbo\Http\Request\Request;
 use Imbo\Exception\RuntimeException;
 use Imbo\Exception;
-use DateTime;
 use PHPUnit\Framework\TestCase;
+use DateTime;
 
 /**
  * @coversDefaultClass Imbo\Model\Error
  */
 class ErrorTest extends TestCase {
-    /**
-     * @var Error
-     */
     private $model;
 
-    /**
-     * Set up the model
-     */
     public function setUp() : void {
         $this->model = new Error();
     }
 
     /**
-     * @covers Imbo\Model\Error::getHttpCode
-     * @covers Imbo\Model\Error::setHttpCode
+     * @covers ::getHttpCode
+     * @covers ::setHttpCode
      */
     public function testCanSetAndGetHttpCode() : void {
         $this->assertNull($this->model->getHttpCode());
@@ -34,8 +28,8 @@ class ErrorTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Error::getErrorMessage
-     * @covers Imbo\Model\Error::setErrorMessage
+     * @covers ::getErrorMessage
+     * @covers ::setErrorMessage
      */
     public function testCanSetAndGetErrorMessage() : void {
         $this->assertNull($this->model->getErrorMessage());
@@ -44,8 +38,8 @@ class ErrorTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Error::getDate
-     * @covers Imbo\Model\Error::setDate
+     * @covers ::getDate
+     * @covers ::setDate
      */
     public function testCanSetAndGetDate() : void {
         $date = new DateTime();
@@ -55,8 +49,8 @@ class ErrorTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Error::getImboErrorCode
-     * @covers Imbo\Model\Error::setImboErrorCode
+     * @covers ::getImboErrorCode
+     * @covers ::setImboErrorCode
      */
     public function testCanSetAndGetImboErrorCode() : void {
         $this->assertNull($this->model->getImboErrorCode());
@@ -65,8 +59,8 @@ class ErrorTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Error::getImageIdentifier
-     * @covers Imbo\Model\Error::setImageIdentifier
+     * @covers ::getImageIdentifier
+     * @covers ::setImageIdentifier
      */
     public function testCanSetAndGetImageIdentifier() : void {
         $this->assertNull($this->model->getImageIdentifier());
@@ -75,10 +69,10 @@ class ErrorTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Error::createFromException
+     * @covers ::createFromException
      */
     public function testCanCreateAnErrorBasedOnAnException() : void {
-        $request = $this->createMock('Imbo\Http\Request\Request');
+        $request = $this->createMock(Request::class);
 
         $exception = new RuntimeException('You wronged', 400);
 
@@ -91,13 +85,13 @@ class ErrorTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Error::createFromException
+     * @covers ::createFromException
      */
     public function testWillUseCorrectImageIdentifierFromRequestWhenCreatingError() : void {
         $exception = new RuntimeException('You wronged', 400);
         $exception->setImboErrorCode(123);
 
-        $request = $this->createMock('Imbo\Http\Request\Request');
+        $request = $this->createMock(Request::class);
         $request->expects($this->once())->method('getImage')->will($this->returnValue(null));
         $request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageIdentifier'));
 
@@ -108,14 +102,14 @@ class ErrorTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Error::createFromException
+     * @covers ::createFromException
      */
     public function testWillUseImageIdentifierFromImageModelIfRequestHasAnImageWhenCreatingError() : void {
         $exception = new RuntimeException('You wronged', 400);
         $exception->setImboErrorCode(123);
 
-        $request = $this->createMock('Imbo\Http\Request\Request');
-        $image = $this->createMock('Imbo\Model\Image');
+        $request = $this->createMock(Request::class);
+        $image = $this->createMock(Image::class);
         $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageId'));
         $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
         $request->expects($this->never())->method('getImageIdentifier');
@@ -127,7 +121,7 @@ class ErrorTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Error::getData
+     * @covers ::getData
      */
     public function testGetData() : void {
         $date = new DateTime();

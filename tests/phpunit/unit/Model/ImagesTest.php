@@ -1,21 +1,14 @@
-<?php
-namespace ImboUnitTest\Model;
+<?php declare(strict_types=1);
+namespace Imbo\Model;
 
-use Imbo\Model\Images;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Model\Images
  */
 class ImagesTest extends TestCase {
-    /**
-     * @var Images
-     */
     private $model;
 
-    /**
-     * Set up the model
-     */
     public function setUp() : void {
         $this->model = new Images();
     }
@@ -26,9 +19,9 @@ class ImagesTest extends TestCase {
      */
     public function testCanSetAndGetImages() : void {
         $images = [
-            $this->createMock('Imbo\Model\Image'),
-            $this->createMock('Imbo\Model\Image'),
-            $this->createMock('Imbo\Model\Image'),
+            $this->createMock(Image::class),
+            $this->createMock(Image::class),
+            $this->createMock(Image::class),
         ];
         $this->assertSame([], $this->model->getImages());
         $this->assertSame($this->model, $this->model->setImages($images));
@@ -81,9 +74,9 @@ class ImagesTest extends TestCase {
     public function testCanCountImages() : void {
         $this->assertSame(0, $this->model->getCount());
         $images = [
-            $this->createMock('Imbo\Model\Image'),
-            $this->createMock('Imbo\Model\Image'),
-            $this->createMock('Imbo\Model\Image'),
+            $this->createMock(Image::class),
+            $this->createMock(Image::class),
+            $this->createMock(Image::class),
         ];
         $this->model->setImages($images);
         $this->assertSame(3, $this->model->getCount());
@@ -94,9 +87,9 @@ class ImagesTest extends TestCase {
      */
     public function testGetData() : void {
         $images = [
-            $this->createMock('Imbo\Model\Image'),
-            $this->createMock('Imbo\Model\Image'),
-            $this->createMock('Imbo\Model\Image'),
+            $this->createMock(Image::class),
+            $this->createMock(Image::class),
+            $this->createMock(Image::class),
         ];
         $fields = ['width', 'height'];
 

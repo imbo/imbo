@@ -1,29 +1,22 @@
-<?php
-namespace ImboUnitTest\Model;
+<?php declare(strict_types=1);
+namespace Imbo\Model;
 
-use Imbo\Model\Image;
-use DateTime;
 use PHPUnit\Framework\TestCase;
+use DateTime;
 
 /**
  * @coversDefaultClass Imbo\Model\Image
  */
 class ImageTest extends TestCase {
-    /**
-     * @var Image
-     */
     private $image;
 
-    /**
-     * Set up the model
-     */
     public function setUp() : void {
         $this->image = new Image();
     }
 
     /**
-     * @covers Imbo\Model\Image::setMetadata
-     * @covers Imbo\Model\Image::getMetadata
+     * @covers ::setMetadata
+     * @covers ::getMetadata
      */
     public function testCanSetAndGetMetadata() : void {
         $this->assertNull($this->image->getMetadata());
@@ -36,8 +29,8 @@ class ImageTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Image::setMimeType
-     * @covers Imbo\Model\Image::getMimeType
+     * @covers ::setMimeType
+     * @covers ::getMimeType
      */
     public function testCanSetAndGetMimeType() : void {
         $mimeType = 'image/png';
@@ -46,12 +39,20 @@ class ImageTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Image::setBlob
-     * @covers Imbo\Model\Image::getBlob
-     * @covers Imbo\Model\Image::getFilesize
-     * @covers Imbo\Model\Image::setFilesize
-     * @covers Imbo\Model\Image::getChecksum
-     * @covers Imbo\Model\Image::setChecksum
+     * @covers ::setMimeType
+     */
+    public function testMimeTypeOverride() : void {
+        $this->assertSame($this->image, $this->image->setMimeType('image/x-png'));
+        $this->assertSame('image/png', $this->image->getMimeType());
+    }
+
+    /**
+     * @covers ::setBlob
+     * @covers ::getBlob
+     * @covers ::getFilesize
+     * @covers ::setFilesize
+     * @covers ::getChecksum
+     * @covers ::setChecksum
      */
     public function testCanSetAndGetBlob() : void {
         $blob = 'some string';
@@ -70,8 +71,8 @@ class ImageTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Image::setExtension
-     * @covers Imbo\Model\Image::getExtension
+     * @covers ::setExtension
+     * @covers ::getExtension
      */
     public function testCanSetAndGetExtension() : void {
         $extension = 'png';
@@ -80,8 +81,8 @@ class ImageTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Image::setWidth
-     * @covers Imbo\Model\Image::getWidth
+     * @covers ::setWidth
+     * @covers ::getWidth
      */
     public function testCanSetAndGetWidth() : void {
         $width = 123;
@@ -90,8 +91,8 @@ class ImageTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Image::setHeight
-     * @covers Imbo\Model\Image::getHeight
+     * @covers ::setHeight
+     * @covers ::getHeight
      */
     public function testCanSetAndGetHeight() : void {
         $height = 234;
@@ -100,8 +101,8 @@ class ImageTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Image::setAddedDate
-     * @covers Imbo\Model\Image::getAddedDate
+     * @covers ::setAddedDate
+     * @covers ::getAddedDate
      */
     public function testCanSetAndGetTheAddedDate() : void {
         $date = $this->createMock('DateTime');
@@ -111,8 +112,8 @@ class ImageTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Image::setUpdatedDate
-     * @covers Imbo\Model\Image::getUpdatedDate
+     * @covers ::setUpdatedDate
+     * @covers ::getUpdatedDate
      */
     public function testCanSetAndGetTheUpdatedDate() : void {
         $date = $this->createMock('DateTime');
@@ -122,8 +123,8 @@ class ImageTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Image::setUser
-     * @covers Imbo\Model\Image::getUser
+     * @covers ::setUser
+     * @covers ::getUser
      */
     public function testCanSetAndGetTheUser() : void {
         $this->assertNull($this->image->getUser());
@@ -132,8 +133,8 @@ class ImageTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Image::setImageIdentifier
-     * @covers Imbo\Model\Image::getImageIdentifier
+     * @covers ::setImageIdentifier
+     * @covers ::getImageIdentifier
      */
     public function testCanSetAndGetTheImageIdentifier() : void {
         $this->assertNull($this->image->getImageIdentifier());
@@ -143,7 +144,7 @@ class ImageTest extends TestCase {
 
 
     /**
-     * @covers Imbo\Model\Image::hasBeenTransformed
+     * @covers ::hasBeenTransformed
      */
     public function testCanUpdateTransformationFlag() : void {
         $this->assertFalse($this->image->hasBeenTransformed());
@@ -153,6 +154,10 @@ class ImageTest extends TestCase {
         $this->assertFalse($this->image->hasBeenTransformed());
     }
 
+    /**
+     * @covers ::setOriginalChecksum
+     * @covers ::getOriginalChecksum
+     */
     public function testCanSetAndGetTheOriginalChecksum() : void {
         $checksum = md5(__FILE__);
         $this->assertSame($this->image, $this->image->setOriginalChecksum($checksum));
@@ -160,7 +165,17 @@ class ImageTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Image::getData
+     * @covers ::setOutputQualityCompression
+     * @covers ::getOutputQualityCompression
+     */
+    public function testCanSetAndGetOutputQualityCompression() : void {
+        $compression = 50;
+        $this->assertSame($this->image, $this->image->setOutputQualityCompression($compression));
+        $this->assertSame($compression, $this->image->getOutputQualityCompression());
+    }
+
+    /**
+     * @covers ::getData
      */
     public function testGetData() : void {
         $metadata = [
@@ -178,6 +193,7 @@ class ImageTest extends TestCase {
         $updated = new DateTime();
         $user = 'christer';
         $identifier = 'identifier';
+        $compression = 75;
 
         $this->image
             ->setMetadata($metadata)
@@ -191,22 +207,24 @@ class ImageTest extends TestCase {
             ->setUser($user)
             ->setImageIdentifier($identifier)
             ->hasBeenTransformed(true)
-            ->setOriginalChecksum($checksum);
+            ->setOriginalChecksum($checksum)
+            ->setOutputQualityCompression($compression);
 
         $this->assertSame([
-            'filesize' => $filesize,
-            'mimeType' => $mimeType,
-            'extension' => $extension,
-            'metadata' => $metadata,
-            'width' => $width,
-            'height' => $height,
-            'addedDate' => $added,
-            'updatedDate' => $updated,
-            'user' => $user,
-            'imageIdentifier' => $identifier,
-            'checksum' => $checksum,
-            'originalChecksum' => $checksum,
-            'hasBeenTransformed' => true,
+            'filesize'                 => $filesize,
+            'mimeType'                 => $mimeType,
+            'extension'                => $extension,
+            'metadata'                 => $metadata,
+            'width'                    => $width,
+            'height'                   => $height,
+            'addedDate'                => $added,
+            'updatedDate'              => $updated,
+            'user'                     => $user,
+            'imageIdentifier'          => $identifier,
+            'checksum'                 => $checksum,
+            'originalChecksum'         => $checksum,
+            'hasBeenTransformed'       => true,
+            'outputQualityCompression' => $compression,
         ], $this->image->getData());
     }
 }
