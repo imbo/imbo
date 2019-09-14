@@ -1,29 +1,22 @@
-<?php
-namespace ImboUnitTest\Model;
+<?php declare(strict_types=1);
+namespace Imbo\Model;
 
-use Imbo\Model\AccessRules;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Model\AccessRules
  */
 class AccessRulesTest extends TestCase {
-    /**
-     * @var AccessRules
-     */
     private $model;
 
-    /**
-     * Set up the model
-     */
     public function setUp() : void {
         $this->model = new AccessRules();
     }
 
     /**
-     * @covers Imbo\Model\AccessRules::getRules
-     * @covers Imbo\Model\AccessRules::setRules
-     * @covers Imbo\Model\AccessRules::getData
+     * @covers ::getRules
+     * @covers ::setRules
+     * @covers ::getData
      */
     public function testSetAndGetId() : void {
         $rules = [

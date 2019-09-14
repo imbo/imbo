@@ -1,28 +1,21 @@
-<?php
-namespace ImboUnitTest\Model;
+<?php declare(strict_types=1);
+namespace Imbo\Model;
 
-use Imbo\Model\Groups;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Model\Groups
  */
 class GroupsTest extends TestCase {
-    /**
-     * @var Groups
-     */
     private $model;
 
-    /**
-     * Set up the model
-     */
     public function setUp() : void {
         $this->model = new Groups();
     }
 
     /**
-     * @covers Imbo\Model\Groups::getGroups
-     * @covers Imbo\Model\Groups::setGroups
+     * @covers ::getGroups
+     * @covers ::setGroups
      */
     public function testSetAndGetGroups() : void {
         $this->assertSame([], $this->model->getGroups());
@@ -31,8 +24,8 @@ class GroupsTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Groups::setHits
-     * @covers Imbo\Model\Groups::getHits
+     * @covers ::setHits
+     * @covers ::getHits
      */
     public function testCanSetAndGetHits() : void {
         $this->assertNull($this->model->getHits());
@@ -41,8 +34,8 @@ class GroupsTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Groups::setPage
-     * @covers Imbo\Model\Groups::getPage
+     * @covers ::setPage
+     * @covers ::getPage
      */
     public function testCanSetAndGetPage() : void {
         $this->assertNull($this->model->getPage());
@@ -51,8 +44,8 @@ class GroupsTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Groups::setLimit
-     * @covers Imbo\Model\Groups::getLimit
+     * @covers ::setLimit
+     * @covers ::getLimit
      */
     public function testCanSetAndGetLimit() : void {
         $this->assertNull($this->model->getLimit());
@@ -61,7 +54,7 @@ class GroupsTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Groups::getCount
+     * @covers ::getCount
      */
     public function testCanCountImages() : void {
         $this->assertSame(0, $this->model->getCount());
@@ -70,7 +63,7 @@ class GroupsTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\Groups::getData
+     * @covers ::getData
      */
     public function testGetData() : void {
         $this->model

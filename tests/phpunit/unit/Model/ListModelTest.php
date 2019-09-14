@@ -1,28 +1,21 @@
-<?php
-namespace ImboUnitTest\Model;
+<?php declare(strict_types=1);
+namespace Imbo\Model;
 
-use Imbo\Model\ListModel;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Model\ListModel
  */
 class ListModelTest extends TestCase {
-    /**
-     * @var ListModel
-     */
     private $model;
 
-    /**
-     * Set up the model
-     */
     public function setUp() : void {
         $this->model = new ListModel();
     }
 
     /**
-     * @covers Imbo\Model\ListModel::setList
-     * @covers Imbo\Model\ListModel::getList
+     * @covers ::setList
+     * @covers ::getList
      */
     public function testCanSetAndGetAList() : void {
         $this->assertSame([], $this->model->getList());
@@ -32,8 +25,8 @@ class ListModelTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\ListModel::setContainer
-     * @covers Imbo\Model\ListModel::getContainer
+     * @covers ::setContainer
+     * @covers ::getContainer
      */
     public function testCanSetAndGetTheContainerValue() : void {
         $this->assertNull($this->model->getContainer());
@@ -43,8 +36,8 @@ class ListModelTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Model\ListModel::__construct
-     * @covers Imbo\Model\ListModel::getData
+     * @covers ::__construct
+     * @covers ::getData
      */
     public function testGetData() : void {
         $container = 'container';
