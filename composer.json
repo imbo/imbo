@@ -58,8 +58,10 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "ImboUnitTest\\": "tests/phpunit/unit",
-      "ImboIntegrationTest\\": "tests/phpunit/integration",
+      "Imbo\\": [
+        "tests/phpunit/unit",
+        "tests/phpunit/integration"
+      ],
       "ImboBehatFeatureContext\\": "tests/behat/features/bootstrap"
     }
   },
