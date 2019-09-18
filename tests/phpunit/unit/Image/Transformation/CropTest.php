@@ -1,20 +1,21 @@
-<?php
-namespace ImboUnitTest\Image\Transformation;
+<?php declare(strict_types=1);
+namespace Imbo\Image\Transformation;
 
-use Imbo\Image\Transformation\Crop;
+use Imbo\Model\Image;
 use Imbo\Exception\TransformationException;
 use PHPUnit\Framework\TestCase;
+use Imagick;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Crop
  */
 class CropTest extends TestCase {
     /**
-     * @covers Imbo\Image\Transformation\Crop::transform
+     * @covers ::transform
      */
     public function testThrowsExceptionWhenWidthIsMissing() : void {
         $transformation = new Crop();
-        $transformation->setImage($this->createMock('Imbo\Model\Image'));
+        $transformation->setImage($this->createMock(Image::class));
         $this->expectExceptionObject(new TransformationException(
             'Missing required parameter: width',
             400
@@ -23,11 +24,11 @@ class CropTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Image\Transformation\Crop::transform
+     * @covers ::transform
      */
     public function testThrowsExceptionWhenHeightIsMissing() : void {
         $transformation = new Crop();
-        $transformation->setImage($this->createMock('Imbo\Model\Image'));
+        $transformation->setImage($this->createMock(Image::class));
         $this->expectExceptionObject(new TransformationException(
             'Missing required parameter: height',
             400
@@ -35,29 +36,49 @@ class CropTest extends TestCase {
         $transformation->transform(['width' => 123]);
     }
 
-    /**
-     * Fetch different image parameters
-     *
-     * @return array[]
-     */
-    public function getImageParams() {
+    public function getImageParams() : array {
         return [
-            'Do not perform work when cropping same sized images' => [['width' => 123, 'height' => 234], 123, 234, 123, 234, 0, 0, false],
-            'Create new cropped image #1' => [['width' => 100, 'height' => 200, 'y' => 10], 100, 400, 100, 200, 0, 10],
-            'Create new cropped image #2' => [['width' => 123, 'height' => 234, 'x' => 10, 'y' => 20], 200, 260, 123, 234, 10, 20],
+            'Do not perform work when cropping same sized images' => [
+                ['width' => 123, 'height' => 234],
+                123,
+                234,
+                123,
+                234,
+                0,
+                0,
+                false,
+            ],
+            'Create new cropped image #1' => [
+                ['width' => 100, 'height' => 200, 'y' => 10],
+                100,
+                400,
+                100,
+                200,
+                0,
+                10,
+            ],
+            'Create new cropped image #2' => [
+                ['width' => 123, 'height' => 234, 'x' => 10, 'y' => 20],
+                200,
+                260,
+                123,
+                234,
+                10,
+                20,
+            ],
         ];
     }
 
     /**
      * @dataProvider getImageParams
-     * @covers Imbo\Image\Transformation\Crop::transform
+     * @covers ::transform
      */
-    public function testUsesAllParams($params, $originalWidth, $originalHeight, $width, $height, $x = 0, $y = 0, $shouldCrop = true) : void {
-        $image = $this->createMock('Imbo\Model\Image');
-        $imagick = $this->createMock('Imagick');
-
-        $image->expects($this->any())->method('getWidth')->will($this->returnValue($originalWidth));
-        $image->expects($this->any())->method('getHeight')->will($this->returnValue($originalHeight));
+    public function testUsesAllParams(array $params, int $originalWidth, int $originalHeight, int $width, int $height, int $x, int $y, ?bool $shouldCrop = true) : void {
+        $imagick = $this->createMock(Imagick::class);
+        $image = $this->createConfiguredMock(Image::class, [
+            'getWidth'  => $originalWidth,
+            'getHeight' => $originalHeight,
+        ]);
 
         if ($shouldCrop) {
             $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnSelf());
@@ -69,41 +90,77 @@ class CropTest extends TestCase {
             $imagick->expects($this->never())->method('cropImage');
         }
 
-        $crop = new Crop();
-        $crop->setImagick($imagick)->setImage($image)->transform($params);
+        (new Crop())
+            ->setImagick($imagick)
+            ->setImage($image)
+            ->transform($params);
     }
 
-    /**
-     * Fetch different invalid image parameters
-     *
-     * @return array[]
-     */
-    public function getInvalidImageParams() {
+    public function getInvalidImageParams() : array {
         return [
-            'Dont throw if width/height are within bounds (no coords)' => [['width' => 100, 'height' => 100], 200, 200, false],
-            'Dont throw if coords are within bounds' => [['width' => 100, 'height' => 100, 'x' => 100, 'y' => 100], 200, 200, false],
-            'Throw if width is out of bounds'  => [['width' => 300, 'height' => 100], 200, 200, '#image width#i'],
-            'Throw if height is out of bounds' => [['width' => 100, 'height' => 300], 200, 200, '#image height#i'],
-            'Throw if X is out of bounds'  => [['width' => 100, 'height' => 100, 'x' => 500], 200, 200, '#image width#i'],
-            'Throw if Y is out of bounds'  => [['width' => 100, 'height' => 100, 'y' => 500], 200, 200, '#image height#i'],
-            'Throw if X + width is out of bounds'  => [['width' => 100, 'height' => 100, 'x' => 105], 200, 200, '#image width#i'],
-            'Throw if Y + height is out of bounds' => [['width' => 100, 'height' => 100, 'y' => 105], 200, 200, '#image height#i'],
+            'Dont throw if width/height are within bounds (no coords)' => [
+                ['width' => 100, 'height' => 100],
+                200,
+                200,
+            ],
+            'Dont throw if coords are within bounds' => [
+                ['width' => 100, 'height' => 100, 'x' => 100, 'y' => 100],
+                200,
+                200,
+            ],
+            'Throw if width is out of bounds'  => [
+                ['width' => 300, 'height' => 100],
+                200,
+                200,
+                '#image width#i',
+            ],
+            'Throw if height is out of bounds' => [
+                ['width' => 100, 'height' => 300],
+                200,
+                200,
+                '#image height#i',
+            ],
+            'Throw if X is out of bounds'  => [
+                ['width' => 100, 'height' => 100, 'x' => 500],
+                200,
+                200,
+                '#image width#i',
+            ],
+            'Throw if Y is out of bounds'  => [
+                ['width' => 100, 'height' => 100, 'y' => 500],
+                200,
+                200,
+                '#image height#i',
+            ],
+            'Throw if X + width is out of bounds'  => [
+                ['width' => 100, 'height' => 100, 'x' => 105],
+                200,
+                200,
+                '#image width#i',
+            ],
+            'Throw if Y + height is out of bounds' => [
+                ['width' => 100, 'height' => 100, 'y' => 105],
+                200,
+                200,
+                '#image height#i',
+            ],
         ];
     }
 
     /**
      * @dataProvider getInvalidImageParams
-     * @covers Imbo\Image\Transformation\Crop::transform
+     * @covers ::transform
      */
-    public function testThrowsOnInvalidCropParams($params, $originalWidth, $originalHeight, $errRegex) : void {
-        $image = $this->createMock('Imbo\Model\Image');
-        $imagick = $this->createMock('Imagick');
+    public function testThrowsOnInvalidCropParams(array $params, int $originalWidth, int $originalHeight, ?string $errRegex = null) : void {
+        $imagick = $this->createMock(Imagick::class);
+        $image = $this->createConfiguredMock(Image::class, [
+            'getWidth'  => $originalWidth,
+            'getHeight' => $originalHeight,
+        ]);
 
-        $image->expects($this->any())->method('getWidth')->will($this->returnValue($originalWidth));
-        $image->expects($this->any())->method('getHeight')->will($this->returnValue($originalHeight));
-
-        if ($errRegex) {
-            $this->expectException('Imbo\Exception\TransformationException');
+        if (null !== $errRegex) {
+            $this->expectException(TransformationException::class);
+            $this->expectExceptionCode(400);
             $this->expectExceptionMessageRegExp($errRegex);
             $imagick->expects($this->never())->method('cropImage');
         } else {
@@ -113,7 +170,9 @@ class CropTest extends TestCase {
             $imagick->expects($this->once())->method('cropImage');
         }
 
-        $crop = new Crop();
-        $crop->setImagick($imagick)->setImage($image)->transform($params);
+        (new Crop())
+            ->setImagick($imagick)
+            ->setImage($image)
+            ->transform($params);
     }
 }
