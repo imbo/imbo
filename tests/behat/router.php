@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Router for the built in httpd in PHP. Route everything through index.php. When ran from the base
  * project directory, the command looks like this:

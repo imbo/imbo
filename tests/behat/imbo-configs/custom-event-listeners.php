@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 class CustomEventListener implements Imbo\EventListener\ListenerInterface {
     /**
      * @var string

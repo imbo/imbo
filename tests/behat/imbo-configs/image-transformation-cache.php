@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Enable the image transformation metadata cache listener,
  * and store the cached images to a temporary directory

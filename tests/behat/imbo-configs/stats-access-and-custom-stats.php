@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 use Imbo\EventListener\StatsAccess;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
