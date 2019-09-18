@@ -1,17 +1,18 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Resource;
+namespace Imbo\Resource;
 
-use Imbo\Resource\Status;
+use Imbo\Http\Response\Response;
+use Imbo\Database\DatabaseInterface;
+use Imbo\Storage\StorageInterface;
+use Imbo\EventManager\EventInterface;
+use Imbo\Model\Status as StatusModel;
+use Symfony\Component\HttpFoundation\HeaderBag;
 
 /**
  * @coversDefaultClass Imbo\Resource\Status
  */
 class StatusTest extends ResourceTests {
-    /**
-     * @var Status
-     */
     private $resource;
-
     private $response;
     private $database;
     private $storage;
@@ -21,93 +22,92 @@ class StatusTest extends ResourceTests {
         return new Status();
     }
 
-    /**
-     * Set up the resource
-     */
     public function setUp() : void {
-        $this->response = $this->createMock('Imbo\Http\Response\Response');
-        $this->database = $this->createMock('Imbo\Database\DatabaseInterface');
-        $this->storage = $this->createMock('Imbo\Storage\StorageInterface');
-        $this->event = $this->createMock('Imbo\EventManager\Event');
-        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
-        $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
-        $this->event->expects($this->any())->method('getStorage')->will($this->returnValue($this->storage));
+        $this->response = $this->createMock(Response::class);
+        $this->database = $this->createMock(DatabaseInterface::class);
+        $this->storage = $this->createMock(StorageInterface::class);
+        $this->event = $this->createConfiguredMock(EventInterface::class, [
+            'getResponse' => $this->response,
+            'getDatabase' => $this->database,
+            'getStorage'  => $this->storage,
+        ]);
 
         $this->resource = $this->getNewResource();
     }
 
-    /**
-     * @covers Imbo\Resource\Status::get
-     */
-    public function testSetsCorrectStatusCodeAndErrorMessageWhenDatabaseFails() : void {
-        $this->database->expects($this->once())->method('getStatus')->will($this->returnValue(false));
-        $this->storage->expects($this->once())->method('getStatus')->will($this->returnValue(true));
-
-        $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
-
-        $this->response->headers = $responseHeaders;
-        $this->response->expects($this->once())->method('setStatusCode')->with(503, 'Database error');
-        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Status'));
-        $this->response->expects($this->once())->method('setMaxAge')->with(0)->will($this->returnSelf());
-        $this->response->expects($this->once())->method('setPrivate')->will($this->returnSelf());
-
-        $this->resource->get($this->event);
+    public function getStatuses() : array {
+        return [
+            'no error' => [
+                true,
+                true
+            ],
+            'database down' => [
+                false,
+                true,
+                503,
+                'Database error',
+            ],
+            'storage down' => [
+                true,
+                false,
+                503,
+                'Storage error',
+            ],
+            'both down' => [
+                false,
+                false,
+                503,
+                'Database and storage error',
+            ],
+        ];
     }
 
     /**
-     * @covers Imbo\Resource\Status::get
+     * @dataProvider getStatuses
+     * @covers ::get
      */
-    public function testSetsCorrectStatusCodeAndErrorMessageWhenStorageFails() : void {
-        $this->database->expects($this->once())->method('getStatus')->will($this->returnValue(true));
-        $this->storage->expects($this->once())->method('getStatus')->will($this->returnValue(false));
+    public function testSetsCorrectStatusCodeAndErrorMessage(bool $databaseStatus, bool $storageStatus, ?int $statusCode = 0, ?string $reasonPhrase = '') : void {
+        $this->database
+            ->expects($this->once())
+            ->method('getStatus')
+            ->willReturn($databaseStatus);
+        $this->storage
+            ->expects($this->once())
+            ->method('getStatus')
+            ->willReturn($storageStatus);
 
-        $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
+        $responseHeaders = $this->createMock(HeaderBag::class);
+        $responseHeaders
+            ->expects($this->once())
+            ->method('addCacheControlDirective')
+            ->with('no-store');
 
         $this->response->headers = $responseHeaders;
-        $this->response->expects($this->once())->method('setStatusCode')->with(503, 'Storage error');
-        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Status'));
-        $this->response->expects($this->once())->method('setMaxAge')->with(0)->will($this->returnSelf());
-        $this->response->expects($this->once())->method('setPrivate')->will($this->returnSelf());
 
-        $this->resource->get($this->event);
-    }
+        if ($databaseStatus && $storageStatus) {
+            $this->response
+                ->expects($this->never())
+                ->method('setStatusCode');
+        } else {
+            $this->response
+                ->expects($this->once())
+                ->method('setStatusCode')
+                ->with($statusCode, $reasonPhrase);
+        }
 
-    /**
-     * @covers Imbo\Resource\Status::get
-     */
-    public function testSetsCorrectStatusCodeAndErrorMessageWhenBothDatabaseAndStorageFails() : void {
-        $this->database->expects($this->once())->method('getStatus')->will($this->returnValue(false));
-        $this->storage->expects($this->once())->method('getStatus')->will($this->returnValue(false));
-
-        $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
-
-        $this->response->headers = $responseHeaders;
-        $this->response->expects($this->once())->method('setStatusCode')->with(503, 'Database and storage error');
-        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Status'));
-        $this->response->expects($this->once())->method('setMaxAge')->with(0)->will($this->returnSelf());
-        $this->response->expects($this->once())->method('setPrivate')->will($this->returnSelf());
-
-        $this->resource->get($this->event);
-    }
-
-    /**
-     * @covers Imbo\Resource\Status::get
-     */
-    public function testDoesNotUpdateStatusCodeWhenNoAdapterFails() : void {
-        $this->database->expects($this->once())->method('getStatus')->will($this->returnValue(true));
-        $this->storage->expects($this->once())->method('getStatus')->will($this->returnValue(true));
-
-        $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
-
-        $this->response->headers = $responseHeaders;
-        $this->response->expects($this->never())->method('setStatusCode');
-        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Status'));
-        $this->response->expects($this->once())->method('setMaxAge')->with(0)->will($this->returnSelf());
-        $this->response->expects($this->once())->method('setPrivate')->will($this->returnSelf());
+        $this->response
+            ->expects($this->once())
+            ->method('setModel')
+            ->with($this->isInstanceOf(StatusModel::class));
+        $this->response
+            ->expects($this->once())
+            ->method('setMaxAge')
+            ->with(0)
+            ->willReturnSelf();
+        $this->response
+            ->expects($this->once())
+            ->method('setPrivate')
+            ->willReturnSelf();
 
         $this->resource->get($this->event);
     }

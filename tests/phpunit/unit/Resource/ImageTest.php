@@ -1,17 +1,21 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Resource;
+namespace Imbo\Resource;
 
-use Imbo\Resource\Image;
+use Imbo\Database\DatabaseInterface;
+use Imbo\EventManager\EventInterface;
+use Imbo\EventManager\EventManager;
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+use Imbo\Model\ArrayModel;
+use Imbo\Model\Image as ImageModel;
+use Imbo\Storage\StorageInterface;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
  * @coversDefaultClass Imbo\Resource\Image
  */
 class ImageTest extends ResourceTests {
-    /**
-     * @var Image
-     */
     private $resource;
-
     private $request;
     private $response;
     private $database;
@@ -24,60 +28,98 @@ class ImageTest extends ResourceTests {
     }
 
     public function setUp() : void {
-        $this->request = $this->createMock('Imbo\Http\Request\Request');
-        $this->response = $this->createMock('Imbo\Http\Response\Response');
-        $this->database = $this->createMock('Imbo\Database\DatabaseInterface');
-        $this->storage = $this->createMock('Imbo\Storage\StorageInterface');
-        $this->event = $this->createMock('Imbo\EventManager\Event');
-        $this->manager = $this->createMock('Imbo\EventManager\EventManager');
-        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
-        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
-        $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
-        $this->event->expects($this->any())->method('getStorage')->will($this->returnValue($this->storage));
-        $this->event->expects($this->any())->method('getManager')->will($this->returnValue($this->manager));
+        $this->request = $this->createMock(Request::class);
+        $this->response = $this->createMock(Response::class);
+        $this->database = $this->createMock(DatabaseInterface::class);
+        $this->storage = $this->createMock(StorageInterface::class);
+        $this->manager = $this->createMock(EventManager::class);
+        $this->event = $this->createConfiguredMock(EventInterface::class, [
+            'getRequest' => $this->request,
+            'getResponse' => $this->response,
+            'getDatabase' => $this->database,
+            'getStorage' => $this->storage,
+            'getManager' => $this->manager,
+        ]);
 
         $this->resource = $this->getNewResource();
     }
 
     /**
-     * @covers Imbo\Resource\Image::deleteImage
+     * @covers ::deleteImage
      */
     public function testSupportsHttpDelete() : void {
-        $this->manager->expects($this->at(0))->method('trigger')->with('db.image.delete');
-        $this->manager->expects($this->at(1))->method('trigger')->with('storage.image.delete');
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
-        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
+        $this->manager
+            ->expects($this->at(0))
+            ->method('trigger')
+            ->with('db.image.delete');
+        $this->manager
+            ->expects($this->at(1))
+            ->method('trigger')
+            ->with('storage.image.delete');
+
+        $this->request
+            ->expects($this->once())
+            ->method('getImageIdentifier')
+            ->willReturn('id');
+
+        $this->response
+            ->expects($this->once())
+            ->method('setModel')
+            ->with($this->isInstanceOf(ArrayModel::class));
 
         $this->resource->deleteImage($this->event);
     }
 
     /**
-     * @covers Imbo\Resource\Image::getImage
+     * @covers ::getImage
      */
     public function testSupportsHttpGet() : void {
         $user = 'christer';
         $imageIdentifier = 'imageIdentifier';
 
-        $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
+        $responseHeaders = $this->createMock(ResponseHeaderBag::class);
 
-        $this->request->expects($this->once())->method('getUser')->will($this->returnValue($user));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
+        $this->request
+            ->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+        $this->request
+            ->expects($this->once())
+            ->method('getImageIdentifier')
+            ->willReturn($imageIdentifier);
 
         $this->response->headers = $responseHeaders;
 
-        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\Image'));
+        $this->response
+            ->expects($this->once())
+            ->method('setModel')
+            ->with($this->isInstanceOf(ImageModel::class));
 
-        $this->manager->expects($this->at(0))->method('trigger')->with('db.image.load');
-        $this->manager->expects($this->at(1))->method('trigger')->with('storage.image.load');
+        $this->manager
+            ->expects($this->at(0))
+            ->method('trigger')
+            ->with('db.image.load');
+        $this->manager
+            ->expects($this->at(1))
+            ->method('trigger')
+            ->with('storage.image.load');
 
-        $this->response->expects($this->once())->method('setMaxAge')->with(31536000)->will($this->returnSelf());
+        $this->response
+            ->expects($this->once())
+            ->method('setMaxAge')
+            ->with(31536000)
+            ->willReturnSelf();
 
-        $responseHeaders->expects($this->once())->method('add')->with($this->callback(function($headers) {
-            return array_key_exists('X-Imbo-OriginalMimeType', $headers) &&
-                   array_key_exists('X-Imbo-OriginalWidth', $headers) &&
-                   array_key_exists('X-Imbo-OriginalHeight', $headers) &&
-                   array_key_exists('X-Imbo-OriginalFileSize', $headers) &&
-                   array_key_exists('X-Imbo-OriginalExtension', $headers);
+        $responseHeaders
+            ->expects($this->once())
+            ->method('add')
+            ->with($this->callback(function(array $headers) : bool {
+                return
+                    array_key_exists('X-Imbo-OriginalMimeType', $headers)
+                    && array_key_exists('X-Imbo-OriginalWidth', $headers)
+                    && array_key_exists('X-Imbo-OriginalHeight', $headers)
+                    && array_key_exists('X-Imbo-OriginalFileSize', $headers)
+                    && array_key_exists('X-Imbo-OriginalExtension', $headers);
         }));
 
         $this->resource->getImage($this->event);

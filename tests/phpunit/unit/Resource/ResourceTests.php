@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Resource;
+namespace Imbo\Resource;
 
-use Imbo\Resource\ResourceInterface;
 use PHPUnit\Framework\TestCase;
 
 abstract class ResourceTests extends TestCase {
@@ -16,12 +15,12 @@ abstract class ResourceTests extends TestCase {
      * @covers ::getSubscribedEvents
      */
     public function testReturnsCorrectEventSubscriptions() : void {
-        $className = get_class($this->getNewResource());
-        $this->assertIsArray($className::getSubscribedEvents());
+        $this->assertIsArray($this->getNewResource()::getSubscribedEvents());
     }
 
     /**
      * @covers ::getSubscribedEvents
+     * @covers ::getAllowedMethods
      */
     public function testReturnsTheCorrectAllowedMethods() : void {
         $resource = $this->getNewResource();

@@ -1,19 +1,18 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Resource;
+namespace Imbo\Resource;
 
-use Imbo\Resource\User;
-use DateTime;
-use DateTimeZone;
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+use Imbo\Database\DatabaseInterface;
+use Imbo\Storage\StorageInterface;
+use Imbo\EventManager\EventInterface;
+use Imbo\EventManager\EventManager;
 
 /**
  * @coversDefaultClass Imbo\Resource\User
  */
 class UserTest extends ResourceTests {
-    /**
-     * @var User
-     */
     private $resource;
-
     private $request;
     private $response;
     private $database;
@@ -24,31 +23,35 @@ class UserTest extends ResourceTests {
         return new User();
     }
 
-    /**
-     * Set up the resource
-     */
     public function setUp() : void {
-        $this->request = $this->createMock('Imbo\Http\Request\Request');
-        $this->response = $this->createMock('Imbo\Http\Response\Response');
-        $this->database = $this->createMock('Imbo\Database\DatabaseInterface');
-        $this->storage = $this->createMock('Imbo\Storage\StorageInterface');
-        $this->event = $this->createMock('Imbo\EventManager\Event');
-        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
-        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
-        $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
-        $this->event->expects($this->any())->method('getStorage')->will($this->returnValue($this->storage));
+        $this->request = $this->createMock(Request::class);
+        $this->response = $this->createMock(Response::class);
+        $this->database = $this->createMock(DatabaseInterface::class);
+        $this->storage = $this->createMock(StorageInterface::class);
+        $this->event = $this->createConfiguredMock(EventInterface::class, [
+            'getRequest'  => $this->request,
+            'getResponse' => $this->response,
+            'getDatabase' => $this->database,
+            'getStorage'  => $this->storage,
+        ]);
 
         $this->resource = $this->getNewResource();
     }
 
     /**
-     * @covers Imbo\Resource\User::get
+     * @covers ::get
      */
     public function testSupportsHttpGet() : void {
-        $date = new DateTime('@1361628679', new DateTimeZone('UTC'));
-        $manager = $this->createMock('Imbo\EventManager\EventManager');
-        $manager->expects($this->once())->method('trigger')->with('db.user.load');
-        $this->event->expects($this->once())->method('getManager')->will($this->returnValue($manager));
+        $manager = $this->createMock(EventManager::class);
+        $manager
+            ->expects($this->once())
+            ->method('trigger')
+            ->with('db.user.load');
+
+            $this->event
+            ->expects($this->once())
+            ->method('getManager')
+            ->will($this->returnValue($manager));
 
         $this->resource->get($this->event);
     }
