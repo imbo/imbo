@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 use Imbo\Image\InputLoader\InputLoaderInterface;
 
 class OverrideJpegDummyLoader implements InputLoaderInterface {

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 use Imbo\Resource;
 use MongoDB\BSON\ObjectId as MongoId;
 

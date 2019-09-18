@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
 use Imbo\Auth\AccessControl\Adapter\AbstractAdapter;
 use Imbo\Auth\AccessControl\GroupQuery;

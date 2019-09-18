@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Enable the max image size event listener, setting a max size of w1000 x h600
  */

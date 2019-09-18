@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Whitelist a single transformation in the access token event listener
  */

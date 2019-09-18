@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 use ImboBehatFeatureContext\FeatureContext;
 use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
 use Imbo\Resource;
