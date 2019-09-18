@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace ImboUnitTest\Http\Response;
 
 use Imbo\Http\Response\Response;

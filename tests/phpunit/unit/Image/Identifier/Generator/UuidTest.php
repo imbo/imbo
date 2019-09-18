@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace ImboUnitTest\Image\Identifier\Generator;
 
 use Imbo\Image\Identifier\Generator\Uuid as UuidGenerator;

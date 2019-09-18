@@ -1,8 +1,8 @@
-<?php
-namespace ImboUnitTest;
+<?php declare(strict_types=1);
+namespace Imbo;
 
-use Imbo\Router;
 use Imbo\Exception\RuntimeException;
+use Imbo\Http\Request\Request;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -10,46 +10,30 @@ use PHPUnit\Framework\TestCase;
  */
 class RouterTest extends TestCase {
     /**
-     * @var Router
-     */
-    private $router;
-
-    private $request;
-
-    /**
-     * Set up the router instance
-     */
-    public function setUp() : void {
-        $this->router = new Router();
-        $this->request = $this->getMockBuilder('Imbo\Http\Request\Request')
-                              ->setMethods(['getPathInfo', 'getMethod'])
-                              ->getMock();
-    }
-
-    /**
      * @covers ::route
      */
     public function testCanBeATeaPot() : void {
-        $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('BREW'));
+        $request = $this->createConfiguredMock(Request::class, [
+            'getMethod' => 'BREW',
+        ]);
         $this->expectExceptionObject(new RuntimeException('I\'m a teapot', 418));
-        $this->router->route($this->request);
+
+        (new Router)->route($request);
     }
 
     /**
      * @covers ::route
      */
     public function testThrowsExceptionOnUnsupportedHttpMethod() : void {
-        $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('TRACE'));
+        $request = $this->createConfiguredMock(Request::class, [
+            'getMethod' => 'TRACE',
+        ]);
         $this->expectExceptionObject(new RuntimeException('Unsupported HTTP method', 501));
-        $this->router->route($this->request);
+
+        (new Router())->route($request);
     }
 
-    /**
-     * Return invalid routes for the resolve method
-     *
-     * @return array[]
-     */
-    public function getInvalidRoutes() {
+    public function getInvalidRoutes() : array {
         return [
             ['/foobar'],
             ['/status.json/'],
@@ -69,19 +53,17 @@ class RouterTest extends TestCase {
      * @dataProvider getInvalidRoutes
      * @covers ::route
      */
-    public function testThrowsExceptionWhenNoRouteMatches($route) : void {
-        $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
-        $this->request->expects($this->once())->method('getPathInfo')->will($this->returnValue($route));
+    public function testThrowsExceptionWhenNoRouteMatches(string $route) : void {
+        $request = $this->createConfiguredMock(Request::class, [
+            'getMethod'   => 'GET',
+            'getPathInfo' => $route,
+        ]);
         $this->expectExceptionObject(new RuntimeException('Not Found', 404));
-        $this->router->route($this->request);
+
+        (new Router())->route($request);
     }
 
-    /**
-     * Returns valid routes for the router
-     *
-     * @return array[]
-     */
-    public function getValidRoutes() {
+    public function getValidRoutes() : array {
         return [
             // Global short URL resource
             ['/s/asdfghj', 'globalshorturl'],
@@ -145,17 +127,54 @@ class RouterTest extends TestCase {
      * @dataProvider getValidRoutes
      * @covers ::route
      */
-    public function testCanMatchValidRoutes($route, $resource, $user = null, $imageIdentifier = null, $extension = null) : void {
-        $this->request->expects($this->once())->method('getPathInfo')->will($this->returnValue($route));
-        $this->request->expects($this->once())->method('getMethod')->will($this->returnValue('GET'));
+    public function testCanMatchValidRoutes(string $route, string $resource, ?string $user = null, ?string $imageIdentifier = null, ?string $extension = null) : void {
+        $request = $this
+            ->getMockBuilder(Request::class)
+            ->setMethods(['getPathInfo', 'getMethod'])
+            ->getMock();
 
-        $this->router->route($this->request);
+        $request
+            ->expects($this->once())
+            ->method('getPathInfo')
+            ->willReturn($route);
+        $request
+            ->expects($this->once())
+            ->method('getMethod')
+            ->willReturn('GET');
 
-        $route = $this->request->getRoute();
+        (new Router())->route($request);
+
+        $route = $request->getRoute();
 
         $this->assertSame($user, $route->get('user'));
         $this->assertSame($imageIdentifier, $route->get('imageIdentifier'));
         $this->assertSame($extension, $route->get('extension'));
         $this->assertSame($resource, (string) $route);
+    }
+
+    /**
+     * @covers ::route
+     * @covers ::__construct
+     */
+    public function testCanMatchCustomRoute() : void {
+        $request = $this
+            ->getMockBuilder(Request::class)
+            ->setMethods(['getPathInfo', 'getMethod'])
+            ->getMock();
+
+        $request
+            ->expects($this->once())
+            ->method('getPathInfo')
+            ->willReturn('/custom/akira');
+        $request
+            ->expects($this->once())
+            ->method('getMethod')
+            ->willReturn('GET');
+
+        (new Router([
+            'custom' => '#^/custom/(?<chars>[a-z]{5})$#',
+        ]))->route($request);
+
+        $this->assertSame('akira', $request->getRoute()->get('chars'));
     }
 }

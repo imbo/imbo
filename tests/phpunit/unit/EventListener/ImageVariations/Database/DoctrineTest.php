@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace ImboUnitTest\EventListener\ImageVariations\Database;
 
 use Imbo\EventListener\ImageVariations\Database\Doctrine;

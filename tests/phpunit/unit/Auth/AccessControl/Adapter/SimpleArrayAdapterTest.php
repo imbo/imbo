@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace ImboUnitTest\Auth\AccessControl\Adapter;
 
 use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
@@ -14,7 +14,7 @@ class SimpleArrayAdapterTest extends TestCase {
     /**
      * @dataProvider getAuthConfig
      */
-    public function testCanSetKeys(array $users, $publicKey, $privateKey) : void {
+    public function testCanSetKeys(array $users, string $publicKey, ?string $privateKey) : void {
         $accessControl = new SimpleArrayAdapter($users);
 
         $this->assertSame($privateKey, $accessControl->getPrivateKey($publicKey));
@@ -25,7 +25,7 @@ class SimpleArrayAdapterTest extends TestCase {
             'A public key can only have a single private key (as of 2.0.0)',
             500
         ));
-        $accessControl = new SimpleArrayAdapter([
+        new SimpleArrayAdapter([
             'publicKey' => ['key1', 'key2']
         ]);
     }
@@ -57,12 +57,7 @@ class SimpleArrayAdapterTest extends TestCase {
         $this->assertFalse($accessControl->isEmpty());
     }
 
-    /**
-     * Data provider for testing the legacy auth compatibility
-     *
-     * @return array
-     */
-    public function getAuthConfig() {
+    public function getAuthConfig() : array {
         $users = [
             'publicKey1' => 'key1',
             'publicKey2' => 'key2',

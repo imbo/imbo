@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace ImboUnitTest;
 
 use Imbo\Application;
@@ -13,14 +13,8 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass Imbo\Application
  */
 class ApplicationTest extends TestCase {
-    /**
-     * @var Application
-     */
     private $application;
 
-    /**
-     * Set up the application
-     */
     public function setUp() : void {
         $this->application = new Application();
     }
