@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace ImboUnitTest\Auth\AccessControl\Adapter;
 
 use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
@@ -137,24 +137,6 @@ class ArrayAdapterTest extends TestCase {
     }
 
     /**
-     * Data provider for testing the legacy auth compatibility
-     *
-     * @return array
-     */
-    public function getAuthConfig() {
-        $users = [
-            'publicKey1' => 'key1',
-            'publicKey2' => 'key2',
-        ];
-
-        return [
-            'no public keys exists' => [[], 'public', null],
-            'public key exists' => [$users, 'publicKey2', 'key2'],
-            'public key does not exist' => [$users, 'publicKey3', null],
-        ];
-    }
-
-    /**
      * @covers ::__construct
      * @covers ::validateAccessList
      */
@@ -169,12 +151,7 @@ class ArrayAdapterTest extends TestCase {
         ]);
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getGroupsData() {
+    public function getGroupsData() : array {
         $query = new GroupQuery();
         $query->page(2)->limit(2);
 
@@ -199,7 +176,7 @@ class ArrayAdapterTest extends TestCase {
      * @dataProvider getGroupsData
      * @covers ::getGroups
      */
-    public function testCanGetGroups(array $groups, array $result, $query = null) : void {
+    public function testCanGetGroups(array $groups, array $result, ?GroupQuery $query = null) : void {
         $numGroups = count($groups);
 
         $model = $this->createMock('Imbo\Model\Groups');
@@ -209,12 +186,7 @@ class ArrayAdapterTest extends TestCase {
         $this->assertSame(array_values($result), array_values($adapter->getGroups($query, $model)));
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getGroupsForTest() {
+    public function getGroupsForTest() : array {
         return [
             'no groups' => [
                 [], 'group', false,
@@ -232,7 +204,7 @@ class ArrayAdapterTest extends TestCase {
      * @dataProvider getGroupsForTest
      * @covers ::groupExists
      */
-    public function testCanCheckIfGroupExists($groups, $group, $exists) : void {
+    public function testCanCheckIfGroupExists(array $groups, string $group, bool $exists) : void {
         $adapter = new ArrayAdapter([], $groups);
         $this->assertSame($exists, $adapter->groupExists($group));
     }
@@ -265,12 +237,7 @@ class ArrayAdapterTest extends TestCase {
         $this->assertFalse($adapter->publicKeyExists('pubKey3'));
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getAccessRules() {
+    public function getAccessRules() : array {
         $acl = [
             [
                 'id' => 1,
@@ -322,7 +289,7 @@ class ArrayAdapterTest extends TestCase {
      * @dataProvider getAccessRules
      * @covers ::getAccessRule
      */
-    public function testGetAccessRule($acl, $publicKey, $ruleId, $rule) : void {
+    public function testGetAccessRule(array $acl, string $publicKey, int $ruleId, ?array $rule) : void {
         $adapter = new ArrayAdapter($acl);
         $this->assertSame($rule, $adapter->getAccessRule($publicKey, $ruleId));
     }

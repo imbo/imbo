@@ -1,35 +1,28 @@
-<?php
-namespace ImboUnitTest\Router;
+<?php declare(strict_types=1);
+namespace Imbo\Router;
 
-use Imbo\Router\Route;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Router\Route
  */
 class RouteTest extends TestCase {
-    /**
-     * @var Route
-     */
     private $route;
 
-    /**
-     * Set up the route instance
-     */
     public function setUp() : void {
         $this->route = new Route();
     }
 
     /**
-     * @covers Imbo\Router\Route::__toString
+     * @covers ::__toString
      */
     public function testReturnsNullWhenNameIsNotSet() : void {
         $this->assertSame('', (string) $this->route);
     }
 
     /**
-     * @covers Imbo\Router\Route::setName
-     * @covers Imbo\Router\Route::__toString
+     * @covers ::setName
+     * @covers ::__toString
      */
     public function testReturnsTheSetName() : void {
         $this->assertSame($this->route, $this->route->setName('name'));

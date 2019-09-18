@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace ImboUnitTest\Image\InputLoader;
 
 use Imbo\Image\InputLoader\Basic;
