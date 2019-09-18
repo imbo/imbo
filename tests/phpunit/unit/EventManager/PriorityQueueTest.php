@@ -1,7 +1,6 @@
-<?php
-namespace ImboUnitTest\EventManager;
+<?php declare(strict_types=1);
+namespace Imbo\EventManager;
 
-use Imbo\EventManager\PriorityQueue;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -9,10 +8,8 @@ use PHPUnit\Framework\TestCase;
  */
 class PriorityQueueTest extends TestCase {
     /**
-     * @var PriorityQueue
+     * @covers ::insert
      */
-    private $queue;
-
     public function testUsesAPredictableOrder() : void {
         $queue = new PriorityQueue();
 

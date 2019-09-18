@@ -1,39 +1,32 @@
-<?php
-namespace ImboUnitTest\EventManager;
+<?php declare(strict_types=1);
+namespace Imbo\EventManager;
 
-use Imbo\EventManager\EventManager;
 use Imbo\EventManager\Event;
 use Imbo\EventListener\ListenerInterface;
 use Imbo\EventListener\Initializer\InitializerInterface;
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Request\Request;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\EventManager\EventManager
  */
 class EventManagerTest extends TestCase {
-    /**
-     * @var EventManager
-     */
     private $manager;
-
     private $request;
     private $event;
 
-    /**
-     * Set up the event manager
-     */
     public function setUp() : void {
-        $this->request = $this->createMock('Imbo\Http\Request\Request');
+        $this->request = $this->createMock(Request::class);
         $this->event = new Event(['request' => $this->request]);
         $this->manager = new EventManager();
         $this->manager->setEventTemplate($this->event);
     }
 
     /**
-     * @covers Imbo\EventManager\EventManager::addEventHandler
-     * @covers Imbo\EventManager\EventManager::addCallbacks
-     * @covers Imbo\EventManager\EventManager::trigger
+     * @covers ::addEventHandler
+     * @covers ::addCallbacks
+     * @covers ::trigger
      */
     public function testCanRegisterAndExecuteRegularCallbacksInAPrioritizedFashion() : void {
         $callback1 = function ($event) { echo 1; };
@@ -42,23 +35,34 @@ class EventManagerTest extends TestCase {
 
         $this->assertSame(
             $this->manager,
-            $this->manager->addEventHandler('handler1', $callback1)->addCallbacks('handler1', ['event1' => 0])
-                          ->addEventHandler('handler2', $callback2)->addCallbacks('handler2', ['event2' => 1])
-                          ->addEventHandler('handler3', $callback3)->addCallbacks('handler3', ['event2' => 2])
-                          ->addEventHandler('handler4', $callback3)->addCallbacks('handler4', ['event3' => 0])
-                          ->addEventHandler('handler5', $callback1)->addCallbacks('handler5', ['event4' => 0])
+            $this->manager
+                ->addEventHandler('handler1', $callback1)
+                ->addCallbacks('handler1', ['event1' => 0])
+
+                ->addEventHandler('handler2', $callback2)
+                ->addCallbacks('handler2', ['event2' => 1])
+
+                ->addEventHandler('handler3', $callback3)
+                ->addCallbacks('handler3', ['event2' => 2])
+
+                ->addEventHandler('handler4', $callback3)
+                ->addCallbacks('handler4', ['event3' => 0])
+
+                ->addEventHandler('handler5', $callback1)
+                ->addCallbacks('handler5', ['event4' => 0])
         );
 
         $this->expectOutputString('1321');
 
-        $this->manager->trigger('otherevent')
-                      ->trigger('event1')
-                      ->trigger('event2')
-                      ->trigger('event4');
+        $this->manager
+            ->trigger('otherevent')
+            ->trigger('event1')
+            ->trigger('event2')
+            ->trigger('event4');
     }
 
     /**
-     * @covers Imbo\EventManager\EventManager::trigger
+     * @covers ::trigger
      */
     public function testLetsListenerStopPropagation() : void {
         $callback1 = function($event) { echo 1; };
@@ -68,35 +72,42 @@ class EventManagerTest extends TestCase {
             $event->stopPropagation();
         };
 
-        $this->manager->addEventHandler('handler1', $callback1)->addCallbacks('handler1', ['event' => 3])
-                      ->addEventHandler('handler2', $stopper)->addCallbacks('handler2', ['event' => 2])
-                      ->addEventHandler('handler3', $callback2)->addCallbacks('handler3', ['event' => 1])
-                      ->addEventHandler('handler4', $callback3)->addCallbacks('handler4', ['otherevent' => 0]);
+        $this->manager
+            ->addEventHandler('handler1', $callback1)
+            ->addCallbacks('handler1', ['event' => 3])
+
+            ->addEventHandler('handler2', $stopper)
+            ->addCallbacks('handler2', ['event' => 2])
+
+            ->addEventHandler('handler3', $callback2)
+            ->addCallbacks('handler3', ['event' => 1])
+
+            ->addEventHandler('handler4', $callback3)
+            ->addCallbacks('handler4', ['otherevent' => 0]);
 
         $this->expectOutputString('13');
 
         $this->assertSame(
             $this->manager,
-            $this->manager->trigger('event')
-                          ->trigger('otherevent')
+            $this->manager
+                ->trigger('event')
+                ->trigger('otherevent')
         );
     }
 
     /**
-     * @covers Imbo\EventManager\EventManager::hasListenersForEvent
+     * @covers ::hasListenersForEvent
      */
     public function testCanCheckIfTheManagerHasListenersForSpecificEvents() : void {
-        $this->manager->addEventHandler('handler', function($event) {})->addCallbacks('handler', ['event' => 0]);
+        $this->manager
+            ->addEventHandler('handler', function($event) {})
+            ->addCallbacks('handler', ['event' => 0]);
+
         $this->assertFalse($this->manager->hasListenersForEvent('some.event'));
         $this->assertTrue($this->manager->hasListenersForEvent('event'));
     }
 
-    /**
-     * Fetch users to test filtering
-     *
-     * @return array[]
-     */
-    public function getUsers() {
+    public function getUsers() : array {
         return [
             [null, [], '1'],
             [null, ['christer'], '1'],
@@ -109,22 +120,28 @@ class EventManagerTest extends TestCase {
 
     /**
      * @dataProvider getUsers
-     * @covers Imbo\EventManager\EventManager::hasListenersForEvent
-     * @covers Imbo\EventManager\EventManager::triggersFor
+     * @covers ::hasListenersForEvent
+     * @covers ::triggersFor
+     * @covers ::trigger
      */
-    public function testCanIncludeAndExcludeUsers($user, $users, $output = '') : void {
+    public function testCanIncludeAndExcludeUsers(?string $user, array $users, string $output = '') : void {
         $callback = function ($event) { echo '1'; };
 
-        $this->manager->addEventHandler('handler', $callback)->addCallbacks('handler', ['event' => 0], $users);
+        $this->manager
+            ->addEventHandler('handler', $callback)
+            ->addCallbacks('handler', ['event' => 0], $users);
 
-        $this->request->expects($this->any())->method('getUser')->will($this->returnValue($user));
+        $this->request
+            ->expects($this->any())
+            ->method('getUser')
+            ->will($this->returnValue($user));
 
         $this->expectOutputString($output);
         $this->manager->trigger('event');
     }
 
     /**
-     * @covers Imbo\EventManager\EventManager::trigger
+     * @covers ::trigger
      */
     public function testCanAddExtraParametersToTheEvent() : void {
         $this->manager->addEventHandler('handler', function($event) {
@@ -141,20 +158,25 @@ class EventManagerTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\EventManager\EventManager::addInitializer
+     * @covers ::addInitializer
+     * @covers ::getInitializers
+     * @covers ::getHandlerInstance
+     * @covers ::trigger
      */
     public function testCanInitializeListeners() : void {
         $listenerClassName = __NAMESPACE__ . '\Listener';
-        $this->manager->addInitializer(new Initializer());
-        $this->manager->addEventHandler('someHandler', $listenerClassName);
-        $this->manager->addCallbacks('someHandler', $listenerClassName::getSubscribedEvents());
+        $this->manager
+            ->addInitializer($i = new Initializer())
+            ->addEventHandler('someHandler', $listenerClassName)
+            ->addCallbacks('someHandler', $listenerClassName::getSubscribedEvents());
 
         $this->expectOutputString('initeventHandler');
         $this->manager->trigger('event');
+        $this->assertSame([$i], $this->manager->getInitializers());
     }
 
     /**
-     * @covers Imbo\EventManager\EventManager::addCallbacks
+     * @covers ::addCallbacks
      */
     public function testThrowsExceptionsWhenInvalidHandlersAreAdded() : void {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -165,30 +187,33 @@ class EventManagerTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\EventManager\EventManager::addCallbacks
+     * @covers ::addCallbacks
+     * @covers ::addEventHandler
      */
     public function testCanAddMultipleHandlersAtOnce() : void {
         $listenerClassName = __NAMESPACE__ . '\Listener';
-        $this->manager->addEventHandler('someHandler', $listenerClassName);
-        $this->manager->addCallbacks('someHandler', $listenerClassName::getSubscribedEvents());
+        $this->manager
+            ->addEventHandler('someHandler', $listenerClassName)
+            ->addCallbacks('someHandler', $listenerClassName::getSubscribedEvents());
 
         $this->expectOutputString('bazbarfoo');
         $this->manager->trigger('someEvent');
     }
 
     /**
-     * @covers Imbo\EventManager\EventManager::getHandlerInstance
+     * @covers ::getHandlerInstance
      */
     public function testCanInjectParamsInConstructor() : void {
         $listenerClassName = __NAMESPACE__ . '\Listener';
-        $this->manager->addEventHandler('someHandler', $listenerClassName, ['param']);
-        $this->manager->addCallbacks('someHandler', $listenerClassName::getSubscribedEvents());
+        $this->manager
+            ->addEventHandler('someHandler', $listenerClassName, ['param'])
+            ->addCallbacks('someHandler', $listenerClassName::getSubscribedEvents());
 
         $this->expectOutputString('a:1:{i:0;s:5:"param";}');
         $this->manager->trigger('getParams');
     }
 
-    public function getWildcardListeners() {
+    public function getWildcardListeners() : array {
         $callback1 = function($event) { echo '1:' . $event->getName() . ' '; };
         $callback2 = function($event) { echo '2:' . $event->getName() . ' '; };
         $callback3 = function($event) { echo '3:' . $event->getName() . ' '; };
@@ -238,12 +263,14 @@ class EventManagerTest extends TestCase {
 
     /**
      * @dataProvider getWildcardListeners
-     * @covers Imbo\EventManager\EventManager::getListenersForEvent
-     * @covers Imbo\EventManager\EventManager::getEventNameParts
+     * @covers ::getListenersForEvent
+     * @covers ::getEventNameParts
      */
-    public function testSupportsWildcardListeners(array $listeners, array $events, $output) : void {
+    public function testSupportsWildcardListeners(array $listeners, array $events, string $output) : void {
         foreach ($listeners as $name => $listener) {
-            $this->manager->addEventHandler($name, $listener['callback'])->addCallbacks($name, [$listener['event'] => $listener['priority']]);
+            $this->manager
+                ->addEventHandler($name, $listener['callback'])
+                ->addCallbacks($name, [$listener['event'] => $listener['priority']]);
         }
 
         $this->expectOutputString($output);
@@ -251,6 +278,18 @@ class EventManagerTest extends TestCase {
         foreach ($events as $event) {
             $this->manager->trigger($event);
         }
+    }
+
+    /**
+     * @covers ::setEventTemplate
+     */
+    public function testCanSetEventTemplate() : void {
+        $this->expectOutputString('bar');
+        (new EventManager())
+            ->setEventTemplate(new Event(['foo' => 'bar', 'request' => $this->createMock(Request::class)]))
+            ->addEventHandler('handler', function ($event) { echo $event->getArgument('foo'); })
+            ->addCallbacks('handler', ['event' => 0])
+            ->trigger('event');
     }
 }
 
