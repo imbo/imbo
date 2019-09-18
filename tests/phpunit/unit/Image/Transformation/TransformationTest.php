@@ -1,34 +1,21 @@
-<?php
-namespace ImboUnitTest\Image\Transformation;
+<?php declare(strict_types=1);
+namespace Imbo\Image\Transformation;
 
-use Imbo\Image\Transformation\Transformation;
 use Imbo\Model\Image;
-use Imagick;
-use ReflectionMethod;
 use PHPUnit\Framework\TestCase;
+use Imagick;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Transformation
  */
 class TransformationTest extends TestCase {
-    /**
-     * @var Transformation
-     */
     private $transformation;
 
-    /**
-     * Set up the transformation instance
-     */
     public function setUp() : void {
-        $this->transformation = new TransformationImpl();
+        $this->transformation = new Border();
     }
 
-    /**
-     * Get different colors and their formatted version
-     *
-     * @return array[]
-     */
-    public function getColors() {
+    public function getColors() : array {
         return [
             ['red', 'red'],
             ['000', '#000'],
@@ -43,16 +30,31 @@ class TransformationTest extends TestCase {
 
     /**
      * @dataProvider getColors
-     * @covers Imbo\Image\Transformation\Transformation::formatColor
+     * @covers ::formatColor
+     * @covers ::setImage
+     * @covers ::setImagick
      */
-    public function testCanFormatColors($color, $expected) : void {
-        $method = new ReflectionMethod('Imbo\Image\Transformation\Transformation', 'formatColor');
-        $method->setAccessible(true);
+    public function testCanFormatColors(string $color, string $expected) : void {
+        $image = $this->createMock(Image::class);
+        $image->expects($this->once())->method('setWidth')->willReturnSelf();
+        $image->expects($this->once())->method('setHeight')->willReturnSelf();
 
-        $this->assertSame($expected, $method->invoke($this->transformation, $color));
+        $imagick = $this->createConfiguredMock(Imagick::class, [
+            'getImageGeometry' => [
+                'width'  => 100,
+                'height' => 100,
+            ],
+            'getImageAlphaChannel' => 0,
+        ]);
+
+        $imagick
+            ->expects($this->once())
+            ->method('borderImage')
+            ->with($expected, 1, 1);
+
+        $this->transformation
+            ->setImage($image)
+            ->setImagick($imagick)
+            ->transform(['color' => $color]);
     }
-}
-
-class TransformationImpl extends Transformation {
-    public function transform(array $params = []) {}
 }

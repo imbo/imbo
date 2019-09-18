@@ -1,21 +1,18 @@
-<?php
-namespace ImboUnitTest\Image\Transformation;
+<?php declare(strict_types=1);
+namespace Imbo\Image\Transformation;
 
 use Imbo\Http\Response\Response;
-use Imbo\Image\Transformation\SmartSize;
 use Imbo\Model\Image;
+use Imbo\EventManager\Event;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use PHPUnit\Framework\TestCase;
+use Imagick;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\SmartSize
  */
 class SmartSizeTest extends TestCase {
-    /**
-     * Fetch different valid smart size crop arguments and expected results
-     *
-     * @return array
-     */
-    public function getSmartSizeArguments() {
+    public function getSmartSizeArguments() : array {
         return [
             'Square, close crop, (800,300) poi on landscape image' => [
                 ['width' => 1200, 'height' => 700],
@@ -128,35 +125,36 @@ class SmartSizeTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Image\Transformation\SmartSize::transform
+     * @covers ::transform
      * @dataProvider getSmartSizeArguments
      */
-    public function testSmartSize($imageDimensions, $params, $cropParams) : void {
-        $imagick = $this->createMock('Imagick');
-        $imagick->expects($this->any())
-                ->method('cropImage')
-                ->with(
-                    $cropParams['width'],
-                    $cropParams['height'],
-                    $cropParams['x'],
-                    $cropParams['y']
-                );
+    public function testSmartSize(array $imageDimensions, array $params, array $cropParams) : void {
+        $imagick = $this->createMock(Imagick::class);
+        $imagick
+            ->expects($this->any())
+            ->method('cropImage')
+            ->with(
+                $cropParams['width'],
+                $cropParams['height'],
+                $cropParams['x'],
+                $cropParams['y']
+            );
 
-        $image = new Image();
-        $image->setWidth($imageDimensions['width']);
-        $image->setHeight($imageDimensions['height']);
+        $image = (new Image())
+            ->setWidth($imageDimensions['width'])
+            ->setHeight($imageDimensions['height']);
 
-        $headerBag = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $headerBag = $this->createMock(ResponseHeaderBag::class);
         $headerBag->expects($this->once())->method('set')->with('X-Imbo-POIs-Used', 1);
 
         $response = new Response();
         $response->headers = $headerBag;
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->once())->method('getResponse')->will($this->returnValue($response));
+        $event = $this->createConfiguredMock(Event::class, [
+            'getResponse' => $response,
+        ]);
 
-        $transformation = new SmartSize();
-        $transformation
+        $transformation = (new SmartSize())
             ->setImagick($imagick)
             ->setImage($image)
             ->setEvent($event)

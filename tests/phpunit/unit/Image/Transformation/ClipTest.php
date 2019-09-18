@@ -1,40 +1,23 @@
-<?php
-namespace ImboUnitTest\Image\Transformation;
+<?php declare(strict_types=1);
+namespace Imbo\Image\Transformation;
 
-use Imbo\Image\Transformation\Clip;
 use Imbo\Model\Image;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\TransformationException;
 use Imbo\Database\DatabaseInterface;
 use Imbo\EventManager\Event;
+use PHPUnit\Framework\TestCase;
 use Imagick;
 use ImagickException;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Clip
  */
 class ClipTest extends TestCase {
-    /**
-     * @var Clip
-     */
     private $transformation;
-
-    /**
-     * @var Image
-     */
     private $image;
-
-    /**
-     * Imagick instance for testing
-     *
-     * @var Imagick
-     */
     private $imagick;
 
-    /**
-     * Set up the transformation instance
-     */
     public function setUp() : void {
         $this->transformation = new Clip();
 
@@ -44,15 +27,16 @@ class ClipTest extends TestCase {
 
         $this->image = $this->createConfiguredMock(Image::class, [
             'getImageIdentifier' => $imageIdentifier,
-            'getUser' => $user,
+            'getUser'            => $user,
         ]);
 
         $database = $this->createMock(DatabaseInterface::class);
-        $database->method('getMetadata')
-                 ->with($user, $imageIdentifier)
-                 ->willReturn([
-                     'paths' => ['House', 'Panda'],
-                 ]);
+        $database
+            ->method('getMetadata')
+            ->with($user, $imageIdentifier)
+            ->willReturn([
+                'paths' => ['House', 'Panda'],
+            ]);
 
         $event = $this->createConfiguredMock(Event::class, [
             'getDatabase' => $database,
@@ -93,9 +77,10 @@ class ClipTest extends TestCase {
      * @covers ::transform
      */
     public function testTransformationHappensWithMatchingPath() : void {
-        $this->image->expects($this->once())
-                    ->method('hasBeenTransformed')
-                    ->with(true);
+        $this->image
+            ->expects($this->once())
+            ->method('hasBeenTransformed')
+            ->with(true);
 
         $this->transformation->transform(['path' => 'Panda']);
     }
@@ -104,9 +89,10 @@ class ClipTest extends TestCase {
      * @covers ::transform
      */
     public function testTransformationHappensWithoutExplicitPath() : void {
-        $this->image->expects($this->once())
-                    ->method('hasBeenTransformed')
-                    ->with(true);
+        $this->image
+            ->expects($this->once())
+            ->method('hasBeenTransformed')
+            ->with(true);
 
         $this->transformation->transform([]);
     }
@@ -116,8 +102,9 @@ class ClipTest extends TestCase {
      */
     public function testTransformationDoesntHappenWhenNoPathIsPresent() : void {
         $this->imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.jpg'));
-        $this->image->expects($this->never())
-                    ->method('hasBeenTransformed');
+        $this->image
+            ->expects($this->never())
+            ->method('hasBeenTransformed');
 
         $this->transformation->transform([]);
     }
@@ -126,42 +113,40 @@ class ClipTest extends TestCase {
      * @covers ::transform
      */
     public function testWillResetAlphaChannelWhenTheImageDoesNotHaveAClippingPath() : void {
-        $imagick = $this->createMock('Imagick');
-        $imagick->expects($this->once())
-                ->method('getImageAlphaChannel')
-                ->willReturn(Imagick::ALPHACHANNEL_COPY);
+        $imagick = $this->createConfiguredMock(Imagick::class, [
+            'getImageAlphaChannel' => Imagick::ALPHACHANNEL_COPY,
+        ]);
 
-        $imagick->expects($this->exactly(2))
-                ->method('setImageAlphaChannel')
-                ->withConsecutive(
-                    [Imagick::ALPHACHANNEL_TRANSPARENT],
-                    [Imagick::ALPHACHANNEL_COPY] // Reset to the one fetched above
-                );
+        $imagick
+            ->expects($this->exactly(2))
+            ->method('setImageAlphaChannel')
+            ->withConsecutive(
+                [Imagick::ALPHACHANNEL_TRANSPARENT],
+                [Imagick::ALPHACHANNEL_COPY] // Reset to the one fetched above
+            );
 
-        $imagick->expects($this->once())
-                ->method('clipImage')
-                ->willThrowException(new ImagickException('some error', 410));
+        $imagick
+            ->expects($this->once())
+            ->method('clipImage')
+            ->willThrowException(new ImagickException('some error', 410));
 
-        $this->transformation->setImagick($imagick)
-                             ->transform([]);
+        $this->transformation
+            ->setImagick($imagick)
+            ->transform([]);
     }
 
     /**
      * @covers ::transform
      */
     public function testThrowsExceptionWhenImagickFailsWithAFatalError() : void {
-        $imagick = $this->createMock('Imagick');
-        $imagick->expects($this->once())
-                ->method('getImageAlphaChannel')
-                ->willReturn(Imagick::ALPHACHANNEL_COPY);
-
-        $imagick->expects($this->once())
-                ->method('setImageAlphaChannel')
-                ->with(Imagick::ALPHACHANNEL_TRANSPARENT);
-
-        $imagick->expects($this->once())
-                ->method('clipImage')
-                ->willThrowException(new ImagickException('Some error'));
+        $imagick = $this->createConfiguredMock(Imagick::class, [
+            'getImageAlphaChannel' => Imagick::ALPHACHANNEL_COPY,
+            'setImageAlphaChannel' => Imagick::ALPHACHANNEL_TRANSPARENT,
+        ]);
+        $imagick
+            ->expects($this->once())
+            ->method('clipImage')
+            ->willThrowException(new ImagickException('Some error'));
 
         $this->transformation->setImagick($imagick);
         $this->expectExceptionObject(new TransformationException('Some error', 400));

@@ -1,43 +1,227 @@
-<?php
-namespace ImboUnitTest\Image\Transformation;
+<?php declare(strict_types=1);
+namespace Imbo\Image\Transformation;
 
-use Imagick;
-use Imbo\Image\Transformation\AutoRotate;
+use Imbo\Model\Image;
+use Imbo\Image\InputSizeConstraint;
+use Imbo\Exception\TransformationException;
 use PHPUnit\Framework\TestCase;
+use Imagick;
+use ImagickException;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\AutoRotate
  */
 class AutoRotateTest extends TestCase {
     /**
-     * @covers Imbo\Image\Transformation\AutoRotate::transform
+     * @covers ::transform
      */
     public function testWillNotUpdateTheImageWhenNotNeeded() : void {
-        $image = $this->createMock('Imbo\Model\Image');
+        $imagick = $this->createConfiguredMock(Imagick::class, [
+            'getImageOrientation' => 0,
+        ]);
+        $imagick
+            ->expects($this->never())
+            ->method('setImageOrientation');
 
-        $imagick = $this->createMock('Imagick');
-        $imagick->expects($this->once())->method('getImageOrientation')->will($this->returnValue(0));
-        $imagick->expects($this->never())->method('setImageOrientation');
+        (new AutoRotate())
+            ->setImagick($imagick)
+            ->transform([]);
+    }
 
-        $transformation = new AutoRotate();
-        $transformation->setImagick($imagick);
-        $transformation->transform([]);
+    public function getTransformationData() : array {
+        return [
+            [
+                Imagick::ORIENTATION_TOPRIGHT,
+                Imagick::ORIENTATION_TOPLEFT,
+                function(Imagick $imagick, Image $image) : void {
+                    $imagick
+                        ->expects($this->once())
+                        ->method('flopImage');
+                    $imagick
+                        ->expects($this->never())
+                        ->method('flipImage');
+                },
+            ],
+            [
+                Imagick::ORIENTATION_BOTTOMRIGHT,
+                Imagick::ORIENTATION_TOPLEFT,
+                function(Imagick $imagick, Image $image) : void {
+                    $imagick
+                        ->expects($this->never())
+                        ->method('flopImage');
+                    $imagick
+                        ->expects($this->never())
+                        ->method('flipImage');
+                },
+            ],
+            [
+                Imagick::ORIENTATION_BOTTOMLEFT,
+                Imagick::ORIENTATION_TOPLEFT,
+                function(Imagick $imagick, Image $image) : void {
+                    $imagick
+                        ->expects($this->never())
+                        ->method('flopImage');
+                    $imagick
+                        ->expects($this->once())
+                        ->method('flipImage');
+                },
+            ],
+            [
+                Imagick::ORIENTATION_LEFTTOP,
+                Imagick::ORIENTATION_TOPLEFT,
+                function(Imagick $imagick, Image $image) : void {
+                    $imagick
+                        ->expects($this->once())
+                        ->method('flopImage');
+                    $imagick
+                        ->expects($this->never())
+                        ->method('flipImage');
+                    $imagick
+                        ->expects($this->once())
+                        ->method('getImageGeometry')
+                        ->willReturn(['width' => 200, 'height' => 150]);
+
+                    $image
+                        ->expects($this->once())
+                        ->method('setWidth')
+                        ->with(200)
+                        ->willReturnSelf();
+                    $image
+                        ->expects($this->once())
+                        ->method('setHeight')
+                        ->with(150)
+                        ->willReturnSelf();
+                },
+            ],
+            [
+                Imagick::ORIENTATION_RIGHTTOP,
+                Imagick::ORIENTATION_TOPLEFT,
+                function(Imagick $imagick, Image $image) : void {
+                    $imagick
+                        ->expects($this->never())
+                        ->method('flopImage');
+                    $imagick
+                        ->expects($this->never())
+                        ->method('flipImage');
+                    $imagick
+                        ->expects($this->once())
+                        ->method('getImageGeometry')
+                        ->willReturn(['width' => 200, 'height' => 150]);
+
+                    $image
+                        ->expects($this->once())
+                        ->method('setWidth')
+                        ->with(200)
+                        ->willReturnSelf();
+                    $image
+                        ->expects($this->once())
+                        ->method('setHeight')
+                        ->with(150)
+                        ->willReturnSelf();
+                },
+            ],
+            [
+                Imagick::ORIENTATION_RIGHTBOTTOM,
+                Imagick::ORIENTATION_TOPLEFT,
+                function(Imagick $imagick, Image $image) : void {
+                    $imagick
+                        ->expects($this->never())
+                        ->method('flopImage');
+                    $imagick
+                        ->expects($this->once())
+                        ->method('flipImage');
+                    $imagick
+                        ->expects($this->once())
+                        ->method('getImageGeometry')
+                        ->willReturn(['width' => 200, 'height' => 150]);
+
+                    $image
+                        ->expects($this->once())
+                        ->method('setWidth')
+                        ->with(200)
+                        ->willReturnSelf();
+                    $image
+                        ->expects($this->once())
+                        ->method('setHeight')
+                        ->with(150)
+                        ->willReturnSelf();
+                },
+            ],
+            [
+                Imagick::ORIENTATION_LEFTBOTTOM,
+                Imagick::ORIENTATION_TOPLEFT,
+                function(Imagick $imagick, Image $image) : void {
+                    $imagick
+                        ->expects($this->never())
+                        ->method('flopImage');
+                    $imagick
+                        ->expects($this->never())
+                        ->method('flipImage');
+                    $imagick
+                        ->expects($this->once())
+                        ->method('getImageGeometry')
+                        ->willReturn(['width' => 200, 'height' => 150]);
+
+                    $image
+                        ->expects($this->once())
+                        ->method('setWidth')
+                        ->with(200)
+                        ->willReturnSelf();
+                    $image
+                        ->expects($this->once())
+                        ->method('setHeight')
+                        ->with(150)
+                        ->willReturnSelf();
+                },
+            ],
+        ];
     }
 
     /**
-     * @covers Imbo\Image\Transformation\AutoRotate::transform
+     * @dataProvider getTransformationData
+     * @covers ::transform
      */
-    public function testWillRotateWhenNeeded() : void {
-        $imagick = $this->createMock('Imagick');
-        $imagick->expects($this->once())->method('getImageOrientation')->will($this->returnValue(
-            Imagick::ORIENTATION_TOPRIGHT
-        ));
-        $imagick->expects($this->once())->method('flopImage');
-        $imagick->expects($this->once())->method('setImageOrientation')->with(Imagick::ORIENTATION_TOPLEFT);
+    public function testWillRotateWhenNeeded(int $imageOrientation, int $newOrientation, callable $expectations) : void {
+        $imagick = $this->createConfiguredMock(Imagick::class, [
+            'getImageOrientation' => $imageOrientation,
+        ]);
 
-        $transformation = new AutoRotate();
-        $transformation->setImagick($imagick);
-        $transformation->setImage($this->createMock('Imbo\Model\Image'));
-        $transformation->transform([]);
+        $image = $this->createMock(Image::class);
+
+        $expectations($imagick, $image);
+
+        $imagick
+            ->expects($this->once())
+            ->method('setImageOrientation')
+            ->with($newOrientation);
+
+        (new AutoRotate())
+            ->setImage($image)
+            ->setImagick($imagick)
+            ->transform([]);
+    }
+
+    /**
+     * @covers ::getMinimumInputSize
+     */
+    public function testGetMinimumInputSizeStopsResolving() : void {
+        $this->assertSame(InputSizeConstraint::STOP_RESOLVING, (new AutoRotate())->getMinimumInputSize([], []));
+    }
+
+    /**
+     * @covers ::transform
+     */
+    public function testThrowsCustomExceptions() {
+        $imagick = $this->createMock(Imagick::class);
+        $imagick
+            ->expects($this->once())
+            ->method('getImageOrientation')
+            ->willThrowException($e = new ImagickException('some error'));
+
+        $this->expectExceptionObject(new TransformationException('some error', 400, $e));
+
+        (new AutoRotate())
+            ->setImagick($imagick)
+            ->transform([]);
     }
 }
