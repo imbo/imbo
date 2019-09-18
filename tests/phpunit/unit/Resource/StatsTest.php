@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Resource;
+namespace Imbo\Resource;
 
-use Imbo\Resource\Stats;
+use Imbo\EventManager\EventInterface;
+use Imbo\EventManager\EventManager;
+use Imbo\Http\Response\Response;
+use Symfony\Component\HttpFoundation\HeaderBag;
 
 /**
  * @coversDefaultClass Imbo\Resource\Stats
  */
 class StatsTest extends ResourceTests {
-    /**
-     * @var Stats
-     */
     private $resource;
-
     private $response;
     private $eventManager;
     private $event;
@@ -20,31 +19,42 @@ class StatsTest extends ResourceTests {
         return new Stats();
     }
 
-    /**
-     * Set up the resource
-     */
     public function setUp() : void {
-        $this->response = $this->createMock('Imbo\Http\Response\Response');
-        $this->eventManager = $this->createMock('Imbo\EventManager\EventManager');
-        $this->event = $this->createMock('Imbo\EventManager\Event');
-        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
-        $this->event->expects($this->any())->method('getManager')->will($this->returnValue($this->eventManager));
+        $this->response = $this->createMock(Response::class);
+        $this->eventManager = $this->createMock(EventManager::class);
+        $this->event = $this->createConfiguredMock(EventInterface::class, [
+            'getResponse' => $this->response,
+            'getManager' => $this->eventManager,
+        ]);
 
         $this->resource = $this->getNewResource();
     }
 
     /**
-     * @covers Imbo\Resource\Stats::get
+     * @covers ::get
      */
     public function testTriggersTheCorrectEvent() : void {
-        $responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $responseHeaders->expects($this->once())->method('addCacheControlDirective')->with('no-store');
+        $responseHeaders = $this->createMock(HeaderBag::class);
+        $responseHeaders
+            ->expects($this->once())
+            ->method('addCacheControlDirective')
+            ->with('no-store');
 
         $this->response->headers = $responseHeaders;
-        $this->response->expects($this->once())->method('setMaxAge')->with(0)->will($this->returnSelf());
-        $this->response->expects($this->once())->method('setPrivate')->will($this->returnSelf());
+        $this->response
+            ->expects($this->once())
+            ->method('setMaxAge')
+            ->with(0)
+            ->willReturnSelf();
+        $this->response
+            ->expects($this->once())
+            ->method('setPrivate')
+            ->willReturnSelf();
 
-        $this->eventManager->expects($this->once())->method('trigger')->with('db.stats.load');
+        $this->eventManager
+            ->expects($this->once())
+            ->method('trigger')
+            ->with('db.stats.load');
 
         $this->resource->get($this->event);
     }

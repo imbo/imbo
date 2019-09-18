@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Resource\Images;
+namespace Imbo\Resource\Images;
 
-use Imbo\Resource\Images\Query;
 use Imbo\Exception\RuntimeException;
 use PHPUnit\Framework\TestCase;
 
@@ -9,20 +8,14 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass Imbo\Resource\Images\Query
  */
 class QueryTest extends TestCase {
-    /**
-     * @var Query
-     */
     private $query;
 
-    /**
-     * Set up the query
-     */
     public function setUp() : void {
         $this->query = new Query();
     }
 
     /**
-     * @covers Imbo\Resource\Images\Query::page
+     * @covers ::page
      */
     public function testPage() : void {
         $value = 2;
@@ -32,7 +25,7 @@ class QueryTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Resource\Images\Query::limit
+     * @covers ::limit
      */
     public function testLimit() : void {
         $value = 30;
@@ -42,7 +35,7 @@ class QueryTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Resource\Images\Query::returnMetadata
+     * @covers ::returnMetadata
      */
     public function testReturnMetadata() : void {
         $this->assertFalse($this->query->returnMetadata());
@@ -51,7 +44,7 @@ class QueryTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Resource\Images\Query::from
+     * @covers ::from
      */
     public function testFrom() : void {
         $value = 123123123;
@@ -61,7 +54,7 @@ class QueryTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Resource\Images\Query::to
+     * @covers ::to
      */
     public function testTo() : void {
         $value = 123123123;
@@ -71,7 +64,7 @@ class QueryTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Resource\Images\Query::imageIdentifiers
+     * @covers ::imageIdentifiers
      */
     public function testImageIdentifiers() : void {
         $value = ['id1', 'id2'];
@@ -81,7 +74,7 @@ class QueryTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Resource\Images\Query::checksums
+     * @covers ::checksums
      */
     public function testChecksums() : void {
         $value = ['sum1', 'sum2'];
@@ -91,7 +84,7 @@ class QueryTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Resource\Images\Query::originalChecksums
+     * @covers ::originalChecksums
      */
     public function testOriginalChecksums() : void {
         $value = ['sum1', 'sum2'];
@@ -100,12 +93,7 @@ class QueryTest extends TestCase {
         $this->assertSame($value, $this->query->originalChecksums());
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getSortData() {
+    public function getSortData() : array {
         return [
             'single field without sort' => [
                 ['field1'],
@@ -147,22 +135,25 @@ class QueryTest extends TestCase {
 
     /**
      * @dataProvider getSortData
-     * @covers Imbo\Resource\Images\Query::sort
+     * @covers ::sort
      */
-    public function testSort(array $value, $formatted) : void {
+    public function testSort(array $value, array $formatted) : void {
         $this->assertSame([], $this->query->sort());
         $this->assertSame($this->query, $this->query->sort($value));
         $this->assertSame($formatted, $this->query->sort());
     }
 
     /**
-     * @covers Imbo\Resource\Images\Query::sort
+     * @covers ::sort
      */
     public function testSortThrowsExceptionOnInvalidSortValues() : void {
         $this->expectExceptionObject(new RuntimeException('Invalid sort value: field:foo', 400));
         $this->query->sort(['field:foo']);
     }
 
+    /**
+     * @covers ::sort
+     */
     public function testSortThrowsExceptionWhenTheStortStringIsBadlyFormatted() : void {
         $this->expectExceptionObject(new RuntimeException('Badly formatted sort', 400));
         $this->query->sort(['field:asc', '']);

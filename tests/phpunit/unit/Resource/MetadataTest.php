@@ -1,18 +1,21 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Resource;
+namespace Imbo\Resource;
 
-use Imbo\Resource\Metadata;
+use Imbo\Database\DatabaseInterface;
+use Imbo\EventManager\EventInterface;
+use Imbo\EventManager\EventManager;
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+use Imbo\Model\ArrayModel;
+use Imbo\Model\ModelInterface;
+use Imbo\Storage\StorageInterface;
 
 /**
  * @coversDefaultClass Imbo\Resource\Metadata
  */
 class MetadataTest extends ResourceTests {
-    /**
-     * @var Metadata
-     */
     private $resource;
-
     private $request;
     private $response;
     private $database;
@@ -25,90 +28,154 @@ class MetadataTest extends ResourceTests {
     }
 
     public function setUp() : void {
-        $this->request = $this->createMock('Imbo\Http\Request\Request');
-        $this->response = $this->createMock('Imbo\Http\Response\Response');
-        $this->database = $this->createMock('Imbo\Database\DatabaseInterface');
-        $this->storage = $this->createMock('Imbo\Storage\StorageInterface');
-        $this->event = $this->createMock('Imbo\EventManager\Event');
-        $this->manager = $this->createMock('Imbo\EventManager\EventManager');
-        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
-        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
-        $this->event->expects($this->any())->method('getDatabase')->will($this->returnValue($this->database));
-        $this->event->expects($this->any())->method('getStorage')->will($this->returnValue($this->storage));
-        $this->event->expects($this->any())->method('getManager')->will($this->returnValue($this->manager));
+        $this->request = $this->createMock(Request::class);
+        $this->response = $this->createMock(Response::class);
+        $this->database = $this->createMock(DatabaseInterface::class);
+        $this->storage = $this->createMock(StorageInterface::class);
+        $this->manager = $this->createMock(EventManager::class);
+        $this->event = $this->createConfiguredMock(EventInterface::class, [
+            'getRequest' => $this->request,
+            'getResponse' => $this->response,
+            'getDatabase' => $this->database,
+            'getStorage' => $this->storage,
+            'getManager' => $this->manager,
+        ]);
 
         $this->resource = $this->getNewResource();
     }
 
     /**
-     * @covers Imbo\Resource\Metadata::delete
+     * @covers ::delete
      */
     public function testSupportsHttpDelete() : void {
-        $this->manager->expects($this->once())->method('trigger')->with('db.metadata.delete');
-        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
+        $this->manager
+            ->expects($this->once())
+            ->method('trigger')
+            ->with('db.metadata.delete');
+        $this->response
+            ->expects($this->once())
+            ->method('setModel')
+            ->with($this->isInstanceOf(ArrayModel::class));
 
         $this->resource->delete($this->event);
     }
 
     /**
-     * @covers Imbo\Resource\Metadata::put
+     * @covers ::put
      */
     public function testSupportsHttpPut() : void {
         $metadata = ['foo' => 'bar'];
-        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"foo":"bar"}'));
-        $this->manager->expects($this->at(0))->method('trigger')->with('db.metadata.delete')->will($this->returnSelf());
-        $this->manager->expects($this->at(1))->method('trigger')->with('db.metadata.update', ['metadata' => $metadata])->will($this->returnSelf());
-        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ArrayModel'));
+        $this->request
+            ->expects($this->once())
+            ->method('getContent')
+            ->willReturn('{"foo":"bar"}');
+        $this->manager
+            ->expects($this->at(0))
+            ->method('trigger')
+            ->with('db.metadata.delete')
+            ->willReturnSelf();
+        $this->manager
+            ->expects($this->at(1))
+            ->method('trigger')
+            ->with('db.metadata.update', ['metadata' => $metadata])
+            ->willReturnSelf();
+        $this->response
+            ->expects($this->once())
+            ->method('setModel')
+            ->with($this->isInstanceOf(ArrayModel::class));
 
         $this->resource->put($this->event);
     }
 
     /**
-     * @covers Imbo\Resource\Metadata::post
+     * @covers ::post
      */
     public function testSupportsHttpPost() : void {
         $metadata = ['foo' => 'bar'];
-        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"foo":"bar"}'));
-        $this->manager->expects($this->once())->method('trigger')->with('db.metadata.update', ['metadata' => $metadata]);
-        $this->response->expects($this->once())->method('setModel')->with($this->isInstanceOf('Imbo\Model\ModelInterface'));
-        $this->database->expects($this->once())->method('getMetadata')->with('user', 'id')->will($this->returnValue(['foo' => 'bar']));
-        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
-        $this->request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
+        $this->request
+            ->expects($this->once())
+            ->method('getContent')
+            ->willReturn('{"foo":"bar"}');
+        $this->manager
+            ->expects($this->once())
+            ->method('trigger')
+            ->with('db.metadata.update', ['metadata' => $metadata]);
+        $this->response
+            ->expects($this->once())
+            ->method('setModel')
+            ->with($this->isInstanceOf(ModelInterface::class));
+        $this->database
+            ->expects($this->once())
+            ->method('getMetadata')
+            ->with('user', 'id')
+            ->willReturn(['foo' => 'bar']);
+        $this->request
+            ->expects($this->once())
+            ->method('getUser')
+            ->willReturn('user');
+        $this->request
+            ->expects($this->once())
+            ->method('getImageIdentifier')
+            ->willReturn('id');
 
         $this->resource->post($this->event);
     }
 
     /**
-     * @covers Imbo\Resource\Metadata::get
+     * @covers ::get
      */
     public function testSupportsHttpGet() : void {
-        $this->manager->expects($this->once())->method('trigger')->with('db.metadata.load');
+        $this->manager
+            ->expects($this->once())
+            ->method('trigger')
+            ->with('db.metadata.load');
         $this->resource->get($this->event);
     }
 
     /**
-     * @covers Imbo\Resource\Metadata::validateMetadata
+     * @covers ::validateMetadata
      */
     public function testThrowsExceptionWhenValidatingMissingJsonData() : void {
-        $this->request->expects($this->once())->method('getContent')->will($this->returnValue(null));
+        $this->request
+            ->expects($this->once())
+            ->method('getContent')
+            ->willReturn(null);
         $this->expectExceptionObject(new InvalidArgumentException('Missing JSON data', 400));
         $this->resource->validateMetadata($this->event);
     }
 
     /**
-     * @covers Imbo\Resource\Metadata::validateMetadata
+     * @covers ::validateMetadata
      */
     public function testThrowsExceptionWhenValidatingInvalidJsonData() : void {
-        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('some string'));
+        $this->request
+            ->expects($this->once())
+            ->method('getContent')
+            ->willReturn('some string');
         $this->expectExceptionObject(new InvalidArgumentException('Invalid JSON data', 400));
         $this->resource->validateMetadata($this->event);
     }
 
     /**
-     * @covers Imbo\Resource\Metadata::validateMetadata
+     * @covers ::validateMetadata
      */
     public function testAllowsValidJsonData() : void {
-        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('{"foo":"bar"}'));
+        $this->request
+            ->expects($this->once())
+            ->method('getContent')
+            ->willReturn('{"foo":"bar"}');
+        $this->resource->validateMetadata($this->event);
+    }
+
+    /**
+     * @covers ::validateMetadata
+     */
+    public function testThrowsExceptionOnInvalidKeys() {
+        $this->request
+            ->expects($this->once())
+            ->method('getContent')
+            ->willReturn('{"foo.bar":"bar"}');
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid metadata. Dot characters (\'.\') are not allowed in metadata keys', 400));
         $this->resource->validateMetadata($this->event);
     }
 }
