@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 namespace ImboIntegrationTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Histogram;
+use Imbo\Model\Image;
 use Imagick;
 
 /**
@@ -27,7 +28,7 @@ class HistogramTest extends TransformationTests {
     public function testTransformWithDifferentParameters(int $scale, int $resultingWidth) : void {
         $blob = file_get_contents(FIXTURES_DIR . '/512x512.png');
 
-        $image = $this->createMock('Imbo\Model\Image');
+        $image = $this->createMock(Image::class);
         $image->expects($this->any())->method('getBlob')->will($this->returnValue($blob));
         $image->expects($this->any())->method('getWidth')->will($this->returnValue(512));
         $image->expects($this->any())->method('getHeight')->will($this->returnValue(512));

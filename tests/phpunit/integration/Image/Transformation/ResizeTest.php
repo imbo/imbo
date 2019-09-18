@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 namespace ImboIntegrationTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Resize;
+use Imbo\Model\Image;
 use Imagick;
 
 /**
@@ -44,7 +45,7 @@ class ResizeTest extends TransformationTests {
      * @covers ::transform
      */
     public function testCanTransformImage(array $params, bool $transformation, int $resizedWidth = null, int $resizedHeight = null) : void {
-        $image = $this->createMock('Imbo\Model\Image');
+        $image = $this->createMock(Image::class);
         $image->expects($this->once())->method('getWidth')->will($this->returnValue(665));
         $image->expects($this->once())->method('getHeight')->will($this->returnValue(463));
 

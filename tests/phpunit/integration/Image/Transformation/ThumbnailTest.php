@@ -1,6 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 namespace ImboIntegrationTest\Image\Transformation;
 
+use Imbo\Model\Image;
 use Imbo\Image\Transformation\Thumbnail;
 use Imagick;
 
@@ -59,7 +60,7 @@ class ThumbnailTest extends TransformationTests {
      * @covers ::transform
      */
     public function testCanTransformImage(array $params, int $width, int $height, int $diff = 0) : void {
-        $image = $this->createMock('Imbo\Model\Image');
+        $image = $this->createMock(Image::class);
         $image->expects($this->once())->method('setWidth')->with($this->callback(function($setWidth) use ($width, $diff) {
             return $setWidth <= ($width + $diff) && $setWidth >= ($width - $diff);
         }))->will($this->returnValue($image));
