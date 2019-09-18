@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 namespace ImboIntegrationTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Desaturate;
+use Imbo\Model\Image;
 use Imagick;
 
 /**
@@ -16,7 +17,7 @@ class DesaturateTest extends TransformationTests {
      * @covers ::transform
      */
     public function testCanDesaturateImages() : void {
-        $image = $this->createMock('Imbo\Model\Image');
+        $image = $this->createMock(Image::class);
         $image->expects($this->once())->method('hasBeenTransformed')->with(true)->will($this->returnValue($image));
 
         $imagick = new Imagick();

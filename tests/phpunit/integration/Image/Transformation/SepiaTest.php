@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 namespace ImboIntegrationTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Sepia;
+use Imbo\Model\Image;
 use Imagick;
 
 /**
@@ -16,7 +17,7 @@ class SepiaTest extends TransformationTests {
      * @covers ::transform
      */
     public function testCanTransformImageWithoutParams() : void {
-        $image = $this->createMock('Imbo\Model\Image');
+        $image = $this->createMock(Image::class);
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
         $imagick = new Imagick();
@@ -29,7 +30,7 @@ class SepiaTest extends TransformationTests {
      * @covers ::transform
      */
     public function testCanTransformImageWithParams() : void {
-        $image = $this->createMock('Imbo\Model\Image');
+        $image = $this->createMock(Image::class);
         $image->expects($this->once())->method('hasBeenTransformed')->with(true);
 
         $imagick = new Imagick();

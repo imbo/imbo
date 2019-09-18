@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace ImboIntegrationTest\Auth\AccessControl\Adapter;
 
 use Imbo\Auth\AccessControl\Adapter\MongoDB;

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace ImboIntegrationTest\Image\Transformation;
 
 use Imbo\Image\Transformation\Watermark;

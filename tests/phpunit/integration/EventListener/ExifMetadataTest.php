@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace ImboIntegrationTest\EventListener;
 
 use Imbo\EventListener\ExifMetadata;

@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 namespace ImboIntegrationTest\Image\Transformation;
 
 use Imbo\Image\Transformation\MaxSize;
+use Imbo\Model\Image;
 use Imagick;
 
 /**
@@ -88,7 +89,7 @@ class MaxSizeTest extends TransformationTests {
      * @covers ::transform
      */
     public function testCanTransformImages(string $file, array $params, int $width, int $height, ?int $transformedWidth, ?int $transformedHeight, ?bool $transformation = true) : void {
-        $image = $this->createMock('Imbo\Model\Image');
+        $image = $this->createMock(Image::class);
         $image->expects($this->once())->method('getWidth')->will($this->returnValue($width));
         $image->expects($this->once())->method('getHeight')->will($this->returnValue($height));
 
