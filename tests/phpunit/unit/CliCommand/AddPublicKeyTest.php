@@ -1,97 +1,75 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\CliCommand;
+namespace Imbo\CliCommand;
 
-use Imbo\CliCommand\AddPublicKey;
+use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
 use Imbo\Resource;
 use Imbo\Exception\RuntimeException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use PHPUnit\Framework\TestCase;
+use Exception;
+use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
 
 /**
  * @coversDefaultClass Imbo\CliCommand\AddPublicKey
  */
 class AddPublicKeyTest extends TestCase {
-    /**
-     * @var Imbo\CliCommand\AddPublicKey
-     */
+    private $application;
     private $command;
-
-    /**
-     * @var Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface
-     */
     private $adapter;
 
-    /**
-     * Set up the command
-     *
-     * @covers Imbo\CliCommand\AddPublicKey::__construct
-     */
     public function setUp() : void {
-        $this->adapter = $this->createMock('Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface');
+        $this->adapter = $this->createMock(MutableAdapterInterface::class);
 
         $this->command = new AddPublicKey();
         $this->command->setConfig([
             'accessControl' => $this->adapter
         ]);
 
-        $application = new Application();
-        $application->add($this->command);
+        $this->application = new Application();
+        $this->application->add($this->command);
+    }
+
+    public function getInvalidAccessControlConfig() : array {
+        return [
+            [
+                ['accessControl' => new Exception()],
+                'Invalid access control adapter'
+            ],
+            [
+                ['accessControl' => function() : Exception { return new Exception(); }],
+                'Invalid access control adapter'
+            ],
+            [
+                ['accessControl' => $this->createMock(AdapterInterface::class)],
+                'The configured access control adapter is not mutable'
+            ],
+        ];
     }
 
     /**
-     * @covers Imbo\CliCommand\AddPublicKey::getAclAdapter
+     * @dataProvider getInvalidAccessControlConfig
+     * @covers ::getAclAdapter
      */
-    public function testThrowsWhenAccessControlIsNotValid() : void {
+    public function testThrowsWhenAccessControlIsNotValid(array $config, string $errorMessage) : void {
         $command = new AddPublicKey();
-        $command->setConfig([
-            'accessControl' => new \Exception()
-        ]);
+        $command->setConfig($config);
 
         $commandTester = new CommandTester($command);
-        $this->expectExceptionObject(new RuntimeException('Invalid access control adapter'));
+        $this->expectExceptionObject(new RuntimeException($errorMessage));
         $commandTester->execute(['publicKey' => 'foo']);
     }
 
     /**
-     * @covers Imbo\CliCommand\AddPublicKey::getAclAdapter
-     */
-    public function testThrowsWhenCallableReturnsInvalidAccessControl() : void {
-        $command = new AddPublicKey();
-        $command->setConfig([
-            'accessControl' => function() {
-                return new \Exception();
-            }
-        ]);
-
-        $commandTester = new CommandTester($command);
-        $this->expectExceptionObject(new RuntimeException('Invalid access control adapter'));
-        $commandTester->execute(['publicKey' => 'foo']);
-    }
-
-    /**
-     * @covers Imbo\CliCommand\AddPublicKey::getAclAdapter
-     */
-    public function testThrowsOnImmutableAdapter() : void {
-        $command = new AddPublicKey();
-        $command->setConfig([
-            'accessControl' => $this->createMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface')
-        ]);
-
-        $commandTester = new CommandTester($command);
-        $this->expectExceptionObject(new RuntimeException('The configured access control adapter is not mutable'));
-        $commandTester->execute(['publicKey' => 'foo']);
-    }
-
-    /**
-     * @covers Imbo\CliCommand\AddPublicKey::execute
+     * @covers ::execute
+     * @covers ::getAclAdapter
      */
     public function testThrowsOnDuplicatePublicKeyName() : void {
         $this->adapter
             ->expects($this->once())
             ->method('publicKeyExists')
             ->with('foo')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $commandTester = new CommandTester($this->command);
         $this->expectExceptionObject(new RuntimeException('Public key with that name already exists'));
@@ -99,7 +77,8 @@ class AddPublicKeyTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\CliCommand\AddPublicKey::askForPrivateKey
+     * @covers ::execute
+     * @covers ::askForPrivateKey
      */
     public function testWillAskForPrivateKeyIfNotSpecified() : void {
         $this->adapter
@@ -118,7 +97,7 @@ class AddPublicKeyTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\CliCommand\AddPublicKey::askForUsers
+     * @covers ::askForUsers
      */
     public function testWillNotAcceptEmptyUserSpecification() : void {
         $commandTester = new CommandTester($this->command);
@@ -134,7 +113,8 @@ class AddPublicKeyTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\CliCommand\AddPublicKey::askForCustomResources
+     * @covers ::askForResources
+     * @covers ::askForCustomResources
      */
     public function testWillNotAcceptEmptyCustomResourceSpecification() : void {
         $commandTester = new CommandTester($this->command);
@@ -154,10 +134,10 @@ class AddPublicKeyTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\CliCommand\AddPublicKey::execute
-     * @covers Imbo\CliCommand\AddPublicKey::askForAnotherAclRule
-     * @covers Imbo\CliCommand\AddPublicKey::askForResources
-     * @covers Imbo\CliCommand\AddPublicKey::askForUsers
+     * @covers ::execute
+     * @covers ::askForAnotherAclRule
+     * @covers ::askForResources
+     * @covers ::askForUsers
      */
     public function testContinuesAskingForAclRulesIfUserSaysThereAreMoreRulesToAdd() : void {
         $this->adapter
@@ -209,10 +189,11 @@ class AddPublicKeyTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\CliCommand\AddPublicKey::execute
-     * @covers Imbo\CliCommand\AddPublicKey::askForAnotherAclRule
-     * @covers Imbo\CliCommand\AddPublicKey::askForResources
-     * @covers Imbo\CliCommand\AddPublicKey::askForUsers
+     * @covers ::execute
+     * @covers ::askForAnotherAclRule
+     * @covers ::askForResources
+     * @covers ::askForUsers
+     * @covers ::askForSpecificResources
      */
     public function testPromptsForListOfSpecificResourcesIfOptionIsSelected() : void {
         $allResources = Resource::getAllResources();
@@ -240,9 +221,9 @@ class AddPublicKeyTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\CliCommand\AddPublicKey::execute
-     * @covers Imbo\CliCommand\AddPublicKey::askForAnotherAclRule
-     * @covers Imbo\CliCommand\AddPublicKey::askForCustomResources
+     * @covers ::execute
+     * @covers ::askForAnotherAclRule
+     * @covers ::askForCustomResources
      */
     public function testPromtpsForListOfCustomResourcesIfOptionIsSelected() : void {
         $allResources = Resource::getAllResources();
@@ -274,15 +255,12 @@ class AddPublicKeyTest extends TestCase {
         $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
     }
 
-    protected function getInputStream($input) {
-        if (is_array($input)) {
-            $input = implode("\n", $input) . "\n";
-        }
-
-        $stream = fopen('php://memory', 'r+', false);
-        fputs($stream, $input);
-        rewind($stream);
-
-        return $stream;
+    /**
+     * @covers ::__construct
+     */
+    public function testConfiguresCommand() : void {
+        $this->assertSame('Add a public key', $this->command->getDescription());
+        $this->assertSame('add-public-key', $this->command->getName());
+        $this->assertSame('Add a public key to the configured access control adapter', $this->command->getHelp());
     }
 }

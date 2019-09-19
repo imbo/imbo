@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\CliCommand;
+namespace Imbo\CliCommand;
 
-use Imbo\CliCommand\GeneratePrivateKey;
 use Imbo\Exception\RuntimeException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -11,16 +10,8 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass Imbo\CliCommand\GeneratePrivateKey
  */
 class GeneratePrivateKeyTest extends TestCase {
-    /**
-     * @var Imbo\CliCommand\GeneratePrivateKey
-     */
     private $command;
 
-    /**
-     * Set up the command
-     *
-     * @covers Imbo\CliCommand\GeneratePrivateKey::__construct
-     */
     public function setUp() : void {
         $this->command = new GeneratePrivateKey();
 
@@ -29,7 +20,9 @@ class GeneratePrivateKeyTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\CliCommand\GeneratePrivateKey::execute
+     * @covers ::execute
+     * @covers ::generate
+     * @covers ::__construct
      */
     public function testCanGenerateAPrivateKey() : void {
         $commandTester = new CommandTester($this->command);
@@ -39,7 +32,9 @@ class GeneratePrivateKeyTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\CliCommand\GeneratePrivateKey::execute
+     * @covers ::execute
+     * @covers ::generate
+     * @covers ::__construct
      */
     public function testFailsWhenItCantGenerateAPrivateKey() : void {
         $this->command->maxTries = 0;
