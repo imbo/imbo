@@ -1,105 +1,97 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Database;
+namespace Imbo\Database;
 
-use Imbo\Database\Doctrine;
 use Imbo\Exception\DatabaseException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
-use PDOException;
-use ReflectionMethod;
+use Doctrine\DBAL\Driver\PDOStatement;
+use Doctrine\DBAL\Query\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Database\Doctrine
  */
 class DoctrineTest extends TestCase {
-    /**
-     * @var Doctrine
-     */
     private $driver;
-
-    /**
-     * @var Connection
-     */
     private $connection;
-
-    /**
-     * Set up the driver
-     */
     public function setUp() : void {
-        $this->driver = $this->getMockBuilder(Doctrine::class)
-                             ->disableOriginalConstructor()
-                             ->setMethods(['getConnection'])
-                             ->getMock();
+        $this->driver = $this
+            ->getMockBuilder(Doctrine::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getConnection'])
+            ->getMock();
 
         $this->connection = $this->createMock(Connection::class);
-        $this->driver->expects($this->any())
-                     ->method('getConnection')
-                     ->willReturn($this->connection);
+        $this->driver
+            ->expects($this->any())
+            ->method('getConnection')
+            ->willReturn($this->connection);
     }
 
     /**
-     * @covers Imbo\Database\Doctrine::getStatus
+     * @covers ::getStatus
      */
     public function testGetStatusWhenDatabaseIsAlreadyConnected() : void {
-        $this->connection->expects($this->any())
-                         ->method('isConnected')
-                         ->willReturn(true);
+        $this->connection
+            ->expects($this->any())
+            ->method('isConnected')
+            ->willReturn(true);
 
         $this->assertTrue($this->driver->getStatus());
     }
 
     /**
-     * @covers Imbo\Database\Doctrine::getStatus
+     * @covers ::getStatus
      */
     public function testGetStatusWhenDatabaseIsNotConnectedAndCanConnect() : void {
-        $this->connection->expects($this->any())
-                         ->method('isConnected')
-                         ->willReturn(false);
+        $this->connection
+            ->expects($this->any())
+            ->method('isConnected')
+            ->willReturn(false);
 
-        $this->connection->expects($this->any())
-                         ->method('connect')
-                         ->willReturn(true);
+        $this->connection
+            ->expects($this->any())
+            ->method('connect')
+            ->willReturn(true);
 
         $this->assertTrue($this->driver->getStatus());
     }
 
     /**
-     * @covers Imbo\Database\Doctrine::getStatus
+     * @covers ::getStatus
      */
     public function testGetStatusWhenDatabaseIsNotConnectedAndCanNotConnect() : void {
-        $this->connection->expects($this->any())
-                         ->method('isConnected')
-                         ->will($this->returnValue(false));
+        $this->connection
+            ->expects($this->any())
+            ->method('isConnected')
+            ->willReturn(false);
 
-        $this->connection->expects($this->any())
-                         ->method('connect')
-                         ->will($this->returnValue(false));
+        $this->connection
+            ->expects($this->any())
+            ->method('connect')
+            ->willReturn(false);
 
         $this->assertFalse($this->driver->getStatus());
     }
 
     /**
-     * @covers Imbo\Database\Doctrine::getStatus
+     * @covers ::getStatus
      */
     public function testGetStatusWhenDatabaseIsNotConnectedAndConnectThrowsAnException() : void {
-        $this->connection->expects($this->any())
-                         ->method('isConnected')
-                         ->will($this->returnValue(false));
+        $this->connection
+            ->expects($this->any())
+            ->method('isConnected')
+            ->willReturn(false);
 
-        $this->connection->expects($this->any())
-                         ->method('connect')
-                         ->will($this->throwException(new DBALException()));
+        $this->connection
+            ->expects($this->any())
+            ->method('connect')
+            ->willThrowException(new DBALException());
 
         $this->assertFalse($this->driver->getStatus());
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getMetadata() {
+    public function getMetadata() : array {
         return [
             'simple key/value' => [
                 ['key' => 'value', 'key2' => 'value2'],
@@ -161,41 +153,100 @@ class DoctrineTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Database\Doctrine::normalizeMetadata
      * @dataProvider getMetadata
+     * @covers ::normalizeMetadata
      */
-    public function testCanNormalizeMetadata($denormalizedMetadata, $normalizedMetadata) : void {
-        $method = new ReflectionMethod($this->driver, 'normalizeMetadata');
-        $method->setAccessible(true);
+    public function testCanNormalizeMetadata(array $denormalizedMetadata, array $normalizedMetadata) : void {
+        $input = array_map(function(string $value, string $key) : array {
+            return [
+                'metadata',
+                [
+                    'imageId'  => 123,
+                    'tagName'  => $key,
+                    'tagValue' => $value,
+                ]
+            ];
+        }, $normalizedMetadata, array_keys($normalizedMetadata));
 
-        $result = [];
-        $method->invokeArgs($this->driver, [&$denormalizedMetadata, &$result]);
-        $this->assertSame($result, $normalizedMetadata);
+        $stmt = $this->createConfiguredMock(PDOStatement::class, [
+            'fetch' => ['id' => 123],
+            'fetchAll' => [],
+        ]);
+
+        $qb = $this->createMock(QueryBuilder::class);
+        $qb->method('select')->willReturnSelf();
+        $qb->method('delete')->willReturnSelf();
+        $qb->method('from')->willReturnSelf();
+        $qb->method('where')->willReturnSelf();
+        $qb->method('andWhere')->willReturnSelf();
+        $qb->method('setParameters')->willReturnSelf();
+        $qb->method('execute')->willReturn($stmt);
+
+        $this->connection
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
+        $this->connection
+            ->expects($this->exactly(count($input)))
+            ->method('insert')
+            ->withConsecutive(...$input);
+
+        $this->driver->updateMetadata('user', 'image id', $denormalizedMetadata);
     }
 
     /**
-     * @covers Imbo\Database\Doctrine::denormalizeMetadata
+     * @covers ::denormalizeMetadata
      * @dataProvider getMetadata
      */
-    public function testCanDenormalizeMetadata($denormalizedMetadata, $normalizedMetadata) : void {
-        $method = new ReflectionMethod($this->driver, 'denormalizeMetadata');
-        $method->setAccessible(true);
+    public function testCanDenormalizeMetadata(array $denormalizedMetadata, array $normalizedMetadata) : void {
+        $dbResult = array_map(function(string $value, string $key) : array {
+            return [
+                'tagName' => $key,
+                'tagValue' => $value,
+            ];
+        }, $normalizedMetadata, array_keys($normalizedMetadata));
 
-        $this->assertSame($denormalizedMetadata, $method->invoke($this->driver, $normalizedMetadata));
+        $stmt = $this->createConfiguredMock(PDOStatement::class, [
+            'fetch' => ['id' => 123],
+            'fetchAll' => $dbResult,
+        ]);
+
+        $qb = $this->createMock(QueryBuilder::class);
+        $qb->method('select')->willReturnSelf();
+        $qb->method('from')->willReturnSelf();
+        $qb->method('where')->willReturnSelf();
+        $qb->method('andWhere')->willReturnSelf();
+        $qb->method('setParameters')->willReturnSelf();
+        $qb->method('execute')->willReturn($stmt);
+
+        $this->connection
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
+
+        $this->assertEquals($denormalizedMetadata, $this->driver->getMetadata('user', 'image id'));
     }
 
     /**
-     * @covers Imbo\Database\Doctrine::normalizeMetadata
+     * @covers ::normalizeMetadata
      */
     public function testThrowsExceptionWhenKeysContainTheSeparator() : void {
-        $method = new ReflectionMethod($this->driver, 'normalizeMetadata');
-        $method->setAccessible(true);
+        $stmt = $this->createConfiguredMock(PDOStatement::class, [
+            'fetch' => ['id' => 123],
+            'fetchAll' => [],
+        ]);
 
-        $result = [];
-        $metadata = [
-            'some::key' => 'value',
-        ];
+        $qb = $this->createMock(QueryBuilder::class);
+        $qb->method('select')->willReturnSelf();
+        $qb->method('from')->willReturnSelf();
+        $qb->method('where')->willReturnSelf();
+        $qb->method('andWhere')->willReturnSelf();
+        $qb->method('setParameters')->willReturnSelf();
+        $qb->method('execute')->willReturn($stmt);
+
+        $this->connection
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
+
         $this->expectExceptionObject(new DatabaseException('Invalid metadata', 400));
-        $method->invokeArgs($this->driver, [&$metadata, &$result]);
+        $this->driver->updateMetadata('user', 'image id', ['some::key' => 'value']);
     }
 }
