@@ -1,19 +1,13 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Exception;
+namespace Imbo\Exception;
 
-use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Exception\InvalidArgumentException
  */
 class InvalidArgumentExceptionTest extends TestCase {
-    /**
-     * Fetch imbo error codes
-     *
-     * @return array[]
-     */
-    public function getErrorCodes() {
+    public function getErrorCodes() : array {
         return [
             [123, 123],
             ['123', 123],
@@ -22,14 +16,13 @@ class InvalidArgumentExceptionTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Exception\InvalidArgumentException::setImboErrorCode
-     * @covers Imbo\Exception\InvalidArgumentException::getImboErrorCode
      * @dataProvider getErrorCodes
+     * @covers ::getImboErrorCode
+     * @covers ::setImboErrorCode
      */
-    public function testSetAndGetImboErrorCode($actual, $expected) : void {
+    public function testSetAndGetImboErrorCode($actual, int $expected) : void {
         $exception = new InvalidArgumentException();
         $this->assertSame($exception, $exception->setImboErrorCode($actual));
         $this->assertSame($expected, $exception->getImboErrorCode());
     }
-
 }
