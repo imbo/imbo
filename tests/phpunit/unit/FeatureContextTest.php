@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest;
+namespace Imbo;
 
 use ImboBehatFeatureContext\FeatureContext;
+use Imbo\BehatApiExtension\Exception\AssertionFailedException;
+use Imbo\BehatApiExtension\ArrayContainsComparator;
 use Micheh\Cache\CacheUtil;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
@@ -9,67 +11,33 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\ClientInterface;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\FeatureNode;
+use Behat\Gherkin\Node\ScenarioInterface;
+use Behat\Testwork\Environment\Environment;
+use Behat\Testwork\Suite\Suite;
 use PHPUnit\Framework\TestCase;
 use Assert;
 use RuntimeException;
 use InvalidArgumentException;
-use Imbo\BehatApiExtension\Exception\AssertionFailedException;
 
 /**
  * @coversDefaultClass ImboBehatFeatureContext\FeatureContext
  */
 class FeatureContextTest extends TestCase {
-    /**
-     * @var FeatureContext
-     */
     private $context;
-
-    /**
-     * @var CacheUtil
-     */
     private $cacheUtil;
-
-    /**
-     * @var Client
-     */
     private $client;
-
-    /**
-     * @var array
-     */
     private $history;
-
-    /**
-     * @var MockHandler
-     */
     private $mockHandler;
-
-    /**
-     * @var HandlerStack
-     */
     private $handlerStack;
-
-    /**
-     * @var string
-     */
     private $baseUri = 'http://localhost:8080';
-
-    /**
-     * @var string
-     */
     private $publicKey = 'publicKey';
-
-    /**
-     * @var string
-     */
     private $privateKey = 'privateKey';
 
-    /**
-     * Set up the feature context
-     */
     public function setUp() : void {
         $this->history = [];
 
@@ -80,7 +48,7 @@ class FeatureContextTest extends TestCase {
             'handler' => $this->handlerStack,
             'base_uri' => $this->baseUri,
         ]);
-        $this->cacheUtil = $this->createMock('Micheh\Cache\CacheUtil');
+        $this->cacheUtil = $this->createMock(CacheUtil::class);
 
         $this->context = new FeatureContext($this->cacheUtil);
         $this->context->setClient($this->client);
@@ -88,11 +56,8 @@ class FeatureContextTest extends TestCase {
 
     /**
      * Convenience method to make a single request and return the request instance
-     *
-     * @param string $path
-     * @return Request
      */
-    private function makeRequest($path = '/somepath') {
+    private function makeRequest(string $path = '/somepath') : Request {
         $this->mockHandler->append(new Response(200));
         $this->context->requestPath($path);
 
@@ -103,13 +68,13 @@ class FeatureContextTest extends TestCase {
      * @covers ::setClient
      */
     public function testCanSetAnApiClient() : void {
-        $handlerStack = $this->createMock('GuzzleHttp\HandlerStack');
+        $handlerStack = $this->createMock(HandlerStack::class);
         $handlerStack
             ->expects($this->exactly(2))
             ->method('push')
             ->with($this->isInstanceOf('Closure'), $this->isType('string'));
 
-        $client = $this->createMock('GuzzleHttp\ClientInterface');
+        $client = $this->createMock(ClientInterface::class);
         $client
             ->expects($this->at(0))
             ->method('getConfig')
@@ -130,7 +95,7 @@ class FeatureContextTest extends TestCase {
      * @covers ::setArrayContainsComparator
      */
     public function testAttachesComparatorFunctions() : void {
-        $comparator = $this->createMock('Imbo\BehatApiExtension\ArrayContainsComparator');
+        $comparator = $this->createMock(ArrayContainsComparator::class);
         $comparator
             ->expects($this->once())
             ->method('addFunction')
@@ -157,12 +122,7 @@ class FeatureContextTest extends TestCase {
         $this->assertSame('current', $request->getHeaderLine('X-Bar'));
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getValidDates() {
+    public function getValidDates() : array {
         return [
             ['date' => 'Wed, 15 Mar 2017 21:28:14 GMT'],
         ];
@@ -171,9 +131,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getValidDates
      * @covers ::isDate
-     * @param string $date Date to validate
      */
-    public function testIsDateFunctionValidatesDates($date) : void {
+    public function testIsDateFunctionValidatesDates(string $date) : void {
         $this->assertNull($this->context->isDate($date));
     }
 
@@ -185,12 +144,7 @@ class FeatureContextTest extends TestCase {
         $this->context->isDate('invalid date');
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getImboConfigFiles() {
+    public function getImboConfigFiles() : array {
         return array_map(function($file) {
             return [basename($file)];
         }, glob(__DIR__ . '/../../behat/imbo-configs/*.php'));
@@ -199,9 +153,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getImboConfigFiles
      * @covers ::setImboConfigHeader
-     * @param string $path
      */
-    public function testCanSetAConfigHeader($path) : void {
+    public function testCanSetAConfigHeader(string $path) : void {
         $this->assertSame($this->context, $this->context->setImboConfigHeader($path));
         $this->assertSame($path, $this->makeRequest()->getHeaderLine('X-Imbo-Test-Config-File'));
     }
@@ -226,12 +179,7 @@ class FeatureContextTest extends TestCase {
         $this->assertSame('*', $this->makeRequest()->getHeaderLine('X-Imbo-Stats-Allowed-By'));
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getAdaptersForFailure() {
+    public function getAdaptersForFailure() : array {
         return [
             ['adapter' => 'database', 'header' => 'X-Imbo-Status-Database-Failure'],
             ['adapter' => 'storage', 'header' => 'X-Imbo-Status-Storage-Failure'],
@@ -241,10 +189,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getAdaptersForFailure
      * @covers ::forceAdapterFailure
-     * @param string $adapter
-     * @param string $header
      */
-    public function testCanForceAdapterFailureBySettingAHeader($adapter, $header) : void {
+    public function testCanForceAdapterFailureBySettingAHeader(string $adapter, string $header) : void {
         $this->assertSame($this->context, $this->context->forceAdapterFailure($adapter));
         $this->assertSame('1', $this->makeRequest()->getHeaderLine($header));
     }
@@ -272,7 +218,7 @@ class FeatureContextTest extends TestCase {
         $request = $this->makeRequest($path);
 
         // Generate the URI and make sure the request URI is the same
-        $uri = parse_url($request->getUri());
+        $uri = parse_url((string) $request->getUri());
         $query = [];
         parse_str($uri['query'], $query);
 
@@ -330,12 +276,7 @@ class FeatureContextTest extends TestCase {
         $this->context->signRequest();
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getDataForAccessTokens() {
+    public function getDataForAccessTokens() : array {
         return [
             'path with no query params' => [
                 'path' => '/path',
@@ -356,10 +297,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getDataForAccessTokens
      * @covers ::setPublicAndPrivateKey
      * @covers ::appendAccessToken
-     * @param string $path
-     * @param string $expectedUrl
      */
-    public function testCanAppendAccessToken($path, $expectedUrl) : void {
+    public function testCanAppendAccessToken(string $path, string $expectedUrl) : void {
         $this->assertSame(
             $this->context,
             $this->context
@@ -509,8 +448,7 @@ class FeatureContextTest extends TestCase {
         $ip = '1.2.3.4';
         $this->assertSame(
             $this->context,
-            $this->context
-                ->setClientIp($ip)
+            $this->context->setClientIp($ip)
         );
         $request = $this->makeRequest('/path');
 
@@ -576,12 +514,7 @@ class FeatureContextTest extends TestCase {
         $this->context->authenticateRequest('auth');
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getAuthDetails() {
+    public function getAuthDetails() : array {
         return [
             'access-token' => [
                 'publicKey' => 'publicKey',
@@ -640,13 +573,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getAuthDetails
      * @covers ::setPublicAndPrivateKey
      * @covers ::authenticateRequest
-     * @param string $publicKey
-     * @param string $privateKey
-     * @param string $authMethod
-     * @param string $uriRegExp
-     * @param array $headers
      */
-    public function testCanUseDifferentAuthenticationMethods($publicKey, $privateKey, $authMethod, $uriRegExp, array $headers = []) : void {
+    public function testCanUseDifferentAuthenticationMethods(string $publicKey, string $privateKey, string $authMethod, string $uriRegExp, array $headers = []) : void {
         $this->assertSame(
             $this->context,
             $this->context->setPublicAndPrivateKey($publicKey, $privateKey)
@@ -665,12 +593,7 @@ class FeatureContextTest extends TestCase {
         }
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getRequestQueryParams() {
+    public function getRequestQueryParams() : array {
         return [
             'single key / value' => [
                 'params' => [
@@ -708,10 +631,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getRequestQueryParams
      * @covers ::setRequestQueryParameter
-     * @param array $params
-     * @param string $uri
      */
-    public function testCanSetRequestQueryParameters(array $params, $uri) : void {
+    public function testCanSetRequestQueryParameters(array $params, string $uri) : void {
         foreach ($params as $param) {
             $this->assertSame(
                 $this->context,
@@ -785,12 +706,7 @@ class FeatureContextTest extends TestCase {
         $this->context->generateShortImageUrl('/path', new PyStringNode([], 1));
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getShortUrlParams() {
+    public function getShortUrlParams() : array {
         return [
             [
                 'image' => FIXTURES_DIR . '/image1.png',
@@ -834,12 +750,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getShortUrlParams
      * @covers ::generateShortImageUrl
-     * @param string $image
-     * @param string $user
-     * @param string $imageIdentifier
-     * @param array $params
      */
-    public function testCanGenerateShortUrls($image, $user, $imageIdentifier, array $params) : void {
+    public function testCanGenerateShortUrls(string $image, string $user, string $imageIdentifier, array $params) : void {
         $this->mockHandler->append(
             new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
             new Response(200)
@@ -889,12 +801,7 @@ class FeatureContextTest extends TestCase {
         $this->context->specifyAsTheWatermarkImage('/path');
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getDataForWatermarkImages() {
+    public function getDataForWatermarkImages() : array {
         return [
             'no params' => [
                 'image' => FIXTURES_DIR . '/image1.png',
@@ -914,12 +821,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getDataForWatermarkImages
      * @covers ::specifyAsTheWatermarkImage
-     * @param string $image
-     * @param string $imageIdentifier
-     * @param string $params
-     * @param string $uri
      */
-    public function testCanSpecifyWatermarkImage($image, $imageIdentifier, $params = null, $uri) : void {
+    public function testCanSpecifyWatermarkImage(string $image, string $imageIdentifier, ?string $params = null, string $uri) : void {
         $this->mockHandler->append(
             new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
             new Response(200)
@@ -953,12 +856,7 @@ class FeatureContextTest extends TestCase {
         $this->context->requestPreviouslyAddedImage();
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getDataForRequestingPreviouslyAddedImage() {
+    public function getDataForRequestingPreviouslyAddedImage() : array {
         return [
             'HTTP GET' => [
                 'imageIdentifier' => 'imageId',
@@ -976,11 +874,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getDataForRequestingPreviouslyAddedImage
      * @covers ::requestPreviouslyAddedImage
-     * @param string $imageIdentifier
-     * @param string $image
-     * @param string $method
      */
-    public function testCanRequestPreviouslyAddedImage($imageIdentifier, $image, $method) : void {
+    public function testCanRequestPreviouslyAddedImage(string $imageIdentifier, string $image, string $method) : void {
         $this->mockHandler->append(
             new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
             new Response(200)
@@ -1012,12 +907,7 @@ class FeatureContextTest extends TestCase {
         );
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getDataForRequestingPreviouslyAddedImageWithExtension() {
+    public function getDataForRequestingPreviouslyAddedImageWithExtension() : array {
         return [
             [
                 'imageIdentifier' => 'imageId',
@@ -1039,7 +929,7 @@ class FeatureContextTest extends TestCase {
      * @covers ::requestPreviouslyAddedImageAsType
      * @covers ::getUserAndImageIdentifierOfPreviouslyAddedImage
      */
-    public function testCanRequestPreviouslyAddedImageUsingAlternativeMethod($imageIdentifier, $image, $method, $extension) : void {
+    public function testCanRequestPreviouslyAddedImageUsingAlternativeMethod(string $imageIdentifier, string $image, string $method, string $extension) : void {
         $this->mockHandler->append(
             new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
             new Response(200)
@@ -1080,12 +970,7 @@ class FeatureContextTest extends TestCase {
         $this->context->makeSameRequest();
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getDataForReplayingRequests() {
+    public function getDataForReplayingRequests() : array {
         return [
             'use original method' => [
                 'orignalMethod' => 'GET',
@@ -1121,13 +1006,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getDataForReplayingRequests
      * @covers ::makeSameRequest
-     * @param string $originalMethod
-     * @param string $method
-     * @param string $expectedUrl
-     * @param string $publicKey
-     * @param string $privateKey
      */
-    public function testCanReplayTheLastRequest($originalMethod, $method, $expectedUrl, $publicKey, $privateKey) : void {
+    public function testCanReplayTheLastRequest(string $originalMethod, ?string $method, string $expectedUrl, ?string $publicKey, ?string $privateKey) : void {
         $this->mockHandler->append(new Response(200), new Response(200));
 
         $this->context->setPublicAndPrivateKey($publicKey, $privateKey);
@@ -1180,12 +1060,7 @@ class FeatureContextTest extends TestCase {
         $this->context->requestMetadataOfPreviouslyAddedImage();
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getDataForRequestingMetadataOfPreviouslyAddedImage() {
+    public function getDataForRequestingMetadataOfPreviouslyAddedImage() : array {
         return [
             'no metadata' => [
                 'imageIdentifier' => 'imageId',
@@ -1205,12 +1080,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getDataForRequestingMetadataOfPreviouslyAddedImage
      * @covers ::requestMetadataOfPreviouslyAddedImage
-     * @param string $imageIdentifier
-     * @param string $image
-     * @param string $method
-     * @param array $metadata
      */
-    public function testCanRequestMetadataOfPreviouslyAddedImage($imageIdentifier, $image, $method, array $metadata) : void {
+    public function testCanRequestMetadataOfPreviouslyAddedImage(string $imageIdentifier, string $image, string $method, array $metadata) : void {
         $this->mockHandler->append(
             new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
             new Response(200, [], json_encode($metadata))
@@ -1254,12 +1125,7 @@ class FeatureContextTest extends TestCase {
         $this->context->requestImageResourceForLocalImage(FIXTURES_DIR . '/image1.png');
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getDataForRequestingImageWithLocalPath() {
+    public function getDataForRequestingImageWithLocalPath() : array {
         return [
             'default values' => [
                 'image' => FIXTURES_DIR . '/image1.png',
@@ -1281,13 +1147,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getDataForRequestingImageWithLocalPath
      * @covers ::requestImageResourceForLocalImage
-     * @param string $image
-     * @param string $imageIdentifier
-     * @param string $extension
-     * @param string $method
-     * @param string $expectedPath
      */
-    public function testCanRequestImageUsingLocalFilePath($image, $imageIdentifier, $extension, $method, $expectedPath) : void {
+    public function testCanRequestImageUsingLocalFilePath(string $image, string $imageIdentifier, ?string $extension, string $method, string $expectedPath) : void {
         $this->mockHandler->append(
             new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
             new Response(200)
@@ -1336,12 +1197,7 @@ class FeatureContextTest extends TestCase {
         ]));
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getDataForBulkRequests() {
+    public function getDataForBulkRequests() : array {
         return [
             'single request with no options' => [
                 'table' => new TableNode([
@@ -1405,8 +1261,6 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getDataForBulkRequests
      * @covers ::requestPaths
-     * @param TableNode $table
-     * @param array $requests
      */
     public function testCanBulkRequest(TableNode $table, array $requests) : void {
         for ($i = 0; $i < count($table->getRows()) - 1; $i++) {
@@ -1732,12 +1586,7 @@ class FeatureContextTest extends TestCase {
         );
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getApproximateImageWidths() {
+    public function getApproximateImageWidths() : array {
         return [
             ['598±1'],
             ['600±1'],
@@ -1750,9 +1599,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getApproximateImageWidths
      * @covers ::assertImageWidth
      * @covers ::validateImageDimensions
-     * @param string $approximateWidth
      */
-    public function testCanAssertApproximateImageWidth($approximateWidth) : void {
+    public function testCanAssertApproximateImageWidth(string $approximateWidth) : void {
         $this->mockHandler->append(
             new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
         );
@@ -1765,12 +1613,7 @@ class FeatureContextTest extends TestCase {
         );
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getApproximateImageWidthsForFailure() {
+    public function getApproximateImageWidthsForFailure() : array {
         return [
             [
                 'approximateWidth' => '597±1',
@@ -1795,10 +1638,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getApproximateImageWidthsForFailure
      * @covers ::assertImageWidth
      * @covers ::validateImageDimensions
-     * @param string $approximateWidth
-     * @param string $exceptionMessage
      */
-    public function testAssertingApproximateImageWidthCanFail($approximateWidth, $exceptionMessage) : void {
+    public function testAssertingApproximateImageWidthCanFail(string $approximateWidth, string $exceptionMessage) : void {
         $this->mockHandler->append(
             new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
         );
@@ -1841,12 +1682,7 @@ class FeatureContextTest extends TestCase {
         );
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getApproximateImageHeights() {
+    public function getApproximateImageHeights() : array {
         return [
             ['416±1'],
             ['418±1'],
@@ -1859,9 +1695,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getApproximateImageHeights
      * @covers ::assertImageHeight
      * @covers ::validateImageDimensions
-     * @param string $approximateHeight
      */
-    public function testCanAssertApproximateImageHeight($approximateHeight) : void {
+    public function testCanAssertApproximateImageHeight(string $approximateHeight) : void {
         $this->mockHandler->append(
             new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
         );
@@ -1874,12 +1709,7 @@ class FeatureContextTest extends TestCase {
         );
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getApproximateImageHeightsForFailure() {
+    public function getApproximateImageHeightsForFailure() : array {
         return [
             [
                 'approximateHeight' => '415±1',
@@ -1904,10 +1734,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getApproximateImageHeightsForFailure
      * @covers ::assertImageHeight
      * @covers ::validateImageDimensions
-     * @param string $approximateHeight
-     * @param string $exceptionMessage
      */
-    public function testAssertingApproximateImageHeightCanFail($approximateHeight, $exceptionMessage) : void {
+    public function testAssertingApproximateImageHeightCanFail(string $approximateHeight, string $exceptionMessage) : void {
         $this->mockHandler->append(
             new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
         );
@@ -1918,12 +1746,7 @@ class FeatureContextTest extends TestCase {
         $this->context->assertImageHeight($approximateHeight);
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getDataForImageDimensionAssertion() {
+    public function getDataForImageDimensionAssertion() : array {
         $image1 = file_get_contents(FIXTURES_DIR . '/image1.png');
         $image2 = file_get_contents(FIXTURES_DIR . '/image2.png');
 
@@ -1954,11 +1777,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getDataForImageDimensionAssertion
      * @covers ::assertImageDimension
-     * @param string $imageData
-     * @param string $dimension
-     * @param string $exceptionMessage
      */
-    public function testAssertingImageDimensionCanFail($imageData, $dimension, $exceptionMessage) : void {
+    public function testAssertingImageDimensionCanFail(string $imageData, string $dimension, string $exceptionMessage) : void {
         $this->mockHandler->append(
             new Response(200, [], $imageData)
         );
@@ -1999,12 +1819,7 @@ class FeatureContextTest extends TestCase {
         );
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getApproximateImageDimensions() {
+    public function getApproximateImageDimensions() : array {
         return [
             ['598±1x415±2'],
             ['600±1x419±2'],
@@ -2017,9 +1832,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getApproximateImageDimensions
      * @covers ::assertImageDimension
      * @covers ::validateImageDimensions
-     * @param string $approximateDimension
      */
-    public function testCanAssertApproximateImageDimension($approximateDimension) : void {
+    public function testCanAssertApproximateImageDimension(string $approximateDimension) : void {
         $this->mockHandler->append(
             new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
         );
@@ -2032,12 +1846,7 @@ class FeatureContextTest extends TestCase {
         );
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getApproximateImageDimensionsForFailure() {
+    public function getApproximateImageDimensionsForFailure() : array {
         return [
             [
                 'approximateDimension' => '597±1x416±1',
@@ -2054,10 +1863,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getApproximateImageDimensionsForFailure
      * @covers ::assertImageWidth
      * @covers ::validateImageDimensions
-     * @param string $approximateDimension
-     * @param string $exceptionMessage
      */
-    public function testAssertingApproximateImageDimensionCanFail($approximateDimension, $exceptionMessage) : void {
+    public function testAssertingApproximateImageDimensionCanFail(string $approximateDimension, string $exceptionMessage) : void {
         $this->mockHandler->append(
             new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
         );
@@ -2068,12 +1875,7 @@ class FeatureContextTest extends TestCase {
         $this->context->assertImageDimension($approximateDimension);
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getDataForAssertingImagePixelInfoFailures() {
+    public function getDataForAssertingImagePixelInfoFailures() : array {
         $image = file_get_contents(FIXTURES_DIR . '/image1.png');
 
         return [
@@ -2102,12 +1904,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getDataForAssertingImagePixelInfoFailures
      * @covers ::assertImagePixelColor
      * @covers ::getImagePixelInfo
-     * @param string $imageData
-     * @param string $coordinate
-     * @param string $color
-     * @param string $exceptionMessage
      */
-    public function testAssertingImagePixelColorCanFail($imageData, $coordinate, $color, $exceptionMessage) : void {
+    public function testAssertingImagePixelColorCanFail(string $imageData, string $coordinate, string $color, string $exceptionMessage) : void {
         $this->mockHandler->append(
             new Response(200, [], $imageData)
         );
@@ -2118,12 +1916,7 @@ class FeatureContextTest extends TestCase {
         $this->context->assertImagePixelColor($coordinate, $color);
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getDataForAssertingImagePixelInfo() {
+    public function getDataForAssertingImagePixelInfo() : array {
         $image = file_get_contents(FIXTURES_DIR . '/image1.png');
 
         return [
@@ -2149,11 +1942,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getDataForAssertingImagePixelInfo
      * @covers ::assertImagePixelColor
      * @covers ::getImagePixelInfo
-     * @param string $imageData
-     * @param string $coordinate
-     * @param string $color
      */
-    public function testCanAssertImagePixelColor($imageData, $coordinate, $color) : void {
+    public function testCanAssertImagePixelColor(string $imageData, string $coordinate, string $color) : void {
         $this->mockHandler->append(
             new Response(200, [], $imageData)
         );
@@ -2182,12 +1972,7 @@ class FeatureContextTest extends TestCase {
         $this->context->assertImagePixelColor('1, 1', 'ffffff');
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getDataForAssertingImagePixelAlphaFailures() {
+    public function getDataForAssertingImagePixelAlphaFailures() : array {
         $image = file_get_contents(FIXTURES_DIR . '/transparency.png');
 
         return [
@@ -2210,12 +1995,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getDataForAssertingImagePixelAlphaFailures
      * @covers ::assertImagePixelAlpha
      * @covers ::getImagePixelInfo
-     * @param string $imageData
-     * @param string $coordinate
-     * @param string $alpha
-     * @param string $exceptionMessage
      */
-    public function testAssertingImagePixelAlphaCanFail($imageData, $coordinate, $alpha, $exceptionMessage) : void {
+    public function testAssertingImagePixelAlphaCanFail(string $imageData, string $coordinate, string $alpha, string $exceptionMessage) : void {
         $this->mockHandler->append(
             new Response(200, [], $imageData)
         );
@@ -2226,12 +2007,7 @@ class FeatureContextTest extends TestCase {
         $this->context->assertImagePixelAlpha($coordinate, $alpha);
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getDataForAssertingImagePixelAlpha() {
+    public function getDataForAssertingImagePixelAlpha() : array {
         $image = file_get_contents(FIXTURES_DIR . '/transparency.png');
 
         return [
@@ -2252,11 +2028,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getDataForAssertingImagePixelAlpha
      * @covers ::assertImagePixelAlpha
      * @covers ::getImagePixelInfo
-     * @param string $imageData
-     * @param string $coordinate
-     * @param string $alpha
      */
-    public function testCanAssertImagePixelAlpha($imageData, $coordinate, $alpha) : void {
+    public function testCanAssertImagePixelAlpha(string $imageData, string $coordinate, string $alpha) : void {
         $this->mockHandler->append(
             new Response(200, [], $imageData)
         );
@@ -2294,7 +2067,9 @@ class FeatureContextTest extends TestCase {
         $this->expectExceptionMessage(
             'ACL rule "someId" with public key "publicKey" still exists. Expected "404 Access rule not found", got "200 OK".'
         );
-        $this->context->assertAclRuleWithIdDoesNotExist('publicKey', 'someId');
+        $this->context
+            ->setPublicAndPrivateKey($this->publicKey, $this->privateKey)
+            ->assertAclRuleWithIdDoesNotExist('publicKey', 'someId');
     }
 
     /**
@@ -2302,6 +2077,8 @@ class FeatureContextTest extends TestCase {
      */
     public function testCanAssertThatAclRuleWithIdDoesNotExist() : void {
         $this->mockHandler->append(new Response(404, [], '', '1.1', 'Access rule not found'));
+        $this->context->setPublicAndPrivateKey($this->publicKey, $this->privateKey);
+
         $this->assertSame(
             $this->context,
             $this->context->assertAclRuleWithIdDoesNotExist('publicKey', 'someId')
@@ -2328,7 +2105,9 @@ class FeatureContextTest extends TestCase {
         $this->expectExceptionMessage(
             'Public key "publicKey" still exists. Expected "404 Public key not found", got "200 OK".'
         );
-        $this->context->assertPublicKeyDoesNotExist('publicKey');
+        $this->context
+            ->setPublicAndPrivateKey($this->publicKey, $this->privateKey)
+            ->assertPublicKeyDoesNotExist('publicKey');
     }
 
     /**
@@ -2336,6 +2115,7 @@ class FeatureContextTest extends TestCase {
      */
     public function testCanAssertThatPublicKeyDoesNotExist() : void {
         $this->mockHandler->append(new Response(404, [], '', '1.1', 'Public key not found'));
+        $this->context->setPublicAndPrivateKey($this->publicKey, $this->privateKey);
         $this->assertSame(
             $this->context,
             $this->context->assertPublicKeyDoesNotExist('publicKey', 'someId')
@@ -2350,12 +2130,7 @@ class FeatureContextTest extends TestCase {
         $this->assertSame('/keys/publicKey', $this->history[0]['request']->getUri()->getPath());
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getCacheabilityData() {
+    public function getCacheabilityData() : array {
         return [
             'cacheable, expect cacheable' => [
                 'cacheable' => true,
@@ -2382,22 +2157,19 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getCacheabilityData
      * @covers ::__construct
      * @covers ::assertCacheability
-     * @param boolean $actual
-     * @param boolean $expected
-     * @param string $exceptionMessage
      */
-    public function testCanAssertResponseCacheability($actual, $expected, $exceptionMessage = null) : void {
+    public function testCanAssertResponseCacheability(bool $actual, bool $expected, string $exceptionMessage = null) : void {
         $this->cacheUtil
             ->expects($this->once())
             ->method('isCacheable')
-            ->with($this->isInstanceOf('GuzzleHttp\Psr7\Response'))
-            ->will($this->returnValue($actual));
+            ->with($this->isInstanceOf(Response::class))
+            ->willReturn($actual);
 
         $this->mockHandler->append(new Response(200));
         $this->context->requestPath('/path');
 
         if ($exceptionMessage) {
-            $this->expectException('Assert\InvalidArgumentException');
+            $this->expectException(Assert\InvalidArgumentException::class);
             $this->expectExceptionMessage($exceptionMessage);
             $this->context->assertCacheability($expected);
         } else {
@@ -2467,8 +2239,7 @@ class FeatureContextTest extends TestCase {
         foreach (['private', 'max-age', 'must-revalidate'] as $directive) {
             $this->assertSame(
                 $this->context,
-                $this->context
-                    ->assertResponseHasCacheControlDirective($directive)
+                $this->context->assertResponseHasCacheControlDirective($directive)
             );
         }
     }
@@ -2507,8 +2278,7 @@ class FeatureContextTest extends TestCase {
         foreach (['public', 'no-cache', 'no-store'] as $directive) {
             $this->assertSame(
                 $this->context,
-                $this->context
-                    ->assertResponseDoesNotHaveCacheControlDirective($directive)
+                $this->context->assertResponseDoesNotHaveCacheControlDirective($directive)
             );
         }
     }
@@ -2750,11 +2520,6 @@ class FeatureContextTest extends TestCase {
         ]));
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
     public function getDataForMatchingSeveralResponses() {
         return [
             'status line' => [
@@ -2828,8 +2593,6 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getDataForMatchingSeveralResponses
      * @covers ::assertLastResponsesMatch
-     * @param Response[] $responses
-     * @param TableNode $table
      */
     public function testCanMatchResponses(array $responses, TableNode $table) : void {
         $this->mockHandler->append(...$responses);
@@ -2844,12 +2607,7 @@ class FeatureContextTest extends TestCase {
         );
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getDataForMatchingSeveralResponsesWhenFailing() {
+    public function getDataForMatchingSeveralResponsesWhenFailing() : array {
         return [
             'status line' => [
                 'responses' => [
@@ -2933,11 +2691,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getDataForMatchingSeveralResponsesWhenFailing
      * @covers ::assertLastResponsesMatch
-     * @param Response[] $responses
-     * @param TableNode $table
-     * @param string $exceptionMessage
      */
-    public function testAssertLastResponsesMatchCanFail(array $responses, TableNode $table, $exceptionMessage) : void {
+    public function testAssertLastResponsesMatchCanFail(array $responses, TableNode $table, string $exceptionMessage) : void {
         $this->mockHandler->append(...$responses);
 
         for ($i = 0; $i < count($responses); $i++) {
@@ -2985,12 +2740,7 @@ class FeatureContextTest extends TestCase {
         $this->context->assertImageProperties('png');
     }
 
-    /**
-     * Data provider
-     *
-     * @return array[]
-     */
-    public function getSuiteSettings() {
+    public function getSuiteSettings() : array {
         return [
             'invalid database' => [
                 'settings' => [
@@ -3012,21 +2762,16 @@ class FeatureContextTest extends TestCase {
     /**
      * @dataProvider getSuiteSettings
      * @covers ::setUpAdapters
-     * @param array $settings
-     * @param string $expectedExceptionMessage
      */
-    public function testSetupAdaptersThrowsExceptionOnInvalidClassNames(array $settings, $expectedExceptionMessage) : void {
-        $suite = $this->createMock('Behat\Testwork\Suite\Suite');
-        $suite->expects($this->once())->method('getSettings')->willReturn($settings);
-
-        $environment = $this->createMock('Behat\Testwork\Environment\Environment');
-        $environment->expects($this->once())->method('getSuite')->willReturn($suite);
+    public function testSetupAdaptersThrowsExceptionOnInvalidClassNames(array $settings, string $expectedExceptionMessage) : void {
+        $suite = $this->createConfiguredMock(Suite::class, ['getSettings' => $settings]);
+        $environment = $this->createConfiguredMock(Environment::class, ['getSuite' => $suite]);
 
         $this->expectExceptionObject(new InvalidArgumentException($expectedExceptionMessage));
         FeatureContext::setUpAdapters(new BeforeScenarioScope(
             $environment,
-            $this->createMock('Behat\Gherkin\Node\FeatureNode'),
-            $this->createMock('Behat\Gherkin\Node\ScenarioInterface')
+            $this->createMock(FeatureNode::class),
+            $this->createMock(ScenarioInterface::class)
         ));
     }
 }
