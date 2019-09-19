@@ -1844,14 +1844,14 @@ class FeatureContext extends ApiContext {
         $actualHeight = (int) $actualHeight;
         $expectedWidthDiff = $expectedHeightDiff = 0;
 
-        if (($pos = strpos($expectedWidth, '±')) !== false) {
+        if (($pos = strpos((string) $expectedWidth, '±')) !== false) {
             $expectedWidthDiff = (int) substr($expectedWidth, $pos + 2); // ± is two bytes
             $expectedWidth = (int) substr($expectedWidth, 0, $pos);
         } else {
             $expectedWidth = (int) $expectedWidth;
         }
 
-        if (($pos = strpos($expectedHeight, '±')) !== false) {
+        if (($pos = strpos((string) $expectedHeight, '±')) !== false) {
             $expectedHeightDiff = (int) substr($expectedHeight, $pos + 2); // ± is two bytes
             $expectedHeight = (int) substr($expectedHeight, 0, $pos);
         } else {
