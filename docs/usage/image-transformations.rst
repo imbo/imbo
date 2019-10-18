@@ -562,6 +562,7 @@ The smart size transformation supports reading the POI from the metadata of the 
     ``close``
     ``medium``
     ``wide``
+    ``full``
 
 **Examples:**
 
