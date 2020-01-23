@@ -1,33 +1,28 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Http\Response;
+namespace Imbo\Http\Response;
 
-use Imbo\Http\Response\Response;
 use DateTime;
 use DateTimeZone;
+use Imbo\Model\Error;
+use Imbo\Model\ModelInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Http\Response\Response
  */
 class ResponseTest extends TestCase {
-    /**
-     * @var Response
-     */
     private $response;
 
-    /**
-     * Set up the response
-     */
     public function setUp() : void {
         $this->response = new Response();
     }
 
     /**
-     * @covers Imbo\Http\Response\Response::setModel
-     * @covers Imbo\Http\Response\Response::getModel
+     * @covers ::setModel
+     * @covers ::getModel
      */
     public function testCanSetAndGetModel() : void {
-        $model = $this->createMock('Imbo\Model\ModelInterface');
+        $model = $this->createMock(ModelInterface::class);
         $this->assertNull($this->response->getModel());
         $this->assertSame($this->response, $this->response->setModel($model));
         $this->assertSame($model, $this->response->getModel());
@@ -36,11 +31,11 @@ class ResponseTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\Response::setModel
-     * @covers Imbo\Http\Response\Response::setNotModified
+     * @covers ::setModel
+     * @covers ::setNotModified
      */
     public function testRemovesModelWhenMarkedAsNotModified() : void {
-        $model = $this->createMock('Imbo\Model\ModelInterface');
+        $model = $this->createMock(ModelInterface::class);
         $this->assertSame($this->response, $this->response->setModel($model));
         $this->assertSame($this->response, $this->response->setNotModified());
         $this->assertSame(304, $this->response->getStatusCode());
@@ -48,7 +43,7 @@ class ResponseTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Response\Response::setError
+     * @covers ::setError
      */
     public function testUpdatesResponseWhenSettingAnErrorModel() : void {
         $message = 'You wronged';
@@ -56,11 +51,12 @@ class ResponseTest extends TestCase {
         $imboErrorCode = '123';
         $date = new DateTime('@1361614522', new DateTimeZone('UTC'));
 
-        $error = $this->createMock('Imbo\Model\Error');
-        $error->expects($this->once())->method('getHttpCode')->will($this->returnValue($code));
-        $error->expects($this->once())->method('getImboErrorCode')->will($this->returnValue($imboErrorCode));
-        $error->expects($this->once())->method('getErrorMessage')->will($this->returnValue($message));
-        $error->expects($this->once())->method('getDate')->will($this->returnValue($date));
+        $error = $this->createConfiguredMock(Error::class, [
+            'getHttpCode' => $code,
+            'getImboErrorCode' => $imboErrorCode,
+            'getErrorMessage' => $message,
+            'getDate' => $date,
+        ]);
 
         $this->response->headers->set('ETag', '"sometag"');
         $this->response->setLastModified(new DateTime('now', new DateTimeZone('UTC')));

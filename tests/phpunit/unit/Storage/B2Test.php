@@ -1,8 +1,7 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Storage;
+namespace Imbo\Storage;
 
 use Imbo\Exception\ConfigurationException;
-use Imbo\Storage\B2;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -10,7 +9,7 @@ use PHPUnit\Framework\TestCase;
  */
 class B2Test extends TestCase {
     /**
-     * Test that we don't get an exception with required parameters present
+     * @covers ::__construct
      */
     public function testConstructorWithAllRequiredParameters() : void {
         $b2 = new B2([
@@ -24,7 +23,7 @@ class B2Test extends TestCase {
     }
 
     /**
-     * Test that we _do_ get an exception with required parameters present
+     * @covers ::__construct
      */
     public function testConstructorMissingRequiredParameters() : void {
         $this->expectException(ConfigurationException::class);
@@ -40,7 +39,7 @@ class B2Test extends TestCase {
     }
 
     /**
-     * Test that we _do_ get exceptions for each single missing parameter
+     * @covers ::__construct
      */
     public function testConstructorEachMissingRequiredParameters() : void {
         $params = [
@@ -50,7 +49,7 @@ class B2Test extends TestCase {
             'bucket' => 'eggs'
         ];
 
-        foreach ($params as $param => $dummy) {
+        foreach (array_keys($params) as $param) {
             $local = $params;
             unset($local[$param]);
             $exception = false;
@@ -67,6 +66,4 @@ class B2Test extends TestCase {
             }
         }
     }
-
-
 }

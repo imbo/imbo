@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\EventListener;
+namespace Imbo\EventListener;
 
-use Imbo\EventListener\AccessToken;
 use Imbo\EventListener\AccessToken\AccessTokenInterface;
 use Imbo\Exception\RuntimeException;
 use Imbo\Exception\ConfigurationException;
@@ -17,39 +16,12 @@ use stdClass;
  * @coversDefaultClass Imbo\EventListener\AccessToken
  */
 class AccessTokenTest extends ListenerTests {
-    /**
-     * @var AccessToken
-     */
     private $listener;
-
-    /**
-     * @var Event
-     */
     private $event;
-
-    /**
-     * @var AccessControlAdapter
-     */
     private $accessControl;
-
-    /**
-     * @var Request
-     */
     private $request;
-
-    /**
-     * @var Response
-     */
     private $response;
-
-    /**
-     * @var ResponseHeaderBag
-     */
     private $responseHeaders;
-
-    /**
-     * @var ParameterBag
-     */
     private $query;
 
     public function setUp() : void {
@@ -77,15 +49,17 @@ class AccessTokenTest extends ListenerTests {
      * @covers ::checkAccessToken
      */
     public function testRequestWithBogusAccessToken() : void {
-        $this->query->expects($this->once())
-                    ->method('has')
-                    ->with('accessToken')
-                    ->willReturn(true);
+        $this->query
+            ->expects($this->once())
+            ->method('has')
+            ->with('accessToken')
+            ->willReturn(true);
 
-        $this->query->expects($this->once())
-                    ->method('get')
-                    ->with('accessToken')
-                    ->willReturn('/string');
+        $this->query
+            ->expects($this->once())
+            ->method('get')
+            ->with('accessToken')
+            ->willReturn('/string');
 
         $this->expectExceptionObject(new RuntimeException('Incorrect access token', 400));
         $this->listener->checkAccessToken($this->event);
@@ -96,14 +70,16 @@ class AccessTokenTest extends ListenerTests {
      * @covers ::isWhitelisted
      */
     public function testThrowsExceptionIfAnAccessTokenIsMissingFromTheRequestWhenNotWhitelisted() : void {
-        $this->event->expects($this->once())
-                    ->method('getName')
-                    ->willReturn('image.get');
+        $this->event
+            ->expects($this->once())
+            ->method('getName')
+            ->willReturn('image.get');
 
-        $this->query->expects($this->once())
-                    ->method('has')
-                    ->with('accessToken')
-                    ->willReturn(false);
+        $this->query
+            ->expects($this->once())
+            ->method('has')
+            ->with('accessToken')
+            ->willReturn(false);
 
         $this->expectExceptionObject(new RuntimeException('Missing access token', 400));
         $this->listener->checkAccessToken($this->event);
@@ -196,12 +172,14 @@ class AccessTokenTest extends ListenerTests {
             $this->expectExceptionObject(new RuntimeException('Missing access token', 400));
         }
 
-        $this->event->expects($this->once())
-                    ->method('getName')
-                    ->willReturn('image.get');
+        $this->event
+            ->expects($this->once())
+            ->method('getName')
+            ->willReturn('image.get');
 
-        $this->request->method('getTransformations')
-                      ->willReturn($transformations);
+        $this->request
+            ->method('getTransformations')
+            ->willReturn($transformations);
 
         $listener->checkAccessToken($this->event);
     }
@@ -272,27 +250,32 @@ class AccessTokenTest extends ListenerTests {
             $this->expectExceptionObject(new RuntimeException('Incorrect access token', 400));
         }
 
-        $this->query->expects($this->once())
-                    ->method('has')
-                    ->with('accessToken')
-                    ->willReturn(true);
+        $this->query
+            ->expects($this->once())
+            ->method('has')
+            ->with('accessToken')
+            ->willReturn(true);
 
-        $this->query->expects($this->once())
-                    ->method('get')
-                    ->with('accessToken')
-                    ->willReturn($token);
+        $this->query
+            ->expects($this->once())
+            ->method('get')
+            ->with('accessToken')
+            ->willReturn($token);
 
-        $this->request->expects($this->atLeastOnce())
-                      ->method('getRawUri')
-                      ->willReturn(urldecode($url));
+        $this->request
+            ->expects($this->atLeastOnce())
+            ->method('getRawUri')
+            ->willReturn(urldecode($url));
 
-        $this->request->expects($this->atLeastOnce())
-                      ->method('getUriAsIs')
-                      ->willReturn($url);
+        $this->request
+            ->expects($this->atLeastOnce())
+            ->method('getUriAsIs')
+            ->willReturn($url);
 
-        $this->accessControl->expects($this->once())
-                            ->method('getPrivateKey')
-                            ->willReturn($privateKey);
+        $this->accessControl
+            ->expects($this->once())
+            ->method('getPrivateKey')
+            ->willReturn($privateKey);
 
         $this->listener->checkAccessToken($this->event);
     }
@@ -301,13 +284,15 @@ class AccessTokenTest extends ListenerTests {
      * @covers ::checkAccessToken
      */
     public function testWillSkipValidationWhenShortUrlHeaderIsPresent() : void {
-        $this->responseHeaders->expects($this->once())
-                              ->method('has')
-                              ->with('X-Imbo-ShortUrl')
-                              ->willReturn(true);
+        $this->responseHeaders
+            ->expects($this->once())
+            ->method('has')
+            ->with('X-Imbo-ShortUrl')
+            ->willReturn(true);
 
-        $this->query->expects($this->never())
-                    ->method('has');
+        $this->query
+            ->expects($this->never())
+            ->method('has');
 
         $this->listener->checkAccessToken($this->event);
     }
@@ -319,20 +304,23 @@ class AccessTokenTest extends ListenerTests {
         $privateKey = 'foobar';
         $baseUrl = '//imbo.host/users/some-user/imgUrl.png?t[]=smartSize:width=320,height=240';
 
-        $this->accessControl->method('getPrivateKey')
-                            ->willReturn($privateKey);
+        $this->accessControl
+            ->method('getPrivateKey')
+            ->willReturn($privateKey);
 
         foreach (['http', 'https'] as $signedProtocol) {
             $token = hash_hmac('sha256', $signedProtocol . ':' . $baseUrl, $privateKey);
 
             $query = $this->createMock(ParameterBag::class);
-            $query->method('has')
-                  ->with('accessToken')
-                  ->willReturn(true);
+            $query
+                ->method('has')
+                ->with('accessToken')
+                ->willReturn(true);
 
-            $query->method('get')
-                  ->with('accessToken')
-                  ->willReturn($token);
+            $query
+                ->method('get')
+                ->with('accessToken')
+                ->willReturn($token);
 
             foreach (['http', 'https'] as $protocol) {
                 $url = $protocol . ':' . $baseUrl . '&accessToken=' . $token;
@@ -362,6 +350,9 @@ class AccessTokenTest extends ListenerTests {
         }
     }
 
+    /**
+     * @covers ::checkAccessToken
+     */
     public function testAccessTokenArgumentKey() : void {
         $url = 'http://imbo/users/christer';
         $token = '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a';
@@ -371,27 +362,32 @@ class AccessTokenTest extends ListenerTests {
             'accessTokenGenerator' => new AccessToken\SHA256(['argumentKeys' => ['foo']]),
         ]);
 
-        $this->query->expects($this->once())
-                    ->method('has')
-                    ->with('foo')
-                    ->willReturn(true);
+        $this->query
+            ->expects($this->once())
+            ->method('has')
+            ->with('foo')
+            ->willReturn(true);
 
-        $this->query->expects($this->once())
-                    ->method('get')
-                    ->with('foo')
-                    ->willReturn($token);
+        $this->query
+            ->expects($this->once())
+            ->method('get')
+            ->with('foo')
+            ->willReturn($token);
 
-        $this->request->expects($this->atLeastOnce())
-                      ->method('getRawUri')
-                      ->willReturn(urldecode($url));
+        $this->request
+            ->expects($this->atLeastOnce())
+            ->method('getRawUri')
+            ->willReturn(urldecode($url));
 
-        $this->request->expects($this->atLeastOnce())
-                      ->method('getUriAsIs')
-                      ->willReturn($url);
+        $this->request
+            ->expects($this->atLeastOnce())
+            ->method('getUriAsIs')
+            ->willReturn($url);
 
-        $this->accessControl->expects($this->once())
-                            ->method('getPrivateKey')
-                            ->willReturn($privateKey);
+        $this->accessControl
+            ->expects($this->once())
+            ->method('getPrivateKey')
+            ->willReturn($privateKey);
 
         $listener->checkAccessToken($this->event);
     }
@@ -433,6 +429,10 @@ class AccessTokenTest extends ListenerTests {
 
     /**
      * @dataProvider getAccessTokensForMultipleGenerator
+     * @covers ::checkAccessToken
+     * @covers ::getAlternativeURL
+     * @covers ::getUnescapedAlternativeURL
+     * @covers ::getEscapedAlternativeURL
      */
     public function testMultipleAccessTokensGenerator(string $url, string $token, string $privateKey, bool $correct, string $argumentKey) : void {
         if (!$correct) {
@@ -445,45 +445,52 @@ class AccessTokenTest extends ListenerTests {
 
         $listener = new AccessToken([
             'accessTokenGenerator' => new AccessToken\MultipleAccessTokenGenerators([
-                    'generators' => [
-                        'accessToken' => new AccessToken\SHA256(),
-                        'dummy' => $dummyAccessToken,
-                    ]
+                'generators' => [
+                    'accessToken' => new AccessToken\SHA256(),
+                    'dummy' => $dummyAccessToken,
                 ]
-            ),
+            ]),
         ]);
 
         // Allows us to return 'false' as default if the key isn't present
-        $this->query->expects($this->atLeastOnce())
-                    ->method('has')
-                    ->with($this->logicalOr(
-                        $this->equalTo($argumentKey),
-                        $this->anything()
-                    ))
-                    ->will($this->returnCallback(function ($val) use ($argumentKey) {
-                        return $val == $argumentKey;
-                    }));
+        $this->query
+            ->expects($this->atLeastOnce())
+            ->method('has')
+            ->with($this->logicalOr(
+                $this->equalTo($argumentKey),
+                $this->anything()
+            ))
+            ->willReturnCallback(function ($val) use ($argumentKey) {
+                return $val == $argumentKey;
+            });
 
-        $this->query->expects($this->atLeastOnce())
-                    ->method('get')
-                    ->with($argumentKey)
-                    ->willReturn($token);
+        $this->query
+            ->expects($this->atLeastOnce())
+            ->method('get')
+            ->with($argumentKey)
+            ->willReturn($token);
 
-        $this->request->expects($this->atLeastOnce())
-                      ->method('getRawUri')
-                      ->willReturn(urldecode($url));
+        $this->request
+            ->expects($this->atLeastOnce())
+            ->method('getRawUri')
+            ->willReturn(urldecode($url));
 
-        $this->request->expects($this->atLeastOnce())
-                      ->method('getUriAsIs')
-                      ->willReturn($url);
+        $this->request
+            ->expects($this->atLeastOnce())
+            ->method('getUriAsIs')
+            ->willReturn($url);
 
-        $this->accessControl->expects($this->once())
-                            ->method('getPrivateKey')
-                            ->willReturn($privateKey);
+        $this->accessControl
+            ->expects($this->once())
+            ->method('getPrivateKey')
+            ->willReturn($privateKey);
 
         $listener->checkAccessToken($this->event);
     }
 
+    /**
+     * @covers ::__construct
+     */
     public function testConfigurationExceptionOnInvalidAccessTokenGenerator() : void {
         $this->expectExceptionObject(new ConfigurationException('Invalid accessTokenGenerator', 500));
 
@@ -562,22 +569,27 @@ class AccessTokenTest extends ListenerTests {
 
         $url = $url . '&accessToken=' . $accessToken;
 
-        $this->query->method('has')
-                    ->with('accessToken')
-                    ->willReturn(true);
+        $this->query
+            ->method('has')
+            ->with('accessToken')
+            ->willReturn(true);
 
-        $this->query->method('get')
-                    ->with('accessToken')
-                    ->willReturn($accessToken);
+        $this->query
+            ->method('get')
+            ->with('accessToken')
+            ->willReturn($accessToken);
 
-        $this->request->method('getRawUri')
-                      ->willReturn(urldecode($url));
+        $this->request
+            ->method('getRawUri')
+            ->willReturn(urldecode($url));
 
-        $this->request->method('getUriAsIs')
-                      ->willReturn($url);
+        $this->request
+            ->method('getUriAsIs')
+            ->willReturn($url);
 
-        $this->accessControl->method('getPrivateKey')
-                            ->willReturn('foobar');
+        $this->accessControl
+            ->method('getPrivateKey')
+            ->willReturn('foobar');
 
         $this->assertTrue(
             $this->listener->checkAccessToken($event),
@@ -588,9 +600,9 @@ class AccessTokenTest extends ListenerTests {
     protected function getEventMock(array $config = null) : Event {
         return $this->createConfiguredMock(Event::class, [
             'getAccessControl' => $this->accessControl,
-            'getRequest' => $this->request,
-            'getResponse' => $this->response,
-            'getConfig' => $config ?: [
+            'getRequest'       => $this->request,
+            'getResponse'      => $this->response,
+            'getConfig'        => $config ?: [
                 'authentication' => [
                     'protocol' => 'incoming'
                 ],

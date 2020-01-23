@@ -1,17 +1,19 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\EventListener;
+namespace Imbo\EventListener;
 
-use Imbo\EventListener\Imagick;
+use Imbo\EventManager\EventInterface;
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+use Imbo\Image\InputLoaderManager;
+use Imbo\Image\TransformationManager;
+use Imbo\Model\Image;
+use Imagick as I;
 
 /**
  * @coversDefaultClass Imbo\EventListener\Imagick
  */
 class ImagickTest extends ListenerTests {
-    /**
-     * @var Imagick
-     */
     private $listener;
-
     private $request;
     private $response;
     private $event;
@@ -19,15 +21,16 @@ class ImagickTest extends ListenerTests {
     private $inputLoaderManager;
 
     public function setUp() : void {
-        $this->request = $this->createMock('Imbo\Http\Request\Request');
-        $this->response = $this->createMock('Imbo\Http\Response\Response');
-        $this->transformationManager = $this->createMock('Imbo\Image\TransformationManager');
-        $this->event = $this->createMock('Imbo\EventManager\Event');
-        $this->inputLoaderManager = $this->createMock('Imbo\Image\InputLoaderManager');
-        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
-        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
-        $this->event->expects($this->any())->method('getTransformationManager')->will($this->returnValue($this->transformationManager));
-        $this->event->expects($this->any())->method('getInputLoaderManager')->will($this->returnValue($this->inputLoaderManager));
+        $this->request = $this->createMock(Request::class);
+        $this->response = $this->createMock(Response::class);
+        $this->transformationManager = $this->createMock(TransformationManager::class);
+        $this->inputLoaderManager = $this->createMock(InputLoaderManager::class);
+        $this->event = $this->createConfiguredMock(EventInterface::class, [
+            'getRequest' => $this->request,
+            'getResponse' => $this->response,
+            'getTransformationManager' => $this->transformationManager,
+            'getInputLoaderManager' => $this->inputLoaderManager,
+        ]);
 
         $this->listener = new Imagick();
     }
@@ -36,21 +39,31 @@ class ImagickTest extends ListenerTests {
         return $this->listener;
     }
 
-
     /**
      * @covers ::readImageBlob
      * @covers ::setImagick
      */
     public function testFetchesImageFromRequest() : void {
-        $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue('image'));
-        $image->expects($this->any())->method('getMimeType')->will($this->returnValue('image/jpeg'));
+        $image = $this->createConfiguredMock(Image::class, [
+            'getBlob' => 'image',
+            'getMimeType' => 'image/jpeg'
+        ]);
 
-        $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
+        $this->request
+            ->expects($this->once())
+            ->method('getImage')
+            ->willReturn($image);
 
-        $this->inputLoaderManager->expects($this->once())->method('load')->with('image/jpeg', 'image');
+        $this->inputLoaderManager
+            ->expects($this->once())
+            ->method('load')
+            ->with('image/jpeg', 'image');
 
-        $this->event->expects($this->once())->method('getName')->will($this->returnValue('images.post'));
+        $this->event
+            ->expects($this->once())
+            ->method('getName')
+            ->willReturn('images.post');
+
         $this->listener->readImageBlob($this->event);
     }
 
@@ -59,15 +72,59 @@ class ImagickTest extends ListenerTests {
      * @covers ::setImagick
      */
     public function testFetchesImageFromResponse() : void {
-        $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue('image'));
-        $image->expects($this->any())->method('getMimeType')->will($this->returnValue('image/jpeg'));
+        $image = $this->createConfiguredMock(Image::class, [
+            'getBlob' => 'image',
+            'getMimeType' => 'image/jpeg',
+        ]);
 
-        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
+        $this->response
+            ->expects($this->once())
+            ->method('getModel')
+            ->willReturn($image);
 
-        $this->inputLoaderManager->expects($this->once())->method('load')->with('image/jpeg', 'image');
+        $this->inputLoaderManager
+            ->expects($this->once())
+            ->method('load')
+            ->with('image/jpeg', 'image');
 
-        $this->event->expects($this->once())->method('getName')->will($this->returnValue('storage.image.load'));
+        $this->event
+            ->expects($this->once())
+            ->method('getName')
+            ->willReturn('storage.image.load');
+
+        $this->listener->readImageBlob($this->event);
+    }
+
+    /**
+     * @covers ::readImageBlob
+     * @covers ::setImagick
+     */
+    public function testFetchesImageFromEvent() : void {
+        $image = $this->createConfiguredMock(Image::class, [
+            'getBlob' => 'image',
+            'getMimeType' => 'image/png'
+        ]);
+
+        $this->event
+            ->expects($this->once())
+            ->method('hasArgument')
+            ->with('image')
+            ->willReturn(true);
+        $this->event
+            ->expects($this->once())
+            ->method('getArgument')
+            ->with('image')
+            ->willReturn($image);
+
+        $this->inputLoaderManager
+            ->expects($this->once())
+            ->method('load')
+            ->with('image/png', 'image');
+
+        $this->event
+            ->expects($this->once())
+            ->method('getName')
+            ->willReturn('images.post');
 
         $this->listener->readImageBlob($this->event);
     }
@@ -80,52 +137,132 @@ class ImagickTest extends ListenerTests {
     }
 
     /**
-     * @covers ::readImageBlob
-     * @covers ::setImagick
      * @dataProvider hasImageBeenTransformed
+     * @covers ::updateModelBeforeStoring
+     * @covers ::setImagick
      */
     public function testUpdatesModelBeforeStoring(bool $hasBeenTransformed) : void {
-        $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('hasBeenTransformed')->will($this->returnValue($hasBeenTransformed));
+        $image = $this->createConfiguredMock(Image::class, [
+            'hasBeenTransformed' => $hasBeenTransformed
+        ]);
 
-        $imagick = $this->createMock('Imagick');
+        $imagick = $this->createMock(I::class);
 
         if ($hasBeenTransformed) {
-            $imagick->expects($this->once())->method('getImageBlob')->will($this->returnValue('image'));
-            $image->expects($this->once())->method('setBlob')->with('image');
+            $imagick
+                ->expects($this->once())
+                ->method('getImageBlob')
+                ->willReturn('image');
+            $image
+                ->expects($this->once())
+                ->method('setBlob')
+                ->with('image');
         } else {
-            $imagick->expects($this->never())->method('getImageBlob');
-            $image->expects($this->never())->method('setBlob');
+            $imagick
+                ->expects($this->never())
+                ->method('getImageBlob');
+            $image
+                ->expects($this->never())
+                ->method('setBlob');
         }
 
-        $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
+        $this->request
+            ->expects($this->once())
+            ->method('getImage')
+            ->willReturn($image);
 
-        $this->listener->setImagick($imagick)
-                       ->updateModelBeforeStoring($this->event);
+        $this->listener
+            ->setImagick($imagick)
+            ->updateModelBeforeStoring($this->event);
+    }
+
+    /**
+     * @dataProvider hasImageBeenTransformed
+     * @covers ::updateModel
+     * @covers ::setImagick
+     */
+    public function testUpdatesModelBeforeSendingResponse(bool $hasBeenTransformed) : void {
+        $image = $this->createConfiguredMock(Image::class, [
+            'hasBeenTransformed' => $hasBeenTransformed,
+        ]);
+
+        $imagick = $this->createMock(I::class);
+
+        if ($hasBeenTransformed) {
+            $imagick
+                ->expects($this->once())
+                ->method('getImageBlob')
+                ->willReturn('image');
+            $image
+                ->expects($this->once())
+                ->method('setBlob')
+                ->with('image');
+        } else {
+            $imagick
+                ->expects($this->never())
+                ->method('getImageBlob');
+            $image
+                ->expects($this->never())
+                ->method('setBlob');
+        }
+
+        $this->event
+            ->expects($this->once())
+            ->method('getArgument')
+            ->with('image')
+            ->willReturn($image);
+
+        $this->listener
+            ->setImagick($imagick)
+            ->updateModel($this->event);
     }
 
     /**
      * @covers ::readImageBlob
-     * @covers ::setImagick
-     * @dataProvider hasImageBeenTransformed
      */
-    public function testUpdatesModelBeforeSendingResponse(bool $hasBeenTransformed) : void {
-        $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('hasBeenTransformed')->will($this->returnValue($hasBeenTransformed));
+    public function testCanOptimizeImage() : void {
+        $this->event
+            ->expects($this->once())
+            ->method('getName')
+            ->willReturn('image.loaded');
+        $this->event
+            ->expects($this->once())
+            ->method('getConfig')
+            ->willReturn(['optimizations' => ['jpegSizeHint' => true]]);
+        $this->event
+            ->method('setArgument')
+            ->withConsecutive(
+                ['ratio', 4],
+                ['transformationIndex', 0]
+            );
 
-        $imagick = $this->createMock('Imagick');
+        $this->transformationManager
+            ->expects($this->once())
+            ->method('getMinimumImageInputSize')
+            ->with($this->event)
+            ->willReturn(['width' => 30, 'height' => 20, 'index' => 0]);
 
-        if ($hasBeenTransformed) {
-            $imagick->expects($this->once())->method('getImageBlob')->will($this->returnValue('image'));
-            $image->expects($this->once())->method('setBlob')->with('image');
-        } else {
-            $imagick->expects($this->never())->method('getImageBlob');
-            $image->expects($this->never())->method('setBlob');
-        }
+        $imagick = $this->createConfiguredMock(I::class, [
+            'getImageGeometry' => ['width' => 32, 'height' => 32],
+        ]);
+        $imagick
+            ->expects($this->once())
+            ->method('setOption')
+            ->with('jpeg:size', '30x20');
 
-        $this->event->expects($this->once())->method('getArgument')->with('image')->will($this->returnValue($image));
+        $image = $this->createConfiguredMock(Image::class, [
+            'getWidth' => 128,
+            'getMimeType' => 'image/jpeg',
+            'getBlob' => 'blob',
+        ]);
 
-        $this->listener->setImagick($imagick)
-                       ->updateModel($this->event);
+        $this->response
+            ->expects($this->once())
+            ->method('getModel')
+            ->willReturn($image);
+
+        $this->listener
+            ->setImagick($imagick)
+            ->readImageBlob($this->event);
     }
 }

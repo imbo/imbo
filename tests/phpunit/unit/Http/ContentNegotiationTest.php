@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Http;
+namespace Imbo\Http;
 
 use Imbo\Http\ContentNegotiation;
 use PHPUnit\Framework\TestCase;
@@ -8,22 +8,13 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass Imbo\Http\ContentNegotiation
  */
 class ContentNegotiationTest extends TestCase {
-    /**
-     * @var ContentNegotiation
-     */
     private $cn;
 
-    /**
-     * Set up
-     */
     public function setUp() : void {
         $this->cn = new ContentNegotiation();
     }
 
-    /**
-     * @return array[]
-     */
-    public function getIsAcceptableData() {
+    public function getIsAcceptableData() : array {
         return [
             ['image/png', ['image/png' => 1, 'image/*' => 0.9], 1],
             ['image/png', ['text/html' => 1, '*/*' => 0.9], 0.9],
@@ -35,16 +26,13 @@ class ContentNegotiationTest extends TestCase {
 
     /**
      * @dataProvider getIsAcceptableData
-     * @covers Imbo\Http\ContentNegotiation::isAcceptable
+     * @covers ::isAcceptable
      */
     public function testCanCheckIfAMimeTypeIsAcceptable($mimeType, $acceptable, $result) : void {
         $this->assertSame($result, $this->cn->isAcceptable($mimeType, $acceptable));
     }
 
-    /**
-     * @return array[]
-     */
-    public function getMimeTypes() {
+    public function getMimeTypes() : array {
         return [
             [['image/png', 'image/gif'], ['image/*' => 1], 'image/png'],
             [['image/png', 'image/gif'], ['image/png' => 0.9, 'image/gif' => 1], 'image/gif'],
@@ -55,8 +43,8 @@ class ContentNegotiationTest extends TestCase {
 
     /**
      * @dataProvider getMimeTypes
-     * @covers Imbo\Http\ContentNegotiation::bestMatch
-     * @covers Imbo\Http\ContentNegotiation::isAcceptable
+     * @covers ::bestMatch
+     * @covers ::isAcceptable
      */
     public function testCanPickTheBestMatchFromASetOfMimeTypes($mimeTypes, $acceptable, $result) : void {
         $this->assertSame($result, $this->cn->bestMatch($mimeTypes, $acceptable));

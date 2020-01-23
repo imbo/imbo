@@ -1,21 +1,16 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\EventListener\ImageVariations\Storage;
+namespace Imbo\EventListener\ImageVariations\Storage;
 
-use Imbo\EventListener\ImageVariations\Storage\Filesystem;
 use Imbo\Exception\StorageException;
 use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamWrapper;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\EventListener\ImageVariations\Storage\Filesystem
  */
 class FilesystemTest extends TestCase {
-    /**
-     * Setup method
-     */
     public function setUp() : void {
-        if (!class_exists('org\bovigo\vfs\vfsStream')) {
+        if (!class_exists(vfsStream::class)) {
             $this->markTestSkipped('This testcase requires vfsStream to run');
         }
     }
@@ -25,8 +20,6 @@ class FilesystemTest extends TestCase {
      */
     public function testThrowsExceptionWhenNotAbleToWriteToDirectory() : void {
         $dir = 'unwritableDirectory';
-
-        // Create the virtual directory with no permissions
         vfsStream::setup($dir, 0);
 
         $adapter = new Filesystem(['dataDir' => vfsStream::url($dir)]);

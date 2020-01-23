@@ -1,12 +1,11 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Storage;
+namespace Imbo\Storage;
 
 use Imbo\Storage\Filesystem;
 use Imbo\Exception\ConfigurationException;
 use Imbo\Exception\StorageException;
-use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamWrapper;
 use PHPUnit\Framework\TestCase;
+use TestFs\StreamWrapper as TestFs;
 
 /**
  * @coversDefaultClass Imbo\Storage\Filesystem
@@ -30,31 +29,30 @@ class FilesystemTest extends TestCase {
      * Setup method
      */
     public function setUp() : void {
-        if (!class_exists('org\bovigo\vfs\vfsStream')) {
-            $this->markTestSkipped('This testcase requires vfsStream to run');
-        }
+        TestFs::register();
+    }
+
+    public function tearDown() : void {
+        TestFs::unregister();
     }
 
     /**
-     * @covers Imbo\Storage\Filesystem::delete
+     * @covers ::delete
      */
     public function testDeleteFileThatDoesNotExist() : void {
-        $driver = new Filesystem(['dataDir' => 'foobar']);
+        $driver = new Filesystem(['dataDir' => TestFs::url('foobar')]);
         $this->expectExceptionObject(new StorageException('File not found', 404));
         $driver->delete($this->user, $this->imageIdentifier);
     }
 
     /**
-     * @covers Imbo\Storage\Filesystem::delete
+     * @covers ::delete
      */
     public function testDelete() : void {
-        vfsStream::setup('basedir');
-        $driver = new Filesystem(['dataDir' => vfsStream::url('basedir')]);
+        $driver = new Filesystem(['dataDir' => TestFs::url('basedir')]);
 
-        $root = vfsStreamWrapper::getRoot();
-        $last = $root;
-
-        $parts = [
+        $dir = TestFs::url(join('/', [
+            'basedir',
             $this->user[0],
             $this->user[1],
             $this->user[2],
@@ -62,81 +60,50 @@ class FilesystemTest extends TestCase {
             $this->imageIdentifier[0],
             $this->imageIdentifier[1],
             $this->imageIdentifier[2],
-        ];
+        ]));
+        $filePath = sprintf('%s/%s', $dir , $this->imageIdentifier);
 
-        foreach ($parts as $part) {
-            $d = vfsStream::newDirectory($part);
-            $last->addChild($d);
-            $last = $d;
-        }
+        mkdir($dir, 0777, true);
+        touch($filePath);
 
-        $last->addChild(vfsStream::newFile($this->imageIdentifier));
-
-        $this->assertTrue($last->hasChild($this->imageIdentifier));
+        $this->assertTrue(is_file($filePath), 'Expected file to exist');
         $driver->delete($this->user, $this->imageIdentifier);
-        $this->assertFalse($last->hasChild($this->imageIdentifier));
+        clearstatcache();
+        $this->assertFalse(is_file($filePath), 'Did not expect file to exist');
     }
 
     /**
-     * @covers Imbo\Storage\Filesystem::store
+     * @covers ::store
      */
     public function testStoreToUnwritablePath() : void {
         $image = 'some image data';
-        $dir = 'unwritableDirectory';
+        $dir = TestFs::url('unwritableDirectory');
 
-        // Create the virtual directory with no permissions
-        vfsStream::setup($dir, 0);
+        mkdir($dir, 0000);
 
-        $driver = new Filesystem(['dataDir' => vfsStream::url($dir)]);
+        $driver = new Filesystem(['dataDir' => $dir]);
         $this->expectExceptionObject(new StorageException('Could not store image', 500));
         $driver->store($this->user, $this->imageIdentifier, $image);
     }
 
     /**
-     * @covers Imbo\Storage\Filesystem::store
+     * @covers ::store
+     * @covers ::getImagePath
      */
     public function testStore() : void {
         $imageData = file_get_contents(FIXTURES_DIR . '/image.png');
 
-        $baseDir = 'someDir';
+        $baseDir = TestFs::url('someDir');
+        mkdir($baseDir);
 
-        // Create the virtual directory
-        vfsStream::setup($baseDir);
-
-        $driver = new Filesystem(['dataDir' => vfsStream::url($baseDir)]);
+        $driver = new Filesystem(['dataDir' => $baseDir]);
         $this->assertTrue($driver->store($this->user, $this->imageIdentifier, $imageData));
+
+        $this->assertTrue(is_file(TestFs::url('someDir/5/9/6/59632bc7a908b9cd47a35d03fc992aa7/9/6/d/96d08a5943ebf1c5635a2995c9408cdd.png')), 'Expected file to exist');
     }
 
     /**
-     * @covers Imbo\Storage\Filesystem::getImagePath
-     */
-    public function testGetImagePath() : void {
-        $driver = new Filesystem(['dataDir' => DIRECTORY_SEPARATOR . 'tmp']);
-
-        $reflection = new \ReflectionClass($driver);
-        $method = $reflection->getMethod('getImagePath');
-        $method->setAccessible(true);
-
-        $expectedFullPath = '/tmp/5/9/6/59632bc7a908b9cd47a35d03fc992aa7/9/6/d/96d08a5943ebf1c5635a2995c9408cdd.png';
-        $expectedDirPath = dirname($expectedFullPath);
-
-        if (DIRECTORY_SEPARATOR != '/') {
-            $expectedFullPath = str_replace('/', DIRECTORY_SEPARATOR, $expectedFullPath);
-            $expectedDirPath = str_replace('/', DIRECTORY_SEPARATOR, $expectedDirPath);
-        }
-
-        $this->assertSame(
-            $expectedFullPath,
-            $method->invoke($driver, $this->user, $this->imageIdentifier)
-        );
-        $this->assertSame(
-            $expectedDirPath,
-            $method->invoke($driver, $this->user, $this->imageIdentifier, false)
-        );
-    }
-
-    /**
-     * @covers Imbo\Storage\Filesystem::getImage
+     * @covers ::getImage
      */
     public function testGetImageFileThatDoesNotExist() : void {
         $driver = new Filesystem(['dataDir' => '/tmp']);
@@ -145,16 +112,15 @@ class FilesystemTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Storage\Filesystem::getImage
+     * @covers ::getImage
      */
     public function testGetImage() : void {
-        vfsStream::setup('basedir');
-        $driver = new Filesystem(['dataDir' => vfsStream::url('basedir')]);
+        $dir = TestFs::url('basedir');
+        mkdir($dir);
+        $driver = new Filesystem(['dataDir' => $dir]);
 
-        $root = vfsStreamWrapper::getRoot();
-        $last = $root;
-
-        $parts = [
+        $filePath = TestFs::url(join('/', [
+            'basedir',
             $this->user[0],
             $this->user[1],
             $this->user[2],
@@ -162,24 +128,17 @@ class FilesystemTest extends TestCase {
             $this->imageIdentifier[0],
             $this->imageIdentifier[1],
             $this->imageIdentifier[2],
-        ];
+            $this->imageIdentifier,
+        ]));
 
-        foreach ($parts as $part) {
-            $d = vfsStream::newDirectory($part);
-            $last->addChild($d);
-            $last = $d;
-        }
+        mkdir(dirname($filePath), 0777, true);
+        file_put_contents($filePath, 'some content');
 
-        $content = 'some binary content';
-        $file = vfsStream::newFile($this->imageIdentifier);
-        $file->setContent($content);
-        $last->addChild($file);
-
-        $this->assertSame($content, $driver->getImage($this->user, $this->imageIdentifier));
+        $this->assertSame('some content', $driver->getImage($this->user, $this->imageIdentifier));
     }
 
     /**
-     * @covers Imbo\Storage\Filesystem::getLastModified
+     * @covers ::getLastModified
      */
     public function testGetLastModifiedWithFileThatDoesNotExist() : void {
         $driver = new Filesystem(['dataDir' => '/some/path']);
@@ -188,16 +147,14 @@ class FilesystemTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Storage\Filesystem::getLastModified
+     * @covers ::getLastModified
      */
     public function testGetLastModified() : void {
-        vfsStream::setup('basedir');
-        $driver = new Filesystem(['dataDir' => vfsStream::url('basedir')]);
+        $dir = TestFs::url('basedir');
+        $driver = new Filesystem(['dataDir' => $dir]);
 
-        $root = vfsStreamWrapper::getRoot();
-        $last = $root;
-
-        $parts = [
+        $filePath = TestFs::url(join('/', [
+            'basedir',
             $this->user[0],
             $this->user[1],
             $this->user[2],
@@ -205,45 +162,38 @@ class FilesystemTest extends TestCase {
             $this->imageIdentifier[0],
             $this->imageIdentifier[1],
             $this->imageIdentifier[2],
-        ];
+            $this->imageIdentifier
+        ]));
 
-        foreach ($parts as $part) {
-            $d = vfsStream::newDirectory($part);
-            $last->addChild($d);
-            $last = $d;
-        }
-
-        $now = time();
-
-        $content = 'some binary content';
-        $file = vfsStream::newFile($this->imageIdentifier);
-        $file->setContent($content);
-        $file->lastModified($now);
-        $last->addChild($file);
+        mkdir(dirname($filePath), 0777, true);
+        file_put_contents($filePath, 'some content');
 
         $this->assertInstanceOf('DateTime', $driver->getLastModified($this->user, $this->imageIdentifier));
     }
 
     /**
-     * @covers Imbo\Storage\Filesystem::getStatus
+     * @covers ::getStatus
      */
     public function testGetStatusWhenBaseDirIsNotWritable() : void {
-        vfsStream::setup('dir', 0);
-
-        $driver = new Filesystem(['dataDir' => vfsStream::url('dir')]);
+        $dir = TestFs::url('dir');
+        mkdir($dir, 0000);
+        $driver = new Filesystem(['dataDir' => $dir]);
         $this->assertFalse($driver->getStatus());
     }
 
     /**
-     * @covers Imbo\Storage\Filesystem::getStatus
+     * @covers ::getStatus
      */
     public function testGetStatusWhenBaseDirIsWritable() : void {
-        vfsStream::setup('dir');
-
-        $driver = new Filesystem(['dataDir' => vfsStream::url('dir')]);
+        $dir = TestFs::url('dir');
+        mkdir($dir);
+        $driver = new Filesystem(['dataDir' => $dir]);
         $this->assertTrue($driver->getStatus());
     }
 
+    /**
+     * @covers ::__construct
+     */
     public function testMissingDataDir() : void {
         $this->expectExceptionObject(new ConfigurationException(
             'Missing required parameter dataDir in the Filesystem storage driver.',

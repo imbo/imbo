@@ -1,15 +1,17 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\EventListener;
+namespace Imbo\EventListener;
 
 use Imbo\EventListener\MaxImageSize;
+use Imbo\EventManager\EventInterface;
+use Imbo\Http\Request\Request;
+use Imbo\Image\Transformation\MaxSize;
+use Imbo\Image\TransformationManager;
+use Imbo\Model\Image;
 
 /**
  * @coversDefaultClass Imbo\EventListener\MaxImageSize
  */
 class MaxImageSizeTest extends ListenerTests {
-    /**
-     * @var MaxImageSize
-     */
     private $listener;
 
     public function setUp() : void {
@@ -34,29 +36,52 @@ class MaxImageSizeTest extends ListenerTests {
      * @covers ::enforceMaxSize
      */
     public function testWillTriggerTransformationWhenImageIsAboveTheLimits(int $imageWidth, int $imageHeight, int $maxWidth, int $maxHeight, bool $willTrigger) : void {
-        $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getWidth')->will($this->returnValue($imageWidth));
-        $image->expects($this->once())->method('getHeight')->will($this->returnValue($imageHeight));
+        $image = $this->createMock(Image::class);
+        $image
+            ->expects($this->once())
+            ->method('getWidth')
+            ->willReturn($imageWidth);
 
-        $request = $this->createMock('Imbo\Http\Request\Request');
-        $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
+        $image
+            ->expects($this->once())
+            ->method('getHeight')
+            ->willReturn($imageHeight);
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
+        $request = $this->createMock(Request::class);
+        $request
+            ->expects($this->once())
+            ->method('getImage')
+            ->willReturn($image);
+
+        $event = $this->createMock(EventInterface::class);
+        $event
+            ->expects($this->once())
+            ->method('getRequest')
+            ->willReturn($request);
 
         if ($willTrigger) {
-            $maxSize = $this->createMock('Imbo\Image\Transformation\MaxSize');
-            $maxSize->expects($this->once())->method('setImage')->will($this->returnSelf());
-            $maxSize->expects($this->once())->method('transform')->with(['width' => $maxWidth, 'height' => $maxHeight]);
+            $maxSize = $this->createMock(MaxSize::class);
+            $maxSize
+                ->expects($this->once())
+                ->method('setImage')
+                ->willReturnSelf();
 
-            $transformationManager = $this->createMock('Imbo\Image\TransformationManager');
+            $maxSize
+                ->expects($this->once())
+                ->method('transform')
+                ->with(['width' => $maxWidth, 'height' => $maxHeight]);
+
+            $transformationManager = $this->createMock(TransformationManager::class);
             $transformationManager
                 ->expects($this->once())
                 ->method('getTransformation')
                 ->with('maxSize')
-                ->will($this->returnValue($maxSize));
+                ->willReturn($maxSize);
 
-            $event->expects($this->once())->method('getTransformationManager')->will($this->returnValue($transformationManager));
+            $event
+                ->expects($this->once())
+                ->method('getTransformationManager')
+                ->willReturn($transformationManager);
         }
 
         $listener = new MaxImageSize(['width' => $maxWidth, 'height' => $maxHeight]);

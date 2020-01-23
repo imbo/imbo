@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest;
+namespace Imbo;
 
-use Imbo\CliApplication;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use PHPUnit\Framework\TestCase;
 

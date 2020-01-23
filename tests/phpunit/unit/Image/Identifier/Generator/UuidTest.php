@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Image\Identifier\Generator;
+namespace Imbo\Image\Identifier\Generator;
 
 use Imbo\Image\Identifier\Generator\Uuid as UuidGenerator;
-use ImagickException;
+use Imbo\Model\Image;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -10,11 +10,11 @@ use PHPUnit\Framework\TestCase;
  */
 class UuidTest extends TestCase {
     public function testGeneratesUniqueUuidV4() : void {
-        $image = $this->createMock('Imbo\Model\Image');
+        $image = $this->createMock(Image::class);
         $generator = new UuidGenerator();
         $generated = [];
 
-        for ($i = 0; $i < 15; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $imageIdentifier = $generator->generate($image);
 
             // Does it have the right format?
@@ -23,9 +23,9 @@ class UuidTest extends TestCase {
                 $imageIdentifier
             );
 
-            // Make sure it doesn't generate any duplicates
-            $this->assertFalse(in_array($imageIdentifier, $generated));
             $generated[] = $imageIdentifier;
         }
+
+        $this->assertSame(count($generated), count(array_unique($generated)), 'Expected array to have unique values');
     }
 }

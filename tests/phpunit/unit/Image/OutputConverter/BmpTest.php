@@ -1,23 +1,19 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Image\OutputConverter;
+namespace Imbo\Image\OutputConverter;
 
 use Imbo\Image\OutputConverter\Bmp;
 use Imbo\Exception\OutputConverterException;
+use Imbo\Model\Image;
 use PHPUnit\Framework\TestCase;
+use Imagick;
 use ImagickException;
 
 /**
  * @coversDefaultClass Imbo\Image\OutputConverter\Bmp
  */
 class BmpTest extends TestCase {
-    /**
-     * @var Bmp
-     */
     private $converter;
 
-    /**
-     * Set up the loader
-     */
     public function setUp() : void {
         $this->converter = new Bmp();
     }
@@ -29,7 +25,6 @@ class BmpTest extends TestCase {
         $types = $this->converter->getSupportedMimeTypes();
 
         $this->assertIsArray($types);
-
         $this->assertContains('image/bmp', array_keys($types));
     }
 
@@ -40,15 +35,17 @@ class BmpTest extends TestCase {
         $extension = 'bmp';
         $mimeType = 'image/bmp';
 
-        $imagick = $this->createMock('Imagick');
-        $imagick->expects($this->once())
-                ->method('setImageFormat')
-                ->with($extension);
+        $imagick = $this->createMock(Imagick::class);
+        $imagick
+            ->expects($this->once())
+            ->method('setImageFormat')
+            ->with($extension);
 
-        $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())
-              ->method('hasBeenTransformed')
-              ->with(true);
+        $image = $this->createMock(Image::class);
+        $image
+            ->expects($this->once())
+            ->method('hasBeenTransformed')
+            ->with(true);
 
         $this->assertNull($this->converter->convert($imagick, $image, $extension, $mimeType));
     }
@@ -59,11 +56,12 @@ class BmpTest extends TestCase {
     public function testThrowsExceptionOnImagickFailure() : void {
         $extension = 'bmp';
 
-        $imagick = $this->createMock('Imagick');
-        $imagick->expects($this->once())
-                ->method('setImageFormat')
-                ->with($extension)
-                ->will($this->throwException(new ImagickException('some error')));
+        $imagick = $this->createMock(Imagick::class);
+        $imagick
+            ->expects($this->once())
+            ->method('setImageFormat')
+            ->with($extension)
+            ->willThrowException(new ImagickException('some error'));
 
         $this->expectExceptionObject(new OutputConverterException('some error', 400));
         $this->converter->convert(

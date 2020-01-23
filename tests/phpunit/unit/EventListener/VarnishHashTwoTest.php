@@ -1,35 +1,33 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\EventListener;
+namespace Imbo\EventListener;
 
-use Imbo\EventListener\VarnishHashTwo;
+use Imbo\EventManager\EventInterface;
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+use Imbo\Model\Image;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
  * @coversDefaultClass Imbo\EventListener\VarnishHashTwo
  */
 class VarnishHashTwoTest extends ListenerTests {
-    /**
-     * @var VarnishHashTwo
-     */
     private $listener;
-
     private $event;
     private $request;
     private $response;
     private $responseHeaders;
 
-    /**
-     * Set up the listener
-     */
     public function setUp() : void {
-        $this->request = $this->createMock('Imbo\Http\Request\Request');
+        $this->request = $this->createMock(Request::class);
 
-        $this->responseHeaders = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
-        $this->response = $this->createMock('Imbo\Http\Response\Response');
+        $this->responseHeaders = $this->createMock(ResponseHeaderBag::class);
+        $this->response = $this->createMock(Response::class);
         $this->response->headers = $this->responseHeaders;
 
-        $this->event = $this->createMock('Imbo\EventManager\Event');
-        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
-        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $this->event = $this->createConfiguredMock(EventInterface::class, [
+            'getRequest' => $this->request,
+            'getResponse' => $this->response,
+        ]);
 
         $this->listener = new VarnishHashTwo();
     }
@@ -42,14 +40,27 @@ class VarnishHashTwoTest extends ListenerTests {
      * @covers ::addHeader
      */
     public function testCanSendAHashTwoHeader() : void {
-        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
-        $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
-        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
-        $this->responseHeaders->expects($this->once())->method('set')->with('X-HashTwo', [
-            'imbo;image;user;id',
-            'imbo;user;user',
+        $this->request
+            ->expects($this->once())
+            ->method('getUser')
+            ->willReturn('user');
+
+        $image = $this->createConfiguredMock(Image::class, [
+            'getImageIdentifier' => 'id',
         ]);
+
+        $this->response
+            ->expects($this->once())
+            ->method('getModel')
+            ->willReturn($image);
+
+        $this->responseHeaders
+            ->expects($this->once())
+            ->method('set')
+            ->with('X-HashTwo', [
+                'imbo;image;user;id',
+                'imbo;user;user',
+            ]);
 
         $this->listener->addHeader($this->event);
     }
@@ -61,14 +72,27 @@ class VarnishHashTwoTest extends ListenerTests {
     public function testCanSpecifyACustomHeaderName() : void {
         $listener = new VarnishHashTwo(['headerName' => 'X-CustomHeader']);
 
-        $this->request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
-        $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('id'));
-        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
-        $this->responseHeaders->expects($this->once())->method('set')->with('X-CustomHeader', [
-            'imbo;image;user;id',
-            'imbo;user;user',
+        $this->request
+            ->expects($this->once())
+            ->method('getUser')
+            ->willReturn('user');
+
+        $image = $this->createConfiguredMock(Image::class, [
+            'getImageIdentifier' => 'id',
         ]);
+
+        $this->response
+            ->expects($this->once())
+            ->method('getModel')
+            ->willReturn($image);
+
+        $this->responseHeaders
+            ->expects($this->once())
+            ->method('set')
+            ->with('X-CustomHeader', [
+                'imbo;image;user;id',
+                'imbo;user;user',
+            ]);
 
         $listener->addHeader($this->event);
     }

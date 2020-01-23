@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Helpers;
+namespace Imbo\Helpers;
 
-use Imbo\Helpers\BSONToArray;
 use MongoDB\Model\BSONArray;
 use MongoDB\Model\BSONDocument;
 use PHPUnit\Framework\TestCase;
@@ -10,24 +9,13 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass Imbo\Helpers\BSONToArray
  */
 class BSONToArrayTest extends TestCase {
-    /**
-     * @var BSONToArray
-     */
     private $helper;
 
-    /**
-     * Set up the helper
-     */
     public function setUp() : void {
         $this->helper = new BSONToArray();
     }
 
-    /**
-     * Get different values to test
-     *
-     * @return array[]
-     */
-    public function getValues() {
+    public function getValues() : array {
         return [
             'string value' => [
                 'string',
@@ -96,8 +84,8 @@ class BSONToArrayTest extends TestCase {
 
     /**
      * @dataProvider getValues
-     * @covers Imbo\Helpers\BSONToArray::toArray
-     * @covers Imbo\Helpers\BSONToArray::isBSONModel
+     * @covers ::toArray
+     * @covers ::isBSONModel
      */
     public function testCanConvertValuesToArray($document, $expected) : void {
         $this->assertSame($expected, $this->helper->toArray($document));

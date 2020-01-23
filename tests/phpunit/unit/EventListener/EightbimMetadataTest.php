@@ -1,22 +1,23 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\EventListener;
+namespace Imbo\EventListener;
 
-use Imbo\EventListener\EightbimMetadata;
 use Imbo\Exception\DatabaseException;
 use Imbo\Exception\RuntimeException;
+use Imbo\Database\DatabaseInterface;
+use Imbo\EventManager\EventInterface;
+use Imbo\Http\Request\Request;
+use Imbo\Model\Image;
+use Imagick;
 
 /**
  * @coversDefaultClass Imbo\EventListener\EightbimMetadata
  */
 class EightbimMetadataTest extends ListenerTests {
-    /**
-     * @var EightbimMetadata
-     */
     protected $listener;
 
     public function setUp() : void {
         $this->listener = new EightbimMetadata();
-        $this->listener->setImagick(new \Imagick());
+        $this->listener->setImagick(new Imagick());
     }
 
     protected function getListener() : EightbimMetadata {
@@ -24,6 +25,7 @@ class EightbimMetadataTest extends ListenerTests {
     }
 
     /**
+     * @covers ::setImagick
      * @covers ::populate
      * @covers ::save
      */
@@ -32,24 +34,30 @@ class EightbimMetadataTest extends ListenerTests {
         $imageIdentifier = 'imageIdentifier';
         $blob = file_get_contents(FIXTURES_DIR . '/jpeg-with-multiple-paths.jpg');
 
-        $image = $this->createConfiguredMock('Imbo\Model\Image', [
+        $image = $this->createConfiguredMock(Image::class, [
             'getImageIdentifier' => $imageIdentifier,
             'getBlob' => $blob,
         ]);
 
-        $request = $this->createConfiguredMock('Imbo\Http\Request\Request', [
+        $request = $this->createConfiguredMock(Request::class, [
             'getUser' => $user,
             'getImage' => $image,
         ]);
 
-        $database = $this->createMock('Imbo\Database\DatabaseInterface');
+        $database = $this->createMock(DatabaseInterface::class);
         $database->expects($this->once())->method('updateMetadata')->with($user, $imageIdentifier, [
             'paths' => ['House', 'Panda'],
         ]);
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->exactly(2))->method('getRequest')->will($this->returnValue($request));
-        $event->expects($this->once())->method('getDatabase')->will($this->returnValue($database));
+        $event = $this->createMock(EventInterface::class);
+        $event
+            ->expects($this->exactly(2))
+            ->method('getRequest')
+            ->willReturn($request);
+        $event
+            ->expects($this->once())
+            ->method('getDatabase')
+            ->willReturn($database);
 
         $addedPaths = $this->listener->populate($event);
         $this->assertIsArray($addedPaths);
@@ -62,9 +70,15 @@ class EightbimMetadataTest extends ListenerTests {
      * @covers ::save
      */
     public function testReturnsEarlyOnMissingProperties() : void {
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->never())->method('getRequest');
-        $this->assertNull($this->listener->save($event), 'Did not expect method to return anything');
+        $event = $this->createMock(EventInterface::class);
+        $event
+            ->expects($this->never())
+            ->method('getRequest');
+
+        $this->assertNull(
+            $this->listener->save($event),
+            'Did not expect method to return anything'
+        );
     }
 
     /**
@@ -75,17 +89,17 @@ class EightbimMetadataTest extends ListenerTests {
         $imageIdentifier = 'imageIdentifier';
         $blob = file_get_contents(FIXTURES_DIR . '/jpeg-with-multiple-paths.jpg');
 
-        $image = $this->createConfiguredMock('Imbo\Model\Image', [
+        $image = $this->createConfiguredMock(Image::class, [
             'getImageIdentifier' => $imageIdentifier,
             'getBlob' => $blob,
         ]);
 
-        $request = $this->createConfiguredMock('Imbo\Http\Request\Request', [
+        $request = $this->createConfiguredMock(Request::class, [
             'getUser' => $user,
             'getImage' => $image,
         ]);
 
-        $database = $this->createMock('Imbo\Database\DatabaseInterface');
+        $database = $this->createMock(DatabaseInterface::class);
         $database
             ->expects($this->once())
             ->method('updateMetadata')
@@ -98,7 +112,7 @@ class EightbimMetadataTest extends ListenerTests {
             ->method('deleteImage')
             ->with($user, $imageIdentifier);
 
-        $event = $this->createConfiguredMock('Imbo\EventManager\Event', [
+        $event = $this->createConfiguredMock(EventInterface::class, [
             'getRequest' => $request,
             'getDatabase' => $database,
         ]);

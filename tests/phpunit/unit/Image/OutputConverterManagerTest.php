@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Image;
+namespace Imbo\Image;
 
 use Imbo\Model\Image;
 use Imbo\Image\OutputConverterManager;
@@ -16,14 +16,8 @@ use stdClass;
  * @coversDefaultClass Imbo\Image\OutputConverterManager
  */
 class OutputConverterManagerTest extends TestCase {
-    /**
-     * @var OutputConverterManager
-     */
     private $manager;
 
-    /**
-     * Set up the manager
-     */
     public function setUp() : void {
         $this->manager = new OutputConverterManager();
     }
@@ -32,7 +26,7 @@ class OutputConverterManagerTest extends TestCase {
      * @covers ::setImagick
      */
     public function testCanSetImagickInstance() : void {
-        $this->assertSame($this->manager, $this->manager->setImagick($this->createMock('Imagick')));
+        $this->assertSame($this->manager, $this->manager->setImagick($this->createMock(Imagick::class)));
     }
 
     /**
@@ -112,8 +106,9 @@ class OutputConverterManagerTest extends TestCase {
             ],
         ]);
 
-        $this->manager->registerConverter($converter1)
-                      ->registerConverter($converter2);
+        $this->manager
+            ->registerConverter($converter1)
+            ->registerConverter($converter2);
 
         $this->assertCount(
             4,
@@ -177,24 +172,27 @@ class OutputConverterManagerTest extends TestCase {
         $imagick = $this->createMock(Imagick::class);
 
         $image = $this->createMock(Image::class);
-        $image->expects($this->once())
-              ->method('setMimeType')
-              ->with($mime);
+        $image
+            ->expects($this->once())
+            ->method('setMimeType')
+            ->with($mime);
 
         $converter = $this->createConfiguredMock(OutputConverterInterface::class, [
             'getSupportedMimeTypes' => [
                 $mime => $extension,
             ],
         ]);
-        $converter->expects($this->once())
-                  ->method('convert')
-                  ->with($imagick, $image, $extension, $mime)
-                  ->willReturn(true);
+        $converter
+            ->expects($this->once())
+            ->method('convert')
+            ->with($imagick, $image, $extension, $mime)
+            ->willReturn(true);
 
         $this->assertTrue(
-            $this->manager->setImagick($imagick)
-                          ->registerConverter($converter)
-                          ->convert($image, $extension, $mime),
+            $this->manager
+                ->setImagick($imagick)
+                ->registerConverter($converter)
+                ->convert($image, $extension, $mime),
             'Exected convert method to return true'
         );
     }
@@ -210,24 +208,27 @@ class OutputConverterManagerTest extends TestCase {
         $imagick = $this->createMock(Imagick::class);
 
         $image = $this->createMock(Image::class);
-        $image->expects($this->once())
-              ->method('setMimeType')
-              ->with($mime);
+        $image
+            ->expects($this->once())
+            ->method('setMimeType')
+            ->with($mime);
 
         $converter = $this->createConfiguredMock(OutputConverterInterface::class, [
             'getSupportedMimeTypes' => [
                 $mime => $extension,
             ],
         ]);
-        $converter->expects($this->once())
-                  ->method('convert')
-                  ->with($imagick, $image, 'jpeg', $mime)
-                  ->willReturn(true);
+        $converter
+            ->expects($this->once())
+            ->method('convert')
+            ->with($imagick, $image, 'jpeg', $mime)
+            ->willReturn(true);
 
         $this->assertTrue(
-            $this->manager->setImagick($imagick)
-                          ->registerConverter($converter)
-                          ->convert($image, 'jpeg', $mime),
+            $this->manager
+                ->setImagick($imagick)
+                ->registerConverter($converter)
+                ->convert($image, 'jpeg', $mime),
             'Exected convert method to return true'
         );
     }
@@ -246,9 +247,10 @@ class OutputConverterManagerTest extends TestCase {
         ]);
 
         $this->assertNull(
-            $this->manager->setImagick($this->createMock(Imagick::class))
-                          ->registerConverter($converter)
-                          ->convert($this->createMock(Image::class), 'png', 'image/png')
+            $this->manager
+                ->setImagick($this->createMock(Imagick::class))
+                ->registerConverter($converter)
+                ->convert($this->createMock(Image::class), 'png', 'image/png')
         );
     }
 }

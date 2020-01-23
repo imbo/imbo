@@ -1,23 +1,19 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Image\OutputConverter;
+namespace Imbo\Image\OutputConverter;
 
 use Imbo\Image\OutputConverter\Basic;
 use Imbo\Exception\OutputConverterException;
+use Imbo\Model\Image;
 use PHPUnit\Framework\TestCase;
+use Imagick;
 use ImagickException;
 
 /**
  * @coversDefaultClass Imbo\Image\OutputConverter\Basic
  */
 class BasicTest extends TestCase {
-    /**
-     * @var Basic
-     */
     private $converter;
 
-    /**
-     * Set up the loader
-     */
     public function setUp() : void {
         $this->converter = new Basic();
     }
@@ -42,15 +38,17 @@ class BasicTest extends TestCase {
         $extension = 'png';
         $mimeType = 'image/png';
 
-        $imagick = $this->createMock('Imagick');
-        $imagick->expects($this->once())
-                ->method('setImageFormat')
-                ->with($extension);
+        $imagick = $this->createMock(Imagick::class);
+        $imagick
+            ->expects($this->once())
+            ->method('setImageFormat')
+            ->with($extension);
 
-        $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())
-              ->method('hasBeenTransformed')
-              ->with(true);
+        $image = $this->createMock(Image::class);
+        $image
+            ->expects($this->once())
+            ->method('hasBeenTransformed')
+            ->with(true);
 
         $this->assertNull($this->converter->convert($imagick, $image, $extension, $mimeType));
     }
@@ -61,16 +59,17 @@ class BasicTest extends TestCase {
     public function testThrowsExceptionOnImagickFailure() : void {
         $extension = 'png';
 
-        $imagick = $this->createMock('Imagick');
-        $imagick->expects($this->once())
-                ->method('setImageFormat')
-                ->with($extension)
-                ->will($this->throwException(new ImagickException('some error')));
+        $imagick = $this->createMock(Imagick::class);
+        $imagick
+            ->expects($this->once())
+            ->method('setImageFormat')
+            ->with($extension)
+            ->willThrowException(new ImagickException('some error'));
 
         $this->expectExceptionObject(new OutputConverterException('some error', 400));
         $this->converter->convert(
             $imagick,
-            $this->createMock('Imbo\Model\Image'),
+            $this->createMock(Image::class),
             $extension,
             'image/png'
         );

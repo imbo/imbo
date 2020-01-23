@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\EventListener;
+namespace Imbo\EventListener;
 
 use Imbo\EventListener\ImageTransformationCache;
 use Imbo\Exception\InvalidArgumentException;
@@ -11,75 +11,23 @@ use Imbo\Model\Error;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
-use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamDirectory;
+use TestFs\StreamWrapper as TestFs;
 
 /**
  * @coversDefaultClass Imbo\EventListener\ImageTransformationCache
  */
 class ImageTransformationCacheTest extends ListenerTests {
-    /**
-     * @var ImageTransformationCache
-     */
     private $listener;
-
-    /**
-     * Cache path
-     *
-     * @var string
-     */
-    private $path = 'cacheDir';
-
-    /**
-     * @var Event
-     */
     private $event;
-
-    /**
-     * @var Request
-     */
     private $request;
-
-    /**
-     * @var Response
-     */
     private $response;
-
-    /**
-     * @var ParameterBag
-     */
     private $query;
-
-    /**
-     * @var string
-     */
     private $user = 'user';
-
-    /**
-     * @var string
-     */
     private $imageIdentifier = '7bf2e67f09de203da740a86cd37bbe8d';
-
-    /**
-     * @var ResponseHeaderBag
-     */
     private $responseHeaders;
-
-    /**
-     * @var HeaderBag
-     */
     private $requestHeaders;
 
-    /**
-     * @var vfsStreamDirectory
-     */
-    private $cacheDir;
-
     public function setUp() : void {
-        if (!class_exists(vfsStream::class)) {
-            $this->markTestSkipped('This testcase requires mikey179/vfsStream to run');
-        }
-
         $this->responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $this->requestHeaders = $this->createMock(HeaderBag::class);
         $this->query = $this->createMock(ParameterBag::class);
@@ -99,9 +47,14 @@ class ImageTransformationCacheTest extends ListenerTests {
             'getResponse' => $this->response,
         ]);
 
-        $this->cacheDir = vfsStream::setup($this->path);
+        TestFs::register();
+        $this->cacheDir = TestFs::getRoot();
 
-        $this->listener = new ImageTransformationCache(['path' => vfsStream::url($this->path)]);
+        $this->listener = new ImageTransformationCache(['path' => TestFs::url('cacheDir')]);
+    }
+
+    public function tearDown() : void {
+        TestFs::unregister();
     }
 
     protected function getListener() : ImageTransformationCache {
@@ -116,40 +69,36 @@ class ImageTransformationCacheTest extends ListenerTests {
      */
     public function testChangesTheImageInstanceOnCacheHit() : void {
         $imageFromCache = $this->createMock(Image::class);
-        $headersFromCache = $this->createMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
         $cachedData = serialize([
             'image' => $imageFromCache,
-            'headers' => $headersFromCache,
+            'headers' => $this->createMock(ResponseHeaderBag::class),
         ]);
 
-        $this->request->method('getUser')
-                      ->willReturn($this->user);
+        $this->request
+            ->method('getExtension')
+            ->willReturn('png');
 
-        $this->request->method('getImageIdentifier')
-                      ->willReturn($this->imageIdentifier);
+        $this->requestHeaders
+            ->method('get')
+            ->with('Accept', '*/*')
+            ->willReturn('text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
 
-        $this->request->method('getExtension')
-                      ->willReturn('png');
+        $this->query
+            ->method('get')
+            ->with('t')
+            ->willReturn(['thumbnail']);
 
-        $this->requestHeaders->method('get')
-                             ->with('Accept', '*/*')
-                             ->willReturn(
-                                 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-                             );
+        $this->response
+            ->expects($this->once())
+            ->method('setModel')
+            ->with($imageFromCache)
+            ->willReturnSelf();
 
-        $this->query->method('get')
-                    ->with('t')
-                    ->willReturn(['thumbnail']);
+        $this->event
+            ->expects($this->once())
+            ->method('stopPropagation');
 
-        $this->response->expects($this->once())
-                       ->method('setModel')
-                       ->with($imageFromCache)
-                       ->willReturnSelf();
-
-        $this->event->expects($this->once())
-                    ->method('stopPropagation');
-
-        $dir = 'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6';
+        $dir = TestFs::url('cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6');
         $file = 'bc6ffe312a5741a5705afe8639c08835';
         $fullPath = $dir . '/' . $file;
 
@@ -168,28 +117,23 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers ::getCacheFilePath
      */
     public function testRemovesCorruptCachedDataOnCacheHit() : void {
-        $this->request->method('getUser')
-                      ->willReturn($this->user);
+        $this->request
+            ->method('getExtension')
+            ->willReturn('png');
 
-        $this->request->method('getImageIdentifier')
-                      ->willReturn($this->imageIdentifier);
+        $this->requestHeaders
+            ->expects($this->once())
+            ->method('get')
+            ->with('Accept', '*/*')
+            ->willReturn('text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
 
-        $this->request->method('getExtension')
-                      ->willReturn('png');
+        $this->query
+            ->expects($this->once())
+            ->method('get')
+            ->with('t')
+            ->willReturn(['thumbnail']);
 
-        $this->requestHeaders->expects($this->once())
-                             ->method('get')
-                             ->with('Accept', '*/*')
-                             ->willReturn(
-                                 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-                             );
-
-        $this->query->expects($this->once())
-                    ->method('get')
-                    ->with('t')
-                    ->willReturn(['thumbnail']);
-
-        $dir = 'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6';
+        $dir = TestFs::url('cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6');
         $file = 'bc6ffe312a5741a5705afe8639c08835';
         $fullPath = $dir . '/' . $file;
 
@@ -209,14 +153,16 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers ::getCacheFilePath
      */
     public function testAddsCorrectResponseHeaderOnCacheMiss() : void {
-        $this->requestHeaders->expects($this->once())
-                             ->method('get')
-                             ->with('Accept', '*/*')
-                             ->willReturn('*/*');
+        $this->requestHeaders
+            ->expects($this->once())
+            ->method('get')
+            ->with('Accept', '*/*')
+            ->willReturn('*/*');
 
-        $this->responseHeaders->expects($this->once())
-                              ->method('set')
-                              ->with('X-Imbo-TransformationCache', 'Miss');
+        $this->responseHeaders
+            ->expects($this->once())
+            ->method('set')
+            ->with('X-Imbo-TransformationCache', 'Miss');
 
         $this->listener->loadFromCache($this->event);
     }
@@ -225,12 +171,14 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers ::storeInCache
      */
     public function testDoesNotStoreNonImageModelsInTheCache() : void {
-        $this->response->expects($this->once())
-                       ->method('getModel')
-                       ->willReturn($this->createMock(Error::class));
+        $this->response
+            ->expects($this->once())
+            ->method('getModel')
+            ->willReturn($this->createMock(Error::class));
 
-        $this->request->expects($this->never())
-                      ->method('getUser');
+        $this->request
+            ->expects($this->never())
+            ->method('getUser');
 
         $this->listener->storeInCache($this->event);
     }
@@ -244,16 +192,18 @@ class ImageTransformationCacheTest extends ListenerTests {
     public function testStoresImageInCache() : void {
         $image = $this->createMock(Image::class);
 
-        $this->response->expects($this->once())
-                       ->method('getModel')
-                       ->willReturn($this->createMock(Image::class));
+        $this->response
+            ->expects($this->once())
+            ->method('getModel')
+            ->willReturn($this->createMock(Image::class));
 
-        $this->requestHeaders->expects($this->once())
-                             ->method('get')
-                             ->with('Accept', '*/*')
-                             ->willReturn('*/*');
+        $this->requestHeaders
+            ->expects($this->once())
+            ->method('get')
+            ->with('Accept', '*/*')
+            ->willReturn('*/*');
 
-        $cacheFile = 'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/0/5/b0571fa001b22145f82750c84c6ddda4';
+        $cacheFile = TestFs::url('cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/0/5/b0571fa001b22145f82750c84c6ddda4');
 
         $this->assertFalse(is_file($cacheFile));
         $this->listener->storeInCache($this->event);
@@ -272,18 +222,53 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers ::getCacheFilePath
      */
     public function testDoesNotStoreIfCachedVersionAlreadyExists() : void {
-        // Reusing the same logic as this test
-        $this->testChangesTheImageInstanceOnCacheHit();
+        $imageFromCache = $this->createMock(Image::class);
+        $cachedData = serialize([
+            'image' => $imageFromCache,
+            'headers' => $this->createMock(ResponseHeaderBag::class),
+        ]);
 
-        $this->response->expects($this->once())
-                       ->method('getModel')
-                       ->willReturn($this->createMock(Image::class));
+        $this->request
+            ->method('getExtension')
+            ->willReturn('png');
 
-        // Overwrite cached file
-        $dir = 'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6';
+        $this->requestHeaders
+            ->method('get')
+            ->with('Accept', '*/*')
+            ->willReturn('text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
+
+        $this->query
+            ->method('get')
+            ->with('t')
+            ->willReturn(['thumbnail']);
+
+        $this->response
+            ->expects($this->once())
+            ->method('setModel')
+            ->with($imageFromCache)
+            ->willReturnSelf();
+
+        $this->response
+            ->expects($this->once())
+            ->method('getModel')
+            ->willReturn($this->createMock(Image::class));
+
+        $this->event
+            ->expects($this->once())
+            ->method('stopPropagation');
+
+        $dir = TestFs::url('cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6');
         $file = 'bc6ffe312a5741a5705afe8639c08835';
         $fullPath = $dir . '/' . $file;
 
+        mkdir($dir, 0775, true);
+        file_put_contents($fullPath, $cachedData);
+
+        $this->listener->loadFromCache($this->event);
+
+        $this->assertInstanceOf(ResponseHeaderBag::class, $this->response->headers);
+
+        // Overwrite cached file
         file_put_contents($fullPath, 'foobar');
 
         // Since we hit a cached version earlier, we shouldn't overwrite the cached file
@@ -299,25 +284,25 @@ class ImageTransformationCacheTest extends ListenerTests {
      */
     public function testCanDeleteAllImageVariationsFromCache() : void {
         $cachedFiles = [
-            'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/f/30f0763c8422360d10fd84573dd58293',
-            'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/e/30e0763c8422360d10fd84573dd58293',
-            'vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/d/30d0763c8422360d10fd84573dd58293',
+            TestFs::url('cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/f/30f0763c8422360d10fd84573dd58293'),
+            TestFs::url('cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/e/30e0763c8422360d10fd84573dd58293'),
+            TestFs::url('cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/d/30d0763c8422360d10fd84573dd58293'),
         ];
 
         foreach ($cachedFiles as $file) {
-            @mkdir(dirname($file), 0775, true);
+            mkdir(dirname($file), 0775, true);
             file_put_contents($file, 'image data');
-            $this->assertTrue(is_file($file));
+            $this->assertTrue(is_file($file), sprintf('Expected file %s to exist', $file));
         }
 
         $this->listener->deleteFromCache($this->event);
 
         foreach ($cachedFiles as $file) {
-            $this->assertFalse(is_file($file));
+            $this->assertFalse(is_file($file), sprintf('Did not expect file %s to exist', $file));
         }
 
-        $this->assertFalse(is_dir('vfs://cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d'));
-        $this->assertTrue(is_dir('vfs://cacheDir/u/s/e/user/7/b/f'));
+        $this->assertFalse(is_dir(TestFs::url('cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d')), 'Did not expect directory to exist');
+        $this->assertTrue(is_dir(TestFs::url('cacheDir/u/s/e/user/7/b/f')), 'Expected directory to exist');
     }
 
     /**
@@ -335,13 +320,14 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers ::__construct
      */
     public function testThrowsExceptionWhenCacheDirIsNotWritable() : void {
-        $dir = new vfsStreamDirectory('dir', 0);
-        $this->cacheDir->addChild($dir);
+        $dir = TestFs::url('unwritableDir');
+        mkdir($dir, 0000);
+
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Image transformation cache path is not writable by the webserver: vfs://cacheDir/dir',
+            'Image transformation cache path is not writable by the webserver: tfs://unwritableDir',
             500
         ));
-        new ImageTransformationCache(['path' => 'vfs://cacheDir/dir']);
+        new ImageTransformationCache(['path' => $dir]);
     }
 
     /**
@@ -349,7 +335,7 @@ class ImageTransformationCacheTest extends ListenerTests {
      */
     public function testDoesNotTriggerWarningIfCachePathDoesNotExistAndParentIsWritable() : void {
         $this->assertNotNull(
-            new ImageTransformationCache(['path' => 'vfs://cacheDir/some/dir/that/does/not/exist'])
+            new ImageTransformationCache(['path' => TestFs::url('cacheDir/some/dir/that/does/not/exist')])
         );
     }
 }
