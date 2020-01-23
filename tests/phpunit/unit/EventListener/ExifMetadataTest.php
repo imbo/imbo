@@ -1,8 +1,14 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\EventListener;
+namespace Imbo\EventListener;
 
 use Imbo\EventListener\ExifMetadata;
 use Imbo\Exception\RuntimeException;
+use Imbo\Model\Image;
+use Imbo\Database\DatabaseInterface;
+use Imbo\EventManager\Event;
+use Imbo\Exception\DatabaseException;
+use Imbo\Http\Request\Request;
+use Imagick;
 
 /**
  * @coversDefaultClass Imbo\EventListener\ExifMetadata
@@ -42,6 +48,7 @@ class ExifMetadataTest extends ListenerTests {
             'jpeg:colorspace' => '2',
             'jpeg:sampling-factor' => '2x2,1x1,1x1',
         ];
+
         return [
             'all values' => [
                 'data' => $data,
@@ -109,24 +116,36 @@ class ExifMetadataTest extends ListenerTests {
         $imageIdentifier = 'imageIdentifier';
         $blob = 'blob';
 
-        $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue($imageIdentifier));
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue($blob));
+        $image = $this->createConfiguredMock(Image::class, [
+            'getImageIdentifier' => $imageIdentifier,
+            'getBlob' => $blob,
+        ]);
 
-        $imagick = $this->createMock('Imagick');
-        $imagick->expects($this->once())->method('readImageBlob')->will($this->returnValue($blob));
-        $imagick->expects($this->once())->method('getImageProperties')->will($this->returnValue($data));
+        $imagick = $this->createConfiguredMock(Imagick::class, [
+            'readImageBlob' => $blob,
+            'getImageProperties' => $data,
+        ]);
 
-        $request = $this->createMock('Imbo\Http\Request\Request');
-        $request->expects($this->once())->method('getUser')->will($this->returnValue($user));
-        $request->expects($this->any())->method('getImage')->will($this->returnValue($image));
+        $request = $this->createConfiguredMock(Request::class, [
+            'getUser' => $user,
+            'getImage' => $image,
+        ]);
 
-        $database = $this->createMock('Imbo\Database\DatabaseInterface');
-        $database->expects($this->once())->method('updateMetadata')->with($user, $imageIdentifier, $expectedData);
+        $database = $this->createMock(DatabaseInterface::class);
+        $database
+            ->expects($this->once())
+            ->method('updateMetadata')
+            ->with($user, $imageIdentifier, $expectedData);
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->exactly(2))->method('getRequest')->will($this->returnValue($request));
-        $event->expects($this->once())->method('getDatabase')->will($this->returnValue($database));
+        $event = $this->createMock(Event::class);
+        $event
+            ->expects($this->exactly(2))
+            ->method('getRequest')
+            ->willReturn($request);
+        $event
+            ->expects($this->once())
+            ->method('getDatabase')
+            ->willReturn($database);
 
         $listener = new ExifMetadata(['allowedTags' => $tags]);
         $listener->setImagick($imagick);
@@ -138,21 +157,30 @@ class ExifMetadataTest extends ListenerTests {
      * @covers ::save
      */
     public function testWillDeleteImageWhenUpdatingMetadataFails() : void {
-        $databaseException = $this->createMock('Imbo\Exception\DatabaseException');
-        $database = $this->createMock('Imbo\Database\DatabaseInterface');
-        $database->expects($this->once())->method('updateMetadata')->with('user', 'imageidentifier', [])->will($this->throwException($databaseException));
-        $database->expects($this->once())->method('deleteImage')->with('user', 'imageidentifier');
+        $database = $this->createMock(DatabaseInterface::class);
+        $database
+            ->expects($this->once())
+            ->method('updateMetadata')
+            ->with('user', 'imageidentifier', [])
+            ->willThrowException($this->createMock(DatabaseException::class));
+        $database
+            ->expects($this->once())
+            ->method('deleteImage')
+            ->with('user', 'imageidentifier');
 
-        $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageidentifier'));
+        $image = $this->createConfiguredMock(Image::class, [
+            'getImageIdentifier' => 'imageidentifier',
+        ]);
 
-        $request = $this->createMock('Imbo\Http\Request\Request');
-        $request->expects($this->once())->method('getUser')->will($this->returnValue('user'));
-        $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
+        $request = $this->createConfiguredMock(Request::class, [
+            'getUser' => 'user',
+            'getImage' => $image,
+        ]);
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
-        $event->expects($this->once())->method('getDatabase')->will($this->returnValue($database));
+        $event = $this->createConfiguredMock(Event::class, [
+            'getRequest' => $request,
+            'getDatabase' => $database,
+        ]);
         $this->expectExceptionObject(new RuntimeException('Could not store EXIF-metadata', 500));
         $this->listener->save($event);
     }
@@ -161,6 +189,6 @@ class ExifMetadataTest extends ListenerTests {
      * @covers ::getImagick
      */
     public function testCanInstantiateImagickItself() : void {
-        $this->assertInstanceOf('Imagick', $this->listener->getImagick());
+        $this->assertInstanceOf(Imagick::class, $this->listener->getImagick());
     }
 }

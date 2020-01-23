@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Auth\AccessControl;
+namespace Imbo\Auth\AccessControl;
 
-use Imbo\Auth\AccessControl\GroupQuery;
 use PHPUnit\Framework\TestCase;
 
 /**

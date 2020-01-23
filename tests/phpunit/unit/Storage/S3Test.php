@@ -1,8 +1,7 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Storage;
+namespace Imbo\Storage;
 
 use Imbo\Exception\ConfigurationException;
-use Imbo\Storage\S3;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -10,21 +9,19 @@ use PHPUnit\Framework\TestCase;
  */
 class S3Test extends TestCase {
     /**
-     * Test that we don't get an exception with required parameters present
+     * @covers ::__construct
      */
     public function testConstructorWithAllRequiredParameters() : void {
-        $s3 = new S3([
+        $this->assertNotNull(new S3([
             'key' => 'foo',
             'secret' => 'bar',
             'bucket' => 'spam',
             'region' => 'eggs',
-        ]);
-
-        $this->assertNotNull($s3);
+        ]));
     }
 
     /**
-     * Test that we _do_ get an exception with required parameters present
+     * @covers ::__construct
      */
     public function testConstructorMissingRequiredParameters() : void {
         $this->expectExceptionObject(new ConfigurationException(
@@ -41,7 +38,7 @@ class S3Test extends TestCase {
     }
 
     /**
-     * Test that we _do_ get exceptions for each single missing parameter
+     * @covers ::__construct
      */
     public function testConstructorEachMissingRequiredParameters() : void {
         $params = [
@@ -51,7 +48,7 @@ class S3Test extends TestCase {
             'region' => 'eggs',
         ];
 
-        foreach ($params as $param => $dummy) {
+        foreach (array_keys($params) as $param) {
             $local = $params;
             unset($local[$param]);
             $exception = false;

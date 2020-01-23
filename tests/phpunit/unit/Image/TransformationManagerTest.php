@@ -1,8 +1,10 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Image;
+namespace Imbo\Image;
 
-use Imbo\Image\TransformationManager;
+use Imbo\EventManager\EventInterface;
 use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+use Imbo\Model\Image;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use PHPUnit\Framework\TestCase;
 
@@ -25,21 +27,24 @@ class TransformationManagerTest extends TestCase {
         $this->query = new ParameterBag([]);
         $this->request = new Request();
         $this->request->query = $this->query;
-        $this->event = $this->createMock('Imbo\EventManager\Event');
-        $this->image = $this->createMock('Imbo\Model\Image');
-        $this->response = $this->createMock('Imbo\Http\Response\Response');
 
-        $this->response->expects($this->any())->method('getModel')->will($this->returnValue($this->image));
+        $this->image = $this->createConfiguredMock(Image::class, [
+            'getWidth' => 1600,
+            'getHeight' => 900,
+        ]);
 
-        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
-        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
+        $this->response = $this->createConfiguredMock(Response::class, [
+            'getModel' => $this->image,
+        ]);
 
-        $this->image->expects($this->any())->method('getWidth')->will($this->returnValue(1600));
-        $this->image->expects($this->any())->method('getHeight')->will($this->returnValue(900));
+        $this->event = $this->createConfiguredMock(EventInterface::class, [
+            'getRequest' => $this->request,
+            'getResponse' => $this->response,
+        ]);
     }
 
     /**
-     * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
+     * @covers ::getMinimumImageInputSize
      */
     public function testFindsTheMinimumImageInputSizeForSingleTransformation() : void {
         $this->query->set('t', ['maxSize:width=1024']);
@@ -50,7 +55,7 @@ class TransformationManagerTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
+     * @covers ::getMinimumImageInputSize
      */
     public function testFindsTheMinimumImageInputSizeForMultipleTransformations() : void {
         $this->query->set('t', ['maxSize:width=1024', 'maxSize:height=620']);
@@ -68,7 +73,7 @@ class TransformationManagerTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
+     * @covers ::getMinimumImageInputSize
      */
     public function testFindsTheMinimumImageInputSizeForRotatedImages() : void {
         $this->query->set('t', ['rotate:angle=90', 'maxSize:width=600']);
@@ -79,7 +84,7 @@ class TransformationManagerTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
+     * @covers ::getMinimumImageInputSize
      */
     public function testFindsTheMinimumImageInputSizeForDoublyRotatedImages() : void {
         $this->query->set('t', [
@@ -96,7 +101,7 @@ class TransformationManagerTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
+     * @covers ::getMinimumImageInputSize
      */
     public function testReturnsFalseIfMinimumSizeIsLargerThanOriginal() : void {
         $this->query->set('t', ['resize:width=3800,height=1800']);
@@ -104,7 +109,7 @@ class TransformationManagerTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
+     * @covers ::getMinimumImageInputSize
      */
     public function testSkipsTransformationsThatReturnNullAsMinInputSize() : void {
         $this->query->set('t', ['maxSize:width=10000']);
@@ -112,7 +117,7 @@ class TransformationManagerTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
+     * @covers ::getMinimumImageInputSize
      */
     public function testReturnsCorrectSizeIfChainIsNotStopped() : void {
         // Sanity check for the test that follows
@@ -122,7 +127,7 @@ class TransformationManagerTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
+     * @covers ::getMinimumImageInputSize
      */
     public function testStopsMinSizeChainIfTransformationReturnsFalse() : void {
         $this->query->set('t', ['maxSize:width=750', 'rotate:angle=17.3', 'maxSize:width=320']);
@@ -133,7 +138,7 @@ class TransformationManagerTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Image\TransformationManager::getMinimumImageInputSize
+     * @covers ::getMinimumImageInputSize
      */
     public function testFindsRightSizeWhenRegionIsExtracted() : void {
         $this->query->set('t', ['crop:width=784,height=700,x=384,y=200', 'maxSize:width=320']);

@@ -1,21 +1,19 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\EventListener;
+namespace Imbo\EventListener;
 
-use Imbo\EventListener\AutoRotateImage;
+use Imbo\EventManager\EventInterface;
+use Imbo\Http\Request\Request;
+use Imbo\Image\Transformation\AutoRotate;
+use Imbo\Image\TransformationManager;
+use Imbo\Model\Image;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\EventListener\AutoRotateImage
  */
 class AutoRotateImageTest extends TestCase {
-    /**
-     * @var AutoRotateImage
-     */
     private $listener;
 
-    /**
-     * Set up the listener
-     */
     public function setUp() : void {
         $this->listener = new AutoRotateImage();
     }
@@ -35,33 +33,34 @@ class AutoRotateImageTest extends TestCase {
      * @covers ::autoRotate
      */
     public function testTriggersTransformationForRotating() : void {
-        $image = $this->createMock('Imbo\Model\Image');
+        $image = $this->createMock(Image::class);
 
-        $request = $this->createMock('Imbo\Http\Request\Request');
-        $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
+        $request = $this->createConfiguredMock(Request::class, [
+            'getImage' => $image,
+        ]);
 
-        $autoRotate = $this->createMock('Imbo\Image\Transformation\Transformation');
+        $autoRotate = $this->createMock(AutoRotate::class);
         $autoRotate
             ->expects($this->once())
             ->method('setImage')
             ->with($image)
-            ->will($this->returnSelf());
-
+            ->willReturnSelf();
         $autoRotate
             ->expects($this->once())
             ->method('transform')
             ->with([]);
 
-        $transformationManager = $this->createMock('Imbo\Image\TransformationManager');
+        $transformationManager = $this->createMock(TransformationManager::class);
         $transformationManager
             ->expects($this->once())
             ->method('getTransformation')
             ->with('autoRotate')
-            ->will($this->returnValue($autoRotate));
+            ->willReturn($autoRotate);
 
-        $event = $this->createMock('Imbo\EventManager\Event');
-        $event->expects($this->once())->method('getRequest')->will($this->returnValue($request));
-        $event->expects($this->once())->method('getTransformationManager')->will($this->returnValue($transformationManager));
+        $event = $this->createConfiguredMock(EventInterface::class, [
+            'getRequest' => $request,
+            'getTransformationManager' => $transformationManager,
+        ]);
 
         $this->listener->autoRotate($event);
     }

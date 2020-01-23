@@ -1,13 +1,16 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest;
+namespace Imbo;
 
-use Imbo\Application;
-use Imbo\Version;
+use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
+use Imbo\Database\DatabaseInterface;
 use Imbo\EventListener\ListenerInterface;
 use Imbo\Http\Request\Request;
 use Imbo\Resource\ResourceInterface;
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Response\Response;
+use Imbo\Storage\StorageInterface;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 /**
  * @coversDefaultClass Imbo\Application
@@ -25,7 +28,7 @@ class ApplicationTest extends TestCase {
     public function testThrowsExceptionWhenConfigurationHasInvalidDatabaseAdapter() : void {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid database adapter', 500));
         $this->application->run([
-            'database' => function() { return new \stdClass(); },
+            'database' => function() { return new stdClass(); },
             'trustedProxies' => [],
         ]);
     }
@@ -37,7 +40,7 @@ class ApplicationTest extends TestCase {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid storage adapter', 500));
         $this->application->run([
             'database' => $this->createMock('Imbo\Database\DatabaseInterface'),
-            'storage' => function() { return new \stdClass(); },
+            'storage' => function() { return new stdClass(); },
             'trustedProxies' => [],
         ]);
     }
@@ -48,11 +51,11 @@ class ApplicationTest extends TestCase {
     public function testThrowsExceptionWhenConfigurationHasInvalidAccessControlAdapter() : void {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid access control adapter', 500));
         $this->application->run([
-            'database' => $this->createMock('Imbo\Database\DatabaseInterface'),
-            'storage' => $this->createMock('Imbo\Storage\StorageInterface'),
+            'database' => $this->createMock(DatabaseInterface::class),
+            'storage' => $this->createMock(StorageInterface::class),
             'routes' => [],
             'trustedProxies' => [],
-            'accessControl' => function() { return new \stdClass(); },
+            'accessControl' => function() { return new stdClass(); },
         ]);
     }
 
@@ -64,9 +67,9 @@ class ApplicationTest extends TestCase {
 
         $this->assertEmpty(Request::getTrustedProxies());
         $this->application->run([
-            'database' => $this->createMock('Imbo\Database\DatabaseInterface'),
-            'storage' => $this->createMock('Imbo\Storage\StorageInterface'),
-            'accessControl' => $this->createMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface'),
+            'database' => $this->createMock(DatabaseInterface::class),
+            'storage' => $this->createMock(StorageInterface::class),
+            'accessControl' => $this->createMock(AdapterInterface::class),
             'eventListenerInitializers' => [],
             'eventListeners' => [],
             'contentNegotiateImages' => false,
@@ -88,34 +91,34 @@ class ApplicationTest extends TestCase {
         $default = require __DIR__ . '/../../../config/config.default.php';
         $test = array(
             'database' => function ($request, $response) {
-                $this->assertInstanceOf('Imbo\Http\Request\Request', $request);
-                $this->assertInstanceOf('Imbo\Http\Response\Response', $response);
+                $this->assertInstanceOf(Request::class, $request);
+                $this->assertInstanceOf(Response::class, $response);
 
-                return $this->createMock('Imbo\Database\DatabaseInterface');
+                return $this->createMock(DatabaseInterface::class);
             },
             'storage' => function ($request, $response) {
-                $this->assertInstanceOf('Imbo\Http\Request\Request', $request);
-                $this->assertInstanceOf('Imbo\Http\Response\Response', $response);
+                $this->assertInstanceOf(Request::class, $request);
+                $this->assertInstanceOf(Response::class, $response);
 
-                return $this->createMock('Imbo\Storage\StorageInterface');
+                return $this->createMock(StorageInterface::class);
             },
             'accessControl' => function ($request, $response) {
-                $this->assertInstanceOf('Imbo\Http\Request\Request', $request);
-                $this->assertInstanceOf('Imbo\Http\Response\Response', $response);
+                $this->assertInstanceOf(Request::class, $request);
+                $this->assertInstanceOf(Response::class, $response);
 
-                return $this->createMock('Imbo\Auth\AccessControl\Adapter\AdapterInterface');
+                return $this->createMock(AdapterInterface::class);
             },
             'eventListeners' => [
                 'test' => function ($request, $response) {
-                    $this->assertInstanceOf('Imbo\Http\Request\Request', $request);
-                    $this->assertInstanceOf('Imbo\Http\Response\Response', $response);
+                    $this->assertInstanceOf(Request::class, $request);
+                    $this->assertInstanceOf(Response::class, $response);
 
                     return new TestListener();
                 },
                 'testSubelement' => [
                     'listener' => function ($request, $response) {
-                        $this->assertInstanceOf('Imbo\Http\Request\Request', $request);
-                        $this->assertInstanceOf('Imbo\Http\Response\Response', $response);
+                        $this->assertInstanceOf(Request::class, $request);
+                        $this->assertInstanceOf(Response::class, $response);
 
                         return new TestListener();
                     },
@@ -123,8 +126,8 @@ class ApplicationTest extends TestCase {
             ],
             'resources' => [
                 'test' => function ($request, $response) {
-                    $this->assertInstanceOf('Imbo\Http\Request\Request', $request);
-                    $this->assertInstanceOf('Imbo\Http\Response\Response', $response);
+                    $this->assertInstanceOf(Request::class, $request);
+                    $this->assertInstanceOf(Response::class, $response);
 
                     return new TestResource();
                 },

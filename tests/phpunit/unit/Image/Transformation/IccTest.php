@@ -162,11 +162,11 @@ class IccTest extends TestCase {
                 ['*', null],
                 ['icc', $profile]
             )
-            ->will($this->onConsecutiveCalls(
+            ->willReturnOnConsecutiveCalls(
                 $this->throwException(new ImagickException('error #1', 465)),
                 true,
                 true
-            ));
+            );
 
         (new Icc([
             'default' => DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc',
@@ -191,11 +191,11 @@ class IccTest extends TestCase {
                 ['*', null],
                 ['icc', $profile]
             )
-            ->will($this->onConsecutiveCalls(
+            ->willReturnOnConsecutiveCalls(
                 $this->throwException(new ImagickException('error #1', 465)),
                 true,
                 $this->throwException($e = new ImagickException('error #2'))
-            ));
+            );
 
         $this->expectExceptionObject(new TransformationException('error #2', 400, $e));
 

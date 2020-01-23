@@ -1,29 +1,26 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\EventListener;
+namespace Imbo\EventListener;
 
-use Imbo\EventListener\StatsAccess;
+use Imbo\EventManager\EventInterface;
 use Imbo\Resource\Stats as StatsResource;
 use Imbo\EventManager\EventManager;
 use Imbo\Exception\RuntimeException;
-use ReflectionProperty;
+use Imbo\Http\Request\Request;
 
 /**
  * @coversDefaultClass Imbo\EventListener\StatsAccess
  */
 class StatsAccessTest extends ListenerTests {
-    /**
-     * @var StatsAccess
-     */
     private $listener;
-
     private $event;
     private $request;
 
     public function setUp() : void {
-        $this->request = $this->createMock('Imbo\Http\Request\Request');
+        $this->request = $this->createMock(Request::class);
 
-        $this->event = $this->createMock('Imbo\EventManager\Event');
-        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
+        $this->event = $this->createConfiguredMock(EventInterface::class, [
+            'getRequest' => $this->request,
+        ]);
 
         $this->listener = new StatsAccess();
     }
@@ -77,6 +74,21 @@ class StatsAccessTest extends ListenerTests {
                 ['2001:db8::/48'],
                 true
             ],
+            'IPv6 in whitelist range (3)' => [
+                '2001:0db8:0000:0000:0000:0000:0000:0000',
+                ['2001:db8::/47'],
+                true
+            ],
+            'IPv6 in whitelist range (2)' => [
+                '2001:0db8:0000:0000:0000:0000:0000:0000',
+                ['2001:db8::/46'],
+                true
+            ],
+            'IPv6 in whitelist range (1)' => [
+                '2001:0db8:0000:0000:0000:0000:0000:0000',
+                ['2001:db8::/45'],
+                true
+            ],
             'IPv6 outside of whitelist range' => [
                 '2001:0db9:0000:0000:0000:0000:0000:0000',
                 ['2001:db8::/48'],
@@ -107,11 +119,23 @@ class StatsAccessTest extends ListenerTests {
 
     /**
      * @dataProvider getFilterData
+     * @covers ::checkAccess
+     * @covers ::isIPv6
+     * @covers ::isIPv4
+     * @covers ::expandIPv6
+     * @covers ::isAllowed
+     * @covers ::cidrMatch
+     * @covers ::cidr6Match
+     * @covers ::cidr4Match
+     * @covers ::getBinaryMask
+     * @covers ::__construct
+     * @covers ::expandIPv6InFilters
      */
     public function testCanUseDifferentFilters(string $clientIp, array $allow, bool $hasAccess) : void {
-        $this->request->expects($this->once())
-                      ->method('getClientIp')
-                      ->will($this->returnValue($clientIp));
+        $this->request
+            ->expects($this->once())
+            ->method('getClientIp')
+            ->willReturn($clientIp);
 
         $listener = new StatsAccess([
             'allow' => $allow,
@@ -126,6 +150,7 @@ class StatsAccessTest extends ListenerTests {
 
     /**
      * @see https://github.com/imbo/imbo/issues/249
+     * @covers ::getSubscribedEvents
      */
     public function testListensToTheSameEventsAsTheStatsResource() : void {
         $this->assertSame(
@@ -137,27 +162,19 @@ class StatsAccessTest extends ListenerTests {
 
     /**
      * @see https://github.com/imbo/imbo/issues/251
+     * @covers ::getSubscribedEvents
      */
     public function testHasHigherPriorityThanTheStatsResource() : void {
-        $statsAccess = new StatsAccess();
-        $statsResource = new StatsResource();
+        $eventManager = (new EventManager())
+            ->setEventTemplate($this->createConfiguredMock(EventInterface::class, [
+                'getRequest' => $this->createMock(Request::class)
+            ]))
+            ->addEventHandler('statsAccess', function () { echo 'stats access'; })
+            ->addCallbacks('statsAccess', StatsAccess::getSubscribedEvents())
+            ->addEventHandler('statsResource', function () { echo 'stats resource'; })
+            ->addCallbacks('statsResource', StatsResource::getSubscribedEvents());
 
-        $eventManager = new EventManager();
-        $eventManager->addEventHandler('statsAccess', $statsAccess);
-        $eventManager->addCallbacks('statsAccess', StatsAccess::getSubscribedEvents());
-        $eventManager->addEventHandler('statsResource', $statsResource);
-        $eventManager->addCallbacks('statsResource', StatsResource::getSubscribedEvents());
-
-        $callbacks = new ReflectionProperty($eventManager, 'callbacks');
-        $callbacks->setAccessible(true);
-
-        $handlersForGet = $callbacks->getValue($eventManager)['stats.get'];
-        $handlersForHead = $callbacks->getValue($eventManager)['stats.head'];
-
-        $this->assertSame($statsAccess, $eventManager->getHandlerInstance($handlersForGet->extract()['handler']));
-        $this->assertSame($statsResource, $eventManager->getHandlerInstance($handlersForGet->extract()['handler']));
-
-        $this->assertSame($statsAccess, $eventManager->getHandlerInstance($handlersForHead->extract()['handler']));
-        $this->assertSame($statsResource, $eventManager->getHandlerInstance($handlersForHead->extract()['handler']));
+        $this->expectOutputString('stats accessstats resource');
+        $eventManager->trigger('stats.get');
     }
 }

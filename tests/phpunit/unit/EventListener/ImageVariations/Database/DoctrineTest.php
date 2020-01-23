@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\EventListener\ImageVariations\Database;
+namespace Imbo\EventListener\ImageVariations\Database;
 
-use Imbo\EventListener\ImageVariations\Database\Doctrine;
 use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use PDO;

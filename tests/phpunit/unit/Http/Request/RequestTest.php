@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Http\Request;
+namespace Imbo\Http\Request;
 
-use Imbo\Http\Request\Request;
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Model\Image;
 use Imbo\Router\Route;
 use PHPUnit\Framework\TestCase;
 
@@ -10,27 +10,21 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass Imbo\Http\Request\Request
  */
 class RequestTest extends TestCase {
-    /**
-     * @var Request
-     */
     private $request;
 
-    /**
-     * Set up the request
-     */
     public function setUp() : void {
         $this->request = new Request();
     }
 
     /**
-     * @covers Imbo\Http\Request\Request::getTransformations
+     * @covers ::getTransformations
      */
     public function testGetTransformationsWithNoTransformationsPresent() : void {
         $this->assertEquals([], $this->request->getTransformations());
     }
 
     /**
-     * @covers Imbo\Http\Request\Request::getTransformations
+     * @covers ::getTransformations
      */
     public function testGetTransformationsWithCorrectOrder() : void {
         $query = [
@@ -47,7 +41,7 @@ class RequestTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Request\Request::getTransformations
+     * @covers ::getTransformations
      */
     public function testGetTransformations() : void {
         $query = [
@@ -100,7 +94,7 @@ class RequestTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Request\Request::getImageIdentifier
+     * @covers ::getImageIdentifier
      */
     public function testSetGetImageIdentifier() : void {
         $identifier = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
@@ -115,7 +109,7 @@ class RequestTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Request\Request::getExtension
+     * @covers ::getExtension
      */
     public function testSetGetExtension() : void {
         $extension = 'jpg';
@@ -130,7 +124,7 @@ class RequestTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Request\Request::getUser
+     * @covers ::getUser
      */
     public function testSetGetUser() : void {
         $user = 'christer';
@@ -145,7 +139,7 @@ class RequestTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Request\Request::getPublicKey
+     * @covers ::getPublicKey
      */
     public function testSetGetPublicKeyThroughRoute() : void {
         $pubkey = 'pubkey';
@@ -160,7 +154,7 @@ class RequestTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Request\Request::getPublicKey
+     * @covers ::getPublicKey
      */
     public function testSetGetPublicKeyThroughQuery() : void {
         $pubkey = 'pubkey';
@@ -171,7 +165,7 @@ class RequestTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Request\Request::getPublicKey
+     * @covers ::getPublicKey
      */
     public function testSetGetPublicKeyThroughHeader() : void {
         $pubkey = 'pubkey';
@@ -182,28 +176,28 @@ class RequestTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Request\Request::getImage
-     * @covers Imbo\Http\Request\Request::setImage
+     * @covers ::getImage
+     * @covers ::setImage
      */
     public function testCanSetAndGetAnImage() : void {
-        $image = $this->createMock('Imbo\Model\Image');
+        $image = $this->createMock(Image::class);
         $this->assertSame($this->request, $this->request->setImage($image));
         $this->assertSame($image, $this->request->getImage());
     }
 
     /**
-     * @covers Imbo\Http\Request\Request::getRoute
-     * @covers Imbo\Http\Request\Request::setRoute
+     * @covers ::getRoute
+     * @covers ::setRoute
      */
     public function testCanSetAndGetARoute() : void {
         $this->assertNull($this->request->getRoute());
-        $route = $this->createMock('Imbo\Router\Route');
+        $route = $this->createMock(Route::class);
         $this->assertSame($this->request, $this->request->setRoute($route));
         $this->assertSame($route, $this->request->getRoute());
     }
 
     /**
-     * @covers Imbo\Http\Request\Request::getTransformations
+     * @covers ::getTransformations
      */
     public function testRequiresTransformationsToBeSpecifiedAsAnArray() : void {
         $request = new Request([
@@ -217,7 +211,7 @@ class RequestTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Http\Request\Request::getTransformations
+     * @covers ::getTransformations
      */
     public function testDoesNotGenerateWarningWhenTransformationIsNotAString() : void {
         $query = [
@@ -237,7 +231,7 @@ class RequestTest extends TestCase {
         $request->getTransformations();
     }
 
-    public function getQueryStrings() {
+    public function getQueryStrings() : array {
         return [
             'transformation with params' => [
                 't[]=thumbnail:width=100',

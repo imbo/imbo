@@ -1,19 +1,21 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\EventListener;
+namespace Imbo\EventListener;
 
-use Imbo\EventListener\StorageOperations;
 use Imbo\Exception\StorageException;
 use DateTime;
+use Imbo\Database\DatabaseInterface;
+use Imbo\EventManager\EventInterface;
+use Imbo\EventManager\EventManager;
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+use Imbo\Model\Image;
+use Imbo\Storage\StorageInterface;
 
 /**
  * @coversDefaultClass Imbo\EventListener\StorageOperations
  */
 class StorageOperationsTest extends ListenerTests {
-    /**
-     * @var StorageOperations
-     */
     private $listener;
-
     private $event;
     private $request;
     private $response;
@@ -22,15 +24,17 @@ class StorageOperationsTest extends ListenerTests {
     private $storage;
 
     public function setUp() : void {
-        $this->response = $this->createMock('Imbo\Http\Response\Response');
-        $this->request = $this->createMock('Imbo\Http\Request\Request');
-        $this->request->expects($this->any())->method('getUser')->will($this->returnValue($this->user));
-        $this->request->expects($this->any())->method('getImageIdentifier')->will($this->returnValue($this->imageIdentifier));
-        $this->storage = $this->createMock('Imbo\Storage\StorageInterface');
-        $this->event = $this->createMock('Imbo\EventManager\Event');
-        $this->event->expects($this->any())->method('getRequest')->will($this->returnValue($this->request));
-        $this->event->expects($this->any())->method('getResponse')->will($this->returnValue($this->response));
-        $this->event->expects($this->any())->method('getStorage')->will($this->returnValue($this->storage));
+        $this->response = $this->createMock(Response::class);
+        $this->request = $this->createConfiguredMock(Request::class, [
+            'getUser' => $this->user,
+            'getImageIdentifier' => $this->imageIdentifier,
+        ]);
+        $this->storage = $this->createMock(StorageInterface::class);
+        $this->event = $this->createConfiguredMock(EventInterface::class, [
+            'getRequest' => $this->request,
+            'getResponse' => $this->response,
+            'getStorage' => $this->storage,
+        ]);
 
         $this->listener = new StorageOperations();
     }
@@ -43,7 +47,11 @@ class StorageOperationsTest extends ListenerTests {
      * @covers ::deleteImage
      */
     public function testCanDeleteAnImage() : void {
-        $this->storage->expects($this->once())->method('delete')->with($this->user, $this->imageIdentifier);
+        $this->storage
+            ->expects($this->once())
+            ->method('delete')
+            ->with($this->user, $this->imageIdentifier);
+
         $this->listener->deleteImage($this->event);
     }
 
@@ -52,16 +60,44 @@ class StorageOperationsTest extends ListenerTests {
      */
     public function testCanLoadImage() : void {
         $date = new DateTime();
-        $this->storage->expects($this->once())->method('getImage')->with($this->user, $this->imageIdentifier)->will($this->returnValue('image data'));
-        $this->storage->expects($this->once())->method('getLastModified')->with($this->user, $this->imageIdentifier)->will($this->returnValue($date));
-        $this->response->expects($this->once())->method('setLastModified')->with($date)->will($this->returnSelf());
-        $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('setBlob')->with('image data');
-        $this->response->expects($this->once())->method('getModel')->will($this->returnValue($image));
+        $this->storage
+            ->expects($this->once())
+            ->method('getImage')
+            ->with($this->user, $this->imageIdentifier)
+            ->willReturn('image data');
+        $this->storage
+            ->expects($this->once())
+            ->method('getLastModified')
+            ->with($this->user, $this->imageIdentifier)
+            ->willReturn($date);
 
-        $eventManager = $this->createMock('Imbo\EventManager\EventManager');
-        $eventManager->expects($this->once())->method('trigger')->with('image.loaded');
-        $this->event->expects($this->once())->method('getManager')->will($this->returnValue($eventManager));
+        $this->response
+            ->expects($this->once())
+            ->method('setLastModified')
+            ->with($date)
+            ->willReturnSelf();
+
+        $image = $this->createMock(Image::class);
+        $image
+            ->expects($this->once())
+            ->method('setBlob')
+            ->with('image data');
+
+        $this->response
+            ->expects($this->once())
+            ->method('getModel')
+            ->willReturn($image);
+
+        $eventManager = $this->createMock(EventManager::class);
+        $eventManager
+            ->expects($this->once())
+            ->method('trigger')
+            ->with('image.loaded');
+
+        $this->event
+            ->expects($this->once())
+            ->method('getManager')
+            ->willReturn($eventManager);
 
         $this->listener->loadImage($this->event);
     }
@@ -70,10 +106,13 @@ class StorageOperationsTest extends ListenerTests {
      * @covers ::loadImage
      */
     public function testExceptionIfLoadImageFails() : void {
-        $this->storage->expects($this->once())->method('getImage')->with($this->user, $this->imageIdentifier)->will($this->returnValue(false));
-        $this->expectException(StorageException::class);
-        $this->expectExceptionCode(503);
-        $this->expectExceptionMessage('Failed reading file from storage backend');
+        $this->storage
+            ->expects($this->once())
+            ->method('getImage')
+            ->with($this->user, $this->imageIdentifier)
+            ->willReturn(false);
+        $this->expectExceptionObject(new StorageException('Failed reading file from storage backend', 503));
+
         $this->listener->loadImage($this->event);
     }
 
@@ -81,13 +120,30 @@ class StorageOperationsTest extends ListenerTests {
      * @covers ::insertImage
      */
     public function testCanInsertImage() : void {
-        $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue('image data'));
-        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageId'));
-        $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $this->response->expects($this->once())->method('setStatusCode')->with(201);
-        $this->storage->expects($this->once())->method('store')->with($this->user, 'imageId', 'image data');
-        $this->storage->expects($this->once())->method('imageExists')->with($this->user, 'imageId')->will($this->returnValue(false));
+        $image = $this->createConfiguredMock(Image::class, [
+            'getBlob' => 'image data',
+            'getImageIdentifier' => 'imageId',
+        ]);
+
+        $this->request
+            ->expects($this->once())
+            ->method('getImage')
+            ->willReturn($image);
+
+        $this->response
+            ->expects($this->once())
+            ->method('setStatusCode')
+            ->with(201);
+
+        $this->storage
+            ->expects($this->once())
+            ->method('store')
+            ->with($this->user, 'imageId', 'image data');
+        $this->storage
+            ->expects($this->once())
+            ->method('imageExists')
+            ->with($this->user, 'imageId')
+            ->willReturn(false);
 
         $this->listener->insertImage($this->event);
     }
@@ -96,13 +152,30 @@ class StorageOperationsTest extends ListenerTests {
      * @covers ::insertImage
      */
     public function testCanInsertImageThatAlreadyExists() : void {
-        $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue('image data'));
-        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageId'));
-        $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $this->response->expects($this->once())->method('setStatusCode')->with(200);
-        $this->storage->expects($this->once())->method('store')->with($this->user, 'imageId', 'image data');
-        $this->storage->expects($this->once())->method('imageExists')->with($this->user, 'imageId')->will($this->returnValue(true));
+        $image = $this->createConfiguredMock(Image::class, [
+            'getBlob' => 'image data',
+            'getImageIdentifier' => 'imageId',
+        ]);
+
+        $this->request
+            ->expects($this->once())
+            ->method('getImage')
+            ->willReturn($image);
+
+        $this->response
+            ->expects($this->once())
+            ->method('setStatusCode')
+            ->with(200);
+
+        $this->storage
+            ->expects($this->once())
+            ->method('store')
+            ->with($this->user, 'imageId', 'image data');
+        $this->storage
+            ->expects($this->once())
+            ->method('imageExists')
+            ->with($this->user, 'imageId')
+            ->willReturn(true);
 
         $this->listener->insertImage($this->event);
     }
@@ -111,16 +184,34 @@ class StorageOperationsTest extends ListenerTests {
      * @covers ::insertImage
      */
     public function testWillDeleteImageFromDatabaseAndThrowExceptionWhenStoringFails() : void {
-        $image = $this->createMock('Imbo\Model\Image');
-        $image->expects($this->once())->method('getBlob')->will($this->returnValue('image data'));
-        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageId'));
-        $this->request->expects($this->once())->method('getImage')->will($this->returnValue($image));
-        $this->storage->expects($this->once())->method('store')->with($this->user, 'imageId', 'image data')->will($this->throwException(
-            new StorageException('Could not store image', 500)
-        ));
-        $database = $this->createMock('Imbo\Database\DatabaseInterface');
-        $database->expects($this->once())->method('deleteImage')->with($this->user, 'imageId');
-        $this->event->expects($this->once())->method('getDatabase')->will($this->returnValue($database));
+        $image = $this->createConfiguredMock(Image::class, [
+            'getBlob' => 'image data',
+            'getImageIdentifier' => 'imageId',
+        ]);
+
+        $this->request
+            ->expects($this->once())
+            ->method('getImage')
+            ->willReturn($image);
+
+        $this->storage
+            ->expects($this->once())
+            ->method('store')
+            ->with($this->user, 'imageId', 'image data')
+            ->willThrowException(
+                new StorageException('Could not store image', 500)
+            );
+
+        $database = $this->createMock(DatabaseInterface::class);
+        $database
+            ->expects($this->once())
+            ->method('deleteImage')
+            ->with($this->user, 'imageId');
+
+        $this->event
+            ->expects($this->once())
+            ->method('getDatabase')
+            ->willReturn($database);
 
         $this->expectExceptionObject(new StorageException('Could not store image', 500));
 

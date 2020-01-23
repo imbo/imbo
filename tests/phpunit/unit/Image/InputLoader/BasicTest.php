@@ -1,21 +1,16 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Image\InputLoader;
+namespace Imbo\Image\InputLoader;
 
 use Imbo\Image\InputLoader\Basic;
 use PHPUnit\Framework\TestCase;
+use Imagick;
 
 /**
  * @coversDefaultClass Imbo\Image\InputLoader\Basic
  */
 class BasicTest extends TestCase {
-    /**
-     * @var Basic
-     */
     private $loader;
 
-    /**
-     * Set up the loader
-     */
     public function setUp() : void {
         $this->loader = new Basic();
     }
@@ -40,10 +35,11 @@ class BasicTest extends TestCase {
     public function testLoadsImage() : void {
         $blob = file_get_contents(FIXTURES_DIR . '/1024x256.png');
 
-        $imagick = $this->createMock('Imagick');
-        $imagick->expects($this->once())
-                ->method('readImageBlob')
-                ->with($blob);
+        $imagick = $this->createMock(Imagick::class);
+        $imagick
+            ->expects($this->once())
+            ->method('readImageBlob')
+            ->with($blob);
 
         $this->assertNull($this->loader->load($imagick, $blob, 'image/png'));
     }

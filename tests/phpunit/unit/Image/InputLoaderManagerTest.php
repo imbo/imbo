@@ -1,25 +1,20 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Image;
+namespace Imbo\Image;
 
 use Imbo\Image\InputLoader\Basic;
 use Imbo\Image\InputLoader\InputLoaderInterface;
 use Imbo\Image\InputLoaderManager;
 use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Imagick;
 use stdClass;
 
 /**
  * @coversDefaultClass Imbo\Image\InputLoaderManager
  */
 class InputLoaderManagerTest extends TestCase {
-    /**
-     * @var InputLoaderManager
-     */
     private $manager;
 
-    /**
-     * Set up the manager
-     */
     public function setUp() : void {
         $this->manager = new InputLoaderManager();
     }
@@ -28,7 +23,7 @@ class InputLoaderManagerTest extends TestCase {
      * @covers ::setImagick
      */
     public function testCanSetImagickInstance() : void {
-        $this->assertSame($this->manager, $this->manager->setImagick($this->createMock('Imagick')));
+        $this->assertSame($this->manager, $this->manager->setImagick($this->createMock(Imagick::class)));
     }
 
     /**
@@ -70,31 +65,38 @@ class InputLoaderManagerTest extends TestCase {
      * @covers ::load
      */
     public function testCanRegisterAndUseLoaders() : void {
-        $imagick = $this->createMock('Imagick');
+        $imagick = $this->createMock(Imagick::class);
         $mime = 'image/png';
         $blob = 'some data';
 
         $loader1 = $this->createMock(InputLoaderInterface::class);
-        $loader1->expects($this->once())
-                ->method('getSupportedMimeTypes')
-                ->will($this->returnValue([$mime => 'png']));
-        $loader1->expects($this->once())
-                ->method('load')
-                ->with($imagick, $blob, $mime)
-                ->will($this->returnValue(false));
+        $loader1
+            ->expects($this->once())
+            ->method('getSupportedMimeTypes')
+            ->willReturn([$mime => 'png']);
+
+        $loader1
+            ->expects($this->once())
+            ->method('load')
+            ->with($imagick, $blob, $mime)
+            ->willReturn(false);
 
         $loader2 = $this->createMock(InputLoaderInterface::class);
-        $loader2->expects($this->once())
-                ->method('getSupportedMimeTypes')
-                ->will($this->returnValue([$mime => 'png']));
-        $loader2->expects($this->once())
-                ->method('load')
-                ->with($imagick, $blob, $mime)
-                ->will($this->returnValue(null));
+        $loader2
+            ->expects($this->once())
+            ->method('getSupportedMimeTypes')
+            ->willReturn([$mime => 'png']);
 
-        $this->manager->setImagick($imagick)
-                      ->registerLoader($loader2)
-                      ->registerLoader($loader1);
+        $loader2
+            ->expects($this->once())
+            ->method('load')
+            ->with($imagick, $blob, $mime)
+            ->willReturn(null);
+
+        $this->manager
+            ->setImagick($imagick)
+            ->registerLoader($loader2)
+            ->registerLoader($loader1);
 
         $this->assertSame(
             $imagick,
@@ -112,9 +114,10 @@ class InputLoaderManagerTest extends TestCase {
         ]);
 
         $this->assertFalse(
-            $this->manager->setImagick($this->createMock('Imagick'))
-                          ->registerLoader($loader)
-                          ->load('image/png', 'some data')
+            $this->manager
+                ->setImagick($this->createMock(Imagick::class))
+                ->registerLoader($loader)
+                ->load('image/png', 'some data')
         );
     }
 

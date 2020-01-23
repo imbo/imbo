@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
-namespace ImboUnitTest\Auth\AccessControl\Adapter;
+namespace Imbo\Auth\AccessControl\Adapter;
 
-use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
 use Imbo\Auth\AccessControl\GroupQuery;
 use Imbo\Resource;
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Model\Groups;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coverscoversDefaultClass Imbo\Auth\AccessControl\Adapter\ArrayAdapter
+ * @coversDefaultClass Imbo\Auth\AccessControl\Adapter\ArrayAdapter
  */
 class ArrayAdapterTest extends TestCase {
     /**
@@ -145,7 +145,7 @@ class ArrayAdapterTest extends TestCase {
             'Public key declared twice in config: pubkey',
             500
         ));
-        $accessControl = new ArrayAdapter([
+        new ArrayAdapter([
             ['publicKey'  => 'pubkey', 'privateKey' => 'privkey', 'acl' => []],
             ['publicKey'  => 'pubkey', 'privateKey' => 'privkey', 'acl' => []]
         ]);
@@ -153,7 +153,9 @@ class ArrayAdapterTest extends TestCase {
 
     public function getGroupsData() : array {
         $query = new GroupQuery();
-        $query->page(2)->limit(2);
+        $query
+            ->page(2)
+            ->limit(2);
 
         return [
             'no groups' => [
@@ -179,8 +181,11 @@ class ArrayAdapterTest extends TestCase {
     public function testCanGetGroups(array $groups, array $result, ?GroupQuery $query = null) : void {
         $numGroups = count($groups);
 
-        $model = $this->createMock('Imbo\Model\Groups');
-        $model->expects($this->once())->method('setHits')->with($numGroups);
+        $model = $this->createMock(Groups::class);
+        $model
+            ->expects($this->once())
+            ->method('setHits')
+            ->with($numGroups);
 
         $adapter = new ArrayAdapter([], $groups);
         $this->assertSame(array_values($result), array_values($adapter->getGroups($query, $model)));
