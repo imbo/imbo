@@ -32,7 +32,7 @@
   },
   "require-dev": {
     "ext-mongodb": "^1.6",
-    "phpunit/phpunit": "^8.3",
+    "phpunit/phpunit": "^8.5",
     "mikey179/vfsStream": "^1.6",
     "behat/behat": "^3.5",
     "mongodb/mongodb": "^1.5",
@@ -41,7 +41,8 @@
     "doctrine/dbal": "^2.9",
     "aws/aws-sdk-php": "^3.111",
     "micheh/psr7-cache": "^0.5",
-    "phpstan/phpstan": "^0.11.15"
+    "phpstan/phpstan": "^0.11.15",
+    "christeredvartsen/testfs": "dev-master"
   },
   "suggest": {
     "ext-mongodb": "Enables usage of MongoDB and GridFS as database and image storage. version: ^1.6",

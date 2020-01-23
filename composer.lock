@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b19af29a18c670a105455c81f5c1975f",
+    "content-hash": "e837829be2ad34285c9ac3d54cc384dc",
     "packages": [
         {
             "name": "guzzlehttp/psr7",
@@ -1204,6 +1204,54 @@
             "time": "2017-04-04T11:38:05+00:00"
         },
         {
+            "name": "christeredvartsen/testfs",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/christeredvartsen/testfs.git",
+                "reference": "84f2ed0820039d867156e9a63a15775d3f62fcf6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/christeredvartsen/testfs/zipball/84f2ed0820039d867156e9a63a15775d3f62fcf6",
+                "reference": "84f2ed0820039d867156e9a63a15775d3f62fcf6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "phploc/phploc": "^5.0",
+                "phpstan/phpstan": "^0.12",
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "TestFs\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christer Edvartsen",
+                    "email": "cogo@starzinger.net"
+                }
+            ],
+            "description": "Virtual filesystem that can be used for testing",
+            "homepage": "https://github.com/christeredvartsen/testfs/",
+            "keywords": [
+                "filesystem",
+                "phpunit",
+                "streamwrapper",
+                "testing"
+            ],
+            "time": "2020-01-23T06:49:51+00:00"
+        },
+        {
             "name": "composer/xdebug-handler",
             "version": "1.3.3",
             "source": {
@@ -1276,6 +1324,7 @@
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "homepage": "https://github.com/container-interop/container-interop",
+            "abandoned": "psr/container",
             "time": "2017-02-14T19:40:03+00:00"
         },
         {
@@ -3467,16 +3516,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "8.3.5",
+            "version": "8.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "302faed7059fde575cf3403a78c730c5e3a62750"
+                "reference": "018b6ac3c8ab20916db85fa91bf6465acb64d1e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/302faed7059fde575cf3403a78c730c5e3a62750",
-                "reference": "302faed7059fde575cf3403a78c730c5e3a62750",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/018b6ac3c8ab20916db85fa91bf6465acb64d1e0",
+                "reference": "018b6ac3c8ab20916db85fa91bf6465acb64d1e0",
                 "shasum": ""
             },
             "require": {
@@ -3520,7 +3569,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "8.3-dev"
+                    "dev-master": "8.5-dev"
                 }
             },
             "autoload": {
@@ -3546,7 +3595,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-09-14T09:12:03+00:00"
+            "time": "2020-01-08T08:49:49+00:00"
         },
         {
             "name": "psr/log",
@@ -4915,7 +4964,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "christeredvartsen/testfs": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
