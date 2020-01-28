@@ -23,7 +23,7 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Install system packages
-        run: pecl install imagick
+        run: apt-get install php-imagick
 
       - name: Install dependencies
         if: steps.composer-cache.outputs.cache-hit != 'true'
