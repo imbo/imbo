@@ -7,8 +7,6 @@ jobs:
     services:
       mongodb:
         image: mongo:3.4.24
-        ports:
-          - 27017:27017
     steps:
       - name: Start MongoDB
         run:  sudo docker run --name mongo -d -p 27017:27017 mongo
