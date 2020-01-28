@@ -11,13 +11,13 @@
 
   <testsuites>
     <testsuite name="imbo-unit">
-      <directory suffix="Test.php">tests/phpunit/unit</directory>
+      <directory suffix="Test.php">tests</directory>
     </testsuite>
   </testsuites>
 
   <php>
     <!-- General config -->
-    <const name="FIXTURES_DIR" value="./tests/phpunit/Fixtures" />
+    <const name="FIXTURES_DIR" value="./tests/Fixtures" />
     <const name="PROJECT_ROOT" value="./" />
     <const name="DATA_DIR" value="./data" />
 

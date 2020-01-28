@@ -147,7 +147,7 @@ class FeatureContextTest extends TestCase {
     public function getImboConfigFiles() : array {
         return array_map(function($file) {
             return [basename($file)];
-        }, glob(__DIR__ . '/../../../../features/bootstrap/imbo-configs/*.php'));
+        }, glob(__DIR__ . '/../../features/bootstrap/imbo-configs/*.php'));
     }
 
     /**
@@ -1120,7 +1120,7 @@ class FeatureContextTest extends TestCase {
     public function testThrowsExceptionWhenTryingToRequestImageUsingLocalPathAndImageDoesNotExistInImbo() : void {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageRegExp(
-            '|Image URL for image with path ".*?[\\/]tests[\\/]phpunit[\\/]Fixtures[\\/]image1\.png" can not be found\.|'
+            '|Image URL for image with path ".*?[\\/]tests[\\/]Fixtures[\\/]image1\.png" can not be found\.|'
         );
         $this->context->requestImageResourceForLocalImage(FIXTURES_DIR . '/image1.png');
     }

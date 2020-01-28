@@ -21,7 +21,7 @@ class TransformationManagerTest extends TestCase {
     private $config;
 
     public function setUp() : void {
-        $this->config = require __DIR__ . '/../../../../config/config.default.php';
+        $this->config = require __DIR__ . '/../../config/config.default.php';
         $this->manager = new TransformationManager();
         $this->manager->addTransformations($this->config['transformations']);
         $this->query = new ParameterBag([]);
