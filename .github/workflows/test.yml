@@ -1,0 +1,30 @@
+name: Run unit tests
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Validate, lint and test
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Validate composer files
+        run: composer validate --strict
+
+      - name: Lint all PHP files
+        run: composer run lint
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v1
+        with:
+          path: vendor
+          key: ${{ runner.os }}-node-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        run: composer install --prefer-dist --no-suggest --no-ansi --no-progress -o
+
+      - name: Run unit tests using PHPUnit
+        run: composer run test:phpunit
