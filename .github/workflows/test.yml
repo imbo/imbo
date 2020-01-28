@@ -28,6 +28,11 @@ jobs:
       - name: Install system packages
         run: sudo apt-get install php-imagick
 
+      - name: Debug
+        run: |
+            php -i
+            php -m
+
       - name: Install dependencies
         if: steps.composer-cache.outputs.cache-hit != 'true'
         run: composer install --prefer-dist --no-suggest --no-ansi --no-progress -o
