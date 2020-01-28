@@ -1,22 +1,42 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventListener\ImageVariations\Database;
 
-use Imbo\Exception\InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
 use PDO;
 
 /**
  * @coversDefaultClass Imbo\EventListener\ImageVariations\Database\Doctrine
  */
-class DoctrineTest extends TestCase {
-    /**
-     * @covers ::__construct
-     */
-    public function testThrowsExceptionWhenUsingPdoInConfiguration() : void {
-        $this->expectExceptionObject(new InvalidArgumentException(
-            "The usage of 'pdo' in the configuration for Imbo\EventListener\ImageVariations\Database\Doctrine is not allowed, use 'driver' instead",
-            500
-        ));
-        new Doctrine(['pdo' => new PDO('sqlite::memory:')]);
+class DoctrineTest extends DatabaseTests {
+    private $dbPath;
+
+    protected function getAdapter() {
+        return new Doctrine([
+            'driver' => 'pdo_sqlite',
+            'path' => $this->dbPath,
+        ]);
+    }
+
+    public function setUp() : void {
+        $this->dbPath = tempnam(sys_get_temp_dir(), 'imbo-integration-test');
+
+        $pdo = new PDO(sprintf('sqlite:%s', $this->dbPath));
+        $pdo->query('
+            CREATE TABLE IF NOT EXISTS imagevariations (
+                user TEXT NOT NULL,
+                imageIdentifier TEXT NOT NULL,
+                width INTEGER NOT NULL,
+                height INTEGER NOT NULL,
+                added INTEGER NOT NULL,
+                PRIMARY KEY (user,imageIdentifier,width)
+            )
+        ');
+
+        parent::setUp();
+    }
+
+    protected function tearDown() : void {
+        @unlink($this->dbPath);
+
+        parent::tearDown();
     }
 }

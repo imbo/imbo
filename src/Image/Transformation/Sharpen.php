@@ -13,25 +13,21 @@ class Sharpen extends Transformation {
      */
     public function transform(array $params) {
         $preset = isset($params['preset']) ? $params['preset'] : null;
+        $radius = 2;
+        $sigma = 1;
 
         switch ($preset) {
             case 'moderate':
-                $radius = 2;
-                $sigma = 1;
                 $gain = 2;
                 $threshold = .05;
                 break;
 
             case 'strong':
-                $radius = 2;
-                $sigma = 1;
                 $gain = 3;
                 $threshold = .025;
                 break;
 
             case 'extreme':
-                $radius = 2;
-                $sigma = 1;
                 $gain = 4;
                 $threshold = 0;
                 break;
@@ -39,8 +35,6 @@ class Sharpen extends Transformation {
             case 'light':
             default:
                 // Default values (with only adding ?t[]=sharpen)
-                $radius = 2;
-                $sigma = 1;
                 $gain = 1;
                 $threshold = .05;
         }

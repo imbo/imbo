@@ -10,7 +10,46 @@ use ImagickException;
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Modulate
  */
-class ModulateTest extends TestCase {
+class ModulateTest extends TransformationTests {
+    protected function getTransformation() : Modulate {
+        return new Modulate();
+    }
+
+    public function getModulateParamsForTransformation() : array {
+        return [
+            'no params' => [
+                [],
+            ],
+            'some params' => [
+                ['b' => 10, 's' => 10],
+            ],
+            'all params' => [
+                ['b' => 1, 's' => 2, 'h' => 3],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getModulateParamsForTransformation
+     * @covers ::transform
+     */
+    public function testCanModulateImages(array $params) : void {
+        $image = $this->createMock(Image::class);
+        $image
+            ->expects($this->once())
+            ->method('hasBeenTransformed')
+            ->with(true)
+            ->willReturn($image);
+
+        $imagick = new Imagick();
+        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
+
+        $this->getTransformation()
+            ->setImage($image)
+            ->setImagick($imagick)
+            ->transform($params);
+    }
+
     public function getModulateParams() : array {
         return [
             'no params' => [
