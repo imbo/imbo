@@ -88,7 +88,7 @@ class ApplicationTest extends TestCase {
         // We just want to swallow the output, since we're testing it explicitly below.
         $this->expectOutputRegex('|.*}|');
 
-        $default = require __DIR__ . '/../../../config/config.default.php';
+        $default = require __DIR__ . '/../config/config.default.php';
         $test = array(
             'database' => function ($request, $response) {
                 $this->assertInstanceOf(Request::class, $request);
@@ -142,14 +142,14 @@ class ApplicationTest extends TestCase {
      */
     public function testCanRunWithDefaultConfiguration() : void {
         $this->expectOutputRegex('|^{.*}$|');
-        $this->application->run(require __DIR__ . '/../../../config/config.default.php');
+        $this->application->run(require __DIR__ . '/../config/config.default.php');
     }
 
     /**
      * @covers ::run
      */
     public function testThrowsExceptionIfTransformationsIsSetAndIsNotAnArray() : void {
-        $defaultConfig = require __DIR__ . '/../../../config/config.default.php';
+        $defaultConfig = require __DIR__ . '/../config/config.default.php';
         $defaultConfig['transformations'] = function() {};
         $this->expectExceptionObject(new InvalidArgumentException(
             'The "transformations" configuration key must be specified as an array',

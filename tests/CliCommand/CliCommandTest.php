@@ -29,7 +29,7 @@ class CliCommandTest extends TestCase {
      * @covers ::getConfig
      */
     public function testFetchesTheDefaultConfigurationIfNoneHasBeenSet() : void {
-        $this->assertEquals(require __DIR__ . '/../../../../config/config.default.php', $this->command->getConfig());
+        $this->assertEquals(require __DIR__ . '/../../config/config.default.php', $this->command->getConfig());
     }
 
     /**

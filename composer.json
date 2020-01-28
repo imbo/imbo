@@ -58,7 +58,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Imbo\\": "tests/phpunit/unit",
+      "Imbo\\": "tests/",
       "Imbo\\Behat\\": "features/bootstrap"
     }
   },

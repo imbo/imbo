@@ -71,7 +71,7 @@ class ImageVariationsTest extends ListenerTests {
         $this->imageStorage = $this->createMock(MainStorageInterface::class);
         $this->imagick = $this->createMock(Imagick::class);
 
-        $this->config = require __DIR__ . '/../../../../config/config.default.php';
+        $this->config = require __DIR__ . '/../../config/config.default.php';
 
         $this->transformationManager = new TransformationManager();
         $this->transformationManager->addTransformations($this->config['transformations']);
