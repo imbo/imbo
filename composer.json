@@ -58,10 +58,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Imbo\\": [
-        "tests/phpunit/unit"
-      ],
-      "ImboBehatFeatureContext\\": "tests/behat/features/bootstrap"
+      "Imbo\\": "tests/phpunit/unit",
+      "Imbo\\Behat\\": "features/bootstrap"
     }
   },
   "bin": [
@@ -94,9 +92,9 @@
     "phpstan": [
       "vendor/bin/phpstan analyse -l 1 -c .phpstan.neon tests"
     ],
-    "start": [
+    "dev": [
       "mkdir -p build/logs",
-      "php -S localhost:8080 -t ./public tests/behat/router.php > build/logs/httpd.log 2>&1 &"
+      "php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &"
     ]
   }
 }
