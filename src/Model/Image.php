@@ -428,10 +428,12 @@ class Image implements ModelInterface {
      * make use of the value.
      *
      * @param int $outputQualityCompression  The requested compression or quality value
-     * @return null
+     * @return self
      */
     public function setOutputQualityCompression($outputQualityCompression) {
         $this->outputQualityCompression = $outputQualityCompression;
+
+        return $this;
     }
 
     /**
@@ -439,19 +441,20 @@ class Image implements ModelInterface {
      */
     public function getData() {
         return [
-            'filesize' => $this->getFilesize(),
-            'mimeType' => $this->getMimeType(),
-            'extension' => $this->getExtension(),
-            'metadata' => $this->getMetadata(),
-            'width' => $this->getWidth(),
-            'height' => $this->getHeight(),
-            'addedDate' => $this->getAddedDate(),
-            'updatedDate' => $this->getUpdatedDate(),
-            'user' => $this->getUser(),
-            'imageIdentifier' => $this->getImageIdentifier(),
-            'checksum' => $this->getChecksum(),
-            'originalChecksum' => $this->getOriginalChecksum(),
-            'hasBeenTransformed' => $this->hasBeenTransformed(),
+            'filesize'                 => $this->getFilesize(),
+            'mimeType'                 => $this->getMimeType(),
+            'extension'                => $this->getExtension(),
+            'metadata'                 => $this->getMetadata(),
+            'width'                    => $this->getWidth(),
+            'height'                   => $this->getHeight(),
+            'addedDate'                => $this->getAddedDate(),
+            'updatedDate'              => $this->getUpdatedDate(),
+            'user'                     => $this->getUser(),
+            'imageIdentifier'          => $this->getImageIdentifier(),
+            'checksum'                 => $this->getChecksum(),
+            'originalChecksum'         => $this->getOriginalChecksum(),
+            'hasBeenTransformed'       => $this->hasBeenTransformed(),
+            'outputQualityCompression' => $this->getOutputQualityCompression(),
         ];
     }
 }

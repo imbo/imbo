@@ -3,13 +3,68 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Model\Image;
 use Imbo\Exception\TransformationException;
-use PHPUnit\Framework\TestCase;
 use Imagick;
+use Imbo\EventManager\EventInterface;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Crop
  */
-class CropTest extends TestCase {
+class CropTest extends TransformationTests {
+    protected function getTransformation() : Crop {
+        return new Crop();
+    }
+
+    public function getCropParams() : array {
+        return [
+            'cropped area smaller than the image' => [['width' => 100, 'height' => 50], 100, 50, true],
+            'cropped area smaller than the image with x and y offset' => [['width' => 100, 'height' => 63, 'x' => 565, 'y' => 400], 100, 63, true],
+            'center mode' => [['mode' => 'center', 'width' => 150, 'height' => 100], 150, 100, true],
+            'center-x mode' => [['mode' => 'center-x', 'y' => 10, 'width' => 50, 'height' => 40], 50, 40, true],
+            'center-y mode' => [['mode' => 'center-y', 'x' => 10, 'width' => 50, 'height' => 40], 50, 40, true],
+        ];
+    }
+
+    /**
+     * @dataProvider getCropParams
+     * @covers ::transform
+     */
+    public function testCanCropImages(array $params, int $endWidth, int $endHeight, bool $transformed) : void {
+        $image = $this->createConfiguredMock(Image::class, [
+            'getWidth' => 665,
+            'getHeight' => 463,
+        ]);
+
+        if ($transformed) {
+            $image
+                ->expects($this->once())
+                ->method('setWidth')
+                ->with($endWidth)
+                ->willReturn($image);
+
+            $image
+                ->expects($this->once())
+                ->method('setHeight')
+                ->with($endHeight)
+                ->willReturn($image);
+
+            $image
+                ->expects($this->once())
+                ->method('hasBeenTransformed')
+                ->with(true)
+                ->willReturn($image);
+        }
+
+        $blob = file_get_contents(FIXTURES_DIR . '/image.png');
+        $imagick = new Imagick();
+        $imagick->readImageBlob($blob);
+
+        $this->getTransformation()
+            ->setEvent($this->createMock(EventInterface::class))
+            ->setImagick($imagick)
+            ->setImage($image)
+            ->transform($params);
+    }
+
     /**
      * @covers ::transform
      */

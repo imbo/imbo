@@ -5,14 +5,64 @@ use Imbo\Model\Image;
 use Imbo\EventManager\EventInterface;
 use Imbo\Image\OutputConverterManager;
 use Imbo\Exception\TransformationException;
-use PHPUnit\Framework\TestCase;
 use Imagick;
 use ImagickException;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Convert
  */
-class ConvertTest extends TestCase {
+class ConvertTest extends TransformationTests {
+    protected function getTransformation() : Convert {
+        return new Convert();
+    }
+
+    /**
+     * @covers ::transform
+     */
+    public function testCanConvertAnImage() : void {
+        $image = $this->createConfiguredMock(Image::class, [
+            'getExtension' => 'png',
+        ]);
+
+        $image
+            ->expects($this->once())
+            ->method('setMimeType')
+            ->with('image/gif')
+            ->willReturnSelf();
+
+        $image
+            ->expects($this->once())
+            ->method('setExtension')
+            ->with('gif')
+            ->willReturnSelf();
+
+        $image
+            ->expects($this->once())
+            ->method('hasBeenTransformed')
+            ->with(true)
+            ->willReturnSelf();
+
+        $imagick = new Imagick();
+        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
+
+        $outputConverterManager = $this->createMock(OutputConverterManager::class);
+        $outputConverterManager
+            ->expects($this->any())
+            ->method('getMimetypeFromExtension')
+            ->with('gif')
+            ->willReturn('image/gif');
+
+        $event = $this->createConfiguredMock(EventInterface::class, [
+            'getOutputConverterManager' => $outputConverterManager,
+        ]);
+
+        $this->getTransformation()
+            ->setEvent($event)
+            ->setImage($image)
+            ->setImagick($imagick)
+            ->transform(['type' => 'gif']);
+    }
+
     /**
      * @covers ::transform
      */

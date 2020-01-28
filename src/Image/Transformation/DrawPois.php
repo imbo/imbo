@@ -50,7 +50,7 @@ class DrawPois extends Transformation {
 
         try {
             foreach ($pois as $poi) {
-                if (isset($poi['width']) && isset($poi['height'])) {
+                if (isset($poi['width']) && isset($poi['height']) && isset($poi['x']) && isset($poi['y'])) {
                     $this->drawPoiRectangle($poi, $color, $borderSize - 1, $imageWidth, $imageHeight);
                 } else if (isset($poi['cx']) && isset($poi['cy'])) {
                     $this->drawPoiCircle($poi, $color, $borderSize, $pointSize);
@@ -154,6 +154,6 @@ class DrawPois extends Transformation {
             $this->image->getImageIdentifier()
         );
 
-        return isset($metadata['poi']) ? $metadata['poi'] : [];
+        return $metadata['poi'] ?? [];
     }
 }

@@ -5,16 +5,71 @@ use Imbo\Exception\DatabaseException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\PDOStatement;
+use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Query\QueryBuilder;
-use PHPUnit\Framework\TestCase;
+use PDO;
 
 /**
  * @coversDefaultClass Imbo\Database\Doctrine
  */
-class DoctrineTest extends TestCase {
+class DoctrineTest extends DatabaseTests {
     private $driver;
     private $connection;
+    private $dbPath;
+    private $pdo;
+
+    protected function insertImage(array $image) : void {
+        $stmt = $this->pdo->prepare("
+            INSERT INTO imageinfo (
+                user, imageIdentifier, size, extension, mime, added, updated, width, height,
+                checksum, originalChecksum
+            ) VALUES (
+                :user, :imageIdentifier, :size, :extension, :mime, :added, :updated, :width,
+                :height, :checksum, :originalChecksum
+            )
+        ");
+        $stmt->execute([
+            ':user'             => $image['user'],
+            ':imageIdentifier'  => $image['imageIdentifier'],
+            ':size'             => $image['size'],
+            ':extension'        => $image['extension'],
+            ':mime'             => $image['mime'],
+            ':added'            => $image['added'],
+            ':updated'          => $image['updated'],
+            ':width'            => $image['width'],
+            ':height'           => $image['height'],
+            ':checksum'         => $image['checksum'],
+            ':originalChecksum' => $image['originalChecksum'],
+        ]);
+    }
+
+    protected function getAdapter() : Doctrine {
+        return new Doctrine([
+            'path' => $this->dbPath,
+            'driver' => 'pdo_sqlite',
+        ]);
+    }
+
     public function setUp() : void {
+        if (!extension_loaded(PDO::class)) {
+            $this->markTestSkipped('PDO is required to run this test');
+        }
+
+        if (!extension_loaded('pdo_sqlite')) {
+            $this->markTestSkipped('pdo_sqlite is required to run this test');
+        }
+
+        if (!class_exists(DriverManager::class)) {
+            $this->markTestSkipped('Doctrine is required to run this test');
+        }
+
+        $this->dbPath = tempnam(sys_get_temp_dir(), 'imbo-integration-test');
+        $this->pdo = new PDO(sprintf('sqlite:%s', $this->dbPath));
+
+        $sqlStatementsFile = sprintf('%s/setup/doctrine.sqlite.sql', PROJECT_ROOT);
+
+        $this->pdo->exec(file_get_contents($sqlStatementsFile));
+
         $this->driver = $this
             ->getMockBuilder(Doctrine::class)
             ->disableOriginalConstructor()
@@ -26,6 +81,17 @@ class DoctrineTest extends TestCase {
             ->expects($this->any())
             ->method('getConnection')
             ->willReturn($this->connection);
+
+            parent::setUp();
+    }
+
+    /**
+     * Remove the database file
+     */
+    protected function tearDown() : void {
+        @unlink($this->dbPath);
+
+        parent::tearDown();
     }
 
     /**

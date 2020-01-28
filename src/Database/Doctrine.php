@@ -156,12 +156,11 @@ class Doctrine implements DatabaseInterface {
         $existing = $this->getMetadata($user, $imageIdentifier);
         $metadata = array_merge($existing, $metadata);
 
+        // Normalize metadata
+        $normalizedMetadata = $this->normalizeMetadata($metadata);
+
         // Delete existing metadata
         $this->deleteMetadata($user, $imageIdentifier);
-
-        // Normalize metadata
-        $normalizedMetadata = [];
-        $this->normalizeMetadata($metadata, $normalizedMetadata);
 
         // Insert merged and normalized metadata
         foreach ($normalizedMetadata as $key => $value) {
@@ -705,7 +704,9 @@ class Doctrine implements DatabaseInterface {
      * @param string $namespace Namespace for keys
      * @return array Returns an associative array with only one level
      */
-    private function normalizeMetadata(array &$metadata, array &$normalized, $namespace = '') {
+    private function normalizeMetadata(array $metadata, $namespace = '') {
+        $result = [];
+
         foreach ($metadata as $key => $value) {
             if (strstr($key, $this->metadataNamespaceSeparator) !== false) {
                 throw new DatabaseException('Invalid metadata', 400);
@@ -714,11 +715,13 @@ class Doctrine implements DatabaseInterface {
             $ns = $namespace . ($namespace ? $this->metadataNamespaceSeparator : '') . $key;
 
             if (is_array($value)) {
-                $this->normalizeMetadata($value, $normalized, $ns);
+                $result = array_merge($result, $this->normalizeMetadata($value, $ns));
             } else {
-                $normalized[$ns] = $value;
+                $result[$ns] = $value;
             }
         }
+
+        return $result;
     }
 
     /**

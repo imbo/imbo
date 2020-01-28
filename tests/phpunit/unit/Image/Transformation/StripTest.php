@@ -3,14 +3,54 @@ namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException;
 use Imbo\Model\Image;
-use PHPUnit\Framework\TestCase;
 use Imagick;
 use ImagickException;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Strip
  */
-class StripTest extends TestCase {
+class StripTest extends TransformationTests {
+    protected function getTransformation() : Strip {
+        return new Strip();
+    }
+
+    /**
+     * @covers ::transform
+     */
+    public function testStripMetadata() : void {
+        $image = $this->createMock(Image::class);
+        $image
+            ->expects($this->once())
+            ->method('hasBeenTransformed')
+            ->with(true)
+            ->willReturn($image);
+
+        $imagick = new Imagick();
+        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));
+
+        $exifExists = false;
+
+        foreach (array_keys($imagick->getImageProperties()) as $key) {
+            if (substr($key, 0, 5) === 'exif:') {
+                $exifExists = true;
+                break;
+            }
+        }
+
+        if (!$exifExists) {
+            $this->fail('Image is missing EXIF data');
+        }
+
+        $this->getTransformation()
+            ->setImage($image)
+            ->setImagick($imagick)
+            ->transform([]);
+
+        foreach (array_keys($imagick->getImageProperties()) as $key) {
+            $this->assertStringStartsNotWith('exif', $key);
+        }
+    }
+
     /**
      * @covers ::transform
      */

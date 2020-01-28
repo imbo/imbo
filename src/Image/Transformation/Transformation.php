@@ -3,7 +3,6 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
-use Imbo\EventManager\Event;
 use Imbo\EventListener\ListenerInterface;
 use Imbo\EventManager\EventInterface;
 use Imbo\EventListener\ImagickAware;
@@ -22,7 +21,7 @@ abstract class Transformation implements ListenerInterface, ImagickAware {
     /**
      * Event that triggered this transformation
      *
-     * @var Event
+     * @var EventInterface
      */
     protected $event;
 
@@ -60,10 +59,10 @@ abstract class Transformation implements ListenerInterface, ImagickAware {
     /**
      * Set the transformation event that triggered the transformation
      *
-     * @param Event $event An Event instance
+     * @param EventInterface $event An Event instance
      * @return self
      */
-    public function setEvent(Event $event) {
+    public function setEvent(EventInterface $event) {
         $this->event = $event;
 
         return $this;
