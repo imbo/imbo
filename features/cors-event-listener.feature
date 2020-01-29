@@ -67,7 +67,7 @@ Feature: Imbo provides an event listener for CORS
         And Imbo uses the "cors.php" configuration
         And the "Origin" request header is "http://allowedhost"
         And I sign the request
-        And the request body contains "ChangeLog.markdown"
+        And the request body contains "ChangeLog.md"
         When I request "/users/user/images" using HTTP "POST"
         Then the response status line is "415 Unsupported image type: text/plain"
         And the "Vary" response header matches "/Origin/"
