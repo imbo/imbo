@@ -4,7 +4,7 @@ Feature: Imbo can generate short URLs for images on demand
     I can request the short URLs resource
 
     Background:
-        Given "tests/phpunit/Fixtures/image.png" exists for user "user"
+        Given "tests/Fixtures/image.png" exists for user "user"
 
     Scenario: Responds with 404 when the image does not exist
         Given I use "publicKey" and "privateKey" for public and private keys
@@ -33,7 +33,7 @@ Feature: Imbo can generate short URLs for images on demand
     Scenario: Generate a short URL
         Given I use "publicKey" and "privateKey" for public and private keys
         And I sign the request
-        And I generate a short URL for "tests/phpunit/Fixtures/image.png" with the following parameters:
+        And I generate a short URL for "tests/Fixtures/image.png" with the following parameters:
             """
             {"user": "user", "extension": "gif"}
             """
@@ -45,10 +45,10 @@ Feature: Imbo can generate short URLs for images on demand
            """
 
     Scenario: Generate a short URL without having access to the user
-        Given "tests/phpunit/Fixtures/image.png" exists for user "other-user"
+        Given "tests/Fixtures/image.png" exists for user "other-user"
         And I use "unpriviledged" and "privatekey" for public and private keys
         And I sign the request
-        And I generate a short URL for "tests/phpunit/Fixtures/image.png" with the following parameters:
+        And I generate a short URL for "tests/Fixtures/image.png" with the following parameters:
             """
             {"user": "other-user", "extension": "gif"}
             """
@@ -57,7 +57,7 @@ Feature: Imbo can generate short URLs for images on demand
     Scenario Outline: Request an image using the short URL
         Given I use "publicKey" and "privateKey" for public and private keys
         And I sign the request
-        And I generate a short URL for "tests/phpunit/Fixtures/image.png" with the following parameters:
+        And I generate a short URL for "tests/Fixtures/image.png" with the following parameters:
             """
             <params>
             """

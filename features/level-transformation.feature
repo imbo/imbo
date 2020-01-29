@@ -4,7 +4,7 @@ Feature: Imbo can adjust color levels of images
     I can use the watermark transformation
 
     Background:
-        Given "tests/phpunit/Fixtures/colors.png" exists for user "user"
+        Given "tests/Fixtures/colors.png" exists for user "user"
         And I use "publicKey" and "privateKey" for public and private keys
         And I include an access token in the query string
 

@@ -4,7 +4,7 @@ Feature: Imbo provides an event listener for the hashtwo Varnish module
     I must send correct headers
 
     Background:
-        Given "tests/phpunit/Fixtures/image1.png" exists for user "user"
+        Given "tests/Fixtures/image1.png" exists for user "user"
         And I use "publicKey" and "privateKey" for public and private keys
         And I include an access token in the query string
         And Imbo uses the "varnish-hashtwo.php" configuration

@@ -4,10 +4,10 @@ Feature: Imbo provides an images endpoint
     I want to make requests against the images endpoint
 
     Background:
-        Given "tests/phpunit/Fixtures/image1.png" exists for user "user"
-        And "tests/phpunit/Fixtures/image.jpg" exists for user "user"
-        And "tests/phpunit/Fixtures/image.gif" exists for user "user"
-        And "tests/phpunit/Fixtures/1024x256.png" exists for user "user"
+        Given "tests/Fixtures/image1.png" exists for user "user"
+        And "tests/Fixtures/image.jpg" exists for user "user"
+        And "tests/Fixtures/image.gif" exists for user "user"
+        And "tests/Fixtures/1024x256.png" exists for user "user"
 
     Scenario: Fetch images with no filter
         Given I use "publicKey" and "privateKey" for public and private keys
@@ -69,7 +69,7 @@ Feature: Imbo provides an images endpoint
     Scenario: Fetch images with a filter on existing image identifier
         Given I use "publicKey" and "privateKey" for public and private keys
         And I include an access token in the query string
-        And the query string parameter "ids[]" is set to the image identifier of "tests/phpunit/Fixtures/image1.png"
+        And the query string parameter "ids[]" is set to the image identifier of "tests/Fixtures/image1.png"
         When I request "/users/user/images"
         Then the response status line is "200 OK"
         And the "Content-Type" response header is "application/json"
@@ -169,8 +169,8 @@ Feature: Imbo provides an images endpoint
         And I include an access token in the query string
         And the query string parameter "page" is set to 1
         And the query string parameter "limit" is set to 1
-        And the query string parameter "ids[]" is set to the image identifier of "tests/phpunit/Fixtures/image1.png"
-        And the query string parameter "ids[]" is set to the image identifier of "tests/phpunit/Fixtures/image.jpg"
+        And the query string parameter "ids[]" is set to the image identifier of "tests/Fixtures/image1.png"
+        And the query string parameter "ids[]" is set to the image identifier of "tests/Fixtures/image.jpg"
         When I request "/users/user/images.json"
         Then the response status line is "200 OK"
         And the response body contains JSON:

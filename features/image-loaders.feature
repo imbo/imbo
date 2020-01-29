@@ -7,7 +7,7 @@ Feature: Imbo allows plugins for loading new file types
     Given Imbo uses the "image-loaders.php" configuration
 
   Scenario: Add an image
-    Given the request body contains "tests/phpunit/Fixtures/nasa_sts-64.tif"
+    Given the request body contains "tests/Fixtures/nasa_sts-64.tif"
     And I use "publicKey" and "privateKey" for public and private keys
     And I sign the request
     When I request "/users/user/images" using HTTP "POST"
@@ -24,7 +24,7 @@ Feature: Imbo allows plugins for loading new file types
           """
 
   Scenario: Request an image loaded by a custom plugin
-    Given "tests/phpunit/Fixtures/nasa_sts-64.tif" exists for user "user"
+    Given "tests/Fixtures/nasa_sts-64.tif" exists for user "user"
     And I use "publicKey" and "privateKey" for public and private keys
     And I include an access token in the query string
     And the "Accept" request header is "image/png"

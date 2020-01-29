@@ -4,7 +4,7 @@ Feature: Imbo supports HTTP HEAD for all resources
     I can make requests using HTTP HEAD and get the same headers as if I did a GET
 
     Background:
-        Given "tests/phpunit/Fixtures/image1.png" exists for user "user"
+        Given "tests/Fixtures/image1.png" exists for user "user"
 
     Scenario: Request status information
         When I request "/status" using HTTP "HEAD"

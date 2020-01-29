@@ -4,7 +4,7 @@ Feature: Imbo enables caching of transformations
     I will cache and re-use transformed images
 
     Background:
-        Given "tests/phpunit/Fixtures/image1.png" exists for user "user"
+        Given "tests/Fixtures/image1.png" exists for user "user"
         And Imbo uses the "image-transformation-cache.php" configuration
         And I use "publicKey" and "privateKey" for public and private keys
 

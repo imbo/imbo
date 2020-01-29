@@ -6,7 +6,7 @@ Feature: Imbo provides an image endpoint
     I want to make requests against the image endpoint
 
     Scenario: Add an image
-        Given the request body contains "tests/phpunit/Fixtures/image1.png"
+        Given the request body contains "tests/Fixtures/image1.png"
         And I use "publicKey" and "privateKey" for public and private keys
         And I sign the request
         When I request "/users/user/images" using HTTP "POST"
@@ -23,8 +23,8 @@ Feature: Imbo provides an image endpoint
           """
 
     Scenario: Add an image that already exists
-        Given "tests/phpunit/Fixtures/image1.png" exists for user "user"
-        And the request body contains "tests/phpunit/Fixtures/image1.png"
+        Given "tests/Fixtures/image1.png" exists for user "user"
+        And the request body contains "tests/Fixtures/image1.png"
         And I use "publicKey" and "privateKey" for public and private keys
         And I sign the request
         When I request "/users/user/images" using HTTP "POST"
@@ -41,7 +41,7 @@ Feature: Imbo provides an image endpoint
           """
 
     Scenario: Fetch image
-        Given "tests/phpunit/Fixtures/image1.png" exists for user "user"
+        Given "tests/Fixtures/image1.png" exists for user "user"
         And I use "publicKey" and "privateKey" for public and private keys
         And I include an access token in the query string
         And the "Accept" request header is "image/png"
@@ -57,7 +57,7 @@ Feature: Imbo provides an image endpoint
         And the response body size is "95576"
 
     Scenario: Fetch image information when not accepting images
-        Given "tests/phpunit/Fixtures/image1.png" exists for user "user"
+        Given "tests/Fixtures/image1.png" exists for user "user"
         And I use "publicKey" and "privateKey" for public and private keys
         And I include an access token in the query string
         And the "Accept" request header is "application/json"
@@ -71,7 +71,7 @@ Feature: Imbo provides an image endpoint
         And the "X-Imbo-Originalwidth" response header is "599"
 
     Scenario: Delete an image
-        Given "tests/phpunit/Fixtures/image1.png" exists for user "user"
+        Given "tests/Fixtures/image1.png" exists for user "user"
         And I use "publicKey" and "privateKey" for public and private keys
         And I sign the request
         When I request the previously added image using HTTP "DELETE"
@@ -95,16 +95,18 @@ Feature: Imbo provides an image endpoint
     Scenario: Add a broken image
         Given I use "publicKey" and "privateKey" for public and private keys
         And I sign the request
-        And the request body contains "tests/phpunit/Fixtures/broken-image.jpg"
+        And the request body contains "tests/Fixtures/broken-image.jpg"
         When I request "/users/user/images" using HTTP "POST"
         Then the response status line is "415 Invalid image"
         And the "Content-Type" response header is "application/json"
         And the Imbo error message is "Invalid image" and the error code is "205"
 
+    # The below scenario is commented out because it causes a segmentation fault (bug in imagemagick)
+    #
     # Scenario: Add a broken image with identifiable size
     #    Given I use "publicKey" and "privateKey" for public and private keys
     #    And I sign the request
-    #    And the request body contains "tests/phpunit/Fixtures/slightly-broken-image.png"
+    #    And the request body contains "tests/Fixtures/slightly-broken-image.png"
     #    When I request "/users/user/images" using HTTP "POST"
     #    Then the response status line is "415 Invalid image"
     #    And the "Content-Type" response header is "application/json"

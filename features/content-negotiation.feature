@@ -4,9 +4,9 @@ Feature: Imbo supports content negotiation
     I can specify the type I want in the Accept request header
 
     Background:
-        Given "tests/phpunit/Fixtures/image1.png" exists for user "user"
-        And "tests/phpunit/Fixtures/image.jpg" exists for user "user"
-        And "tests/phpunit/Fixtures/image.gif" exists for user "user"
+        Given "tests/Fixtures/image1.png" exists for user "user"
+        And "tests/Fixtures/image.jpg" exists for user "user"
+        And "tests/Fixtures/image.gif" exists for user "user"
 
     Scenario Outline: Imbo's resources can respond with different content types using content negotiation
         Given the "Accept" request header is "<accept>"
@@ -69,7 +69,7 @@ Feature: Imbo supports content negotiation
         Given I use "publicKey" and "privateKey" for public and private keys
         And I include an access token in the query string
         And the "Accept" request header is "application/json"
-        When I request the image resource for "tests/phpunit/Fixtures/image1.png"
+        When I request the image resource for "tests/Fixtures/image1.png"
         Then the response status line is "406 Not acceptable"
         And the "Content-Type" response header is "application/json"
         And the "X-Imbo-Originalextension" response header is "png"
@@ -99,10 +99,10 @@ Feature: Imbo supports content negotiation
         And the "Content-Type" response header is "<content-type>"
 
         Examples:
-            | image-path                        | content-type |
-            | tests/phpunit/Fixtures/image1.png | image/png    |
-            | tests/phpunit/Fixtures/image.jpg  | image/jpeg   |
-            | tests/phpunit/Fixtures/image.gif  | image/gif    |
+            | image-path                | content-type |
+            | tests/Fixtures/image1.png | image/png    |
+            | tests/Fixtures/image.jpg  | image/jpeg   |
+            | tests/Fixtures/image.gif  | image/gif    |
 
     Scenario Outline: Imbo uses the original mime type of the image if configuration has disabled content negotiation for images
         Given Imbo uses the "image-content-negotiation-disabled.php" configuration
@@ -114,7 +114,7 @@ Feature: Imbo supports content negotiation
         And the "Content-Type" response header is "<original-content-type>"
 
         Examples:
-            | image-path                        | requested-content-type | original-content-type |
-            | tests/phpunit/Fixtures/image1.png | image/gif              | image/png             |
-            | tests/phpunit/Fixtures/image.jpg  | image/png              | image/jpeg            |
-            | tests/phpunit/Fixtures/image.gif  | image/jpeg             | image/gif             |
+            | image-path                | requested-content-type | original-content-type |
+            | tests/Fixtures/image1.png | image/gif              | image/png             |
+            | tests/Fixtures/image.jpg  | image/png              | image/jpeg            |
+            | tests/Fixtures/image.gif  | image/jpeg             | image/gif             |

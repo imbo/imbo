@@ -4,7 +4,7 @@ Feature: Imbo adds ETag's to some responses
     I can specify ETag's in some responses
 
     Background:
-        Given "tests/phpunit/Fixtures/image.png" exists for user "user"
+        Given "tests/Fixtures/image.png" exists for user "user"
         And I use "publicKey" and "privateKey" for public and private keys
 
     Scenario: Index resource does not contain any Etag header
