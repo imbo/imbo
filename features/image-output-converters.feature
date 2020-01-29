@@ -7,7 +7,7 @@ Feature: Imbo allows plugins for outputting new file types
     Given Imbo uses the "image-output-converters.php" configuration
 
   Scenario: Request an image in a custom format
-    Given "tests/phpunit/Fixtures/image.png" exists for user "user"
+    Given "tests/Fixtures/image.png" exists for user "user"
     And I use "publicKey" and "privateKey" for public and private keys
     And I include an access token in the query string
     And the "Accept" request header is "image/bmp"
@@ -17,7 +17,7 @@ Feature: Imbo allows plugins for outputting new file types
     And the image dimension is "665x463"
 
   Scenario: Request an image in a custom format with a custom extension
-    Given "tests/phpunit/Fixtures/image.png" exists for user "user"
+    Given "tests/Fixtures/image.png" exists for user "user"
     And I use "publicKey" and "privateKey" for public and private keys
     And I include an access token in the query string
     When I request the previously added image as a "bmp"

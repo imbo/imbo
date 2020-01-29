@@ -5,7 +5,7 @@ Feature: Imbo provides an event listener that generates variations when adding i
 
     Background:
         Given Imbo uses the "image-variations.php" configuration
-        And "tests/phpunit/Fixtures/1024x256.png" exists for user "user"
+        And "tests/Fixtures/1024x256.png" exists for user "user"
         And I use "publicKey" and "privateKey" for public and private keys
         And I include an access token in the query string
 

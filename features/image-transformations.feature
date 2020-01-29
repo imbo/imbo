@@ -4,14 +4,14 @@ Feature: Imbo enables dynamic transformations of images
     I can specify image transformations as query parameters
 
     Background:
-        Given "tests/phpunit/Fixtures/image1.png" exists for user "user"
+        Given "tests/Fixtures/image1.png" exists for user "user"
         And I use "publicKey" and "privateKey" for public and private keys
         And I include an access token in the query string
         And Imbo uses the "image-transformation-presets.php" configuration
 
     Scenario Outline: Transform the image
         Given I specify "<transformation>" as transformation
-        When I request the image resource for "tests/phpunit/Fixtures/image1.png" as a "png"
+        When I request the image resource for "tests/Fixtures/image1.png" as a "png"
         Then the response status line is "200 OK"
         And the "Content-Type" response header is "image/png"
         And the "X-Imbo-Originalextension" response header is "png"
@@ -87,7 +87,7 @@ Feature: Imbo enables dynamic transformations of images
 
     Scenario Outline: Transform the image using HTTP HEAD
         Given I specify "<transformation>" as transformation
-        When I request the image resource for "tests/phpunit/Fixtures/image1.png" as a "png" using HTTP "HEAD"
+        When I request the image resource for "tests/Fixtures/image1.png" as a "png" using HTTP "HEAD"
         Then the response status line is "200 OK"
         And the "Content-Type" response header is "image/png"
         And the "X-Imbo-Originalextension" response header is "png"
@@ -154,7 +154,7 @@ Feature: Imbo enables dynamic transformations of images
 
     Scenario Outline: Gracefully handle transformation errors
         Given I specify "<transformation>" as transformation
-        When I request the image resource for "tests/phpunit/Fixtures/image1.png" as a "png"
+        When I request the image resource for "tests/Fixtures/image1.png" as a "png"
         Then the response status line is "<reason-phrase>"
         And the "Content-Type" response header is "application/json"
         And the "X-Imbo-Originalextension" response header is "png"
@@ -199,7 +199,7 @@ Feature: Imbo enables dynamic transformations of images
           sepia
           strip
           """
-        When I request the image resource for "tests/phpunit/Fixtures/image1.png" as a "png"
+        When I request the image resource for "tests/Fixtures/image1.png" as a "png"
         Then the response status line is "200 OK"
         And the "Content-Type" response header is "image/png"
         And the "X-Imbo-Originalextension" response header is "png"
@@ -211,7 +211,7 @@ Feature: Imbo enables dynamic transformations of images
 
     Scenario Outline: Fetch different formats of the image based on the Accept header
         Given the "Accept" request header is "<accept>"
-        When I request the image resource for "tests/phpunit/Fixtures/image1.png"
+        When I request the image resource for "tests/Fixtures/image1.png"
         Then the response status line is "200 OK"
         And the "Content-Type" response header is "<content-type>"
         And the "X-Imbo-Originalextension" response header is "png"
@@ -227,7 +227,7 @@ Feature: Imbo enables dynamic transformations of images
             | image/png  | image/png    |
 
     Scenario Outline: Fetch different formats of the image based on the image extension
-        When I request the image resource for "tests/phpunit/Fixtures/image1.png" as a "<extension>"
+        When I request the image resource for "tests/Fixtures/image1.png" as a "<extension>"
         Then the response status line is "200 OK"
         And the "Content-Type" response header is "<content-type>"
         And the "X-Imbo-Originalextension" response header is "png"

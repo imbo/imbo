@@ -4,7 +4,7 @@ Feature: Imbo provides a metadata endpoint
     I want to make requests against the metadata endpoint
 
     Background:
-        Given "tests/phpunit/Fixtures/image1.png" exists for user "user"
+        Given "tests/Fixtures/image1.png" exists for user "user"
         And I use "publicKey" and "privateKey" for public and private keys
 
     Scenario: Get metadata when image has no metadata attached

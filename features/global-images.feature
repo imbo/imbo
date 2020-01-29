@@ -4,10 +4,10 @@ Feature: Imbo provides a global images endpoint
     I want to make requests against the images endpoint
 
     Background:
-        Given "tests/phpunit/Fixtures/image1.png" exists for user "user"
-        And "tests/phpunit/Fixtures/image.jpg" exists for user "user"
-        And "tests/phpunit/Fixtures/image.gif" exists for user "other-user"
-        And "tests/phpunit/Fixtures/1024x256.png" exists for user "other-user"
+        Given "tests/Fixtures/image1.png" exists for user "user"
+        And "tests/Fixtures/image.jpg" exists for user "user"
+        And "tests/Fixtures/image.gif" exists for user "other-user"
+        And "tests/Fixtures/1024x256.png" exists for user "other-user"
 
     Scenario: Fetch images without specifying any users (all images)
         Given I use "publicKey" and "privateKey" for public and private keys
