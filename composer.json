@@ -39,7 +39,6 @@
     "doctrine/dbal": "^2.9",
     "aws/aws-sdk-php": "^3.111",
     "micheh/psr7-cache": "^0.5",
-    "phpstan/phpstan": "^0.11.15",
     "christeredvartsen/testfs": "dev-master"
   },
   "suggest": {
@@ -87,9 +86,6 @@
     "docs": [
       "cd docs; make spelling",
       "cd docs; make html"
-    ],
-    "phpstan": [
-      "vendor/bin/phpstan analyse -l 1 -c .phpstan.neon tests"
     ],
     "dev": [
       "mkdir -p build/logs",
