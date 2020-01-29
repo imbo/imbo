@@ -1897,16 +1897,16 @@
         },
         {
             "name": "mongodb/mongodb",
-            "version": "1.5.0",
+            "version": "1.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mongodb/mongo-php-library.git",
-                "reference": "6405e91ba63955bcd187d3bab9ec7327d17cc4ce"
+                "reference": "9480f994de9f70e2ae5a946b21e6fc04bf5a6c3c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mongodb/mongo-php-library/zipball/6405e91ba63955bcd187d3bab9ec7327d17cc4ce",
-                "reference": "6405e91ba63955bcd187d3bab9ec7327d17cc4ce",
+                "url": "https://api.github.com/repos/mongodb/mongo-php-library/zipball/9480f994de9f70e2ae5a946b21e6fc04bf5a6c3c",
+                "reference": "9480f994de9f70e2ae5a946b21e6fc04bf5a6c3c",
                 "shasum": ""
             },
             "require": {
@@ -1961,7 +1961,7 @@
                 "mongodb",
                 "persistence"
             ],
-            "time": "2019-09-09T13:42:06+00:00"
+            "time": "2019-11-15T08:21:00+00:00"
         },
         {
             "name": "mtdowling/jmespath.php",
