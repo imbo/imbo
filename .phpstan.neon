@@ -1,9 +1,0 @@
-parameters:
-    autoload_files:
-        - tests/phpunit/bootstrap.php
-        - tests/behat/imbo-configs/image-loaders.php
-        - tests/behat/imbo-configs/image-loaders-fallback.php
-        - tests/behat/imbo-configs/custom-routes-and-resources.php
-        - tests/behat/imbo-configs/custom-event-listeners.php
-        - tests/behat/imbo-configs/custom-access-control.php
-        - tests/behat/imbo-configs/access-control.php
