@@ -7,7 +7,6 @@ use Imbo\Resource\Images\Query;
 use Imbo\Database\Doctrine;
 use Imbo\Exception\DuplicateImageIdentifierException;
 use Imbo\Exception\DatabaseException;
-use Imbo\Database\DatabaseInterface;
 use PHPUnit\Framework\TestCase;
 use DateTime;
 use DateTimeZone;
@@ -722,7 +721,7 @@ abstract class DatabaseTests extends TestCase {
         $query = new Query();
         $query->returnMetadata(true);
 
-        $images = $this->adapter->getImages(['user', 'user2'], $query, $this->createMock('Imbo\Model\Images'));
+        $images = $this->adapter->getImages(['user', 'user2'], $query, $this->createMock(Images::class));
         $this->assertCount(6, $images, sprintf('Incorrect length. Expected 6, got %d', count($images)));
 
         foreach ($images as $image) {

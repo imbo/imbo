@@ -134,7 +134,7 @@ class EventManagerTest extends TestCase {
         $this->request
             ->expects($this->any())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $this->expectOutputString($output);
         $this->manager->trigger('event');

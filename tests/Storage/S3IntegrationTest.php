@@ -18,9 +18,6 @@ class S3IntegrationTest extends StorageTests {
         ]);
     }
 
-    /**
-     * Make sure we have the correct config available
-     */
     public function setUp() : void {
         foreach (['AWS_S3_KEY', 'AWS_S3_SECRET', 'AWS_S3_BUCKET', 'AWS_S3_REGION'] as $var) {
             if (!defined($var)) {

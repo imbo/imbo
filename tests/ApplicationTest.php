@@ -39,7 +39,7 @@ class ApplicationTest extends TestCase {
     public function testThrowsExceptionWhenConfigurationHasInvalidStorageAdapter() : void {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid storage adapter', 500));
         $this->application->run([
-            'database' => $this->createMock('Imbo\Database\DatabaseInterface'),
+            'database' => $this->createMock(DatabaseInterface::class),
             'storage' => function() { return new stdClass(); },
             'trustedProxies' => [],
         ]);

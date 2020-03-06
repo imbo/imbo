@@ -3,7 +3,6 @@ namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
 use Imbo\Model;
-use Imbo\Version;
 
 class Index implements ResourceInterface {
     /**

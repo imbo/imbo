@@ -51,7 +51,7 @@ class UserTest extends ResourceTests {
             $this->event
             ->expects($this->once())
             ->method('getManager')
-            ->will($this->returnValue($manager));
+            ->willReturn($manager);
 
         $this->resource->get($this->event);
     }

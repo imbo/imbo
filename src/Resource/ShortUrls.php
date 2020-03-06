@@ -4,7 +4,6 @@ namespace Imbo\Resource;
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Model\ArrayModel;
-use Imbo\Model\Image as ImageModel;
 
 class ShortUrls implements ResourceInterface {
     /**

@@ -91,9 +91,10 @@ class ErrorTest extends TestCase {
         $exception = new RuntimeException('You wronged', 400);
         $exception->setImboErrorCode(123);
 
-        $request = $this->createMock(Request::class);
-        $request->expects($this->once())->method('getImage')->will($this->returnValue(null));
-        $request->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageIdentifier'));
+        $request = $this->createConfiguredMock(Request::class, [
+            'getImage' => null,
+            'getImageIdentifier' => 'imageIdentifier'
+        ]);
 
         $model = Error::createFromException($exception, $request);
 
@@ -108,10 +109,14 @@ class ErrorTest extends TestCase {
         $exception = new RuntimeException('You wronged', 400);
         $exception->setImboErrorCode(123);
 
-        $request = $this->createMock(Request::class);
-        $image = $this->createMock(Image::class);
-        $image->expects($this->once())->method('getImageIdentifier')->will($this->returnValue('imageId'));
-        $request->expects($this->once())->method('getImage')->will($this->returnValue($image));
+        $image = $this->createConfiguredMock(Image::class, [
+            'getImageIdentifier' => 'imageId',
+        ]);
+
+        $request = $this->createConfiguredMock(Request::class, [
+            'getImage' => $image,
+        ]);
+
         $request->expects($this->never())->method('getImageIdentifier');
 
         $model = Error::createFromException($exception, $request);

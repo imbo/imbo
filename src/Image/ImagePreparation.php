@@ -3,12 +3,10 @@ namespace Imbo\Image;
 
 use Imbo\EventManager\EventInterface;
 use Imbo\EventListener\ListenerInterface;
-use Imbo\Image\Identifier\Generator\GeneratorInterface;
 use Imbo\Exception\ImageException;
 use Imbo\Exception\LoaderException;
 use Imbo\Exception;
 use Imbo\Model\Image;
-use Imagick;
 use ImagickException;
 use finfo;
 

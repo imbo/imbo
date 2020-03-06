@@ -13,7 +13,6 @@ use Imbo\Router\Route;
  * @coversDefaultClass Imbo\Resource\ShortUrl
  */
 class ShortUrlTest extends ResourceTests {
-    private $resource;
     private $request;
     private $route;
     private $response;
@@ -68,7 +67,7 @@ class ShortUrlTest extends ResourceTests {
             ->expects($this->once())
             ->method('get')
             ->with('shortUrlId')
-            ->will($this->returnValue('aaaaaaa'));
+            ->willReturn('aaaaaaa');
         $this->database
             ->expects($this->once())
             ->method('getShortUrlParams')

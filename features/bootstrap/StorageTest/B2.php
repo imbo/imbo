@@ -30,7 +30,6 @@ class B2 implements AdapterTest {
     }
 
     static public function tearDown(array $config) {
-        //$client = new Client($config['storage.accountId'], $config['storage.applicationKey']);
         self::$client->deleteBucket(['BucketId' => $config['storage.bucketId']]);
     }
 

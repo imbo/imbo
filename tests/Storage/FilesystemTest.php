@@ -25,9 +25,6 @@ class FilesystemTest extends TestCase {
      */
     private $imageIdentifier = '96d08a5943ebf1c5635a2995c9408cdd.png';
 
-    /**
-     * Setup method
-     */
     public function setUp() : void {
         TestFs::register();
     }

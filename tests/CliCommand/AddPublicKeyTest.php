@@ -7,8 +7,8 @@ use Imbo\Exception\RuntimeException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use PHPUnit\Framework\TestCase;
-use Exception;
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
+use Exception;
 
 /**
  * @coversDefaultClass Imbo\CliCommand\AddPublicKey

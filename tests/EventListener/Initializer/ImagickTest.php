@@ -3,9 +3,9 @@ namespace Imbo\EventListener\Initializer;
 
 use Imbo\EventListener\Initializer\Imagick as ImagickInitializer;
 use Imbo\EventListener\Imagick as ImagickEventListener;
+use Imbo\Image\Transformation\Border;
 use PHPUnit\Framework\TestCase;
 use Imagick;
-use Imbo\Image\Transformation\Border;
 
 /**
  * @coversDefaultClass Imbo\EventListener\Initializer\Imagick

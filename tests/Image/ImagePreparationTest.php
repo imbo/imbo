@@ -10,8 +10,8 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Image\Identifier\Generator\GeneratorInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Imagick;
 use Imbo\Model\Image;
+use Imagick;
 
 /**
  * @coversDefaultClass Imbo\Image\ImagePreparation
@@ -29,9 +29,6 @@ class ImagePreparationTest extends TestCase {
     private $outputConverterManager;
     private $imagickLoader;
 
-    /**
-     * Set up the image preparation instance
-     */
     public function setUp() : void {
         $this->request = $this->createMock(Request::class);
         $this->database = $this->createMock(DatabaseInterface::class);

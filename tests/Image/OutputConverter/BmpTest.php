@@ -66,7 +66,7 @@ class BmpTest extends TestCase {
         $this->expectExceptionObject(new OutputConverterException('some error', 400));
         $this->converter->convert(
             $imagick,
-            $this->createMock('Imbo\Model\Image'),
+            $this->createMock(Image::class),
             $extension,
             'image/bmp'
         );

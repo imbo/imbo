@@ -1,8 +1,10 @@
 <?php declare(strict_types=1);
 namespace Imbo\Behat;
 
+use Imbo\Image\OutputConverter\Bmp;
+
 return [
     'outputConverters' => [
-        'Imbo\Image\OutputConverter\Bmp',
+        Bmp::class,
     ],
 ];

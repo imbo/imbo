@@ -3,7 +3,6 @@ namespace Imbo\Behat;
 
 use Imbo\EventListener\StatsAccess;
 use Imbo\Http\Request\Request;
-use Imbo\Http\Response\Response;
 use Imbo\EventManager\EventInterface;
 
 /**

@@ -85,9 +85,6 @@ class DoctrineTest extends DatabaseTests {
             parent::setUp();
     }
 
-    /**
-     * Remove the database file
-     */
     protected function tearDown() : void {
         @unlink($this->dbPath);
 
