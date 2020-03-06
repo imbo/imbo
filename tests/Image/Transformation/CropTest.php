@@ -136,13 +136,29 @@ class CropTest extends TransformationTests {
         ]);
 
         if ($shouldCrop) {
-            $image->expects($this->once())->method('setWidth')->with($width)->will($this->returnSelf());
-            $image->expects($this->once())->method('setHeight')->with($height)->will($this->returnSelf());
+            $image
+                ->expects($this->once())
+                ->method('setWidth')
+                ->with($width)
+                ->willReturnSelf();
+            $image
+                ->expects($this->once())
+                ->method('setHeight')
+                ->with($height)
+                ->willReturnSelf();
 
-            $imagick->expects($this->once())->method('cropImage')->with($width, $height, $x, $y);
-            $imagick->expects($this->once())->method('getImageGeometry')->will($this->returnValue(['width' => $width, 'height' => $height]));
+            $imagick
+                ->expects($this->once())
+                ->method('cropImage')
+                ->with($width, $height, $x, $y);
+            $imagick
+                ->expects($this->once())
+                ->method('getImageGeometry')
+                ->willReturn(['width' => $width, 'height' => $height]);
         } else {
-            $imagick->expects($this->never())->method('cropImage');
+            $imagick
+                ->expects($this->never())
+                ->method('cropImage');
         }
 
         (new Crop())
@@ -219,8 +235,14 @@ class CropTest extends TransformationTests {
             $this->expectExceptionMessageRegExp($errRegex);
             $imagick->expects($this->never())->method('cropImage');
         } else {
-            $image->expects($this->once())->method('setWidth')->will($this->returnSelf());
-            $image->expects($this->once())->method('setHeight')->will($this->returnSelf());
+            $image
+                ->expects($this->once())
+                ->method('setWidth')
+                ->willReturnSelf();
+            $image
+                ->expects($this->once())
+                ->method('setHeight')
+                ->willReturnSelf();
 
             $imagick->expects($this->once())->method('cropImage');
         }

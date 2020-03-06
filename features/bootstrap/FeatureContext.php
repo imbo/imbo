@@ -9,7 +9,6 @@ use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
 use Behat\Gherkin\Node\TableNode;

@@ -15,7 +15,6 @@ class IndexTest extends ResourceTests {
     private $request;
     private $response;
     private $event;
-    private $responseHeaders;
 
     protected function getNewResource() : Index {
         return new Index();

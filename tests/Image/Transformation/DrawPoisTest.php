@@ -7,7 +7,6 @@ use Imbo\Database\DatabaseInterface;
 use Imbo\Exception\TransformationException;
 use PHPUnit\Framework\TestCase;
 use Imagick;
-use ImagickDraw;
 use ImagickException;
 
 /**

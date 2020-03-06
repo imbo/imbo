@@ -13,7 +13,6 @@ use Imbo\Model\ArrayModel;
  * @coversDefaultClass Imbo\Resource\ShortUrls
  */
 class ShortUrlsTest extends ResourceTests {
-    private $resource;
     private $request;
     private $response;
     private $database;
@@ -32,8 +31,9 @@ class ShortUrlsTest extends ResourceTests {
         ]);
         $this->response = $this->createMock(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);
-        $this->outputConverterManager = $this->createMock(OutputConverterManager::class);
-        $this->outputConverterManager->expects($this->any())->method('supportsExtension')->will($this->returnCallback(function ($ext) { return $ext == 'gif'; }));
+        $this->outputConverterManager = $this->createConfiguredMock(OutputConverterManager::class, [
+            'supportsExtension' => $this->returnCallback(function ($ext) { return $ext === 'gif'; }),
+        ]);
 
         $this->event = $this->createConfiguredMock(EventInterface::class, [
             'getRequest' => $this->request,
@@ -211,14 +211,17 @@ class ShortUrlsTest extends ResourceTests {
      * @covers ::createShortUrl
      */
     public function testWillReturn200OKIfTheShortUrlAlreadyExists() : void {
-        $this->request->expects($this->once())->method('getContent')->will($this->returnValue('
-            {
-                "user": "user",
-                "imageIdentifier": "id",
-                "extension": null,
-                "query": null
-            }
-        '));
+        $this->request
+            ->expects($this->once())
+            ->method('getContent')
+            ->willReturn('
+                {
+                    "user": "user",
+                    "imageIdentifier": "id",
+                    "extension": null,
+                    "query": null
+                }
+            ');
         $this->database
             ->expects($this->once())
             ->method('imageExists')

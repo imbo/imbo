@@ -105,7 +105,7 @@ class ImageTest extends TestCase {
      * @covers ::getAddedDate
      */
     public function testCanSetAndGetTheAddedDate() : void {
-        $date = $this->createMock('DateTime');
+        $date = $this->createMock(DateTime::class);
         $this->assertNull($this->image->getAddedDate());
         $this->assertSame($this->image, $this->image->setAddedDate($date));
         $this->assertSame($date, $this->image->getAddedDate());
@@ -116,7 +116,7 @@ class ImageTest extends TestCase {
      * @covers ::getUpdatedDate
      */
     public function testCanSetAndGetTheUpdatedDate() : void {
-        $date = $this->createMock('DateTime');
+        $date = $this->createMock(DateTime::class);
         $this->assertNull($this->image->getUpdatedDate());
         $this->assertSame($this->image, $this->image->setUpdatedDate($date));
         $this->assertSame($date, $this->image->getUpdatedDate());
