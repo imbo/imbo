@@ -33,7 +33,7 @@
   "require-dev": {
     "ext-mongodb": "^1.6",
     "phpunit/phpunit": "^8.5",
-    "mongodb/mongodb": "^1.5",
+    "mongodb/mongodb": "^1.6",
     "cwhite92/b2-sdk-php": "^1.3",
     "imbo/behat-api-extension": "^2.2",
     "doctrine/dbal": "^2.9",
