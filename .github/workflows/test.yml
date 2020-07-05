@@ -6,7 +6,7 @@ jobs:
     name: Validate, lint and test
     services:
       mongodb:
-        image: mongo:3.4.24
+        image: mongo:4.2.8
     steps:
       - uses: actions/checkout@v2
 
@@ -16,22 +16,23 @@ jobs:
       - name: Lint all PHP files
         run: composer run lint
 
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v1
-        with:
-          path: vendor
-          key: ${{ runner.os }}-node-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       - name: Install system packages
         run: sudo apt-get install php-imagick
 
-      - name: Debug
+      - name: Debug PHP installation
         run: |
+            php -v
             php -i
             php -m
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
       - name: Install dependencies
         if: steps.composer-cache.outputs.cache-hit != 'true'
