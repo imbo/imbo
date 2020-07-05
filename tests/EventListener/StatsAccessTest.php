@@ -34,6 +34,11 @@ class StatsAccessTest extends ListenerTests {
      */
     public function testDoesNotAllowAnyIpAddressPerDefault() : void {
         $this->expectExceptionObject(new RuntimeException('Access denied', 403));
+        $this->request
+            ->expects($this->once())
+            ->method('getClientIp')
+            ->willReturn('1.2.3.4');
+
         $this->listener->checkAccess($this->event);
     }
 

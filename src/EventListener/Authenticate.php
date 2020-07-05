@@ -187,12 +187,12 @@ class Authenticate implements ListenerInterface {
      * @return boolean
      */
     private function timestampHasExpired($timestamp) {
-        $year   = substr($timestamp, 0, 4);
-        $month  = substr($timestamp, 5, 2);
-        $day    = substr($timestamp, 8, 2);
-        $hour   = substr($timestamp, 11, 2);
-        $minute = substr($timestamp, 14, 2);
-        $second = substr($timestamp, 17, 2);
+        $year   = (int) substr($timestamp, 0, 4);
+        $month  = (int) substr($timestamp, 5, 2);
+        $day    = (int) substr($timestamp, 8, 2);
+        $hour   = (int) substr($timestamp, 11, 2);
+        $minute = (int) substr($timestamp, 14, 2);
+        $second = (int) substr($timestamp, 17, 2);
 
         $timestamp = gmmktime($hour, $minute, $second, $month, $day, $year);
 

@@ -162,7 +162,7 @@ class StatsAccess implements ListenerInterface {
      */
     private function getBinaryMask($mask) {
         // Prefix the string
-        $hexMask = str_repeat('f', $mask / 4);
+        $hexMask = str_repeat('f', (int) ($mask / 4));
 
         // Add the remainder
         switch ($mask % 4) {

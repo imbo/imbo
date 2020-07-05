@@ -709,7 +709,7 @@ class Doctrine implements DatabaseInterface {
         $result = [];
 
         foreach ($metadata as $key => $value) {
-            if (strstr($key, $this->metadataNamespaceSeparator) !== false) {
+            if (strstr((string) $key, $this->metadataNamespaceSeparator) !== false) {
                 throw new DatabaseException('Invalid metadata', 400);
             }
 

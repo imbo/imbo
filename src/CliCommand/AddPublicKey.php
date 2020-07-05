@@ -153,7 +153,7 @@ class AddPublicKey extends CliCommand {
         );
 
         $question->setValidator(function($answer) {
-            $resources = array_filter(array_map('trim', explode(',', $answer)));
+            $resources = array_filter(array_map('trim', explode(',', (string) $answer)));
 
             if (empty($resources)) {
                 throw new RuntimeException(
@@ -179,8 +179,8 @@ class AddPublicKey extends CliCommand {
             'On which users should the public key have access to these resources?' . PHP_EOL .
             '(comma-separated, specify "*" for all users) '
         );
-        $question->setValidator(function($answer) {
-            $users = array_filter(array_map('trim', explode(',', $answer)));
+        $question->setValidator(function(?string $answer) {
+            $users = array_filter(array_map('trim', explode(',', (string) $answer)));
 
             if (empty($users)) {
                 throw new RuntimeException(

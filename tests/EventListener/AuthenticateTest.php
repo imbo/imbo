@@ -151,9 +151,9 @@ class AuthenticateTest extends ListenerTests {
             ->expects($this->at(2))
             ->method('get')
             ->with('x-imbo-authenticate-timestamp')
-            ->willReturn('2010-10-10T20:10:10Z');
+            ->willReturn('2010-07-10T20:02:10Z');
 
-        $this->expectExceptionObject(new RuntimeException('Timestamp has expired: 2010-10-10T20:10:10Z', 400));
+        $this->expectExceptionObject(new RuntimeException('Timestamp has expired: 2010-07-10T20:02:10Z', 400));
         $this->listener->authenticate($this->event);
     }
 
@@ -184,6 +184,17 @@ class AuthenticateTest extends ListenerTests {
             ->method('get')
             ->with('x-imbo-authenticate-signature')
             ->willReturn('foobar');
+
+        $this->request
+            ->expects($this->once())
+            ->method('getPublicKey')
+            ->willReturn('publickey');
+
+        $this->accessControl
+            ->expects($this->once())
+            ->method('getPrivateKey')
+            ->with('publickey')
+            ->willReturn('privateKey');
 
         $this->expectExceptionObject(new RuntimeException('Signature mismatch', 400));
         $this->listener->authenticate($this->event);
