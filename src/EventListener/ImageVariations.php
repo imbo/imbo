@@ -276,9 +276,11 @@ class ImageVariations implements ListenerInterface {
 
                 try {
                     $this->storage->deleteImageVariations($user, $imageIdentifier, $width);
+                // @codeCoverageIgnoreStart
                 } catch (StorageException $e) {
                     trigger_error('Could not remove the stored variation', E_USER_WARNING);
                 }
+                // @codeCoverageIgnoreEnd
             }
         }
     }
