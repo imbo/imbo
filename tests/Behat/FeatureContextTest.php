@@ -164,7 +164,7 @@ class FeatureContextTest extends TestCase {
      */
     public function testSettingConfigHeaderFailsWithNonExistingFile() : void {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp(
+        $this->expectExceptionMessageMatches(
             '|Configuration file "foobar" does not exist in the ".*?[\\/]imbo-configs" directory\.|'
         );
 
@@ -498,7 +498,7 @@ class FeatureContextTest extends TestCase {
      */
     public function testThrowsExceptionWhenPrimingDatabaseWithScriptThatDoesNotExist() : void {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp(
+        $this->expectExceptionMessageMatches(
             '|Fixture file "foobar.php" does not exist in ".*?[\\/]features[\\/]fixtures"\.|'
         );
         $this->context->primeDatabase('foobar.php');
@@ -585,11 +585,11 @@ class FeatureContextTest extends TestCase {
         );
 
         $request = $this->makeRequest('/path');
-        $this->assertRegExp($uriRegExp, (string) $request->getUri());
+        $this->assertMatchesRegularExpression($uriRegExp, (string) $request->getUri());
 
         foreach ($headers as $name => $regExp) {
             $this->assertTrue($request->hasHeader($name));
-            $this->assertRegExp($regExp, $request->getHeaderLine($name));
+            $this->assertMatchesRegularExpression($regExp, $request->getHeaderLine($name));
         }
     }
 
@@ -1119,7 +1119,7 @@ class FeatureContextTest extends TestCase {
      */
     public function testThrowsExceptionWhenTryingToRequestImageUsingLocalPathAndImageDoesNotExistInImbo() : void {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp(
+        $this->expectExceptionMessageMatches(
             '|Image URL for image with path ".*?[\\/]tests[\\/]Fixtures[\\/]image1\.png" can not be found\.|'
         );
         $this->context->requestImageResourceForLocalImage(FIXTURES_DIR . '/image1.png');
@@ -1364,7 +1364,7 @@ class FeatureContextTest extends TestCase {
 
         $this->assertSame('GET', $this->history[0]['request']->getMethod());
         $this->assertSame('/path1', $this->history[0]['request']->getUri()->getPath());
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/^publicKey=publicKey&signature=[a-z0-9]{64}&timestamp=[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$/',
             $this->history[0]['request']->getUri()->getQuery()
         );
@@ -1375,7 +1375,7 @@ class FeatureContextTest extends TestCase {
 
         $this->assertSame('HEAD', $this->history[2]['request']->getMethod());
         $this->assertSame('/path3', $this->history[2]['request']->getUri()->getPath());
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/^publicKey=publicKey&signature=[a-z0-9]{64}&timestamp=[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$/',
             $this->history[2]['request']->getUri()->getQuery()
         );

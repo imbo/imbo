@@ -28,7 +28,7 @@ class GeneratePrivateKeyTest extends TestCase {
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(['command' => $this->command->getName()]);
 
-        $this->assertRegExp('/^[a-zA-Z_\\-0-9]{8,}$/', trim($commandTester->getDisplay()));
+        $this->assertMatchesRegularExpression('/^[a-zA-Z_\\-0-9]{8,}$/', trim($commandTester->getDisplay()));
     }
 
     /**

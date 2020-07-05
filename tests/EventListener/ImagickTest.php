@@ -63,6 +63,15 @@ class ImagickTest extends ListenerTests {
             ->expects($this->once())
             ->method('getName')
             ->willReturn('images.post');
+        
+        $this->event
+            ->expects($this->once())
+            ->method('getConfig')
+            ->willReturn([
+                'optimizations' => [
+                    'jpegSizeHint' => false,
+                ]
+            ]);
 
         $this->listener->readImageBlob($this->event);
     }
@@ -91,6 +100,15 @@ class ImagickTest extends ListenerTests {
             ->expects($this->once())
             ->method('getName')
             ->willReturn('storage.image.load');
+
+        $this->event
+            ->expects($this->once())
+            ->method('getConfig')
+            ->willReturn([
+                'optimizations' => [
+                    'jpegSizeHint' => false,
+                ]
+            ]);
 
         $this->listener->readImageBlob($this->event);
     }
@@ -125,6 +143,15 @@ class ImagickTest extends ListenerTests {
             ->expects($this->once())
             ->method('getName')
             ->willReturn('images.post');
+
+        $this->event
+            ->expects($this->once())
+            ->method('getConfig')
+            ->willReturn([
+                'optimizations' => [
+                    'jpegSizeHint' => false,
+                ]
+            ]);
 
         $this->listener->readImageBlob($this->event);
     }

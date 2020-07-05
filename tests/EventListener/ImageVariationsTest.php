@@ -7,7 +7,6 @@ use Imbo\Exception\StorageException;
 use Imbo\Exception\TransformationException;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Image\TransformationManager;
-use Imbo\EventListener\Initializer\Imagick as ImagickInitializer;
 use Imbo\EventListener\ImageVariations\Database\DatabaseInterface;
 use Imbo\EventListener\ImageVariations\Storage\StorageInterface;
 use Imbo\EventManager\EventManager;
@@ -20,29 +19,28 @@ use Imbo\Image\Transformation\Transformation;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use DateTime;
-use Imagick;
+use Imbo\Image\Transformation\Convert;
+use Imbo\Image\Transformation\Resize;
+use PHPUnit\Util\ErrorHandler;
 
 /**
  * @coversDefaultClass Imbo\EventListener\ImageVariations
  */
 class ImageVariationsTest extends ListenerTests {
-    private $listener;
-    private $db;
-    private $config;
-    private $storage;
-    private $event;
-    private $request;
-    private $response;
-    private $responseHeaders;
-    private $query;
-    private $imagick;
-    private $imageModel;
-    private $imageStorage;
-    private $eventManager;
-    private $transformationManager;
-    private $user = 'user';
-    private $imageIdentifier = 'imgid';
-    private $transformation;
+    private ImageVariations $listener;
+    private DatabaseInterface $db;
+    private StorageInterface $storage;
+    private EventInterface $event;
+    private Request $request;
+    private Response $response;
+    private ResponseHeaderBag $responseHeaders;
+    private ParameterBag $query;
+    private Image $imageModel;
+    private MainStorageInterface $imageStorage;
+    private EventManager $eventManager;
+    private TransformationManager $transformationManager;
+    private string $user = 'user';
+    private string $imageIdentifier = 'imgid';
 
     protected function getListener() : ImageVariations {
         return new ImageVariations([
@@ -56,44 +54,39 @@ class ImageVariationsTest extends ListenerTests {
     }
 
     public function setUp() : void {
-        $this->db = $this->createMock(DatabaseInterface::class);
-        $this->storage = $this->createMock(StorageInterface::class);
-
-        $this->query = $this->createMock(ParameterBag::class);
+        $this->db         = $this->createMock(DatabaseInterface::class);
+        $this->storage    = $this->createMock(StorageInterface::class);
+        $this->query      = $this->createMock(ParameterBag::class);
         $this->imageModel = $this->createConfiguredMock(Image::class, [
             'getImageIdentifier' => $this->imageIdentifier,
-            'setWidth' => $this->returnSelf(),
-            'setHeight' => $this->returnSelf(),
-            'setMimeType' => $this->returnSelf(),
-            'setExtension' => $this->returnSelf(),
+            'setWidth'           => $this->returnSelf(),
+            'setHeight'          => $this->returnSelf(),
+            'setMimeType'        => $this->returnSelf(),
+            'setExtension'       => $this->returnSelf(),
         ]);
         $this->eventManager = $this->createMock(EventManager::class);
         $this->imageStorage = $this->createMock(MainStorageInterface::class);
-        $this->imagick = $this->createMock(Imagick::class);
+        $this->config       = [];
 
-        $this->config = require __DIR__ . '/../../config/config.default.php';
-
-        $this->transformationManager = new TransformationManager();
-        $this->transformationManager->addTransformations($this->config['transformations']);
-        $this->transformationManager->addInitializer(new ImagickInitializer($this->imagick));
-        $this->request = $this->createConfiguredMock(Request::class, [
-            'getUser' => $this->user,
+        $this->transformationManager = $this->createMock(TransformationManager::class);
+        $this->request               = $this->createConfiguredMock(Request::class, [
+            'getUser'            => $this->user,
             'getImageIdentifier' => $this->imageIdentifier,
-            'getImage' => $this->imageModel,
+            'getImage'           => $this->imageModel,
         ]);
         $this->request->query = $this->query;
 
         $this->responseHeaders = $this->createMock(ResponseHeaderBag::class);
-        $this->response = $this->createConfiguredMock(Response::class, [
+        $this->response        = $this->createConfiguredMock(Response::class, [
             'getModel' => $this->imageModel,
         ]);
         $this->response->headers = $this->responseHeaders;
 
         $this->event = $this->createConfiguredMock(EventInterface::class, [
-            'getRequest' => $this->request,
-            'getResponse' => $this->response,
-            'getManager' => $this->eventManager,
-            'getStorage' => $this->imageStorage,
+            'getRequest'               => $this->request,
+            'getResponse'              => $this->response,
+            'getManager'               => $this->eventManager,
+            'getStorage'               => $this->imageStorage,
             'getTransformationManager' => $this->transformationManager,
         ]);
 
@@ -126,7 +119,9 @@ class ImageVariationsTest extends ListenerTests {
             500
         ));
         new ImageVariations([
-            'storage' => [ 'adapter' => $this->storage ],
+            'storage' => [
+                'adapter' => $this->storage,
+            ],
         ]);
     }
 
@@ -140,8 +135,12 @@ class ImageVariationsTest extends ListenerTests {
             500
         ));
         new ImageVariations([
-            'database' => [ 'adapter' => function() { return null; } ],
-            'storage'  => [ 'adapter' => $this->storage ],
+            'database' => [
+                'adapter' => function() { return null; },
+            ],
+            'storage' => [
+                'adapter' => $this->storage,
+            ],
         ]);
     }
 
@@ -155,8 +154,12 @@ class ImageVariationsTest extends ListenerTests {
             500
         ));
         new ImageVariations([
-            'database' => [ 'adapter' => 'DateTime' ],
-            'storage'  => [ 'adapter' => $this->storage ],
+            'database' => [
+                'adapter' => 'DateTime',
+            ],
+            'storage' => [
+                'adapter' => $this->storage,
+            ],
         ]);
     }
 
@@ -170,7 +173,9 @@ class ImageVariationsTest extends ListenerTests {
             500
         ));
         new ImageVariations([
-            'database' => [ 'adapter' => $this->db ],
+            'database' => [
+                'adapter' => $this->db,
+            ],
         ]);
     }
 
@@ -184,8 +189,12 @@ class ImageVariationsTest extends ListenerTests {
             500
         ));
         new ImageVariations([
-            'storage'  => [ 'adapter' => function() { return null; } ],
-            'database' => [ 'adapter' => $this->db ],
+            'storage'  => [
+                'adapter' => function() { return null; },
+            ],
+            'database' => [
+                'adapter' => $this->db,
+            ],
         ]);
     }
 
@@ -199,8 +208,12 @@ class ImageVariationsTest extends ListenerTests {
             500
         ));
         new ImageVariations([
-            'storage'  => [ 'adapter' => 'DateTime' ],
-            'database' => [ 'adapter' => $this->db ],
+            'storage'  => [
+                'adapter' => 'DateTime',
+            ],
+            'database' => [
+                'adapter' => $this->db,
+            ],
         ]);
     }
 
@@ -209,7 +222,6 @@ class ImageVariationsTest extends ListenerTests {
      */
     public function testFallsBackIfNoTransformationsAreApplied() : void {
         $this->request
-            ->expects($this->any())
             ->method('getTransformations')
             ->willReturn([]);
 
@@ -226,24 +238,29 @@ class ImageVariationsTest extends ListenerTests {
     public function testFallsBackIfNoRelevantTransformationsApplied() : void {
         $width  = 1024;
         $height = 768;
-        $transformations = [[
-            'name'   => 'desaturate',
-            'params' => []
-        ]];
+        $transformations = [
+            [
+                'name'   => 'desaturate',
+                'params' => []
+            ],
+        ];
 
         $this->imageModel
-            ->expects($this->any())
             ->method('getWidth')
             ->willReturn($width);
+
         $this->imageModel
-            ->expects($this->any())
             ->method('getHeight')
             ->willReturn($height);
 
         $this->request
-            ->expects($this->any())
             ->method('getTransformations')
             ->willReturn($transformations);
+
+        $this->transformationManager
+            ->expects($this->once())
+            ->method('getMinimumImageInputSize')
+            ->willReturn(false);
 
         $this->eventManager
             ->expects($this->never())
@@ -258,25 +275,32 @@ class ImageVariationsTest extends ListenerTests {
     public function testFallsBackIfSizeIsLargerThanOriginal() : void {
         $width  = 1024;
         $height = 768;
-        $transformations = [[
-            'name'   => 'maxSize',
-            'params' => ['width' => $width * 2]
-        ]];
+        $transformations = [
+            [
+                'name'   => 'maxSize',
+                'params' => ['width' => 2048]
+            ],
+        ];
 
         $this->imageModel
-            ->expects($this->any())
             ->method('getWidth')
             ->willReturn($width);
 
         $this->imageModel
-            ->expects($this->any())
             ->method('getHeight')
             ->willReturn($height);
 
         $this->request
-            ->expects($this->any())
             ->method('getTransformations')
             ->willReturn($transformations);
+
+        $this->transformationManager
+            ->expects($this->once())
+            ->method('getMinimumImageInputSize')
+            ->willReturn([
+                'index' => 0,
+                'width' => 2048,
+            ]);
 
         $this->eventManager
             ->expects($this->never())
@@ -291,29 +315,36 @@ class ImageVariationsTest extends ListenerTests {
     public function testFallsBackIfDatabaseDoesNotReturnAnyVariation() : void {
         $width  = 1024;
         $height = 768;
-        $transformations = [[
-            'name'   => 'maxSize',
-            'params' => ['width' => 512]
-        ]];
+        $transformations = [
+            [
+                'name'   => 'maxSize',
+                'params' => ['width' => 512],
+            ],
+        ];
 
         $this->eventManager
             ->expects($this->never())
             ->method('trigger');
 
         $this->imageModel
-            ->expects($this->any())
             ->method('getWidth')
             ->willReturn($width);
 
         $this->imageModel
-            ->expects($this->any())
             ->method('getHeight')
             ->willReturn($height);
 
         $this->request
-            ->expects($this->any())
             ->method('getTransformations')
             ->willReturn($transformations);
+
+        $this->transformationManager
+            ->expects($this->once())
+            ->method('getMinimumImageInputSize')
+            ->willReturn([
+                'index' => 0,
+                'width' => 512,
+            ]);
 
         $this->db
             ->expects($this->once())
@@ -332,45 +363,53 @@ class ImageVariationsTest extends ListenerTests {
      * @covers ::chooseVariation
      */
     public function testTriggersWarningIfVariationFoundInDbButNotStorage() : void {
-        $width  = 1024;
-        $height = 768;
+        $width               = 1024;
+        $height              = 768;
         $transformationWidth = 512;
-        $variationWidth = 800;
-        $transformations = [[
-            'name'   => 'desaturate',
-            'params' => [],
-        ],[
-            'name'   => 'maxSize',
-            'params' => ['width' => $transformationWidth]
-        ]];
+        $variationWidth      = 800;
+        $transformations     = [
+            [
+                'name'   => 'desaturate',
+                'params' => [],
+            ],
+            [
+                'name'   => 'maxSize',
+                'params' => ['width' => $transformationWidth]
+            ],
+        ];
 
         $this->imageModel
-            ->expects($this->atLeastOnce())
             ->method('getWidth')
             ->willReturn($width);
 
         $this->imageModel
-            ->expects($this->atLeastOnce())
             ->method('getHeight')
             ->willReturn($height);
 
         $this->request
-            ->expects($this->atLeastOnce())
             ->method('getTransformations')
             ->willReturn($transformations);
 
         $this->db
-            ->expects($this->atLeastOnce())
             ->method('getBestMatch')
             ->with(
                 $this->user,
                 $this->imageIdentifier,
                 $transformationWidth
             )
-            ->willReturn(['width' => $variationWidth, 'height' => 600]);
+            ->willReturn([
+                'width' => $variationWidth,
+                'height' => 600,
+            ]);
+
+        $this->transformationManager
+            ->method('getMinimumImageInputSize')
+            ->willReturn([
+                'index' => 1,
+                'width' => $transformationWidth,
+            ]);
 
         $this->eventManager
-            ->expects($this->atLeastOnce())
             ->method('trigger')
             ->with(
                 'image.transformations.adjust', [
@@ -380,7 +419,6 @@ class ImageVariationsTest extends ListenerTests {
             );
 
         $this->storage
-            ->expects($this->atLeastOnce())
             ->method('getImageVariation')
             ->with(
                 $this->user,
@@ -406,53 +444,62 @@ class ImageVariationsTest extends ListenerTests {
      * @covers ::chooseVariation
      */
     public function testUpdatesResponseAndImageModelOnSuccess() : void {
-        $width  = 1024;
-        $height = 768;
+        $width               = 1024;
+        $height              = 768;
         $transformationWidth = 512;
-        $variationWidth = 800;
-        $variationHeight = 600;
-        $variationBlob = 'blob';
-        $lastModified = new DateTime();
-        $transformations = [[
-            'name'   => 'desaturate',
-            'params' => [],
-        ],[
-            'name'   => 'maxSize',
-            'params' => ['width' => $transformationWidth]
-        ]];
+        $variationWidth      = 800;
+        $variationHeight     = 600;
+        $variationBlob       = 'blob';
+        $lastModified        = new DateTime();
+        $transformations     = [
+            [
+                'name'   => 'desaturate',
+                'params' => [],
+            ],
+            [
+                'name'   => 'maxSize',
+                'params' => ['width' => $transformationWidth],
+            ],
+        ];
 
         $this->imageModel
-            ->expects($this->any())
             ->method('getWidth')
             ->willReturn($width);
 
         $this->imageModel
-            ->expects($this->any())
             ->method('getHeight')
             ->willReturn($height);
 
         $this->request
-            ->expects($this->any())
             ->method('getTransformations')
             ->willReturn($transformations);
 
         $this->db
-            ->expects($this->once())
             ->method('getBestMatch')
             ->with(
                 $this->user,
                 $this->imageIdentifier,
                 $transformationWidth
             )
-            ->willReturn(['width' => $variationWidth, 'height' => $variationHeight]);
+            ->willReturn([
+                'width'  => $variationWidth,
+                'height' => $variationHeight,
+            ]);
 
         $this->eventManager
-            ->expects($this->at(0))
             ->method('trigger')
-            ->with('image.transformations.adjust', [
-                'transformationIndex' => 1,
-                'ratio' => $width / $variationWidth,
-            ]);
+            ->withConsecutive(
+                [
+                    'image.transformations.adjust',
+                    [
+                        'transformationIndex' => 1,
+                        'ratio'               => $width / $variationWidth,
+                    ],
+                ],
+                [
+                    'image.loaded'
+                ]
+            );
 
         $this->storage
             ->expects($this->once())
@@ -501,17 +548,19 @@ class ImageVariationsTest extends ListenerTests {
             ->method('set')
             ->with(
                 'X-Imbo-ImageVariation',
-                $variationWidth . 'x' . $variationHeight
+                sprintf('%dx%d', $variationWidth, $variationHeight)
             );
 
         $this->event
             ->expects($this->once())
             ->method('stopPropagation');
 
-        $this->eventManager
-            ->expects($this->at(1))
-            ->method('trigger')
-            ->with('image.loaded');
+        $this->transformationManager
+            ->method('getMinimumImageInputSize')
+            ->willReturn([
+                'index' => 1,
+                'width' => $transformationWidth,
+            ]);
 
         $this->listener->chooseVariation($this->event);
     }
@@ -578,7 +627,7 @@ class ImageVariationsTest extends ListenerTests {
                 $this->imageIdentifier
             );
 
-        $this->listener->deleteVariations($this->event);
+        $this->assertNull($this->listener->deleteVariations($this->event));
     }
 
     /**
@@ -586,8 +635,12 @@ class ImageVariationsTest extends ListenerTests {
      */
     public function testGenerateVariationsCallsStoreImageVariationForEveryWidth() : void {
         $listener = new ImageVariations([
-            'database'  => ['adapter' => $this->db],
-            'storage'   => ['adapter' => $this->storage],
+            'database' => [
+                'adapter' => $this->db,
+            ],
+            'storage' => [
+                'adapter' => $this->storage,
+            ],
 
             /**
              * With autoScale on, it should filter out the first and last two widths,
@@ -602,6 +655,14 @@ class ImageVariationsTest extends ListenerTests {
             ->method('getWidth')
             ->willReturn(2048);
 
+            $this->imageModel
+            ->method('getHeight')
+            ->willReturn(1536);
+
+        $this->imageModel
+            ->method('getBlob')
+            ->willReturn('some blob');
+
         $this->imageModel
             ->method('setWidth')
             ->willReturnSelf();
@@ -611,9 +672,49 @@ class ImageVariationsTest extends ListenerTests {
             ->willReturnSelf();
 
         $this->storage
-             ->expects($this->exactly(6))
-             ->method('storeImageVariation')
-             ->with($this->user, $this->imageIdentifier, $this->anything(), $this->greaterThan(0));
+            ->method('storeImageVariation')
+            ->withConsecutive(
+                [$this->user, $this->imageIdentifier, 'some blob', 25],
+                [$this->user, $this->imageIdentifier, 'some blob', 100],
+                [$this->user, $this->imageIdentifier, 'some blob', 400],
+                [$this->user, $this->imageIdentifier, 'some blob', 800],
+                [$this->user, $this->imageIdentifier, 'some blob', 1024],
+                [$this->user, $this->imageIdentifier, 'some blob', 1700],
+            );
+
+        $transformation = $this->createMock(Resize::class);
+        $transformation
+            ->expects($this->exactly(6))
+            ->method('setImage')
+            ->with($this->isInstanceOf(Image::class))
+            ->willReturnSelf();
+
+        $transformation
+            ->expects($this->exactly(6))
+            ->method('transform')
+            ->withConsecutive(
+                [['width' => 25]],
+                [['width' => 100]],
+                [['width' => 400]],
+                [['width' => 800]],
+                [['width' => 1024]],
+                [['width' => 1700]],
+            );
+
+        $this->transformationManager
+            ->expects($this->exactly(6))
+            ->method('getTransformation')
+            ->with('resize')
+            ->willReturn($transformation);
+
+        $this->db
+            ->expects($this->exactly(6))
+            ->method('storeImageVariationMetadata')
+            ->with($this->user, $this->imageIdentifier, $this->greaterThan(0), $this->greaterThan(0));
+
+        $this->eventManager
+            ->expects($this->exactly(12))
+            ->method('trigger');
 
         $listener->generateVariations($this->event);
     }
@@ -630,18 +731,49 @@ class ImageVariationsTest extends ListenerTests {
             'lossless'  => true,
         ]);
 
-        $this->imageModel->method('getWidth')->willReturn(2048);
+        $convertTransformation = $this->createMock(Convert::class);
+        $convertTransformation
+            ->expects($this->once())
+            ->method('setImage')
+            ->with($this->isInstanceOf(Image::class))
+            ->willReturnSelf();
 
-        $this->transformation = $this->createConfiguredMock(Transformation::class, [
-            'setImage' => $this->returnSelf(),
-        ]);
-
-        $this->transformation
-            ->expects($this->at(1))
+        $convertTransformation
+            ->expects($this->once())
             ->method('transform')
             ->with(['type' => 'png']);
 
-        $this->transformationManager->addTransformation('convert', $this->transformation);
+        $resizeTransformation = $this->createMock(Resize::class);
+        $resizeTransformation
+            ->expects($this->once())
+            ->method('setImage')
+            ->with($this->isInstanceOf(Image::class))
+            ->willReturnSelf();
+
+        $resizeTransformation
+            ->expects($this->once())
+            ->method('transform')
+            ->with(['width' => 500]);
+
+        $this->transformationManager
+            ->expects($this->exactly(2))
+            ->method('getTransformation')
+            ->withConsecutive(
+                ['convert'],
+                ['resize'],
+            )
+            ->willReturnOnConsecutiveCalls(
+                $convertTransformation,
+                $resizeTransformation,
+            );
+
+        $this->imageModel
+            ->method('getWidth')
+            ->willReturn(2048);
+
+        $this->imageModel
+            ->method('getHeight')
+            ->willReturn(1536);
 
         $listener->generateVariations($this->event);
     }
@@ -659,9 +791,24 @@ class ImageVariationsTest extends ListenerTests {
             'scaleFactor' => .65,
         ]);
 
+        $resize = $this->createMock(Resize::class);
+        $resize
+            ->expects($this->exactly(3))
+            ->method('setImage')
+            ->willReturnSelf();
+
+        $this->transformationManager
+            ->expects($this->exactly(3))
+            ->method('getTransformation')
+            ->willReturn($resize);
+
         $this->imageModel
             ->method('getWidth')
             ->willReturn(2048);
+
+        $this->imageModel
+            ->method('getHeight')
+            ->willReturn(1536);
 
         $this->storage
             ->expects($this->exactly(3))
@@ -686,9 +833,20 @@ class ImageVariationsTest extends ListenerTests {
             'scaleFactor' => .2,
         ]);
 
+        $this->transformationManager
+            ->expects($this->exactly(2))
+            ->method('getTransformation')
+            ->willReturn($this->createConfiguredMock(Resize::class, [
+                'setImage' => $this->returnSelf(),
+            ]));
+
         $this->imageModel
             ->method('getWidth')
             ->willReturn(2048);
+
+        $this->imageModel
+            ->method('getHeight')
+            ->willReturn(1536);
 
         $this->storage
             ->expects($this->exactly(2))
@@ -705,19 +863,22 @@ class ImageVariationsTest extends ListenerTests {
      * @covers ::generateVariations
      */
     public function testGenerateVariationsTriggersWarningOnTransformationException() : void {
-        $this->imageModel->method('getWidth')->willReturn(1024);
+        $this->imageModel
+            ->method('getWidth')
+            ->willReturn(1024);
 
-        $this->transformation = $this->createConfiguredMock(Transformation::class, [
-            'setImage' => $this->returnSelf(),
-        ]);
+        $this->imageModel
+            ->method('getHeight')
+            ->willReturn(768);
 
-        $this->transformation
-            ->expects($this->at(1))
-            ->method('transform')
-            ->with($this->anything())
-            ->willThrowException(new TransformationException());
-
-        $this->transformationManager->addTransformation('resize', $this->transformation);
+        $this->transformationManager
+            ->expects($this->once())
+            ->method('getTransformation')
+            ->with('resize')
+            ->willReturn($this->createConfiguredMock(Transformation::class, [
+                'setImage'  => $this->returnSelf(),
+                'transform' => $this->throwException(new TransformationException())
+            ]));
 
         $this->expectWarning();
         $this->expectWarningMessage(
@@ -735,10 +896,23 @@ class ImageVariationsTest extends ListenerTests {
             ->method('getWidth')
             ->willReturn(1024);
 
+        $this->imageModel
+            ->method('getHeight')
+            ->willReturn(768);
+
         $this->storage
             ->expects($this->once())
             ->method('storeImageVariation')
             ->willThrowException(new StorageException());
+
+        $this->transformationManager
+            ->expects($this->once())
+            ->method('getTransformation')
+            ->with('resize')
+            ->willReturn($this->createConfiguredMock(Transformation::class, [
+                'setImage'  => $this->returnSelf(),
+                'transform' => null,
+            ]));
 
         $this->expectWarning();
         $this->expectWarningMessage(
@@ -756,10 +930,23 @@ class ImageVariationsTest extends ListenerTests {
             ->method('getWidth')
             ->willReturn(1024);
 
+            $this->imageModel
+            ->method('getHeight')
+            ->willReturn(768);
+
         $this->db
             ->expects($this->once())
             ->method('storeImageVariationMetadata')
             ->willThrowException(new DatabaseException());
+
+        $this->transformationManager
+            ->expects($this->once())
+            ->method('getTransformation')
+            ->with('resize')
+            ->willReturn($this->createConfiguredMock(Transformation::class, [
+                'setImage'  => $this->returnSelf(),
+                'transform' => null,
+            ]));
 
         $this->expectWarning();
         $this->expectWarningMessage(
@@ -767,5 +954,47 @@ class ImageVariationsTest extends ListenerTests {
         );
 
         $this->listener->generateVariations($this->event);
+    }
+
+    /**
+     * @covers ::generateVariations
+     */
+    public function testTriggersDeletionOfImageVariationsWhenUnableToStoreMetadata() : void {
+        $listener = new ImageVariations([
+            'database'  => ['adapter' => $this->db],
+            'storage'   => ['adapter' => $this->storage],
+            'widths'    => [1000],
+            'autoScale' => false,
+        ]);
+
+        $this->imageModel
+            ->method('getWidth')
+            ->willReturn(1024);
+
+        $this->imageModel
+            ->method('getHeight')
+            ->willReturn(768);
+
+        $this->db
+            ->expects($this->once())
+            ->method('storeImageVariationMetadata')
+            ->willThrowException(new DatabaseException());
+
+        $this->transformationManager
+            ->expects($this->once())
+            ->method('getTransformation')
+            ->with('resize')
+            ->willReturn($this->createConfiguredMock(Transformation::class, [
+                'setImage'  => $this->returnSelf(),
+                'transform' => null,
+            ]));
+
+        $this->storage
+            ->expects($this->once())
+            ->method('deleteImageVariations')
+            ->with($this->user, $this->imageIdentifier, 1000);
+
+        // Need to suppress the warning, otherwise PHPUnit will stop executing the code
+        @$listener->generateVariations($this->event);
     }
 }

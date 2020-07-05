@@ -13,10 +13,10 @@ use PDO;
  * @coversDefaultClass Imbo\Database\Doctrine
  */
 class DoctrineTest extends DatabaseTests {
-    private $driver;
-    private $connection;
-    private $dbPath;
-    private $pdo;
+    private Doctrine $driver;
+    private Connection $connection;
+    private string $dbPath;
+    private PDO $pdo;
 
     protected function insertImage(array $image) : void {
         $stmt = $this->pdo->prepare("
@@ -96,7 +96,7 @@ class DoctrineTest extends DatabaseTests {
      */
     public function testGetStatusWhenDatabaseIsAlreadyConnected() : void {
         $this->connection
-            ->expects($this->any())
+            ->expects($this->once())
             ->method('isConnected')
             ->willReturn(true);
 
@@ -108,12 +108,12 @@ class DoctrineTest extends DatabaseTests {
      */
     public function testGetStatusWhenDatabaseIsNotConnectedAndCanConnect() : void {
         $this->connection
-            ->expects($this->any())
+            ->expects($this->once())
             ->method('isConnected')
             ->willReturn(false);
 
         $this->connection
-            ->expects($this->any())
+            ->expects($this->once())
             ->method('connect')
             ->willReturn(true);
 
@@ -125,12 +125,12 @@ class DoctrineTest extends DatabaseTests {
      */
     public function testGetStatusWhenDatabaseIsNotConnectedAndCanNotConnect() : void {
         $this->connection
-            ->expects($this->any())
+            ->expects($this->once())
             ->method('isConnected')
             ->willReturn(false);
 
         $this->connection
-            ->expects($this->any())
+            ->expects($this->once())
             ->method('connect')
             ->willReturn(false);
 
@@ -142,12 +142,12 @@ class DoctrineTest extends DatabaseTests {
      */
     public function testGetStatusWhenDatabaseIsNotConnectedAndConnectThrowsAnException() : void {
         $this->connection
-            ->expects($this->any())
+            ->expects($this->once())
             ->method('isConnected')
             ->willReturn(false);
 
         $this->connection
-            ->expects($this->any())
+            ->expects($this->once())
             ->method('connect')
             ->willThrowException(new DBALException());
 
