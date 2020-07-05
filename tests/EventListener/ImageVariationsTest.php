@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use DateTime;
 use Imbo\Image\Transformation\Convert;
 use Imbo\Image\Transformation\Resize;
-use PHPUnit\Util\ErrorHandler;
+use stdClass;
 
 /**
  * @coversDefaultClass Imbo\EventListener\ImageVariations
@@ -155,7 +155,7 @@ class ImageVariationsTest extends ListenerTests {
         ));
         new ImageVariations([
             'database' => [
-                'adapter' => 'DateTime',
+                'adapter' => stdClass::class,
             ],
             'storage' => [
                 'adapter' => $this->storage,
@@ -209,7 +209,7 @@ class ImageVariationsTest extends ListenerTests {
         ));
         new ImageVariations([
             'storage'  => [
-                'adapter' => 'DateTime',
+                'adapter' => stdClass::class,
             ],
             'database' => [
                 'adapter' => $this->db,
@@ -450,7 +450,7 @@ class ImageVariationsTest extends ListenerTests {
         $variationWidth      = 800;
         $variationHeight     = 600;
         $variationBlob       = 'blob';
-        $lastModified        = new DateTime();
+        $lastModified        = new DateTime('now');
         $transformations     = [
             [
                 'name'   => 'desaturate',

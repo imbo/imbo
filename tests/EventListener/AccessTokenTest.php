@@ -61,6 +61,10 @@ class AccessTokenTest extends ListenerTests {
             ->with('accessToken')
             ->willReturn('/string');
 
+        $this->request
+            ->method('getRawUri')
+            ->willReturn('someuri');
+
         $this->expectExceptionObject(new RuntimeException('Incorrect access token', 400));
         $this->listener->checkAccessToken($this->event);
     }
