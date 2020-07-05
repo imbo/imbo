@@ -21,15 +21,15 @@ Feature: Imbo can crop images using smart size and POIs
 
         Examples:
             | transformation                                         | coord | color   | width | height |
-            | smartSize:width=250,height=250,poi=810,568,crop=close  | 0,0   | #396473 | 250   | 250    |
-            | smartSize:width=250,height=250,poi=810,568,crop=medium | 0,0   | #355170 | 250   | 250    |
-            | smartSize:width=250,height=250,poi=810,568,crop=wide   | 0,0   | #52607c | 250   | 250    |
-            | smartSize:width=600,height=250,poi=810,568,crop=close  | 0,0   | #50748c | 600   | 250    |
-            | smartSize:width=600,height=250,poi=810,568,crop=medium | 0,0   | #1d2f55 | 600   | 250    |
-            | smartSize:width=600,height=250,poi=810,568,crop=wide   | 0,0   | #1a2749 | 600   | 250    |
+            | smartSize:width=250,height=250,poi=810,568,crop=close  | 0,0   | #386470 | 250   | 250    |
+            | smartSize:width=250,height=250,poi=810,568,crop=medium | 0,0   | #34516f | 250   | 250    |
+            | smartSize:width=250,height=250,poi=810,568,crop=wide   | 0,0   | #50607a | 250   | 250    |
+            | smartSize:width=600,height=250,poi=810,568,crop=close  | 0,0   | #4f758a | 600   | 250    |
+            | smartSize:width=600,height=250,poi=810,568,crop=medium | 0,0   | #1c2e54 | 600   | 250    |
+            | smartSize:width=600,height=250,poi=810,568,crop=wide   | 0,0   | #192746 | 600   | 250    |
             | smartSize:width=250,height=600,poi=810,568,crop=close  | 0,0   | #5b8089 | 250   | 600    |
-            | smartSize:width=250,height=600,poi=810,568,crop=medium | 0,0   | #aaab84 | 250   | 600    |
-            | smartSize:width=250,height=600,poi=810,568,crop=wide   | 0,0   | #fafff3 | 250   | 600    |
+            | smartSize:width=250,height=600,poi=810,568,crop=medium | 0,0   | #abac83 | 250   | 600    |
+            | smartSize:width=250,height=600,poi=810,568,crop=wide   | 0,0   | #f9fff3 | 250   | 600    |
 
     Scenario: Smart size based on POI stored in metadata
         Given I specify "smartSize:width=250,height=250" as transformation
@@ -37,7 +37,7 @@ Feature: Imbo can crop images using smart size and POIs
         When I request the previously added image as a "png"
         Then the response status line is "200 OK"
         And the image dimension is "250x250"
-        And the pixel at coordinate "0,0" has a color of "#355170"
+        And the pixel at coordinate "0,0" has a color of "#34516f"
         And the "X-Imbo-POIs-Used" response header is "1"
 
     Scenario: Smart size based on POI without center coordinates stored in metadata
@@ -52,7 +52,7 @@ Feature: Imbo can crop images using smart size and POIs
         And I request the previously added image as a "png"
         Then the response status line is "200 OK"
         And the image dimension is "250x250"
-        And the pixel at coordinate "0,0" has a color of "#355170"
+        And the pixel at coordinate "0,0" has a color of "#34516f"
         And the "X-Imbo-POIs-Used" response header is "1"
 
     Scenario Outline: Smart size falls back to simple crop/resize when no POI data is found
@@ -72,6 +72,6 @@ Feature: Imbo can crop images using smart size and POIs
 
         Examples:
             | color   | width | height |
-            | #495569 | 250   | 250    |
-            | #171c3a | 500   | 150    |
-            | #feffef | 150   | 500    |
+            | #475568 | 250   | 250    |
+            | #161b39 | 500   | 150    |
+            | #feffed | 150   | 500    |
