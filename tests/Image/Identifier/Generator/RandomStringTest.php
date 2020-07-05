@@ -9,6 +9,9 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass Imbo\Image\Identifier\Generator\RandomString
  */
 class RandomStringTest extends TestCase {
+    /**
+     * @covers ::generate
+     */
     public function testGeneratesUniqueStrings() : void {
         $stringLength = 15;
 

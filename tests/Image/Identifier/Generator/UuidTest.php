@@ -9,6 +9,9 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass Imbo\Image\Identifier\Generator\Uuid
  */
 class UuidTest extends TestCase {
+    /**
+     * @covers ::generate
+     */
     public function testGeneratesUniqueUuidV4() : void {
         $image = $this->createMock(Image::class);
         $generator = new UuidGenerator();

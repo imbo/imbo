@@ -16,6 +16,9 @@ class CompressTest extends TransformationTests {
         return new Compress();
     }
 
+    /**
+     * @covers ::transform
+     */
     public function testCanTransformTheImage() : void {
         $image = $this->createMock(Image::class);
         $image

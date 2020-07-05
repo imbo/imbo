@@ -87,6 +87,9 @@ class ModulateTest extends TransformationTests {
             ->transform($params);
     }
 
+    /**
+     * @covers ::transform
+     */
     public function testThrowsException() : void {
         $imagick = $this->createMock(Imagick::class);
         $imagick

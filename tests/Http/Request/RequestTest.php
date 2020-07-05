@@ -246,6 +246,7 @@ class RequestTest extends TestCase {
 
     /**
      * @dataProvider getQueryStrings
+     * @covers ::getRawUri
      */
     public function testGetRawUriDecodesUri($queryString, $expectedQueryString) : void {
         $request = new Request([], [], [], [], [], [

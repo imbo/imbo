@@ -35,6 +35,9 @@ class FilesystemIntegrationTest extends StorageTests {
         parent::tearDown();
     }
 
+    /**
+     * @covers ::store
+     */
     public function testStoringEmptyDataFails() : void {
         $this->expectExceptionObject(new StorageException(
             'Failed writing file (disk full? zero bytes input?) to disk:',

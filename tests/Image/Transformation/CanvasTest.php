@@ -50,6 +50,7 @@ class CanvasTest extends TransformationTests {
 
     /**
      * @dataProvider getCanvasParameters
+     * @covers ::transform
      */
     public function testTransformWithDifferentParameters(?int $width, ?int $height, string $mode, int $resultingWidth, int $resultingHeight) : void {
         $blob = file_get_contents(FIXTURES_DIR . '/image.png');
