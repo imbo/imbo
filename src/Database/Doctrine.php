@@ -677,23 +677,24 @@ class Doctrine implements DatabaseInterface {
      *
      * @param string $user The user which the image belongs to
      * @param string $imageIdentifier The image identifier
-     * @return int
+     * @return ?int
      */
-    private function getImageId($user, $imageIdentifier) {
+    private function getImageId($user, $imageIdentifier) : ?int {
         $query = $this->getConnection()->createQueryBuilder();
-        $query->select('i.id')
-              ->from($this->tableNames['imageinfo'], 'i')
-              ->where('i.user = :user')
-              ->andWhere('i.imageIdentifier = :imageIdentifier')
-              ->setParameters([
-                  ':user'            => $user,
-                  ':imageIdentifier' => $imageIdentifier,
-              ]);
+        $query
+            ->select('i.id')
+            ->from($this->tableNames['imageinfo'], 'i')
+            ->where('i.user = :user')
+            ->andWhere('i.imageIdentifier = :imageIdentifier')
+            ->setParameters([
+                ':user'            => $user,
+                ':imageIdentifier' => $imageIdentifier,
+            ]);
 
         $stmt = $query->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $row = $stmt->fetch();
 
-        return (int) $row['id'];
+        return false === $row ? null : (int) $row['id'];
     }
 
     /**
