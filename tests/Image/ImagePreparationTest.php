@@ -79,7 +79,7 @@ class ImagePreparationTest extends TestCase {
     }
 
     /**
-     * @covers Imbo\Image\ImagePreparation::prepareImage
+     * @covers ::prepareImage
      */
     public function testThrowsExceptionWhenImageTypeIsNotSupported() : void {
         $this->request
