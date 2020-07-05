@@ -23,6 +23,7 @@ class HistogramTest extends TransformationTests {
 
     /**
      * @dataProvider getHistogramParameters
+     * @covers ::transform
      */
     public function testTransformWithDifferentParameters(int $scale, int $resultingWidth) : void {
         $blob = file_get_contents(FIXTURES_DIR . '/512x512.png');

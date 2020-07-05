@@ -30,6 +30,7 @@ class ResponseETagTest extends ListenerTests {
 
     /**
      * @dataProvider getTaintedHeaders
+     * @covers ::fixIfNoneMatchHeader
      */
     public function testCanFixATaintedInNoneMatchHeader(string $incoming, string $real, bool $willFix) : void {
         $requestHeaders = $this->createMock(HeaderBag::class);

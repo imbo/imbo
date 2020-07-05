@@ -22,6 +22,7 @@ class BorderTest extends TransformationTests {
 
     /**
      * @dataProvider getBorderParams
+     * @covers ::transform
      */
     public function testTransformationSupportsDifferentModes(int $expectedWidth, int $expectedHeight, int $borderWidth, int $borderHeight, string $borderMode) : void {
         $image = $this->createMock(Image::class);

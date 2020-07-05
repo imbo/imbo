@@ -6,7 +6,7 @@
   forceCoversAnnotation="true"
   beStrictAboutCoversAnnotation="false"
   beStrictAboutOutputDuringTests="true"
-  beStrictAboutTodoAnnotatedTests="true"
+  beStrictAboutTodoAnnotatedTests="false"
   verbose="true">
 
   <testsuites>
