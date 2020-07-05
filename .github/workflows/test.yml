@@ -1,23 +1,11 @@
 name: Run unit tests
 on: push
 jobs:
-  test:
+  validate:
     runs-on: ubuntu-latest
-    name: Validate, lint and test
-    services:
-      mongodb:
-        image: mongo:4.2.8
-        ports:
-        - 27017:27017
-
+    name: Validate Composer files and lint code
     steps:
       - uses: actions/checkout@v2
-
-      - name: Validate composer files
-        run: composer validate --strict
-
-      - name: Lint all PHP files
-        run: composer run lint
 
       - name: Install system packages
         run: sudo apt-get install php-imagick
@@ -28,17 +16,44 @@ jobs:
             php -i
             php -m
 
+      - name: Validate composer files
+        run: composer validate --strict
+
+      - name: Lint all PHP files
+        run: composer run lint
+
+  unit-tests:
+    needs:
+      - validate
+    runs-on: ubuntu-latest
+    name: Run unit tests
+    services:
+      mongodb:
+        image: mongo:4.2.8
+        ports:
+          - 27017
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install system packages
+        run: sudo apt-get install php-imagick
+
+      - name: Get Composer Cache Directory
+        id: composer-cache-dir
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+
       - name: Cache Composer packages
         id: composer-cache
         uses: actions/cache@v2
         with:
-          path: vendor
+          path: ${{ steps.composer-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        if: steps.composer-cache.outputs.cache-hit != 'true'
         run: composer install --prefer-dist --no-suggest --no-ansi --no-progress -o
 
       - name: Run unit tests using PHPUnit
