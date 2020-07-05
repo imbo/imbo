@@ -107,9 +107,10 @@ class AddPublicKeyTest extends TestCase {
             '*',
             'n',
         ]);
-        $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
 
-        $this->assertRegExp('/at least one user/', $commandTester->getDisplay(true));
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageMatches('/at least one user/');
+        $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
     }
 
     /**
@@ -125,12 +126,9 @@ class AddPublicKeyTest extends TestCase {
             '*',
             'n'
         ]);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageMatches('/must specify at least one resource/');
         $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
-
-        $this->assertRegExp(
-            '/must specify at least one resource/',
-            $commandTester->getDisplay(true)
-        );
     }
 
     /**

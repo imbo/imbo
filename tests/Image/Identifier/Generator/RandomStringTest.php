@@ -20,7 +20,7 @@ class RandomStringTest extends TestCase {
             $imageIdentifier = $generator->generate($image);
 
             // Does it have the right format?
-            $this->assertRegExp(
+            $this->assertMatchesRegularExpression(
                 '/^[A-Za-z0-9_-]{' . $stringLength . '}$/',
                 $imageIdentifier
             );

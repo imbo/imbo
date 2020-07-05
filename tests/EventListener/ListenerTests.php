@@ -13,6 +13,7 @@ abstract class ListenerTests extends TestCase {
         $listener = $this->getListener();
         $className = get_class($listener);
         $events = $className::getSubscribedEvents();
+        
         $this->assertIsArray($events);
 
         foreach ($events as $callbacks) {

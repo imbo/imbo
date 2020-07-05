@@ -232,19 +232,32 @@ class CropTest extends TransformationTests {
         if (null !== $errRegex) {
             $this->expectException(TransformationException::class);
             $this->expectExceptionCode(400);
-            $this->expectExceptionMessageRegExp($errRegex);
-            $imagick->expects($this->never())->method('cropImage');
+            $this->expectExceptionMessageMatches($errRegex);
+            $imagick
+                ->expects($this->never())
+                ->method('cropImage');
         } else {
             $image
                 ->expects($this->once())
                 ->method('setWidth')
+                ->with($params['width'])
                 ->willReturnSelf();
             $image
                 ->expects($this->once())
                 ->method('setHeight')
+                ->with($params['height'])
                 ->willReturnSelf();
 
-            $imagick->expects($this->once())->method('cropImage');
+            $imagick
+                ->expects($this->once())
+                ->method('cropImage');
+            $imagick
+                ->expects($this->once())
+                ->method('getImageGeometry')
+                ->willReturn([
+                    'width'  => $params['width'],
+                    'height' => $params['height'],
+                ]);
         }
 
         (new Crop())

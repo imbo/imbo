@@ -55,7 +55,7 @@ class ClipTest extends TestCase {
      */
     public function testExceptionIfMissingNamedPath() : void {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/clipping path .* not found/');
+        $this->expectExceptionMessageMatches('/clipping path .* not found/');
         $this->expectExceptionCode(400);
         $this->transformation->transform(['path' => 'foo']);
     }

@@ -12,9 +12,9 @@ use DateTime;
 use DateTimeZone;
 
 abstract class DatabaseTests extends TestCase {
-    private $adapter;
+    private DatabaseInterface $adapter;
 
-    abstract protected function getAdapter();
+    abstract protected function getAdapter() : DatabaseInterface;
 
     /**
      * Insert an image into the database

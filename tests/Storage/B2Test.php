@@ -27,7 +27,7 @@ class B2Test extends TestCase {
      */
     public function testConstructorMissingRequiredParameters() : void {
         $this->expectException(ConfigurationException::class);
-        $this->expectExceptionMessageRegExp('/: accountId, bucketId/');
+        $this->expectExceptionMessageMatches('/: accountId, bucketId/');
         $this->expectExceptionCode(500);
 
         $b2 = new B2([
