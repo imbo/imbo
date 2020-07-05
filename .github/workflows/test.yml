@@ -22,6 +22,23 @@ jobs:
       - name: Lint all PHP files
         run: composer run lint
 
+      - name: Get Composer Cache Directory
+        id: composer-cache-dir
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-suggest --no-ansi --no-progress -o
+
   unit-tests:
     needs:
       - validate
@@ -58,3 +75,54 @@ jobs:
 
       - name: Run unit tests using PHPUnit
         run: composer run test:phpunit
+
+  integration-tests:
+    needs:
+      - validate
+    runs-on: ubuntu-latest
+    name: Run integration tests
+    services:
+      mysql:
+        image: mysql:8.0.20
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: imbo_test
+          MYSQL_USER: imbo_test
+          MYSQL_PASSWORD: imbo_test
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install system packages
+        run: sudo apt-get install php-imagick
+
+      - name: Get Composer Cache Directory
+        id: composer-cache-dir
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-suggest --no-ansi --no-progress -o
+
+      - name: Start PHP web server
+        run: composer run dev --timeout=0 &
+
+      - name: Run integration tests using Behat
+        run: composer run test:behat
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: httpd-logs
+          path: build/logs
