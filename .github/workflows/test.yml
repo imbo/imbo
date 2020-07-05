@@ -82,6 +82,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Run integration tests
     services:
+      mongodb:
+        image: mongo:4.2.8
+        ports:
+          - 27017:27017
       mysql:
         image: mysql:8.0.20
         env:
@@ -120,7 +124,7 @@ jobs:
         run: composer run dev --timeout=0 &
 
       - name: Run integration tests using Behat
-        run: composer run test:behat
+        run: composer run test:behat:mongodb_gridfs
 
       - uses: actions/upload-artifact@v2
         with:

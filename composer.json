@@ -78,7 +78,10 @@
       "mkdir -p build/coverage",
       "vendor/bin/phpunit --verbose --coverage-html build/coverage"
     ],
-    "test:behat": "vendor/bin/behat --strict",
+    "test:behat": [
+      "@test:behat:mongodb_gridfs"
+    ],
+    "test:behat:mongodb_gridfs": "vendor/bin/behat --strict --suite=mongodb_gridfs",
     "test": [
       "@test:phpunit",
       "@test:behat"
