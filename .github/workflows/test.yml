@@ -80,7 +80,7 @@ jobs:
     needs:
       - validate
     runs-on: ubuntu-latest
-    name: Run integration tests
+    name: Run integration tests (MongoDB / GridFS)
     services:
       mongodb:
         image: mongo:4.2.8

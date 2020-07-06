@@ -55,6 +55,10 @@
     }
   },
   "autoload-dev": {
+    "classmap": [
+      "features/bootstrap/imbo-configs",
+      "tests/Storage"
+    ],
     "psr-4": {
       "Imbo\\": "tests/",
       "Imbo\\Behat\\": "features/bootstrap"
