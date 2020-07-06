@@ -37,7 +37,7 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-suggest --no-ansi --no-progress -o
+        run: composer install --prefer-dist --no-suggest --no-progress -o
 
   unit-tests:
     needs:
@@ -71,12 +71,12 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-suggest --no-ansi --no-progress -o
+        run: composer install --prefer-dist --no-suggest --no-progress -o
 
       - name: Run unit tests using PHPUnit
         run: composer run test:phpunit
 
-  integration-tests:
+  integration-tests-mongodb-gridfs:
     needs:
       - validate
     runs-on: ubuntu-latest
@@ -86,16 +86,6 @@ jobs:
         image: mongo:4.2.8
         ports:
           - 27017:27017
-      mysql:
-        image: mysql:8.0.20
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: imbo_test
-          MYSQL_USER: imbo_test
-          MYSQL_PASSWORD: imbo_test
-        ports:
-          - 3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
       - uses: actions/checkout@v2
@@ -118,15 +108,60 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-suggest --no-ansi --no-progress -o
+        run: composer install --prefer-dist --no-suggest --no-progress -o
 
       - name: Start PHP web server
         run: composer run dev --timeout=0 &
 
       - name: Run integration tests using Behat
-        run: composer run test:behat:mongodb_gridfs
+        run: composer run test:behat:mongodb-gridfs
 
       - uses: actions/upload-artifact@v2
         with:
-          name: httpd-logs
+          name: httpd-logs-mongodb-gridfs
+          path: build/logs
+
+  integration-tests-mongodb-filesystem:
+    needs:
+      - validate
+    runs-on: ubuntu-latest
+    name: Run integration tests (MongoDB / Filesystem)
+    services:
+      mongodb:
+        image: mongo:4.2.8
+        ports:
+          - 27017:27017
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install system packages
+        run: sudo apt-get install php-imagick
+
+      - name: Get Composer Cache Directory
+        id: composer-cache-dir
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-suggest --no-progress -o
+
+      - name: Start PHP web server
+        run: composer run dev --timeout=0 &
+
+      - name: Run integration tests using Behat
+        run: composer run test:behat:mongodb-filesystem
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: httpd-logs-mongodb-filesystem
           path: build/logs
