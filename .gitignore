@@ -9,3 +9,4 @@ public/.htaccess
 behat.yml
 phpunit.xml
 .phpunit.result.cache
+test.php
