@@ -76,16 +76,18 @@
       "mkdir build/logs",
       "mkdir build/docs"
     ],
-    "test:phpunit": "vendor/bin/phpunit --verbose",
+    "test:phpunit": "vendor/bin/phpunit --colors=always --verbose",
     "test:phpunit:coverage": [
       "rm -rf build/coverage",
       "mkdir -p build/coverage",
-      "vendor/bin/phpunit --verbose --coverage-html build/coverage"
+      "vendor/bin/phpunit --colors=always --verbose --coverage-html build/coverage --coverage-text"
     ],
     "test:behat": [
-      "@test:behat:mongodb_gridfs"
+      "@test:behat:mongodb-gridfs",
+      "@test:behat:mongodb-filesystem"
     ],
-    "test:behat:mongodb_gridfs": "vendor/bin/behat --strict --suite=mongodb_gridfs",
+    "test:behat:mongodb-gridfs": "vendor/bin/behat --colors --strict --suite=mongodb-gridfs",
+    "test:behat:mongodb-filesystem": "vendor/bin/behat --strict --suite=mongodb-filesystem",
     "test": [
       "@test:phpunit",
       "@test:behat"

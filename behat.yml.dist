@@ -1,21 +1,21 @@
 default:
   suites:
-    mongodb_gridfs:
+    mongodb-gridfs:
       project_root: "%paths.base%"
       contexts: [Imbo\Behat\FeatureContext]
       database: MongoDB
       storage: GridFS
-    mongodb_filesystem:
+    mongodb-filesystem:
       project_root: "%paths.base%"
       contexts: [Imbo\Behat\FeatureContext]
       database: MongoDB
       storage: Filesystem
-    doctrine_sqlite_filesystem:
+    doctrine-sqlite-filesystem:
       project_root: "%paths.base%"
       contexts: [Imbo\Behat\FeatureContext]
       database: DoctrineSQLite
       storage: Filesystem
-    doctrine_mysql_filesystem:
+    doctrine-mysql-filesystem:
       project_root: "%paths.base%"
       contexts: [Imbo\Behat\FeatureContext]
       database: DoctrineMySQL
