@@ -165,3 +165,43 @@ jobs:
         with:
           name: httpd-logs-mongodb-filesystem
           path: build/logs
+
+  integration-tests-doctrine-sqlite-filesystem:
+    needs:
+      - validate
+    runs-on: ubuntu-latest
+    name: Run integration tests (SQLite / Filesystem)
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install system packages
+        run: sudo apt-get install php-imagick
+
+      - name: Get Composer Cache Directory
+        id: composer-cache-dir
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-suggest --no-progress -o
+
+      - name: Start PHP web server
+        run: composer run dev --timeout=0 &
+
+      - name: Run integration tests using Behat
+        run: composer run test:behat:doctrine-sqlite-filesystem
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: httpd-logs-doctrine-sqlite-filesystem
+          path: build/logs

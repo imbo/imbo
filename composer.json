@@ -84,10 +84,12 @@
     ],
     "test:behat": [
       "@test:behat:mongodb-gridfs",
-      "@test:behat:mongodb-filesystem"
+      "@test:behat:mongodb-filesystem",
+      "@test:behat:doctrine-sqlite-filesystem"
     ],
     "test:behat:mongodb-gridfs": "vendor/bin/behat --colors --strict --suite=mongodb-gridfs",
     "test:behat:mongodb-filesystem": "vendor/bin/behat --strict --suite=mongodb-filesystem",
+    "test:behat:doctrine-sqlite-filesystem": "vendor/bin/behat --strict --suite=doctrine-sqlite-filesystem",
     "test": [
       "@test:phpunit",
       "@test:behat"
