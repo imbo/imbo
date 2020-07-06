@@ -43,7 +43,7 @@ jobs:
     needs:
       - validate
     runs-on: ubuntu-latest
-    name: Run unit tests
+    name: Unit tests
     services:
       mongodb:
         image: mongo:4.2.8
@@ -80,7 +80,7 @@ jobs:
     needs:
       - validate
     runs-on: ubuntu-latest
-    name: Run integration tests (MongoDB / GridFS)
+    name: Integration tests (MongoDB / GridFS)
     services:
       mongodb:
         image: mongo:4.2.8
@@ -125,7 +125,7 @@ jobs:
     needs:
       - validate
     runs-on: ubuntu-latest
-    name: Run integration tests (MongoDB / Filesystem)
+    name: Integration tests (MongoDB / Filesystem)
     services:
       mongodb:
         image: mongo:4.2.8
@@ -170,7 +170,12 @@ jobs:
     needs:
       - validate
     runs-on: ubuntu-latest
-    name: Run integration tests (SQLite / Filesystem)
+    name: Integration tests (SQLite / Filesystem)
+    services:
+      mongodb:
+        image: mongo:4.2.8
+        ports:
+          - 27017:27017
 
     steps:
       - uses: actions/checkout@v2
