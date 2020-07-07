@@ -25,6 +25,7 @@ Feature: Imbo enables dynamic transformations of images
             | transformation                               | width | height |
             | blur:radius=2,sigma=4                        | 599   | 417    |
             | blur:angle=5,type=radial                     | 599   | 417    |
+            | blur:angle=5,type=rotational                 | 599   | 417    |
             | blur:radius=20,sigma=10,angle=70,type=motion | 599   | 417    |
             | blur:radius=2,sigma=4,type=adaptive          | 599   | 417    |
             | border                                       | 601   | 419    |
@@ -100,6 +101,7 @@ Feature: Imbo enables dynamic transformations of images
             | transformation                               |
             | blur:radius=2,sigma=4                        |
             | blur:angle=5,type=radial                     |
+            | blur:angle=5,type=rotational                 |
             | blur:radius=20,sigma=10,angle=70,type=motion |
             | blur:radius=2,sigma=4,type=adaptive          |
             | border                                       |
@@ -169,10 +171,10 @@ Feature: Imbo enables dynamic transformations of images
             | blur:radius=2                     | 400 Missing required parameter: sigma                                       |
             | blur:type=foobar                  | 400 Unknown blur type: foobar                                               |
             | blur:type=radial                  | 400 Missing required parameter: angle                                       |
+            | blur:type=rotational              | 400 Missing required parameter: angle                                       |
             | blur:radius=2,type=motion         | 400 Missing required parameter: sigma                                       |
             | blur:sigma=1,type=motion          | 400 Missing required parameter: radius                                      |
             | blur:sigma=1,radius=2,type=motion | 400 Missing required parameter: angle                                       |
-            | blur:type=radial                  | 400 Missing required parameter: angle                                       |
             | compress                          | 400 Missing required parameter: level                                       |
             | compress:level=200                | 400 level must be between 0 and 100                                         |
             | compress:level=-10                | 400 level must be between 0 and 100                                         |
