@@ -1,4 +1,4 @@
-name: Run unit tests
+name: CI build
 on: push
 jobs:
   validate:
