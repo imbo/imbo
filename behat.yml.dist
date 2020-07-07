@@ -23,6 +23,7 @@ default:
       database.database: imbo_test
       database.username: imbo_test
       database.password: imbo_test
+      database.port: 3306
       storage: Filesystem
 
   extensions:

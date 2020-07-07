@@ -159,8 +159,8 @@ class FeatureContext extends ApiContext {
         $suiteSettings = $scope->getSuite()->getSettings();
 
         // Generate FQCNs for the adapter tests
-        $database = sprintf('%s\DatabaseTest\%s', __NAMESPACE__, $suiteSettings['database']);
-        $storage = sprintf('%s\StorageTest\%s', __NAMESPACE__, $suiteSettings['storage']);
+        $database = sprintf('Imbo\Behat\DatabaseTest\%s', $suiteSettings['database']);
+        $storage  = sprintf('Imbo\Behat\StorageTest\%s', $suiteSettings['storage']);
 
         if (!class_exists($database)) {
             throw new InvalidArgumentException(sprintf(

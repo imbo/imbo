@@ -258,6 +258,15 @@ jobs:
       - name: Start PHP web server
         run: composer run dev --timeout=0 &
 
+      - name: Update MySQL configuration for the Behat suite
+        run: |
+          sed -i 's/\(database.port: \)3306/\1${{ job.services.mysql.ports['3306'] }}/g' behat.yml.dist
+          sed -i 's/\(database.hostname: \)localhost/\1127.0.0.1/g' behat.yml.dist
+          echo "Updated Behat configuration file:"
+          echo "================================="
+          cat behat.yml.dist
+          echo "================================="
+
       - name: Run integration tests using Behat
         run: composer run test:behat:doctrine-mysql-filesystem
 
