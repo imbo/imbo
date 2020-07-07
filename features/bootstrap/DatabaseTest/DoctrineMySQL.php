@@ -54,7 +54,8 @@ class DoctrineMySQL implements AdapterTest {
             'user'     => $config['database.username'],
             'password' => $config['database.password'],
             'host'     => $config['database.hostname'],
-            'driver'   => 'pdo_mysql'
+            'port'     => $config['database.port'],
+            'driver'   => 'pdo_mysql',
         ]);
     }
 }
