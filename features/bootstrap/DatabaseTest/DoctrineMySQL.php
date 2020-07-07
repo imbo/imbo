@@ -39,11 +39,13 @@ class DoctrineMySQL implements AdapterTest {
     static public function tearDown(array $config) {
         $pdo = new PDO(
             sprintf(
-                'mysql:host=%s;dbname=%s',
+                'mysql:host=%s;dbname=%s;port=%d',
                 $config['database.hostname'],
-                $config['database.database']
+                $config['database.database'],
+                $config['database.port'],
             ),
-            $config['database.username'], $config['database.password']
+            $config['database.username'],
+            $config['database.password'],
         );
         $pdo->query('DROP TABLE IF EXISTS `imageinfo`, `imagevariations`, `metadata`, `shorturl`');
     }
