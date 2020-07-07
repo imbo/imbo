@@ -14,7 +14,7 @@ class Blur extends Transformation {
     public function transform(array $params) {
         $type = isset($params['type']) ? $params['type'] : 'gaussian';
 
-        $blurTypes = ['gaussian', 'adaptive', 'motion', 'radial'];
+        $blurTypes = ['gaussian', 'adaptive', 'motion', 'radial', 'rotational'];
 
         if (!in_array($type, $blurTypes)) {
             throw new TransformationException('Unknown blur type: ' . $type, 400);
@@ -24,8 +24,9 @@ class Blur extends Transformation {
             case 'motion':
                 return $this->motionBlur($params);
 
+            case 'rotational':
             case 'radial':
-                return $this->radialBlur($params);
+                return $this->rotationalBlur($params);
 
             case 'adaptive':
                 return $this->blur($params, true);
@@ -97,17 +98,17 @@ class Blur extends Transformation {
     }
 
     /**
-     * Add radial blur to the image
+     * Add rotational blur to the image
      *
      * @param array $params The transformation parameters
      */
-    private function radialBlur(array $params) {
+    private function rotationalBlur(array $params) {
         $this->checkRequiredParams($params, ['angle']);
 
         $angle = (float) $params['angle'];
 
         try {
-            $this->imagick->radialBlurImage($angle);
+            $this->imagick->rotationalBlurImage($angle);
         } catch (ImagickException $e) {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
