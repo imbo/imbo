@@ -15,11 +15,13 @@ class DoctrineMySQL implements AdapterTest {
     static public function setUp(array $config) {
         $pdo = new PDO(
             sprintf(
-                'mysql:host=%s;dbname=%s',
+                'mysql:host=%s;dbname=%s;port=%d',
                 $config['database.hostname'],
-                $config['database.database']
+                $config['database.database'],
+                $config['database.port'],
             ),
-            $config['database.username'], $config['database.password']
+            $config['database.username'],
+            $config['database.password'],
         );
 
         $sqlStatementsFile = sprintf('%s/setup/doctrine.mysql.sql', $config['project_root']);
