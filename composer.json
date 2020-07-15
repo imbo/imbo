@@ -34,7 +34,6 @@
     "ext-mongodb": "^1.6",
     "phpunit/phpunit": "^9.2",
     "mongodb/mongodb": "^1.6",
-    "cwhite92/b2-sdk-php": "^1.3",
     "imbo/behat-api-extension": "^2.2",
     "doctrine/dbal": "^2.10",
     "aws/aws-sdk-php": "^3.111",
@@ -47,7 +46,7 @@
     "imbo/imbo-metadata-cache": "Enabled caching of metadata through an event listener. Recommended version ^1.0",
     "doctrine/dbal": "Enables usage of using RDMS for storing data (and optionally images). Recommended version: ^2.9",
     "aws/aws-sdk-php": "Enables usage of the AWS S3 storage adapter. Recommended version ^3.111",
-    "cwhite92/b2-sdk-php": "Enables usage of the Backblaze B2 storage adapter. Recommended version ^1.3"
+    "imbo/imbo-b2-adapters": "Enables usage of the Backblaze B2 for storing images"
   },
   "autoload": {
     "psr-4": {

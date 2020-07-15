@@ -26,12 +26,6 @@
     <const name="AWS_S3_SECRET" value="" />
     <const name="AWS_S3_BUCKET" value="" />
     <const name="AWS_S3_REGION" value="" />
-
-    <!-- Backblaze B2 tests -->
-    <const name="BACKBLAZE_B2_ACCOUNT_ID" value="" />
-    <const name="BACKBLAZE_B2_APPLICATION_KEY" value="" />
-    <const name="BACKBLAZE_B2_BUCKET" value="" />
-    <const name="BACKBLAZE_B2_BUCKET_ID" value="" />
   </php>
 
   <filter>
