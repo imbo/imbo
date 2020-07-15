@@ -7,8 +7,7 @@
   beStrictAboutCoversAnnotation="false"
   beStrictAboutOutputDuringTests="true"
   beStrictAboutTodoAnnotatedTests="false"
-  verbose="true"
-  colors="true">
+  verbose="true">
 
   <testsuites>
     <testsuite name="imbo-unit">
