@@ -47,7 +47,7 @@ class StorageOperations implements ListenerInterface {
         // were unable to read the image for some reason. Might be NFS
         // that's down, web-backed storage being unavailable or something
         // similar.
-        if ($imageData === false) {
+        if (null === $imageData) {
             throw new StorageException('Failed reading file from storage backend for user ' . $user . ', id: ' . $imageIdentifier, 503);
         }
 

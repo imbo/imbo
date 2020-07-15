@@ -1,6 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Storage;
 
+use DateTime;
 use Imbo\Exception\StorageException;
 
 /**
@@ -16,15 +17,15 @@ interface StorageInterface {
      * actual storage adaper. If an error occurs the adapter should throw an
      * Imbo\Exception\StorageException exception.
      *
-     * If the image already exists, simply overwrite it.
+     * If the image already exists, overwrite it.
      *
      * @param string $user The user which the image belongs to
      * @param string $imageIdentifier The image identifier
      * @param string $imageData The image data to store
-     * @return boolean Returns true on success or false on failure
      * @throws StorageException
+     * @return bool Returns true on success or false on failure
      */
-    function store($user, $imageIdentifier, $imageData);
+    function store(string $user, string $imageIdentifier, string $imageData) : bool;
 
     /**
      * Delete an image
@@ -33,47 +34,47 @@ interface StorageInterface {
      *
      * @param string $user The user which the image belongs to
      * @param string $imageIdentifier Image identifier
-     * @return boolean Returns true on success or false on failure
      * @throws StorageException
+     * @return bool Returns true on success or false on failure
      */
-    function delete($user, $imageIdentifier);
+    function delete(string $user, string $imageIdentifier) : bool;
 
     /**
      * Get image content
      *
      * @param string $user The user which the image belongs to
      * @param string $imageIdentifier Image identifier
-     * @return string The binary content of the image
      * @throws StorageException
+     * @return ?string The binary content of the image, null on failure
      */
-    function getImage($user, $imageIdentifier);
+    function getImage(string $user, string $imageIdentifier) : ?string;
 
     /**
      * Get the last modified timestamp
      *
      * @param string $user The user which the image belongs to
      * @param string $imageIdentifier Image identifier
-     * @return DateTime Returns an instance of DateTime
      * @throws StorageException
+     * @return DateTime Returns an instance of DateTime, using the UTC timezone
      */
-    function getLastModified($user, $imageIdentifier);
+    function getLastModified(string $user, string $imageIdentifier) : DateTime;
 
     /**
      * Get the current status of the storage
      *
      * This method is used with the status resource.
      *
-     * @return boolean
+     * @return bool
      */
-    function getStatus();
+    function getStatus() : bool;
 
     /**
-     * See if the image already exists
+     * Check if the image already exists
      *
      * @param string $user The user which the image belongs to
      * @param string $imageIdentifier Image identifier
-     * @return DateTime Returns an instance of DateTime
      * @throws StorageException
+     * @return bool True if the image exists, false otherwise
      */
-    function imageExists($user, $imageIdentifier);
+    function imageExists(string $user, string $imageIdentifier) : bool;
 }

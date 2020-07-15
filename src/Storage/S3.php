@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Storage;
 
 use Imbo\Exception\StorageException;
@@ -21,19 +21,8 @@ use DateTimeZone;
  *                   you.
  */
 class S3 implements StorageInterface {
-    /**
-     * S3 client
-     *
-     * @var S3Client
-     */
-    private $client;
-
-    /**
-     * Parameters for the driver
-     *
-     * @var array
-     */
-    private $params = [
+    private S3Client $client;
+    private array $params = [
         // Access key
         'key' => null,
 
@@ -85,7 +74,7 @@ class S3 implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function store($user, $imageIdentifier, $imageData) {
+    public function store(string $user, string $imageIdentifier, string $imageData) : bool {
         try {
             $this->getClient()->putObject([
                 'Bucket' => $this->getParams()['bucket'],
@@ -102,7 +91,7 @@ class S3 implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function delete($user, $imageIdentifier) {
+    public function delete(string $user, string $imageIdentifier) : bool {
         if (!$this->imageExists($user, $imageIdentifier)) {
             throw new StorageException('File not found', 404);
         }
@@ -118,7 +107,7 @@ class S3 implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImage($user, $imageIdentifier) {
+    public function getImage(string $user, string $imageIdentifier) : string {
         try {
             $model = $this->getClient()->getObject([
                 'Bucket' => $this->getParams()['bucket'],
@@ -134,7 +123,7 @@ class S3 implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function getLastModified($user, $imageIdentifier) {
+    public function getLastModified(string $user, string $imageIdentifier) : DateTime {
         try {
             $model = $this->getClient()->headObject([
                 'Bucket' => $this->getParams()['bucket'],
@@ -150,7 +139,7 @@ class S3 implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function getStatus() {
+    public function getStatus() : bool {
         try {
             $this->getClient()->headBucket([
                 'Bucket' => $this->getParams()['bucket'],
@@ -165,7 +154,7 @@ class S3 implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function imageExists($user, $imageIdentifier) {
+    public function imageExists(string $user, string $imageIdentifier) : bool {
         try {
             $this->getClient()->headObject([
                 'Bucket' => $this->getParams()['bucket'],
@@ -185,7 +174,7 @@ class S3 implements StorageInterface {
      * @param string $imageIdentifier Image identifier
      * @return string
      */
-    protected function getImagePath($user, $imageIdentifier) {
+    protected function getImagePath(string $user, string $imageIdentifier) : string {
         $userPath = str_pad($user, 3, '0', STR_PAD_LEFT);
         return implode('/', [
             $userPath[0],
@@ -204,7 +193,7 @@ class S3 implements StorageInterface {
      *
      * @return array<string>
      */
-    protected function getParams() {
+    protected function getParams() : array {
         return $this->params;
     }
 
@@ -213,7 +202,7 @@ class S3 implements StorageInterface {
      *
      * @return S3Client
      */
-    protected function getClient() {
+    protected function getClient() : S3Client {
         if ($this->client === null) {
             $params = [
                 'credentials' => [

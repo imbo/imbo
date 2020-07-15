@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Storage;
 
 use Imbo\Exception\StorageException;
@@ -21,7 +21,7 @@ class Filesystem implements StorageInterface {
      *
      * @var array
      */
-    private $params = [
+    private array $params = [
         'dataDir' => null,
     ];
 
@@ -44,7 +44,7 @@ class Filesystem implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function store($user, $imageIdentifier, $imageData) {
+    public function store(string $user, string $imageIdentifier, string $imageData) : bool {
         if (!is_writable($this->getParams()['dataDir'])) {
             throw new StorageException('Could not store image', 500);
         }
@@ -80,7 +80,7 @@ class Filesystem implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function delete($user, $imageIdentifier) {
+    public function delete(string $user, string $imageIdentifier) : bool {
         if (!$this->imageExists($user, $imageIdentifier)) {
             throw new StorageException('File not found', 404);
         }
@@ -93,20 +93,20 @@ class Filesystem implements StorageInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImage($user, $imageIdentifier) {
+    public function getImage(string $user, string $imageIdentifier) : ?string {
         if (!$this->imageExists($user, $imageIdentifier)) {
             throw new StorageException('File not found', 404);
         }
 
         $path = $this->getImagePath($user, $imageIdentifier);
 
-        return file_get_contents($path);
+        return file_get_contents($path) ?: null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getLastModified($user, $imageIdentifier) {
+    public function getLastModified(string $user, string $imageIdentifier) : DateTime {
         if (!$this->imageExists($user, $imageIdentifier)) {
             throw new StorageException('File not found', 404);
         }
@@ -117,20 +117,20 @@ class Filesystem implements StorageInterface {
         $timestamp = filemtime($path);
 
         // Create a new datetime instance
-        return new DateTime('@' . $timestamp, new DateTimeZone('UTC'));
+        return new DateTime(sprintf('@%d', $timestamp), new DateTimeZone('UTC'));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getStatus() {
+    public function getStatus() : bool {
         return is_writable($this->getParams()['dataDir']);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function imageExists($user, $imageIdentifier) {
+    public function imageExists(string $user, string $imageIdentifier) : bool {
         $path = $this->getImagePath($user, $imageIdentifier);
 
         return file_exists($path);
@@ -150,11 +150,11 @@ class Filesystem implements StorageInterface {
      *
      * @param string $user The user which the image belongs to
      * @param string $imageIdentifier Image identifier
-     * @param boolean $includeFilename Whether or not to include the last part of the path (the
+     * @param bool $includeFilename Whether or not to include the last part of the path (the
      *                                 filename itself)
      * @return string
      */
-    protected function getImagePath($user, $imageIdentifier, $includeFilename = true) {
+    protected function getImagePath(string $user, string $imageIdentifier, bool $includeFilename = true) : string {
         $userPath = str_pad($user, 3, '0', STR_PAD_LEFT);
         $parts = [
             $this->getParams()['dataDir'],

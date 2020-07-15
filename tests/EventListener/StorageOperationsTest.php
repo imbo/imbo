@@ -110,7 +110,7 @@ class StorageOperationsTest extends ListenerTests {
             ->expects($this->once())
             ->method('getImage')
             ->with($this->user, $this->imageIdentifier)
-            ->willReturn(false);
+            ->willReturn(null);
         $this->expectExceptionObject(new StorageException('Failed reading file from storage backend', 503));
 
         $this->listener->loadImage($this->event);
