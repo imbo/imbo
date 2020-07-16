@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener\ImageVariations\Storage;
 
 /**
@@ -9,30 +9,30 @@ interface StorageInterface {
      * Store an image variation
      *
      * @param string $user The user which the image belongs to
-     * @param string $imageIdentifier The image identifier of the original
+     * @param string $imageIdentifier The image identifier of the original image
      * @param string $blob The image blob to store
      * @param int $width The width of the variation
-     * @return boolean
+     * @return bool
      */
-    function storeImageVariation($user, $imageIdentifier, $blob, $width);
+    function storeImageVariation(string $user, string $imageIdentifier, string $blob, int $width) : bool;
 
     /**
      * Get the blob of an image variation
      *
      * @param string $user The user which the image belongs to
-     * @param string $imageIdentifier The image identifier of the original
+     * @param string $imageIdentifier The image identifier of the original image
      * @param int $width The width of the variation
-     * @return string
+     * @return ?string
      */
-    function getImageVariation($user, $imageIdentifier, $width);
+    function getImageVariation(string $user, string $imageIdentifier, int $width) : ?string;
 
     /**
      * Remove an image variation
      *
      * @param string $user The user which the image belongs to
-     * @param string $imageIdentifier The image identifier
+     * @param string $imageIdentifier The image identifier of the original image
      * @param int $width Only delete the variation with this width
-     * @return boolean
+     * @return bool
      */
-    function deleteImageVariations($user, $imageIdentifier, $width = null);
+    function deleteImageVariations(string $user, string $imageIdentifier, int $width = null) : bool;
 }

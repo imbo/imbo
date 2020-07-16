@@ -1,11 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener\ImageVariations\Storage;
 
 use Imbo\Exception\StorageException;
 use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
-use DateTime;
-use DateTimeZone;
 
 /**
  * S3 storage driver for the image variations
@@ -20,19 +18,8 @@ use DateTimeZone;
  *                   you.
  */
 class S3 implements StorageInterface {
-    /**
-     * S3 client
-     *
-     * @var S3Client
-     */
-    private $client;
-
-    /**
-     * Parameters for the driver
-     *
-     * @var array
-     */
-    private $params = [
+    private S3Client $client;
+    private array $params = [
         // Access key
         'key' => null,
 
@@ -65,10 +52,7 @@ class S3 implements StorageInterface {
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function storeImageVariation($user, $imageIdentifier, $imageData, $width) {
+    public function storeImageVariation(string $user, string $imageIdentifier, string $imageData, int $width) : bool {
         try {
             $this->getClient()->putObject([
                 'Bucket' => $this->params['bucket'],
@@ -82,10 +66,7 @@ class S3 implements StorageInterface {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getImageVariation($user, $imageIdentifier, $width) {
+    public function getImageVariation(string $user, string $imageIdentifier, int $width) : ?string {
         try {
             $model = $this->getClient()->getObject([
                 'Bucket' => $this->params['bucket'],
@@ -98,10 +79,7 @@ class S3 implements StorageInterface {
         return (string) $model->get('Body');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteImageVariations($user, $imageIdentifier, $width = null) {
+    public function deleteImageVariations(string $user, string $imageIdentifier, int $width = null) : bool {
         // If width is specified, delete only the specific image
         if ($width !== null) {
             $this->getClient()->deleteObject([
@@ -138,11 +116,11 @@ class S3 implements StorageInterface {
      * @param string $user The user which the image belongs to
      * @param string $imageIdentifier Image identifier
      * @param int $width Width of the image, in pixels
-     * @param boolean $includeFilename Whether or not to include the last part of the path
+     * @param bool $includeFilename Whether or not to include the last part of the path
      *                                 (the filename itself)
      * @return string
      */
-    private function getImagePath($user, $imageIdentifier, $width = null, $includeFilename = true) {
+    private function getImagePath(string $user, string $imageIdentifier, int $width = null, bool $includeFilename = true) : string {
         $userPath = str_pad($user, 3, '0', STR_PAD_LEFT);
         $parts = [
             'imageVariation',
@@ -169,7 +147,7 @@ class S3 implements StorageInterface {
      *
      * @return S3Client
      */
-    private function getClient() {
+    private function getClient() : S3Client {
         if ($this->client === null) {
             $params = [
                 'credentials' => [

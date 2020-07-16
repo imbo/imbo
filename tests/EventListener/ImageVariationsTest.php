@@ -425,7 +425,7 @@ class ImageVariationsTest extends ListenerTests {
                 $this->imageIdentifier,
                 $variationWidth
             )
-            ->willReturn(false);
+            ->willReturn(null);
 
         $this->imageStorage
             ->expects($this->never())
@@ -775,6 +775,10 @@ class ImageVariationsTest extends ListenerTests {
             ->method('getHeight')
             ->willReturn(1536);
 
+        $this->imageModel
+            ->method('getBlob')
+            ->willReturn('image data');
+
         $listener->generateVariations($this->event);
     }
 
@@ -809,6 +813,10 @@ class ImageVariationsTest extends ListenerTests {
         $this->imageModel
             ->method('getHeight')
             ->willReturn(1536);
+
+        $this->imageModel
+            ->method('getBlob')
+            ->willReturn('image data');
 
         $this->storage
             ->expects($this->exactly(3))
@@ -848,6 +856,10 @@ class ImageVariationsTest extends ListenerTests {
             ->method('getHeight')
             ->willReturn(1536);
 
+        $this->imageModel
+            ->method('getBlob')
+            ->willReturn('image data');
+
         $this->storage
             ->expects($this->exactly(2))
             ->method('storeImageVariation')
@@ -870,6 +882,10 @@ class ImageVariationsTest extends ListenerTests {
         $this->imageModel
             ->method('getHeight')
             ->willReturn(768);
+
+        $this->imageModel
+            ->method('getBlob')
+            ->willReturn('image data');
 
         $this->transformationManager
             ->expects($this->once())
@@ -899,6 +915,10 @@ class ImageVariationsTest extends ListenerTests {
         $this->imageModel
             ->method('getHeight')
             ->willReturn(768);
+
+        $this->imageModel
+            ->method('getBlob')
+            ->willReturn('image data');
 
         $this->storage
             ->expects($this->once())
@@ -930,9 +950,13 @@ class ImageVariationsTest extends ListenerTests {
             ->method('getWidth')
             ->willReturn(1024);
 
-            $this->imageModel
+        $this->imageModel
             ->method('getHeight')
             ->willReturn(768);
+
+        $this->imageModel
+            ->method('getBlob')
+            ->willReturn('image data');
 
         $this->db
             ->expects($this->once())
@@ -975,9 +999,14 @@ class ImageVariationsTest extends ListenerTests {
             ->method('getHeight')
             ->willReturn(768);
 
+        $this->imageModel
+            ->method('getBlob')
+            ->willReturn('image data');
+
         $this->db
             ->expects($this->once())
             ->method('storeImageVariationMetadata')
+            ->with($this->user, )
             ->willThrowException(new DatabaseException());
 
         $this->transformationManager

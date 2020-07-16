@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener\ImageVariations\Storage;
 
 use Imbo\Exception\StorageException;
 use MongoDB\Client;
-use MongoDB\GridFS\Database;
+use MongoDB\Database;
 use MongoDB\GridFS\Bucket;
 use MongoDB\Driver\Exception\Exception as MongoDBException;
 
@@ -20,27 +20,16 @@ use MongoDB\Driver\Exception\Exception as MongoDBException;
  * - `array bucketOptions`: Options for the internal Bucket instance. Defaults to []
  */
 class GridFS implements StorageInterface {
-    /**
-     * @var Client
-     */
-    private $mongoClient;
-
-    /**
-     * @var Database
-     */
-    private $database;
-
-    /**
-     * @var Bucket
-     */
-    private $bucket;
+    private Client $client;
+    private Database $database;
+    private Bucket $bucket;
 
     /**
      * Parameters for the driver
      *
      * @var array
      */
-    private $params = [
+    private array $params = [
         'uri' => 'mongodb://localhost:27017',
         'uriOptions' => [],
         'clientOptions' => [
@@ -55,8 +44,6 @@ class GridFS implements StorageInterface {
      * Class constructor
      *
      * @param array $params Parameters for the driver
-     * @param MongoClient $client Mongo client instance
-     * @param MongoGridFS $grid MongoGridFS instance
      */
     public function __construct(array $params = null) {
         if ($params !== null) {
@@ -77,10 +64,7 @@ class GridFS implements StorageInterface {
         $this->bucket = $this->database->selectGridFSBucket($this->params['bucketOptions']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function storeImageVariation($user, $imageIdentifier, $blob, $width) {
+    public function storeImageVariation(string $user, string $imageIdentifier, string $blob, int $width) : bool {
         $this->bucket->uploadFromStream(
             $this->getImageFilename($user, $imageIdentifier, (int) $width),
             $this->createStream($blob),
@@ -97,10 +81,7 @@ class GridFS implements StorageInterface {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getImageVariation($user, $imageIdentifier, $width) {
+    public function getImageVariation(string $user, string $imageIdentifier, int $width) : ?string {
         try {
             return stream_get_contents($this->bucket->openDownloadStreamByName(
                 $this->getImageFilename($user, $imageIdentifier, (int) $width)
@@ -110,10 +91,7 @@ class GridFS implements StorageInterface {
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteImageVariations($user, $imageIdentifier, $width = null) {
+    public function deleteImageVariations(string $user, string $imageIdentifier, int $width = null) : bool {
         $filter = [
             'metadata.user' => $user,
             'metadata.imageIdentifier' => $imageIdentifier
@@ -136,7 +114,7 @@ class GridFS implements StorageInterface {
      * @param string $data The string to use in the stream
      * @return resource
      */
-    private function createStream($data) {
+    private function createStream(string $data) {
         $stream = fopen('php://temp', 'w+b');
         fwrite($stream, $data);
         rewind($stream);
@@ -152,7 +130,7 @@ class GridFS implements StorageInterface {
      * @param int $width
      * @return string
      */
-    private function getImageFilename($user, $imageIdentifier, $width) {
-        return sprintf('%s.%s.%d', $user, $imageIdentifier, (int) $width);
+    private function getImageFilename(string $user, string $imageIdentifier, int $width) : string {
+        return $user . '.' . $imageIdentifier . '.' . $width;
     }
 }
