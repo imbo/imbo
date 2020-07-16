@@ -20,12 +20,6 @@
     <const name="FIXTURES_DIR" value="./tests/Fixtures" />
     <const name="PROJECT_ROOT" value="./" />
     <const name="DATA_DIR" value="./data" />
-
-    <!-- AWS S3 tests -->
-    <const name="AWS_S3_KEY" value="" />
-    <const name="AWS_S3_SECRET" value="" />
-    <const name="AWS_S3_BUCKET" value="" />
-    <const name="AWS_S3_REGION" value="" />
   </php>
 
   <filter>
