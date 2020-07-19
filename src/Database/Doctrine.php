@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Database;
 
 use Imbo\Model\Image;
@@ -73,7 +73,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function insertImage($user, $imageIdentifier, Image $image, $updateIfDuplicate = true) {
+    public function insertImage(string $user, string $imageIdentifier, Image $image, bool $updateIfDuplicate = true) : bool {
         $now = time();
 
         if ($added = $image->getAddedDate()) {
@@ -85,7 +85,7 @@ class Doctrine implements DatabaseInterface {
         }
 
         if ($updateIfDuplicate && $id = $this->getImageId($user, $imageIdentifier)) {
-            return (boolean)$this->getConnection()->update($this->tableNames['imageinfo'], [
+            return (bool) $this->getConnection()->update($this->tableNames['imageinfo'], [
                 'updated' => $now,
             ], [
                 'id' => $id
@@ -116,13 +116,13 @@ class Doctrine implements DatabaseInterface {
             throw new DatabaseException('Unable to save image data', 500, $e);
         }
 
-        return (boolean) $result;
+        return (bool) $result;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteImage($user, $imageIdentifier) {
+    public function deleteImage(string $user, string $imageIdentifier) : bool {
         if (!$id = $this->getImageId($user, $imageIdentifier)) {
             throw new DatabaseException('Image not found', 404);
         }
@@ -147,7 +147,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function updateMetadata($user, $imageIdentifier, array $metadata) {
+    public function updateMetadata(string $user, string $imageIdentifier, array $metadata) : bool {
         // Fetch the current connection
         $connection = $this->getConnection();
         $imageId = $this->getImageId($user, $imageIdentifier);
@@ -177,7 +177,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getMetadata($user, $imageIdentifier) {
+    public function getMetadata(string $user, string $imageIdentifier) : array {
         if (!$id = $this->getImageId($user, $imageIdentifier)) {
             throw new DatabaseException('Image not found', 404);
         }
@@ -220,7 +220,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImages(array $users, Query $query, Images $model) {
+    public function getImages(array $users, Query $query, Images $model) : array {
         $images = [];
 
         $qb = $this->getConnection()->createQueryBuilder();
@@ -362,7 +362,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImageProperties($user, $imageIdentifier) {
+    public function getImageProperties(string $user, string $imageIdentifier) : array {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('*')
               ->from($this->tableNames['imageinfo'], 'i')
@@ -383,7 +383,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function load($user, $imageIdentifier, Image $image) {
+    public function load(string $user, string $imageIdentifier, Image $image) : bool {
         $row = $this->getImageProperties($user, $imageIdentifier);
 
         $image->setWidth($row['width'])
@@ -400,7 +400,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getLastModified(array $users, $imageIdentifier = null) {
+    public function getLastModified(array $users, string $imageIdentifier = null) : DateTime {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('i.updated')
               ->from($this->tableNames['imageinfo'], 'i')
@@ -439,14 +439,14 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function setLastModifiedNow($user, $imageIdentifier) {
+    public function setLastModifiedNow(string $user, string $imageIdentifier) : DateTime {
         return $this->setLastModifiedTime($user, $imageIdentifier, new DateTime('@' . time(), new DateTimeZone('UTC')));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setLastModifiedTime($user, $imageIdentifier, DateTime $time) {
+    public function setLastModifiedTime(string $user, string $imageIdentifier, DateTime $time) : DateTime {
         // Fetch the current connection
         $connection = $this->getConnection();
 
@@ -468,7 +468,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getNumImages($user = null) {
+    public function getNumImages(string $user = null) : int {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('COUNT(i.id)')
               ->from($this->tableNames['imageinfo'], 'i');
@@ -486,7 +486,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getNumBytes($user = null) {
+    public function getNumBytes(string $user = null) : int {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('SUM(i.size)')
               ->from($this->tableNames['imageinfo'], 'i');
@@ -504,7 +504,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getNumUsers() {
+    public function getNumUsers() : int {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('COUNT(DISTINCT(i.user))')
               ->from($this->tableNames['imageinfo'], 'i');
@@ -517,7 +517,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getStatus() {
+    public function getStatus() : bool {
         try {
             $connection = $this->getConnection();
 
@@ -530,7 +530,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImageMimeType($user, $imageIdentifier) {
+    public function getImageMimeType(string $user, string $imageIdentifier) : string {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('mime')
               ->from($this->tableNames['imageinfo'], 'i')
@@ -554,15 +554,15 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function imageExists($user, $imageIdentifier) {
-        return (boolean) $this->getImageId($user, $imageIdentifier);
+    public function imageExists(string $user, string $imageIdentifier) : bool {
+        return (bool) $this->getImageId($user, $imageIdentifier);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function insertShortUrl($shortUrlId, $user, $imageIdentifier, $extension = null, array $query = []) {
-        return (boolean) $this->getConnection()->insert($this->tableNames['shorturl'], [
+    public function insertShortUrl(string $shortUrlId, string $user, string $imageIdentifier, string $extension = null, array $query = []) : bool {
+        return (bool) $this->getConnection()->insert($this->tableNames['shorturl'], [
             'shortUrlId' => $shortUrlId,
             'user' => $user,
             'imageIdentifier' => $imageIdentifier,
@@ -574,7 +574,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getShortUrlParams($shortUrlId) {
+    public function getShortUrlParams(string $shortUrlId) : ?array {
         $qb = $this->getConnection()->createQueryBuilder();
         $qb->select('user', 'imageIdentifier', 'extension', 'query')
            ->from($this->tableNames['shorturl'], 's')
@@ -596,7 +596,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getShortUrlId($user, $imageIdentifier, $extension = null, array $query = []) {
+    public function getShortUrlId(string $user, string $imageIdentifier, string $extension = null, array $query = []) : ?string {
         $qb = $this->getConnection()->createQueryBuilder();
         $qb->select('shortUrlId')
            ->from($this->tableNames['shorturl'], 's')
@@ -629,7 +629,7 @@ class Doctrine implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function deleteShortUrls($user, $imageIdentifier, $shortUrlId = null) {
+    public function deleteShortUrls(string $user, string $imageIdentifier, string $shortUrlId = null) : bool {
         $qb = $this->getConnection()->createQueryBuilder();
 
         $qb->delete($this->tableNames['shorturl'])
@@ -645,13 +645,13 @@ class Doctrine implements DatabaseInterface {
                ->setParameter(':shortUrlId', $shortUrlId);
         }
 
-        return (boolean) $qb->execute();
+        return (bool) $qb->execute();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAllUsers() {
+    public function getAllUsers() : array {
         $query = $this->getConnection()->createQueryBuilder();
         $query->select('DISTINCT(i.user)')
               ->from($this->tableNames['imageinfo'], 'i');

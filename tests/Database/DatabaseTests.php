@@ -1341,14 +1341,14 @@ abstract class DatabaseTests extends TestCase {
             sprintf('Expected 0 bytes, got %d', $num)
         );
 
-        $this->adapter->insertImage('user', 'id', $this->getImage(), 'Could not insert image');
+        $this->assertTrue($this->adapter->insertImage('user', 'id', $this->getImage()), 'Could not insert image');
         $this->assertSame(
             3456,
             $num = $this->adapter->getNumBytes('user'),
             sprintf('Expected 3456 bytes, got %d', $num)
         );
 
-        $this->adapter->insertImage('user2', 'id', $this->getImage(), 'Could not insert image');
+        $this->assertTrue($this->adapter->insertImage('user2', 'id', $this->getImage()), 'Could not insert image');
         $this->assertSame(
             3456,
             $num = $this->adapter->getNumBytes('user2'),
@@ -1366,14 +1366,14 @@ abstract class DatabaseTests extends TestCase {
      * @covers ::getNumUsers
      */
     public function testCanGetNumberOfUsers() : void {
-        $this->adapter->insertImage('user', 'id', $this->getImage(), 'Could not insert image');
+        $this->assertTrue($this->adapter->insertImage('user', 'id', $this->getImage()), 'Could not insert image');
         $this->assertSame(
             1,
             $num = $this->adapter->getNumUsers(),
             sprintf('Expected 1 user, got %d', $num)
         );
 
-        $this->adapter->insertImage('user2', 'id', $this->getImage(), 'Could not insert image');
+        $this->assertTrue($this->adapter->insertImage('user2', 'id', $this->getImage()), 'Could not insert image');
         $this->assertSame(
             2,
             $num = $this->adapter->getNumUsers(),

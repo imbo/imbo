@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Database;
 
 use Imbo\Model\Image;
@@ -104,7 +104,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function insertImage($user, $imageIdentifier, Image $image, $updateIfDuplicate = true) {
+    public function insertImage(string $user, string $imageIdentifier, Image $image, bool $updateIfDuplicate = true) : bool {
         $now = time();
 
         if ($added = $image->getAddedDate()) {
@@ -164,7 +164,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function deleteImage($user, $imageIdentifier) {
+    public function deleteImage(string $user, string $imageIdentifier) : bool {
         try {
             $data = $this->getImageCollection()->findOne([
                 'user' => $user,
@@ -189,7 +189,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function updateMetadata($user, $imageIdentifier, array $metadata) {
+    public function updateMetadata(string $user, string $imageIdentifier, array $metadata) : bool {
         try {
             // Fetch existing metadata and merge with the incoming data
             $existing = $this->getMetadata($user, $imageIdentifier);
@@ -209,7 +209,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getMetadata($user, $imageIdentifier) {
+    public function getMetadata(string $user, string $imageIdentifier) : array {
         try {
             $data = $this->getImageCollection()->findOne([
                 'user' => $user,
@@ -229,7 +229,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function deleteMetadata($user, $imageIdentifier) {
+    public function deleteMetadata(string $user, string $imageIdentifier) : bool {
         try {
             $data = $this->getImageCollection()->findOne([
                 'user' => $user,
@@ -254,7 +254,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImages(array $users, Query $query, Images $model) {
+    public function getImages(array $users, Query $query, Images $model) : array {
         // Initialize return value
         $images = [];
         $queryData = [];
@@ -355,7 +355,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImageProperties($user, $imageIdentifier) {
+    public function getImageProperties(string $user, string $imageIdentifier) : array {
         try {
             $data = $this->getImageCollection()->findOne(
                 ['user' => $user, 'imageIdentifier' => $imageIdentifier],
@@ -364,16 +364,18 @@ class MongoDB implements DatabaseInterface {
         } catch (MongoException $e) {
             throw new DatabaseException('Unable to fetch image data', 500, $e);
         }
+
         if ($data === null) {
             throw new DatabaseException('Image not found', 404);
         }
-        return $data;
+
+        return $data->getArrayCopy();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function load($user, $imageIdentifier, Image $image) {
+    public function load(string $user, string $imageIdentifier, Image $image) : bool {
         $data = $this->getImageProperties($user, $imageIdentifier);
 
         $image->setWidth($data['width'])
@@ -390,7 +392,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getLastModified(array $users, $imageIdentifier = null) {
+    public function getLastModified(array $users, string $imageIdentifier = null) : DateTime {
         $query = [];
 
         if ($users) {
@@ -426,14 +428,14 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function setLastModifiedNow($user, $imageIdentifier) {
+    public function setLastModifiedNow(string $user, string $imageIdentifier) : DateTime {
         return $this->setLastModifiedTime($user, $imageIdentifier, new DateTime('@' . time(), new DateTimeZone('UTC')));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setLastModifiedTime($user, $imageIdentifier, DateTime $time) {
+    public function setLastModifiedTime(string $user, string $imageIdentifier, DateTime $time) : DateTime {
         $data = $this->getImageCollection()->findOne([
             'user' => $user,
             'imageIdentifier' => $imageIdentifier,
@@ -454,7 +456,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getNumImages($user = null) {
+    public function getNumImages(string $user = null) : int {
         try {
             $query = [];
 
@@ -473,7 +475,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getNumBytes($user = null) {
+    public function getNumBytes(string $user = null) : int {
         try {
             $pipeline = [
                 [
@@ -507,7 +509,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getNumUsers() {
+    public function getNumUsers() : int {
         try {
             $result = (int) count($this->getImageCollection()->distinct('user'));
 
@@ -520,7 +522,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getStatus() {
+    public function getStatus() : bool {
         try {
             // Create a manager and try to get servers
             $manager = new Manager($this->params['server']);
@@ -535,7 +537,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getImageMimeType($user, $imageIdentifier) {
+    public function getImageMimeType(string $user, string $imageIdentifier) : string {
         try {
             $data = $this->getImageCollection()->findOne([
                 'user' => $user,
@@ -555,7 +557,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function imageExists($user, $imageIdentifier) {
+    public function imageExists(string $user, string $imageIdentifier) : bool {
         $data = $this->getImageCollection()->findOne([
             'user' => $user,
             'imageIdentifier' => $imageIdentifier,
@@ -567,7 +569,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function insertShortUrl($shortUrlId, $user, $imageIdentifier, $extension = null, array $query = []) {
+    public function insertShortUrl(string $shortUrlId, string $user, string $imageIdentifier, string $extension = null, array $query = []) : bool {
         try {
             $data = [
                 'shortUrlId' => $shortUrlId,
@@ -588,7 +590,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getShortUrlId($user, $imageIdentifier, $extension = null, array $query = []) {
+    public function getShortUrlId(string $user, string $imageIdentifier, string $extension = null, array $query = []) : ?string {
         try {
             $result = $this->getShortUrlCollection()->findOne([
                 'user' => $user,
@@ -612,7 +614,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getShortUrlParams($shortUrlId) {
+    public function getShortUrlParams(string $shortUrlId) : ?array {
         try {
             $result = $this->getShortUrlCollection()->findOne([
                 'shortUrlId' => $shortUrlId,
@@ -626,7 +628,7 @@ class MongoDB implements DatabaseInterface {
 
             $result['query'] = unserialize($result['query']);
 
-            return $result;
+            return $result->getArrayCopy();
         } catch (MongoException $e) {
             return null;
         }
@@ -635,7 +637,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function deleteShortUrls($user, $imageIdentifier, $shortUrlId = null) {
+    public function deleteShortUrls(string $user, string $imageIdentifier, string $shortUrlId = null) : bool {
         $query = [
             'user' => $user,
             'imageIdentifier' => $imageIdentifier,
@@ -657,7 +659,7 @@ class MongoDB implements DatabaseInterface {
     /**
      * {@inheritdoc}
      */
-    public function getAllUsers() {
+    public function getAllUsers() : array {
         return $this->getImageCollection()->distinct('user');
     }
 

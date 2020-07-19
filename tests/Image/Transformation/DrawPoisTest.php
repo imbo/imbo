@@ -26,7 +26,10 @@ class DrawPoisTest extends TestCase {
             'getDatabase' => $database,
         ]);
 
-        $image = $this->createMock(Image::class);
+        $image = $this->createConfiguredMock(Image::class, [
+            'getUser' => 'user',
+            'getImageIdentifier' => 'image-id',
+        ]);
         $image
             ->expects($this->never())
             ->method('hasBeenTransformed');
@@ -83,7 +86,10 @@ class DrawPoisTest extends TestCase {
             'getDatabase' => $database,
         ]);
 
-        $image = $this->createMock(Image::class);
+        $image = $this->createConfiguredMock(Image::class, [
+            'getUser' => 'user',
+            'getImageIdentifier' => 'image-id',
+        ]);
         $image
             ->expects($this->never())
             ->method('hasBeenTransformed');
@@ -129,7 +135,10 @@ class DrawPoisTest extends TestCase {
             'getDatabase' => $database,
         ]);
 
-        $image = $this->createMock(Image::class);
+        $image = $this->createConfiguredMock(Image::class, [
+            'getUser' => 'user',
+            'getImageIdentifier' => 'image-id',
+        ]);
         $image
             ->expects($this->once())
             ->method('hasBeenTransformed')
