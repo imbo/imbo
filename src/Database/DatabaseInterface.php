@@ -43,7 +43,7 @@ interface DatabaseInterface {
      *
      * @param string $user The user which the image belongs to
      * @param string $imageIdentifier Image identifier
-     * @param array $metadata An array with metadata
+     * @param array<string, mixed> $metadata An array with metadata
      * @throws DatabaseException
      * @return bool Returns true on success or false on failure
      */
@@ -55,7 +55,7 @@ interface DatabaseInterface {
      * @param string $user The user which the image belongs to
      * @param string $imageIdentifier Image identifier
      * @throws DatabaseException
-     * @return array Returns the metadata as an array
+     * @return array<string, mixed> Returns the metadata as an array
      */
     function getMetadata(string $user, string $imageIdentifier) : array;
 
@@ -74,12 +74,12 @@ interface DatabaseInterface {
      *
      * This method is also responsible for setting a correct "hits" number in the images model.
      *
-     * @param array $users The users which the images belongs to. If an empty array is specified
-     *                     the adapter should return images for all users.
+     * @param string[] $users The users which the images belongs to. If an empty array is specified
+     *                        the adapter should return images for all users.
      * @param Query $query A query instance
      * @param Images $model The images model
      * @throws DatabaseException
-     * @return array
+     * @return array<int, array<string, mixed>>
      */
     function getImages(array $users, Query $query, Images $model) : array;
 
