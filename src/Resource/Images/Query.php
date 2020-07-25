@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Resource\Images;
 
 use Imbo\Exception\RuntimeException;
@@ -6,206 +6,232 @@ use Imbo\Exception\RuntimeException;
 class Query {
     /**
      * The page to get
-     *
-     * @var int
      */
-    private $page = 1;
+    private int $page = 1;
 
     /**
      * Number of images to get
-     *
-     * @var int
      */
-    private $limit = 20;
+    private int $limit = 20;
 
     /**
      * Return metadata or not
-     *
-     * @var boolean
      */
-    private $returnMetadata = false;
+    private bool $returnMetadata = false;
 
     /**
      * Timestamp to start fetching from
-     *
-     * @var int
      */
-    private $from;
+    private ?int $from = null;
 
     /**
      * Timestamp to fetch to
-     *
-     * @var int
      */
-    private $to;
+    private ?int $to = null;
 
     /**
      * Image identifiers filter
      *
-     * @var array
+     * @var string[]
      */
-    private $imageIdentifiers = [];
+    private array $imageIdentifiers = [];
 
     /**
      * Checksums filter
      *
-     * @var array
+     * @var string[]
      */
-    private $checksums = [];
+    private array $checksums = [];
 
     /**
      * Original checksums filter
      *
-     * @var array
+     * @var string[]
      */
-    private $originalChecksums = [];
+    private array $originalChecksums = [];
 
     /**
      * Sort
      *
-     * @var array
+     * @var array<int, array{field: string, sort: string}>
      */
     private $sort = [];
 
     /**
-     * Set or get the page property
+     * Set the page property
      *
-     * @param int $page Give this a value to set the page property
-     * @return int|self
+     * @param int $page
+     * @return self
      */
-    public function page($page = null) {
-        if ($page === null) {
-            return $this->page;
-        }
-
-        $this->page = (int) $page;
+    public function setPage(int $page) : self {
+        $this->page = $page;
 
         return $this;
     }
 
     /**
-     * Set or get the limit property
+     * Get the page
      *
-     * @param int $limit Give this a value to set the limit property
-     * @return int|self
+     * @return int
      */
-    public function limit($limit = null) {
-        if ($limit === null) {
-            return $this->limit;
-        }
+    public function getPage() : int {
+        return $this->page;
+    }
 
-        $this->limit = (int) $limit;
+    /**
+     * Set the limit property
+     *
+     * @param int $limit
+     * @return self
+     */
+    public function setLimit(int $limit) : self {
+        $this->limit = $limit;
 
         return $this;
     }
 
     /**
-     * Set or get the returnMetadata flag
+     * Get the limit
      *
-     * @param boolean $returnMetadata Give this a value to set the returnMetadata flag
-     * @return boolean|self
+     * @return int
      */
-    public function returnMetadata($returnMetadata = null) {
-        if ($returnMetadata === null) {
-            return $this->returnMetadata;
-        }
+    public function getLimit() : int {
+        return $this->limit;
+    }
 
-        $this->returnMetadata = (bool) $returnMetadata;
+    /**
+     * Set the returnMetadata flag
+     *
+     * @param bool $returnMetadata
+     * @return self
+     */
+    public function setReturnMetadata($returnMetadata) : self {
+        $this->returnMetadata = $returnMetadata;
 
         return $this;
     }
 
     /**
-     * Set or get the from attribute
+     * Get the returnMetadata flag
      *
-     * @param int $from Give this a value to set the from property
-     * @return int|self
+     * @return bool
      */
-    public function from($from = null) {
-        if ($from === null) {
-            return $this->from;
-        }
+    public function getReturnMetadata() : bool {
+        return $this->returnMetadata;
+    }
 
-        $this->from = (int) $from;
+    /**
+     * Set the from attribute
+     *
+     * @param int $from
+     * @return self
+     */
+    public function setFrom(int $from) : self {
+        $this->from = $from;
 
         return $this;
     }
 
     /**
-     * Set or get the to attribute
+     * Get the from attribute
      *
-     * @param int $to Give this a value to set the to property
-     * @return int|self
+     * @return ?int
      */
-    public function to($to = null) {
-        if ($to === null) {
-            return $this->to;
-        }
+    public function getFrom() : ?int {
+        return $this->from;
+    }
 
-        $this->to = (int) $to;
+    /**
+     * Set the to attribute
+     *
+     * @param int $to
+     * @return self
+     */
+    public function setTo(int $to) : self {
+        $this->to = $to;
 
         return $this;
     }
 
     /**
-     * Set or get the imageIdentifiers filter
+     * Get the to attribute
      *
-     * @param array $imageIdentifiers Give this a value to set the property
-     * @return array|self
+     * @return ?int
      */
-    public function imageIdentifiers(array $imageIdentifiers = null) {
-        if ($imageIdentifiers === null) {
-            return $this->imageIdentifiers;
-        }
+    public function getTo() : ?int {
+        return $this->to;
+    }
 
+    /**
+     * Set the imageIdentifiers filter
+     *
+     * @param string[] $imageIdentifiers
+     * @return self
+     */
+    public function setImageIdentifiers(array $imageIdentifiers) : self {
         $this->imageIdentifiers = $imageIdentifiers;
 
         return $this;
     }
 
     /**
-     * Set or get the checksums filter
+     * Get the imageIdentifiers filter
      *
-     * @param array $checksums Give this a value to set the property
-     * @return array|self
+     * @return string[]
      */
-    public function checksums(array $checksums = null) {
-        if ($checksums === null) {
-            return $this->checksums;
-        }
+    public function getImageIdentifiers() : array {
+        return $this->imageIdentifiers;
+    }
 
+    /**
+     * Set the checksums filter
+     *
+     * @param string[] $checksums
+     * @return self
+     */
+    public function setChecksums(array $checksums) : self {
         $this->checksums = $checksums;
 
         return $this;
     }
 
     /**
-     * Set or get the original checksums filter
+     * Get the checksums filter
      *
-     * @param array $checksums Give this a value to set the property
-     * @return array|self
+     * @return string[]
      */
-    public function originalChecksums(array $checksums = null) {
-        if ($checksums === null) {
-            return $this->originalChecksums;
-        }
+    public function getChecksums() : array {
+        return $this->checksums;
+    }
 
-        $this->originalChecksums = $checksums;
+    /**
+     * Set the original checksums filter
+     *
+     * @param string[] $originalChecksums
+     * @return self
+     */
+    public function setOriginalChecksums(array $originalChecksums) : self {
+        $this->originalChecksums = $originalChecksums;
 
         return $this;
     }
 
     /**
-     * Set or get the sort data
+     * Get the original checksums filter
      *
-     * @param array $sort Specify a value to set the sort property
-     * @return array|self
+     * @return string[]
      */
-    public function sort(array $sort = null) {
-        if ($sort === null) {
-            return $this->sort;
-        }
+    public function getOriginalChecksums() : array {
+        return $this->originalChecksums;
+    }
 
+    /**
+     * Set the sort data
+     *
+     * @param string[] $sort
+     * @return self
+     */
+    public function setSort(array $sort) : self {
         $sortData = [];
 
         foreach ($sort as $field) {
@@ -228,12 +254,21 @@ class Query {
 
             $sortData[] = [
                 'field' => $field,
-                'sort' => $dir,
+                'sort'  => $dir,
             ];
         }
 
         $this->sort = $sortData;
 
         return $this;
+    }
+
+    /**
+     * Get the sort data
+     *
+     * @return array<int, array{field: string, sort: string}>
+     */
+    public function getSort() : array {
+        return $this->sort;
     }
 }

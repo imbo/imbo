@@ -540,7 +540,7 @@ abstract class DatabaseTests extends TestCase {
         );
 
         $query = new Query();
-        $query->returnMetadata(true);
+        $query->setReturnMetadata(true);
 
         $images = $this->adapter->getImages(['user'], $query, new Images());
 
@@ -656,7 +656,7 @@ abstract class DatabaseTests extends TestCase {
 
         // Fetch to the timestamp of when the last image was added
         $query = new Query();
-        $query->to($end);
+        $query->setTo($end);
         $this->assertCount(
             6,
             $images = $this->adapter->getImages([$user], $query, $model),
@@ -670,7 +670,7 @@ abstract class DatabaseTests extends TestCase {
 
         // Fetch until the second the first image was added
         $query = new Query();
-        $query->to($start);
+        $query->setTo($start);
         $this->assertCount(
             1,
             $images = $this->adapter->getImages([$user], $query, $model),
@@ -684,7 +684,7 @@ abstract class DatabaseTests extends TestCase {
 
         // Fetch from the second the first image was added
         $query = new Query();
-        $query->from($start);
+        $query->setFrom($start);
         $this->assertCount(
             6,
             $images = $this->adapter->getImages([$user], $query, $model),
@@ -698,7 +698,7 @@ abstract class DatabaseTests extends TestCase {
 
         // Fetch from the second the last image was added
         $query = new Query();
-        $query->from($end);
+        $query->setFrom($end);
         $this->assertCount(
             1,
             $images = $this->adapter->getImages([$user], $query, $model),
@@ -719,7 +719,7 @@ abstract class DatabaseTests extends TestCase {
         $this->insertImages(true);
 
         $query = new Query();
-        $query->returnMetadata(true);
+        $query->setReturnMetadata(true);
 
         $images = $this->adapter->getImages(['user', 'user2'], $query, $this->createMock(Images::class));
         $this->assertCount(6, $images, sprintf('Incorrect length. Expected 6, got %d', count($images)));
@@ -827,11 +827,11 @@ abstract class DatabaseTests extends TestCase {
         $query = new Query();
 
         if ($page !== null) {
-            $query->page($page);
+            $query->setPage($page);
         }
 
         if ($limit !== null) {
-            $query->limit($limit);
+            $query->setLimit($limit);
         }
 
         $model = $this->createMock(Images::class);
@@ -1079,7 +1079,7 @@ abstract class DatabaseTests extends TestCase {
         $query = new Query();
         $model = new Images();
 
-        $query->imageIdentifiers([$id1]);
+        $query->setImageIdentifiers([$id1]);
         $this->assertCount(
             1,
             $images = $this->adapter->getImages([$user], $query, $model),
@@ -1091,7 +1091,7 @@ abstract class DatabaseTests extends TestCase {
             sprintf('Expected model to have 1 hit, got %d', $num)
         );
 
-        $query->imageIdentifiers([$id1, $id2]);
+        $query->setImageIdentifiers([$id1, $id2]);
         $this->assertCount(
             2,
             $images = $this->adapter->getImages([$user], $query, $model),
@@ -1103,7 +1103,7 @@ abstract class DatabaseTests extends TestCase {
             sprintf('Expected model to have 2 hits, got %d', $num)
         );
 
-        $query->imageIdentifiers([$id1, $id2, $id3]);
+        $query->setImageIdentifiers([$id1, $id2, $id3]);
         $this->assertCount(
             3,
             $images = $this->adapter->getImages([$user], $query, $model),
@@ -1115,7 +1115,7 @@ abstract class DatabaseTests extends TestCase {
             sprintf('Expected model to have 3 hits, got %d', $num)
         );
 
-        $query->imageIdentifiers([$id1, $id2, $id3, str_repeat('f', 32)]);
+        $query->setImageIdentifiers([$id1, $id2, $id3, str_repeat('f', 32)]);
         $this->assertCount(
             3,
             $images = $this->adapter->getImages([$user], $query, $model),
@@ -1150,7 +1150,7 @@ abstract class DatabaseTests extends TestCase {
         $query = new Query();
         $model = new Images();
 
-        $query->originalChecksums(['foobar']);
+        $query->setOriginalChecksums(['foobar']);
         $this->assertCount(
             0,
             $images = $this->adapter->getImages([$user], $query, $model),
@@ -1162,7 +1162,7 @@ abstract class DatabaseTests extends TestCase {
             sprintf('Expected model to have 0 hits, got %d', $num)
         );
 
-        $query->originalChecksums([$originalChecksum]);
+        $query->setOriginalChecksums([$originalChecksum]);
         $this->assertCount(
             3,
             $images = $this->adapter->getImages([$user], $query, $model),
@@ -1174,7 +1174,7 @@ abstract class DatabaseTests extends TestCase {
             sprintf('Expected model to have 3 hits, got %d', $num)
         );
 
-        $query->checksums(['foobar']);
+        $query->setChecksums(['foobar']);
         $this->assertCount(
             0,
             $images = $this->adapter->getImages([$user], $query, $model),
@@ -1186,7 +1186,7 @@ abstract class DatabaseTests extends TestCase {
             sprintf('Expected model to have 0 hits, got %d', $num)
         );
 
-        $query->checksums(['checksum1']);
+        $query->setChecksums(['checksum1']);
         $this->assertCount(
             1,
             $images = $this->adapter->getImages([$user], $query, $model),
@@ -1198,7 +1198,7 @@ abstract class DatabaseTests extends TestCase {
             sprintf('Expected model to have 1 hit, got %d', $num)
         );
 
-        $query->checksums(['checksum1', 'checksum2']);
+        $query->setChecksums(['checksum1', 'checksum2']);
         $this->assertCount(
             2,
             $images = $this->adapter->getImages([$user], $query, $model),
@@ -1210,7 +1210,7 @@ abstract class DatabaseTests extends TestCase {
             sprintf('Expected model to have 2 hits, got %d', $num)
         );
 
-        $query->checksums(['checksum1', 'checksum2', 'checksum3']);
+        $query->setChecksums(['checksum1', 'checksum2', 'checksum3']);
         $this->assertCount(
             3,
             $images = $this->adapter->getImages([$user], $query, $model),
@@ -1444,7 +1444,7 @@ abstract class DatabaseTests extends TestCase {
         $query = new Query();
 
         if (!empty($sort)) {
-            $query->sort($sort);
+            $query->setSort($sort);
         }
 
         $images = $this->adapter->getImages(['user'], $query, $this->createMock(Images::class));

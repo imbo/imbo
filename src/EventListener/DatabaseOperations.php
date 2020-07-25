@@ -177,31 +177,31 @@ class DatabaseOperations implements ListenerInterface {
         $returnMetadata = false;
 
         if ($params->has('page')) {
-            $query->page($params->get('page'));
+            $query->setPage((int) $params->get('page'));
         }
 
         if ($params->has('limit')) {
-            $query->limit($params->get('limit'));
+            $query->setLimit($params->get('limit'));
         }
 
         if ($params->has('metadata')) {
-            $query->returnMetadata($params->get('metadata'));
+            $query->setReturnMetadata(true);
             $returnMetadata = true;
         }
 
         if ($params->has('from')) {
-            $query->from($params->get('from'));
+            $query->setFrom($params->get('from'));
         }
 
         if ($params->has('to')) {
-            $query->to($params->get('to'));
+            $query->setTo($params->get('to'));
         }
 
         if ($params->has('sort')) {
             $sort = $params->get('sort');
 
             if (is_array($sort)) {
-                $query->sort($sort);
+                $query->setSort($sort);
             }
         }
 
@@ -209,7 +209,7 @@ class DatabaseOperations implements ListenerInterface {
             $ids = $params->get('ids');
 
             if (is_array($ids)) {
-                $query->imageIdentifiers($ids);
+                $query->setImageIdentifiers($ids);
             }
         }
 
@@ -217,7 +217,7 @@ class DatabaseOperations implements ListenerInterface {
             $checksums = $params->get('checksums');
 
             if (is_array($checksums)) {
-                $query->checksums($checksums);
+                $query->setChecksums($checksums);
             }
         }
 
@@ -225,7 +225,7 @@ class DatabaseOperations implements ListenerInterface {
             $checksums = $params->get('originalChecksums');
 
             if (is_array($checksums)) {
-                $query->originalChecksums($checksums);
+                $query->setOriginalChecksums($checksums);
             }
         }
 
@@ -240,8 +240,8 @@ class DatabaseOperations implements ListenerInterface {
 
         // Create the model and set some pagination values
         $model = new Model\Images();
-        $model->setLimit($query->limit())
-              ->setPage($query->page());
+        $model->setLimit($query->getLimit())
+              ->setPage($query->getPage());
 
         $images = $database->getImages($users, $query, $model);
         $modelImages = [];

@@ -239,7 +239,7 @@ class Doctrine implements DatabaseInterface {
             $qb->where($composite);
         }
 
-        if ($sort = $query->sort()) {
+        if ($sort = $query->getSort()) {
             // Fields valid for sorting
             $validFields = [
                 'size'             => true,
@@ -266,8 +266,8 @@ class Doctrine implements DatabaseInterface {
             $qb->orderBy('added', 'DESC');
         }
 
-        $from = $query->from();
-        $to = $query->to();
+        $from = $query->getFrom();
+        $to = $query->getTo();
 
         if ($from || $to) {
             if ($from !== null) {
@@ -279,7 +279,7 @@ class Doctrine implements DatabaseInterface {
             }
         }
 
-        if ($imageIdentifiers = $query->imageIdentifiers()) {
+        if ($imageIdentifiers = $query->getImageIdentifiers()) {
             $expr = $qb->expr();
             $composite = $expr->orX();
 
@@ -291,7 +291,7 @@ class Doctrine implements DatabaseInterface {
             $qb->andWhere($composite);
         }
 
-        if ($checksums = $query->checksums()) {
+        if ($checksums = $query->getChecksums()) {
             $expr = $qb->expr();
             $composite = $expr->orX();
 
@@ -303,7 +303,7 @@ class Doctrine implements DatabaseInterface {
             $qb->andWhere($composite);
         }
 
-        if ($originalChecksums = $query->originalChecksums()) {
+        if ($originalChecksums = $query->getOriginalChecksums()) {
             $expr = $qb->expr();
             $composite = $expr->orX();
 
@@ -321,18 +321,18 @@ class Doctrine implements DatabaseInterface {
         $stmt = $hitsQb->execute();
         $model->setHits((int) $stmt->fetchColumn());
 
-        if ($limit = $query->limit()) {
+        if ($limit = $query->getLimit()) {
             $qb->setMaxResults($limit);
         }
 
-        if ($page = $query->page()) {
-            $offset = (int) $query->limit() * ($page - 1);
+        if ($page = $query->getPage()) {
+            $offset = (int) $query->getLimit() * ($page - 1);
             $qb->setFirstResult($offset);
         }
 
         $stmt = $qb->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $returnMetadata = $query->returnMetadata();
+        $returnMetadata = $query->getReturnMetadata();
 
         foreach ($rows as $row) {
             $image = [

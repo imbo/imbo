@@ -8,89 +8,97 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass Imbo\Resource\Images\Query
  */
 class QueryTest extends TestCase {
-    private $query;
+    private Query $query;
 
     public function setUp() : void {
         $this->query = new Query();
     }
 
     /**
-     * @covers ::page
+     * @covers ::setPage
+     * @covers ::getPage
      */
     public function testPage() : void {
         $value = 2;
-        $this->assertSame(1, $this->query->page());
-        $this->assertSame($this->query, $this->query->page($value));
-        $this->assertSame($value, $this->query->page());
+        $this->assertSame(1, $this->query->getPage());
+        $this->assertSame($this->query, $this->query->setPage($value));
+        $this->assertSame($value, $this->query->getPage());
     }
 
     /**
-     * @covers ::limit
+     * @covers ::setLimit
+     * @covers ::getLimit
      */
     public function testLimit() : void {
         $value = 30;
-        $this->assertSame(20, $this->query->limit());
-        $this->assertSame($this->query, $this->query->limit($value));
-        $this->assertSame($value, $this->query->limit());
+        $this->assertSame(20, $this->query->getLimit());
+        $this->assertSame($this->query, $this->query->setLimit($value));
+        $this->assertSame($value, $this->query->getLimit());
     }
 
     /**
-     * @covers ::returnMetadata
+     * @covers ::setReturnMetadata
+     * @covers ::getReturnMetadata
      */
     public function testReturnMetadata() : void {
-        $this->assertFalse($this->query->returnMetadata());
-        $this->assertSame($this->query, $this->query->returnMetadata(true));
-        $this->assertTrue($this->query->returnMetadata());
+        $this->assertFalse($this->query->getReturnMetadata());
+        $this->assertSame($this->query, $this->query->setReturnMetadata(true));
+        $this->assertTrue($this->query->getReturnMetadata());
     }
 
     /**
-     * @covers ::from
+     * @covers ::setFrom
+     * @covers ::getFrom
      */
     public function testFrom() : void {
         $value = 123123123;
-        $this->assertNull($this->query->from());
-        $this->assertSame($this->query, $this->query->from($value));
-        $this->assertSame($value, $this->query->from());
+        $this->assertNull($this->query->getFrom());
+        $this->assertSame($this->query, $this->query->setFrom($value));
+        $this->assertSame($value, $this->query->getFrom());
     }
 
     /**
-     * @covers ::to
+     * @covers ::setTo
+     * @covers ::getTo
      */
     public function testTo() : void {
         $value = 123123123;
-        $this->assertNull($this->query->to());
-        $this->assertSame($this->query, $this->query->to($value));
-        $this->assertSame($value, $this->query->to());
+        $this->assertNull($this->query->getTo());
+        $this->assertSame($this->query, $this->query->setTo($value));
+        $this->assertSame($value, $this->query->getTo());
     }
 
     /**
-     * @covers ::imageIdentifiers
+     * @covers ::setImageIdentifiers
+     * @covers ::getImageIdentifiers
      */
     public function testImageIdentifiers() : void {
         $value = ['id1', 'id2'];
-        $this->assertSame([], $this->query->imageIdentifiers());
-        $this->assertSame($this->query, $this->query->imageIdentifiers($value));
-        $this->assertSame($value, $this->query->imageIdentifiers());
+        $this->assertSame([], $this->query->getImageIdentifiers());
+        $this->assertSame($this->query, $this->query->setImageIdentifiers($value));
+        $this->assertSame($value, $this->query->getImageIdentifiers());
     }
 
     /**
-     * @covers ::checksums
+     * @covers ::setChecksums
+     * @covers ::getChecksums
      */
     public function testChecksums() : void {
         $value = ['sum1', 'sum2'];
-        $this->assertSame([], $this->query->checksums());
-        $this->assertSame($this->query, $this->query->checksums($value));
-        $this->assertSame($value, $this->query->checksums());
+        $this->assertSame([], $this->query->getChecksums());
+        $this->assertSame($this->query, $this->query->setChecksums($value));
+        $this->assertSame($value, $this->query->getChecksums());
     }
 
     /**
-     * @covers ::originalChecksums
+     * @covers ::setOriginalChecksums
+     * @covers ::getOriginalChecksums
      */
     public function testOriginalChecksums() : void {
         $value = ['sum1', 'sum2'];
-        $this->assertSame([], $this->query->originalChecksums());
-        $this->assertSame($this->query, $this->query->originalChecksums($value));
-        $this->assertSame($value, $this->query->originalChecksums());
+        $this->assertSame([], $this->query->getOriginalChecksums());
+        $this->assertSame($this->query, $this->query->setOriginalChecksums($value));
+        $this->assertSame($value, $this->query->getOriginalChecksums());
     }
 
     public function getSortData() : array {
@@ -135,27 +143,28 @@ class QueryTest extends TestCase {
 
     /**
      * @dataProvider getSortData
-     * @covers ::sort
+     * @covers ::setSort
+     * @covers ::getSort
      */
     public function testSort(array $value, array $formatted) : void {
-        $this->assertSame([], $this->query->sort());
-        $this->assertSame($this->query, $this->query->sort($value));
-        $this->assertSame($formatted, $this->query->sort());
+        $this->assertSame([], $this->query->getSort());
+        $this->assertSame($this->query, $this->query->setSort($value));
+        $this->assertSame($formatted, $this->query->getSort());
     }
 
     /**
-     * @covers ::sort
+     * @covers ::setSort
      */
     public function testSortThrowsExceptionOnInvalidSortValues() : void {
         $this->expectExceptionObject(new RuntimeException('Invalid sort value: field:foo', 400));
-        $this->query->sort(['field:foo']);
+        $this->query->setSort(['field:foo']);
     }
 
     /**
-     * @covers ::sort
+     * @covers ::setSort
      */
     public function testSortThrowsExceptionWhenTheStortStringIsBadlyFormatted() : void {
         $this->expectExceptionObject(new RuntimeException('Badly formatted sort', 400));
-        $this->query->sort(['field:asc', '']);
+        $this->query->setSort(['field:asc', '']);
     }
 }

@@ -265,8 +265,8 @@ class MongoDB implements DatabaseInterface {
             $queryData['user']['$in'] = $users;
         }
 
-        $from = $query->from();
-        $to = $query->to();
+        $from = $query->getFrom();
+        $to = $query->getTo();
 
         if ($from || $to) {
             $tmp = [];
@@ -282,19 +282,19 @@ class MongoDB implements DatabaseInterface {
             $queryData['added'] = $tmp;
         }
 
-        $imageIdentifiers = $query->imageIdentifiers();
+        $imageIdentifiers = $query->getImageIdentifiers();
 
         if (!empty($imageIdentifiers)) {
             $queryData['imageIdentifier']['$in'] = $imageIdentifiers;
         }
 
-        $checksums = $query->checksums();
+        $checksums = $query->getChecksums();
 
         if (!empty($checksums)) {
             $queryData['checksum']['$in'] = $checksums;
         }
 
-        $originalChecksums = $query->originalChecksums();
+        $originalChecksums = $query->getOriginalChecksums();
 
         if (!empty($originalChecksums)) {
             $queryData['originalChecksum']['$in'] = $originalChecksums;
@@ -303,7 +303,7 @@ class MongoDB implements DatabaseInterface {
         // Sorting
         $sort = ['added' => -1];
 
-        if ($querySort = $query->sort()) {
+        if ($querySort = $query->getSort()) {
             $sort = [];
 
             foreach ($querySort as $s) {
@@ -317,20 +317,20 @@ class MongoDB implements DatabaseInterface {
             'user', 'imageIdentifier', 'mime', 'size', 'width', 'height'
         ], true);
 
-        if ($query->returnMetadata()) {
+        if ($query->getReturnMetadata()) {
             $fields['metadata'] = true;
         }
 
         try {
             $options = [
                 'projection' => $fields,
-                'limit' => $query->limit(),
+                'limit' => $query->getLimit(),
                 'sort' => $sort,
             ];
 
             // Skip some images if a page has been set
-            if (($page = $query->page()) > 1) {
-                $skip = $query->limit() * ($page - 1);
+            if (($page = $query->getPage()) > 1) {
+                $skip = $query->getLimit() * ($page - 1);
                 $options['skip'] = $skip;
             }
 
