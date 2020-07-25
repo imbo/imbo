@@ -19,7 +19,7 @@ class SepiaTest extends TransformationTests {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true);
 
         $imagick = new Imagick();
@@ -38,7 +38,7 @@ class SepiaTest extends TransformationTests {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true);
 
         $imagick = new Imagick();

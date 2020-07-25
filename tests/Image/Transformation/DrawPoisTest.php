@@ -32,7 +32,7 @@ class DrawPoisTest extends TestCase {
         ]);
         $image
             ->expects($this->never())
-            ->method('hasBeenTransformed');
+            ->method('setHasBeenTransformed');
 
         $transformation = new DrawPois();
         $transformation
@@ -63,7 +63,7 @@ class DrawPoisTest extends TestCase {
         ]);
         $image
             ->expects($this->never())
-            ->method('hasBeenTransformed');
+            ->method('setHasBeenTransformed');
 
         $transformation = new DrawPois();
         $transformation
@@ -92,7 +92,7 @@ class DrawPoisTest extends TestCase {
         ]);
         $image
             ->expects($this->never())
-            ->method('hasBeenTransformed');
+            ->method('setHasBeenTransformed');
 
         $this->expectExceptionObject(new TransformationException(
             'Point of interest had neither `width` and `height` nor `cx` and `cy`'
@@ -141,7 +141,7 @@ class DrawPoisTest extends TestCase {
         ]);
         $image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true);
 
         $imagick = $this->createMock(Imagick::class);

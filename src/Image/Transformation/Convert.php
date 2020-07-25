@@ -36,6 +36,6 @@ class Convert extends Transformation {
 
         $this->image->setMimeType($outputConverterManager->getMimeTypeFromExtension($type))
                     ->setExtension($type)
-                    ->hasBeenTransformed(true);
+                    ->setHasBeenTransformed(true);
     }
 }

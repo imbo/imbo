@@ -20,7 +20,7 @@ class DesaturateTest extends TransformationTests {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true)
             ->willReturn($image);
 

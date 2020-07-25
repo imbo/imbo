@@ -223,7 +223,7 @@ class JSONTest extends TestCase {
      */
     public function testCanFormatAnImagesModelWithNoMetadataSet() : void {
         $image = $this->createConfiguredMock(Image::class, [
-            'getMetadata' => null,
+            'getMetadata' => [],
             'getAddedDate' => new DateTime(),
             'getUpdatedDate' => new DateTime(),
         ]);
@@ -241,7 +241,7 @@ class JSONTest extends TestCase {
         $this->assertCount(1, $data['images']);
         $image = $data['images'][0];
 
-        $this->assertArrayNotHasKey('metadata', $image);
+        $this->assertSame([], $image['metadata']);
     }
 
     /**

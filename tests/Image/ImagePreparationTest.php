@@ -150,6 +150,12 @@ class ImagePreparationTest extends TestCase {
             ->method('load')
             ->willReturnCallback($this->imagickLoader);
 
+        $this->inputLoaderManager
+            ->expects($this->any())
+            ->method('getExtensionFromMimetype')
+            ->with('image/png')
+            ->willReturn('png');
+
         $this->request
             ->expects($this->once())
             ->method('getContent')

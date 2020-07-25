@@ -42,12 +42,12 @@ class ContrastTest extends TestCase {
         if ($shouldTransform) {
             $image
                 ->expects($this->once())
-                ->method('hasBeenTransformed')
+                ->method('setHasBeenTransformed')
                 ->with(true);
         } else {
             $image
                 ->expects($this->never())
-                ->method('hasBeenTransformed');
+                ->method('setHasBeenTransformed');
         }
 
         (new Contrast())

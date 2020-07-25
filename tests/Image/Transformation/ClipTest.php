@@ -79,7 +79,7 @@ class ClipTest extends TestCase {
     public function testTransformationHappensWithMatchingPath() : void {
         $this->image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true);
 
         $this->transformation->transform(['path' => 'Panda']);
@@ -91,7 +91,7 @@ class ClipTest extends TestCase {
     public function testTransformationHappensWithoutExplicitPath() : void {
         $this->image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true);
 
         $this->transformation->transform([]);
@@ -104,7 +104,7 @@ class ClipTest extends TestCase {
         $this->imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.jpg'));
         $this->image
             ->expects($this->never())
-            ->method('hasBeenTransformed');
+            ->method('setHasBeenTransformed');
 
         $this->transformation->transform([]);
     }

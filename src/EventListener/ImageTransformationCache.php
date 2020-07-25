@@ -107,7 +107,7 @@ class ImageTransformationCache implements ListenerInterface {
             ) {
                 // Mark as cache hit
                 $data['headers']->set('X-Imbo-TransformationCache', 'Hit');
-                $data['image']->hasBeenTransformed(false);
+                $data['image']->setHasBeenTransformed(false);
 
                 // Replace all headers and set the image model
                 $response->headers = $data['headers'];

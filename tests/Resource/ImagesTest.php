@@ -61,6 +61,10 @@ class ImagesTest extends ResourceTests {
             ->expects($this->any())
             ->method('isDeterministic')
             ->willReturn(false);
+        $this->imageIdentifierGenerator
+            ->expects($this->any())
+            ->method('generate')
+            ->willReturn('id');
 
         $this->manager
             ->expects($this->at(0))

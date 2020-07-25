@@ -450,11 +450,11 @@ $defaultConfig = [
      *
      * An output converter work similar to what an input loader does, and configures the current
      * Imagick instance to return the requested image format. If the Imagick instance is updated,
-     * the plugin must call `$image->hasBeenTransformed(true);` to tell Imbo that the content inside
+     * the plugin must call `$image->setHasBeenTransformed(true);` to tell Imbo that the content inside
      * the Imagick instance has changed.
      *
      * If your plugin returns binary data directly, call `$image->setBlob($data)` instead and
-     * _don't_ call `$image->hasBeenTransformed(true)` as you've handled the conversion to binary
+     * _don't_ call `$image->setHasBeenTransformed(true)` as you've handled the conversion to binary
      * data yourself.
      *
      * @var Imbo\Image\OutputConverter\OutputConverterInterface[]|string[]

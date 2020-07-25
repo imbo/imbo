@@ -21,7 +21,7 @@ class StripTest extends TransformationTests {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true)
             ->willReturn($image);
 
@@ -74,7 +74,7 @@ class StripTest extends TransformationTests {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true);
 
         $imagick = $this->createConfiguredMock(Imagick::class, [

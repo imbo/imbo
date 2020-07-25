@@ -54,7 +54,7 @@ class Thumbnail extends Transformation implements InputSizeConstraint {
 
         $this->image->setWidth($size['width'])
                     ->setHeight($size['height'])
-                    ->hasBeenTransformed(true);
+                    ->setHasBeenTransformed(true);
     }
 
     /**

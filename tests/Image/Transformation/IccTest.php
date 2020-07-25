@@ -44,7 +44,7 @@ class IccTest extends TestCase {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true);
 
         $profilePath = DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc';
@@ -71,7 +71,7 @@ class IccTest extends TestCase {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true);
 
         $profilePath = DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc';
@@ -148,7 +148,7 @@ class IccTest extends TestCase {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true);
 
         $profilePath = DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc';

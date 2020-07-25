@@ -168,7 +168,7 @@ class Watermark extends Transformation implements InputSizeConstraint {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
 
-        $image->hasBeenTransformed(true);
+        $image->setHasBeenTransformed(true);
     }
 
     /**

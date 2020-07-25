@@ -48,7 +48,7 @@ class HistogramTest extends TransformationTests {
 
         $image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true);
 
         $imagick = new Imagick();

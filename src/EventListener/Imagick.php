@@ -105,7 +105,7 @@ class Imagick implements ListenerInterface, ImagickAware {
     public function updateModelBeforeStoring(EventInterface $event) {
         $image = $event->getRequest()->getImage();
 
-        if ($image->hasBeenTransformed()) {
+        if ($image->getHasBeenTransformed()) {
             $image->setBlob($this->imagick->getImageBlob());
         }
     }
@@ -118,7 +118,7 @@ class Imagick implements ListenerInterface, ImagickAware {
     public function updateModel(EventInterface $event) {
         $image = $event->getArgument('image');
 
-        if ($image->hasBeenTransformed()) {
+        if ($image->getHasBeenTransformed()) {
             $image->setBlob($this->imagick->getImageBlob());
         }
     }

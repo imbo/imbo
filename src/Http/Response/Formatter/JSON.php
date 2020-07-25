@@ -88,13 +88,11 @@ class JSON extends Formatter implements FormatterInterface {
             if (empty($fields) || isset($fields['metadata'])) {
                 $metadata = $image->getMetadata();
 
-                if (is_array($metadata)) {
-                    if (empty($metadata)) {
-                        $metadata = new stdClass();
-                    }
-
-                    $entry['metadata'] = $metadata;
+                if (empty($metadata)) {
+                    $metadata = new stdClass();
                 }
+
+                $entry['metadata'] = $metadata;
             }
 
             // Remove elements that should not be displayed

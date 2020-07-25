@@ -63,7 +63,7 @@ class ImagickTest extends ListenerTests {
             ->expects($this->once())
             ->method('getName')
             ->willReturn('images.post');
-        
+
         $this->event
             ->expects($this->once())
             ->method('getConfig')
@@ -170,7 +170,7 @@ class ImagickTest extends ListenerTests {
      */
     public function testUpdatesModelBeforeStoring(bool $hasBeenTransformed) : void {
         $image = $this->createConfiguredMock(Image::class, [
-            'hasBeenTransformed' => $hasBeenTransformed
+            'getHasBeenTransformed' => $hasBeenTransformed
         ]);
 
         $imagick = $this->createMock(I::class);
@@ -210,7 +210,7 @@ class ImagickTest extends ListenerTests {
      */
     public function testUpdatesModelBeforeSendingResponse(bool $hasBeenTransformed) : void {
         $image = $this->createConfiguredMock(Image::class, [
-            'hasBeenTransformed' => $hasBeenTransformed,
+            'getHasBeenTransformed' => $hasBeenTransformed,
         ]);
 
         $imagick = $this->createMock(I::class);

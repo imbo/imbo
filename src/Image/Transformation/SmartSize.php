@@ -43,7 +43,7 @@ class SmartSize extends Transformation {
 
         $this->image->setWidth($params['width'])
                     ->setHeight($params['height'])
-                    ->hasBeenTransformed(true);
+                    ->setHasBeenTransformed(true);
     }
 
     /**

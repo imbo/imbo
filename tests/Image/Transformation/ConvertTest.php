@@ -38,7 +38,7 @@ class ConvertTest extends TransformationTests {
 
         $image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true)
             ->willReturnSelf();
 
@@ -112,7 +112,7 @@ class ConvertTest extends TransformationTests {
             ->willReturnSelf();
         $image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true)
             ->willReturnSelf();
 

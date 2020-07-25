@@ -33,7 +33,7 @@ class Resize extends Transformation implements InputSizeConstraint {
 
         $this->image->setWidth($newSize['width'])
                     ->setHeight($newSize['height'])
-                    ->hasBeenTransformed(true);
+                    ->setHasBeenTransformed(true);
     }
 
     /**

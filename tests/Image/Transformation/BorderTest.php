@@ -40,7 +40,7 @@ class BorderTest extends TransformationTests {
 
         $image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true);
 
         $blob = file_get_contents(FIXTURES_DIR . '/image.png');

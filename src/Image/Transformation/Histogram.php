@@ -154,6 +154,6 @@ class Histogram extends Transformation {
         $image = $this->image;
         $image->setWidth($size['width'])
               ->setHeight($size['height'])
-              ->hasBeenTransformed(true);
+              ->setHasBeenTransformed(true);
     }
 }

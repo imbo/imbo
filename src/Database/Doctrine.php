@@ -386,13 +386,13 @@ class Doctrine implements DatabaseInterface {
     public function load(string $user, string $imageIdentifier, Image $image) : bool {
         $row = $this->getImageProperties($user, $imageIdentifier);
 
-        $image->setWidth($row['width'])
-              ->setHeight($row['height'])
-              ->setFilesize($row['size'])
-              ->setMimeType($row['mime'])
-              ->setExtension($row['extension'])
-              ->setAddedDate(new DateTime('@' . $row['added'], new DateTimeZone('UTC')))
-              ->setUpdatedDate(new DateTime('@' . $row['updated'], new DateTimeZone('UTC')));
+        $image->setWidth((int) $row['width'])
+              ->setHeight((int) $row['height'])
+              ->setFilesize((int) $row['size'])
+              ->setMimeType((string) $row['mime'])
+              ->setExtension((string) $row['extension'])
+              ->setAddedDate(new DateTime('@' . (int) $row['added'], new DateTimeZone('UTC')))
+              ->setUpdatedDate(new DateTime('@' . (int) $row['updated'], new DateTimeZone('UTC')));
 
         return true;
     }

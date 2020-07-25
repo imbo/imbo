@@ -108,7 +108,7 @@ class MaxSizeTest extends TransformationTests {
 
             $image
                 ->expects($this->once())
-                ->method('hasBeenTransformed')
+                ->method('setHasBeenTransformed')
                 ->with(true)
                 ->willReturn($image);
         } else {
@@ -122,7 +122,7 @@ class MaxSizeTest extends TransformationTests {
 
             $image
                 ->expects($this->never())
-                ->method('hasBeenTransformed');
+                ->method('setHasBeenTransformed');
         }
 
         $imagick = new Imagick();

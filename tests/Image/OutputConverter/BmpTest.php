@@ -44,7 +44,7 @@ class BmpTest extends TestCase {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true);
 
         $this->assertNull($this->converter->convert($imagick, $image, $extension, $mimeType));

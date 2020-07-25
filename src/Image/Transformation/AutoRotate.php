@@ -81,7 +81,7 @@ class AutoRotate extends Transformation implements InputSizeConstraint {
                 if ($rotate || $flipHorizontally || $flipVertically) {
                     // Set the image orientation so it reflects the transformation that's been done
                     $this->imagick->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
-                    $this->image->hasBeenTransformed(true);
+                    $this->image->setHasBeenTransformed(true);
                 }
             }
         } catch (ImagickException $e) {

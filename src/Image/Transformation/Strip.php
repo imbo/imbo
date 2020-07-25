@@ -24,6 +24,6 @@ class Strip extends Transformation {
         $this->imagick->clear();
         $this->imagick->readImageBlob($data);
 
-        $this->image->hasBeenTransformed(true);
+        $this->image->setHasBeenTransformed(true);
     }
 }

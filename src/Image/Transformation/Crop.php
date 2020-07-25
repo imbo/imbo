@@ -54,7 +54,7 @@ class Crop extends Transformation implements RegionExtractor, InputSizeConstrain
 
         $this->image->setWidth($size['width'])
                     ->setHeight($size['height'])
-                    ->hasBeenTransformed(true);
+                    ->setHasBeenTransformed(true);
     }
 
     /**

@@ -59,11 +59,23 @@ class ImageVariationsTest extends ListenerTests {
         $this->query      = $this->createMock(ParameterBag::class);
         $this->imageModel = $this->createConfiguredMock(Image::class, [
             'getImageIdentifier' => $this->imageIdentifier,
-            'setWidth'           => $this->returnSelf(),
-            'setHeight'          => $this->returnSelf(),
-            'setMimeType'        => $this->returnSelf(),
-            'setExtension'       => $this->returnSelf(),
+            //'setWidth'           => $this->returnSelf(),
+            //'setHeight'          => $this->returnSelf(),
+            //'setMimeType'        => $this->returnSelf(),
+            //'setExtension'       => $this->returnSelf(),
         ]);
+        $this->imageModel
+            ->method('setWidth')
+            ->willReturnSelf();
+        $this->imageModel
+            ->method('setHeight')
+            ->willReturnSelf();
+        $this->imageModel
+            ->method('setMimeType')
+            ->willReturnSelf();
+        $this->imageModel
+            ->method('setExtension')
+            ->willReturnSelf();
         $this->eventManager = $this->createMock(EventManager::class);
         $this->imageStorage = $this->createMock(MainStorageInterface::class);
         $this->config       = [];

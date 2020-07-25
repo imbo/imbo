@@ -83,6 +83,6 @@ class Icc extends Transformation {
             }
         }
 
-        $this->image->hasBeenTransformed(true);
+        $this->image->setHasBeenTransformed(true);
     }
 }

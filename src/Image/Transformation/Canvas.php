@@ -135,7 +135,7 @@ class Canvas extends Transformation implements InputSizeConstraint {
         $size = $this->imagick->getImageGeometry();
         $image->setWidth($size['width'])
               ->setHeight($size['height'])
-              ->hasBeenTransformed(true);
+              ->setHasBeenTransformed(true);
     }
 
     /**

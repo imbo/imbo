@@ -37,7 +37,7 @@ class ModulateTest extends TransformationTests {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true)
             ->willReturn($image);
 
@@ -78,7 +78,7 @@ class ModulateTest extends TransformationTests {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
-            ->method('hasBeenTransformed')
+            ->method('setHasBeenTransformed')
             ->with(true);
 
         (new Modulate())

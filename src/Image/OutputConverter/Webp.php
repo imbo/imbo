@@ -29,6 +29,6 @@ class Webp implements OutputConverterInterface {
             throw new OutputConverterException($e->getMessage(), 400, $e);
         }
 
-        $image->hasBeenTransformed(true);
+        $image->setHasBeenTransformed(true);
     }
 }

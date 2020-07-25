@@ -40,6 +40,6 @@ class Vignette extends Transformation {
             throw new TransformationException($e->getMessage(), 400, $e);
         }
 
-        $image->hasBeenTransformed(true);
+        $image->setHasBeenTransformed(true);
     }
 }

@@ -19,7 +19,7 @@ class ImageTest extends TestCase {
      * @covers ::getMetadata
      */
     public function testCanSetAndGetMetadata() : void {
-        $this->assertNull($this->image->getMetadata());
+        $this->assertSame([], $this->image->getMetadata());
         $data = [
             'foo' => 'bar',
             'bar' => 'foo',
@@ -144,14 +144,15 @@ class ImageTest extends TestCase {
 
 
     /**
-     * @covers ::hasBeenTransformed
+     * @covers ::getHasBeenTransformed
+     * @covers ::setHasBeenTransformed
      */
     public function testCanUpdateTransformationFlag() : void {
-        $this->assertFalse($this->image->hasBeenTransformed());
-        $this->assertSame($this->image, $this->image->hasBeenTransformed(true));
-        $this->assertTrue($this->image->hasBeenTransformed());
-        $this->assertSame($this->image, $this->image->hasBeenTransformed(false));
-        $this->assertFalse($this->image->hasBeenTransformed());
+        $this->assertFalse($this->image->getHasBeenTransformed());
+        $this->assertSame($this->image, $this->image->setHasBeenTransformed(true));
+        $this->assertTrue($this->image->getHasBeenTransformed());
+        $this->assertSame($this->image, $this->image->setHasBeenTransformed(false));
+        $this->assertFalse($this->image->getHasBeenTransformed());
     }
 
     /**
@@ -206,7 +207,7 @@ class ImageTest extends TestCase {
             ->setUpdatedDate($updated)
             ->setUser($user)
             ->setImageIdentifier($identifier)
-            ->hasBeenTransformed(true)
+            ->setHasBeenTransformed(true)
             ->setOriginalChecksum($checksum)
             ->setOutputQualityCompression($compression);
 
