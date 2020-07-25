@@ -259,78 +259,72 @@ class DatabaseOperationsTest extends ListenerTests {
 
         $query
             ->expects($this->at(5))
-            ->method('get')
-            ->with('metadata')
-            ->willReturn(true);
-
-        $query
-            ->expects($this->at(6))
             ->method('has')
             ->with('from')
             ->willReturn(true);
 
         $query
-            ->expects($this->at(7))
+            ->expects($this->at(6))
             ->method('get')
             ->with('from')
             ->willReturn(1355156488);
 
         $query
-            ->expects($this->at(8))
+            ->expects($this->at(7))
             ->method('has')
             ->with('to')
             ->willReturn(true);
 
         $query
-            ->expects($this->at(9))
+            ->expects($this->at(8))
             ->method('get')
             ->with('to')
             ->willReturn(1355176488);
 
         $query
-            ->expects($this->at(10))
+            ->expects($this->at(9))
             ->method('has')
             ->with('sort')
             ->willReturn(true);
 
         $query
-            ->expects($this->at(11))
+            ->expects($this->at(10))
             ->method('get')
             ->with('sort')
             ->willReturn(['size:desc']);
 
         $query
-            ->expects($this->at(12))
+            ->expects($this->at(11))
             ->method('has')
             ->with('ids')
             ->willReturn(true);
 
         $query
-            ->expects($this->at(13))
+            ->expects($this->at(12))
             ->method('get')
             ->with('ids')
             ->willReturn(['identifier1', 'identifier2', 'identifier3']);
 
         $query
-            ->expects($this->at(14))
+            ->expects($this->at(13))
             ->method('has')
             ->with('checksums')
             ->willReturn(true);
 
         $query
-            ->expects($this->at(15))
+            ->expects($this->at(14))
             ->method('get')
             ->with('checksums')
             ->willReturn(['checksum1', 'checksum2', 'checksum3']);
 
         $query
-            ->expects($this->at(16))
+            ->expects($this->at(15))
             ->method('has')
             ->with('originalChecksums')
             ->willReturn(true);
 
         $query
-            ->expects($this->at(17))
+            ->expects($this->at(16))
             ->method('get')
             ->with('originalChecksums')
             ->willReturn(['checksum1', 'checksum2', 'checksum3']);
