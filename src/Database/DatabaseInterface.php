@@ -99,7 +99,7 @@ interface DatabaseInterface {
      *
      * @param string $user The user which the image belongs to
      * @param string $imageIdentifier The image identifier
-     * @return array
+     * @return array{size: int, width: int, height: int, mime: string, extension: string, added: int, updated: int}
      */
     function getImageProperties(string $user, string $imageIdentifier) : array;
 
@@ -112,7 +112,7 @@ interface DatabaseInterface {
      * method will return either the current timestamp, or the max timestamp of any of the given
      * users.
      *
-     * @param array $users The users
+     * @param string[] $users The users
      * @param string $imageIdentifier The image identifier
      * @throws DatabaseException
      * @return DateTime Returns an instance of DateTime
@@ -203,7 +203,7 @@ interface DatabaseInterface {
      * @param string $user The user attached to the URL
      * @param string $imageIdentifier The image identifier attached to the URL
      * @param string $extension Optionl image extension
-     * @param array $query Optional query parameters
+     * @param array<string, string> $query Optional query parameters
      * @return bool
      */
     function insertShortUrl(string $shortUrlId, string $user, string $imageIdentifier, string $extension = null, array $query = []) : bool;
@@ -214,7 +214,7 @@ interface DatabaseInterface {
      * @param string $user The user attached to the URL
      * @param string $imageIdentifier The image identifier attached to the URL
      * @param string $extension Optionl image extension
-     * @param array $query Optional query parameters
+     * @param array<string, string> $query Optional query parameters
      * @return ?string
      */
     function getShortUrlId(string $user, string $imageIdentifier, string $extension = null, array $query = []) : ?string;
@@ -223,7 +223,7 @@ interface DatabaseInterface {
      * Fetch parameters for a short URL
      *
      * @param string $shortUrlId The ID of the short URL
-     * @return ?array Returns an array with information regarding the short URL, or null if the
+     * @return ?array<string, string> Returns an array with information regarding the short URL, or null if the
      *                    short URL is not found
      */
     function getShortUrlParams(string $shortUrlId) : ?array;
