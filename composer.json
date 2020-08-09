@@ -26,7 +26,7 @@
     "php": ">=7.4",
     "ext-imagick": "^3.4",
     "symfony/http-foundation": "^4.3",
-    "symfony/console": "^4.3",
+    "symfony/console": "^5.1",
     "ramsey/uuid": "^3.9",
     "guzzlehttp/psr7": "^1.6"
   },
