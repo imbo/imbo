@@ -43,7 +43,7 @@ class AddPublicKey extends CliCommand {
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output) : int {
         $adapter = $this->getAclAdapter();
         $publicKey = $input->getArgument('publicKey');
 
@@ -82,6 +82,8 @@ class AddPublicKey extends CliCommand {
         $output->writeln('Public key:  ' . $publicKey);
         $output->writeln('Private key: ' . $privateKey);
         $output->writeln('ACL rules added: ' . count($aclRules));
+
+        return self::SUCCESS;
     }
 
     /**
@@ -105,6 +107,7 @@ class AddPublicKey extends CliCommand {
         );
 
         $type = $this->getHelper('question')->ask($input, $output, $question);
+
         switch ($type) {
             case self::RESOURCES_READ_ONLY:
                 return Resource::getReadOnlyResources();
@@ -163,6 +166,7 @@ class AddPublicKey extends CliCommand {
 
             return $resources;
         });
+        $question->setMaxAttempts(1);
 
         return $this->getHelper('question')->ask($input, $output, $question);
     }
@@ -190,6 +194,7 @@ class AddPublicKey extends CliCommand {
 
             return array_search('*', $users) === false ? $users : '*';
         });
+        $question->setMaxAttempts(1);
 
         return $this->getHelper('question')->ask($input, $output, $question);
     }
@@ -222,6 +227,7 @@ class AddPublicKey extends CliCommand {
             'What do you want the private key to be (leave blank to generate)',
             $privateKeyGenerator->generate()
         );
+        $question->setMaxAttempts(1);
 
         return $this->getHelper('question')->ask($input, $output, $question);
     }

@@ -76,16 +76,15 @@ class FeatureContextTest extends TestCase {
 
         $client = $this->createMock(ClientInterface::class);
         $client
-            ->expects($this->at(0))
             ->method('getConfig')
-            ->with('handler')
-            ->willReturn($handlerStack);
-
-        $client
-            ->expects($this->at(1))
-            ->method('getConfig')
-            ->with('base_uri')
-            ->willReturn('http://localhost:8080');
+            ->withConsecutive(
+                ['handler'],
+                ['base_uri'],
+            )
+            ->willReturnOnConsecutiveCalls(
+                $handlerStack,
+                'http://localhost:8080',
+            );
 
         $context = new FeatureContext();
         $this->assertSame($context, $context->setClient($client));

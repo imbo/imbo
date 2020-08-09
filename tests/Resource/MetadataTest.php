@@ -70,14 +70,11 @@ class MetadataTest extends ResourceTests {
             ->method('getContent')
             ->willReturn('{"foo":"bar"}');
         $this->manager
-            ->expects($this->at(0))
             ->method('trigger')
-            ->with('db.metadata.delete')
-            ->willReturnSelf();
-        $this->manager
-            ->expects($this->at(1))
-            ->method('trigger')
-            ->with('db.metadata.update', ['metadata' => $metadata])
+            ->withConsecutive(
+                ['db.metadata.delete'],
+                ['db.metadata.update', ['metadata' => $metadata]],
+            )
             ->willReturnSelf();
         $this->response
             ->expects($this->once())

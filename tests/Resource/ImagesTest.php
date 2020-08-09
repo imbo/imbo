@@ -13,6 +13,7 @@ use Imbo\Model\ArrayModel;
 use Imbo\Model\Image;
 use Imbo\Storage\StorageInterface;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use PHPUnit\Framework\MockObject\Stub\Exception as ExceptionStub;
 
 /**
  * @coversDefaultClass Imbo\Resource\Images
@@ -67,13 +68,11 @@ class ImagesTest extends ResourceTests {
             ->willReturn('id');
 
         $this->manager
-            ->expects($this->at(0))
             ->method('trigger')
-            ->with('db.image.insert', ['updateIfDuplicate' => false]);
-        $this->manager
-            ->expects($this->at(1))
-            ->method('trigger')
-            ->with('storage.image.insert');
+            ->withConsecutive(
+                ['db.image.insert', ['updateIfDuplicate' => false]],
+                ['storage.image.insert'],
+            );
 
         $image = $this->createMock(Image::class);
         $image
@@ -147,22 +146,19 @@ class ImagesTest extends ResourceTests {
      */
     public function testAddImageWithCallableImageIdentifierGenerator() : void {
         $this->manager
-            ->expects($this->at(0))
             ->method('trigger')
-            ->with('db.image.insert', ['updateIfDuplicate' => true])
-            ->willThrowException(new DuplicateImageIdentifierException());
-        $this->manager
-            ->expects($this->at(1))
-            ->method('trigger')
-            ->with('db.image.insert', ['updateIfDuplicate' => true]);
-        $this->manager
-            ->expects($this->at(2))
-            ->method('trigger')
-            ->with('db.image.insert', ['updateIfDuplicate' => true]);
-        $this->manager
-            ->expects($this->at(3))
-            ->method('trigger')
-            ->with('storage.image.insert');
+            ->withConsecutive(
+                ['db.image.insert', ['updateIfDuplicate' => true]],
+                ['db.image.insert', ['updateIfDuplicate' => true]],
+                ['db.image.insert', ['updateIfDuplicate' => true]],
+                ['storage.image.insert'],
+            )
+            ->willReturnOnConsecutiveCalls(
+                new ExceptionStub(new DuplicateImageIdentifierException()),
+                null,
+                null,
+                null,
+            );
 
         $image = $this->createConfiguredMock(Image::class, [
             'getImageIdentifier' => 'some id',

@@ -547,7 +547,6 @@ class ResponseFormatterTest extends TestCase {
 
         $eventManager = $this->createMock(EventManager::class);
         $eventManager
-            ->expects($this->at(0))
             ->method('trigger')
             ->with('image.transformed', ['image' => $image]);
 

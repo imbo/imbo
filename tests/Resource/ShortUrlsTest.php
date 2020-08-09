@@ -258,32 +258,26 @@ class ShortUrlsTest extends ResourceTests {
             ->willReturn('{"user": "user", "imageIdentifier": "id"}');
 
         $this->database
-            ->expects($this->at(0))
             ->method('imageExists')
             ->with('user', 'id')
             ->willReturn(true);
         $this->database
-            ->expects($this->at(1))
             ->method('getShortUrlId')
             ->with('user', 'id', null, [])
             ->willReturn(null);
         $this->database
-            ->expects($this->at(2))
             ->method('getShortUrlParams')
-            ->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))
-            ->willReturn(['user' => 'value']);
+            ->withConsecutive(
+                [$this->matchesRegularExpression('/[a-zA-Z0-9]{7}/')],
+                [$this->matchesRegularExpression('/[a-zA-Z0-9]{7}/')],
+                [$this->matchesRegularExpression('/[a-zA-Z0-9]{7}/')],
+            )
+            ->willReturnOnConsecutiveCalls(
+                ['user' => 'value'],
+                ['user' => 'value'],
+                null,
+            );
         $this->database
-            ->expects($this->at(3))
-            ->method('getShortUrlParams')
-            ->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))
-            ->willReturn(['user' => 'value']);
-        $this->database
-            ->expects($this->at(4))
-            ->method('getShortUrlParams')
-            ->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))
-            ->willReturn(null);
-        $this->database
-            ->expects($this->at(5))
             ->method('insertShortUrl')
             ->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'), 'user', 'id', null, []);
 

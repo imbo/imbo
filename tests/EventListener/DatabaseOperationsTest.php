@@ -228,106 +228,41 @@ class DatabaseOperationsTest extends ListenerTests {
 
         $query = $this->createMock(ParameterBag::class);
         $query
-            ->expects($this->at(0))
             ->method('has')
-            ->with('page')
+            ->withConsecutive(
+                ['page'],
+                ['limit'],
+                ['metadata'],
+                ['from'],
+                ['to'],
+                ['sort'],
+                ['ids'],
+                ['checksums'],
+                ['originalChecksums'],
+            )
             ->willReturn(true);
-
         $query
-            ->expects($this->at(1))
             ->method('get')
-            ->with('page')
-            ->willReturn(1);
-
-        $query
-            ->expects($this->at(2))
-            ->method('has')
-            ->with('limit')
-            ->willReturn(true);
-
-        $query
-            ->expects($this->at(3))
-            ->method('get')
-            ->with('limit')
-            ->willReturn(5);
-
-        $query
-            ->expects($this->at(4))
-            ->method('has')
-            ->with('metadata')
-            ->willReturn(true);
-
-        $query
-            ->expects($this->at(5))
-            ->method('has')
-            ->with('from')
-            ->willReturn(true);
-
-        $query
-            ->expects($this->at(6))
-            ->method('get')
-            ->with('from')
-            ->willReturn(1355156488);
-
-        $query
-            ->expects($this->at(7))
-            ->method('has')
-            ->with('to')
-            ->willReturn(true);
-
-        $query
-            ->expects($this->at(8))
-            ->method('get')
-            ->with('to')
-            ->willReturn(1355176488);
-
-        $query
-            ->expects($this->at(9))
-            ->method('has')
-            ->with('sort')
-            ->willReturn(true);
-
-        $query
-            ->expects($this->at(10))
-            ->method('get')
-            ->with('sort')
-            ->willReturn(['size:desc']);
-
-        $query
-            ->expects($this->at(11))
-            ->method('has')
-            ->with('ids')
-            ->willReturn(true);
-
-        $query
-            ->expects($this->at(12))
-            ->method('get')
-            ->with('ids')
-            ->willReturn(['identifier1', 'identifier2', 'identifier3']);
-
-        $query
-            ->expects($this->at(13))
-            ->method('has')
-            ->with('checksums')
-            ->willReturn(true);
-
-        $query
-            ->expects($this->at(14))
-            ->method('get')
-            ->with('checksums')
-            ->willReturn(['checksum1', 'checksum2', 'checksum3']);
-
-        $query
-            ->expects($this->at(15))
-            ->method('has')
-            ->with('originalChecksums')
-            ->willReturn(true);
-
-        $query
-            ->expects($this->at(16))
-            ->method('get')
-            ->with('originalChecksums')
-            ->willReturn(['checksum1', 'checksum2', 'checksum3']);
+            ->withConsecutive(
+                ['page'],
+                ['limit'],
+                ['from'],
+                ['to'],
+                ['sort'],
+                ['ids'],
+                ['checksums'],
+                ['originalChecksums'],
+            )
+            ->willReturnOnConsecutiveCalls(
+                1,
+                5,
+                1355156488,
+                1355176488,
+                ['size:desc'],
+                ['identifier1', 'identifier2', 'identifier3'],
+                ['checksum1', 'checksum2', 'checksum3'],
+                ['checksum1', 'checksum2', 'checksum3'],
+            );
 
         $this->request->query = $query;
 
@@ -397,19 +332,12 @@ class DatabaseOperationsTest extends ListenerTests {
      */
     public function testCanLoadStats() : void {
         $this->database
-            ->expects($this->at(0))
             ->method('getNumImages')
-            ->willReturn(1);
+            ->willReturnOnConsecutiveCalls(1, 2);
 
         $this->database
-            ->expects($this->at(1))
             ->method('getNumBytes')
             ->willReturn(1);
-
-        $this->database
-            ->expects($this->at(2))
-            ->method('getNumImages')
-            ->willReturn(2);
 
         $this->response
             ->expects($this->once())

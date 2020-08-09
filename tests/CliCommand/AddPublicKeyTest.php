@@ -104,8 +104,6 @@ class AddPublicKeyTest extends TestCase {
         $commandTester->setInputs([
             '0',
             '',
-            '*',
-            'n',
         ]);
 
         $this->expectException(RuntimeException::class);
@@ -122,9 +120,6 @@ class AddPublicKeyTest extends TestCase {
         $commandTester->setInputs([
             '4',
             '',
-            'foo.bar,bar.foo',
-            '*',
-            'n'
         ]);
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessageMatches('/must specify at least one resource/');

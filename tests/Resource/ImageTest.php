@@ -49,13 +49,11 @@ class ImageTest extends ResourceTests {
      */
     public function testSupportsHttpDelete() : void {
         $this->manager
-            ->expects($this->at(0))
             ->method('trigger')
-            ->with('db.image.delete');
-        $this->manager
-            ->expects($this->at(1))
-            ->method('trigger')
-            ->with('storage.image.delete');
+            ->withConsecutive(
+                ['db.image.delete'],
+                ['storage.image.delete'],
+            );
 
         $this->request
             ->expects($this->once())
@@ -96,13 +94,11 @@ class ImageTest extends ResourceTests {
             ->with($this->isInstanceOf(ImageModel::class));
 
         $this->manager
-            ->expects($this->at(0))
             ->method('trigger')
-            ->with('db.image.load');
-        $this->manager
-            ->expects($this->at(1))
-            ->method('trigger')
-            ->with('storage.image.load');
+            ->withConsecutive(
+                ['db.image.load'],
+                ['storage.image.load'],
+            );
 
         $this->response
             ->expects($this->once())

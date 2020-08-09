@@ -62,13 +62,13 @@ class AuthenticateTest extends ListenerTests {
      */
     public function testThrowsExceptionWhenAuthInfoIsMissing() : void {
         $this->headers
-            ->expects($this->at(0))
+            ->expects($this->once())
             ->method('has')
             ->with('x-imbo-authenticate-timestamp')
             ->willReturn(false);
 
         $this->headers
-            ->expects($this->at(1))
+            ->expects($this->once())
             ->method('get')
             ->with('x-imbo-authenticate-timestamp')
             ->willReturn(null);
@@ -82,22 +82,23 @@ class AuthenticateTest extends ListenerTests {
      */
     public function testThrowsExceptionWhenSignatureIsMissing() : void {
         $this->headers
-            ->expects($this->at(0))
             ->method('has')
-            ->with('x-imbo-authenticate-timestamp')
+            ->withConsecutive(
+                ['x-imbo-authenticate-timestamp'],
+                ['x-imbo-authenticate-signature'],
+            )
             ->willReturn(true);
 
         $this->headers
-            ->expects($this->at(1))
-            ->method('has')
-            ->with('x-imbo-authenticate-signature')
-            ->willReturn(true);
-
-        $this->headers
-            ->expects($this->at(2))
             ->method('get')
-            ->with('x-imbo-authenticate-timestamp')
-            ->willReturn(gmdate('Y-m-d\TH:i:s\Z'));
+            ->withConsecutive(
+                ['x-imbo-authenticate-timestamp', null],
+                ['x-imbo-authenticate-signature', null],
+            )
+            ->willReturnOnConsecutiveCalls(
+                gmdate('Y-m-d\TH:i:s\Z'),
+                null,
+            );
 
         $this->expectExceptionObject(new RuntimeException('Missing authentication signature', 400));
         $this->listener->authenticate($this->event);
@@ -109,19 +110,14 @@ class AuthenticateTest extends ListenerTests {
      */
     public function testThrowsExceptionWhenTimestampIsInvalid() : void {
         $this->headers
-            ->expects($this->at(0))
             ->method('has')
-            ->with('x-imbo-authenticate-timestamp')
+            ->withConsecutive(
+                ['x-imbo-authenticate-timestamp'],
+                ['x-imbo-authenticate-signature'],
+            )
             ->willReturn(true);
 
         $this->headers
-            ->expects($this->at(1))
-            ->method('has')
-            ->with('x-imbo-authenticate-signature')
-            ->willReturn(true);
-
-        $this->headers
-            ->expects($this->at(2))
             ->method('get')
             ->with('x-imbo-authenticate-timestamp')
             ->willReturn('some string');
@@ -136,19 +132,14 @@ class AuthenticateTest extends ListenerTests {
      */
     public function testThrowsExceptionWhenTimestampHasExpired() : void {
         $this->headers
-            ->expects($this->at(0))
             ->method('has')
-            ->with('x-imbo-authenticate-timestamp')
+            ->withConsecutive(
+                ['x-imbo-authenticate-timestamp'],
+                ['x-imbo-authenticate-signature'],
+            )
             ->willReturn(true);
 
         $this->headers
-            ->expects($this->at(1))
-            ->method('has')
-            ->with('x-imbo-authenticate-signature')
-            ->willReturn(true);
-
-        $this->headers
-            ->expects($this->at(2))
             ->method('get')
             ->with('x-imbo-authenticate-timestamp')
             ->willReturn('2010-07-10T20:02:10Z');
@@ -162,28 +153,23 @@ class AuthenticateTest extends ListenerTests {
      */
     public function testThrowsExceptionWhenSignatureDoesNotMatch() : void {
         $this->headers
-            ->expects($this->at(0))
             ->method('has')
-            ->with('x-imbo-authenticate-timestamp')
+            ->withConsecutive(
+                ['x-imbo-authenticate-timestamp'],
+                ['x-imbo-authenticate-signature'],
+            )
             ->willReturn(true);
 
         $this->headers
-            ->expects($this->at(1))
-            ->method('has')
-            ->with('x-imbo-authenticate-signature')
-            ->willReturn(true);
-
-        $this->headers
-            ->expects($this->at(2))
             ->method('get')
-            ->with('x-imbo-authenticate-timestamp')
-            ->willReturn(gmdate('Y-m-d\TH:i:s\Z'));
-
-        $this->headers
-            ->expects($this->at(3))
-            ->method('get')
-            ->with('x-imbo-authenticate-signature')
-            ->willReturn('foobar');
+            ->withConsecutive(
+                ['x-imbo-authenticate-timestamp'],
+                ['x-imbo-authenticate-signature'],
+            )
+            ->willReturnOnConsecutiveCalls(
+                gmdate('Y-m-d\TH:i:s\Z'),
+                'foobar',
+            );
 
         $this->request
             ->expects($this->once())
@@ -221,28 +207,23 @@ class AuthenticateTest extends ListenerTests {
             ->willReturn($privateKey);
 
         $this->headers
-            ->expects($this->at(0))
             ->method('has')
-            ->with('x-imbo-authenticate-timestamp')
+            ->withConsecutive(
+                ['x-imbo-authenticate-timestamp'],
+                ['x-imbo-authenticate-signature'],
+            )
             ->willReturn(true);
 
         $this->headers
-            ->expects($this->at(1))
-            ->method('has')
-            ->with('x-imbo-authenticate-signature')
-            ->willReturn(true);
-
-        $this->headers
-            ->expects($this->at(2))
             ->method('get')
-            ->with('x-imbo-authenticate-timestamp')
-            ->willReturn($timestamp);
-
-        $this->headers
-            ->expects($this->at(3))
-            ->method('get')
-            ->with('x-imbo-authenticate-signature')
-            ->willReturn($signature);
+            ->withConsecutive(
+                ['x-imbo-authenticate-timestamp'],
+                ['x-imbo-authenticate-signature'],
+            )
+            ->willReturnOnConsecutiveCalls(
+                $timestamp,
+                $signature,
+            );
 
         $this->request
             ->expects($this->once())
@@ -292,34 +273,31 @@ class AuthenticateTest extends ListenerTests {
             ->willReturn($privateKey);
 
         $this->headers
-            ->expects($this->at(0))
             ->method('has')
             ->with('x-imbo-authenticate-timestamp')
             ->willReturn(false);
 
         $this->headers
-            ->expects($this->at(1))
             ->method('get')
-            ->with('x-imbo-authenticate-timestamp', $timestamp)
-            ->willReturn($timestamp);
-
-        $this->headers
-            ->expects($this->at(2))
-            ->method('get')
-            ->with('x-imbo-authenticate-signature', $signature)
-            ->willReturn($signature);
-
-        $this->query
-            ->expects($this->at(0))
-            ->method('get')
-            ->with('timestamp')
-            ->willReturn($timestamp);
+            ->withConsecutive(
+                ['x-imbo-authenticate-timestamp', $timestamp],
+                ['x-imbo-authenticate-signature', $signature],
+            )
+            ->willReturnOnConsecutiveCalls(
+                $timestamp,
+                $signature,
+            );
 
         $this->query
-            ->expects($this->at(1))
             ->method('get')
-            ->with('signature')
-            ->willReturn($signature);
+            ->withConsecutive(
+                ['timestamp'],
+                ['signature'],
+            )
+            ->willReturnOnConsecutiveCalls(
+                $timestamp,
+                $signature,
+            );
 
         $this->request
             ->expects($this->once())
@@ -463,34 +441,31 @@ class AuthenticateTest extends ListenerTests {
             ->willReturn('key');
 
         $this->headers
-            ->expects($this->at(0))
             ->method('has')
             ->with('x-imbo-authenticate-timestamp')
             ->willReturn(false);
 
         $this->headers
-            ->expects($this->at(1))
             ->method('get')
-            ->with('x-imbo-authenticate-timestamp', $timestamp)
-            ->willReturn($timestamp);
-
-        $this->headers
-            ->expects($this->at(2))
-            ->method('get')
-            ->with('x-imbo-authenticate-signature', $signature)
-            ->willReturn($signature);
-
-        $this->query
-            ->expects($this->at(0))
-            ->method('get')
-            ->with('timestamp')
-            ->willReturn($timestamp);
+            ->withConsecutive(
+                ['x-imbo-authenticate-timestamp', $timestamp],
+                ['x-imbo-authenticate-signature', $signature],
+            )
+            ->willReturnOnConsecutiveCalls(
+                $timestamp,
+                $signature,
+            );
 
         $this->query
-            ->expects($this->at(1))
             ->method('get')
-            ->with('signature')
-            ->willReturn($signature);
+            ->withConsecutive(
+                ['timestamp'],
+                ['signature'],
+            )
+            ->willReturnOnConsecutiveCalls(
+                $timestamp,
+                $signature,
+            );
 
         $this->request
             ->expects($this->once())

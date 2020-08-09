@@ -58,25 +58,17 @@ class GlobalShortUrlTest extends ResourceTests {
 
         $route = $this->createMock(Route::class);
         $route
-            ->expects($this->at(0))
             ->method('get')
             ->with('shortUrlId')
             ->willReturn($id);
 
         $route
-            ->expects($this->at(1))
             ->method('set')
-            ->with('user', $user);
-
-        $route
-            ->expects($this->at(2))
-            ->method('set')
-            ->with('imageIdentifier', $imageIdentifier);
-
-        $route
-            ->expects($this->at(3))
-            ->method('set')
-            ->with('extension', $extension);
+            ->withConsecutive(
+                ['user', $user],
+                ['imageIdentifier', $imageIdentifier],
+                ['extension', $extension],
+            );
 
         $this->request
             ->expects($this->once())
