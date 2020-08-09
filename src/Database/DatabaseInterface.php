@@ -214,7 +214,7 @@ interface DatabaseInterface {
      * @param string $user The user attached to the URL
      * @param string $imageIdentifier The image identifier attached to the URL
      * @param string $extension Optionl image extension
-     * @param array<string, string> $query Optional query parameters
+     * @param array<string, string|string[]> $query Optional query parameters
      * @return ?string
      */
     function getShortUrlId(string $user, string $imageIdentifier, string $extension = null, array $query = []) : ?string;
