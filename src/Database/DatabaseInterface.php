@@ -223,8 +223,12 @@ interface DatabaseInterface {
      * Fetch parameters for a short URL
      *
      * @param string $shortUrlId The ID of the short URL
-     * @return ?array<string, string> Returns an array with information regarding the short URL, or null if the
-     *                    short URL is not found
+     * @return ?array{
+     *   user: string,
+     *   imageIdentifier: string,
+     *   extension: string,
+     *   query: array<string, string|string[]>
+     * }
      */
     function getShortUrlParams(string $shortUrlId) : ?array;
 
