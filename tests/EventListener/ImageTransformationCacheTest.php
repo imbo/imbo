@@ -48,7 +48,7 @@ class ImageTransformationCacheTest extends ListenerTests {
         ]);
 
         TestFs::register();
-        $this->cacheDir = TestFs::getRoot();
+        $this->cacheDir = TestFs::getDevice();
 
         $this->listener = new ImageTransformationCache(['path' => TestFs::url('cacheDir')]);
     }

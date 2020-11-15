@@ -37,7 +37,7 @@
     "imbo/behat-api-extension": "^2.2",
     "doctrine/dbal": "^2.10",
     "micheh/psr7-cache": "^0.5",
-    "christeredvartsen/testfs": "^0.0"
+    "christeredvartsen/testfs": "^0.3.0"
   },
   "suggest": {
     "ext-mongodb": "Enables usage of MongoDB and GridFS as database and image storage. version: ^1.6",
@@ -45,7 +45,9 @@
     "imbo/imbo-metadata-cache": "Enabled caching of metadata through an event listener. Recommended version ^1.0",
     "doctrine/dbal": "Enables usage of using RDMS for storing data (and optionally images). Recommended version: ^2.9",
     "imbo/imbo-s3-adapters": "Enables usage of AWS S3 for storing images",
-    "imbo/imbo-b2-adapters": "Enables usage of Backblaze B2 for storing images"
+    "imbo/imbo-b2-adapters": "Enables usage of Backblaze B2 for storing images",
+    "imbo/imbo-filesystem-adapters": "Enables usage of a (local) filesystem for storing images",
+    "imbo/imbo-mongodb-adapters": "Enables usage of MongoDB for storing images"
   },
   "autoload": {
     "psr-4": {
