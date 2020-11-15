@@ -37,7 +37,8 @@
     "imbo/behat-api-extension": "^2.2",
     "doctrine/dbal": "^2.10",
     "micheh/psr7-cache": "^0.5",
-    "christeredvartsen/testfs": "^0.3.0"
+    "christeredvartsen/testfs": "^0.3.0",
+    "imbo/imbo-filesystem-adapters": "dev-main"
   },
   "suggest": {
     "ext-mongodb": "Enables usage of MongoDB and GridFS as database and image storage. version: ^1.6",

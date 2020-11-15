@@ -69,8 +69,6 @@ class Filesystem implements AdapterTest {
     }
 
     static public function getAdapter(array $config) : Storage {
-        return new Storage([
-            'dataDir' => $config['dataDir'],
-        ]);
+        return new Storage($config['dataDir']);
     }
 }
