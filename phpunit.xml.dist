@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/8.5/phpunit.xsd"
+<phpunit
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
   bootstrap="vendor/autoload.php"
   executionOrder="depends,defects"
   forceCoversAnnotation="true"
   beStrictAboutCoversAnnotation="false"
   beStrictAboutOutputDuringTests="true"
   beStrictAboutTodoAnnotatedTests="false"
-  verbose="true">
+  verbose="true"
+>
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">src</directory>
+      <directory>tests/behat/features/bootstrap</directory>
+    </include>
+  </coverage>
 
   <testsuites>
     <testsuite name="imbo-unit">
@@ -17,17 +25,10 @@
 
   <php>
     <!-- General config -->
-    <const name="FIXTURES_DIR" value="./tests/Fixtures" />
-    <const name="PROJECT_ROOT" value="./" />
-    <const name="DATA_DIR" value="./data" />
+    <const name="FIXTURES_DIR" value="./tests/Fixtures"/>
+    <const name="PROJECT_ROOT" value="./"/>
+    <const name="DATA_DIR" value="./data"/>
   </php>
-
-  <filter>
-    <whitelist processUncoveredFilesFromWhitelist="true">
-      <directory suffix=".php">src</directory>
-      <directory>tests/behat/features/bootstrap</directory>
-    </whitelist>
-  </filter>
 
   <groups>
     <exclude>
