@@ -14,6 +14,7 @@ __N/A__
 
 Bug fixes:
 
+* #624: Fix incorrect colorspace handling in the Canvas image transformation (Christer Edvartsen)
 * #491: Fix undefined user when retrieving metadata (Mats Lindh)
 
 Imbo-2.2.1
