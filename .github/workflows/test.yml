@@ -2,13 +2,16 @@ name: CI build
 on: push
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: Validate Composer files and lint code
     steps:
-      - uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: imagick
 
-      - name: Install system packages
-        run: sudo apt-get install php-imagick
+      - uses: actions/checkout@v2
 
       - name: Debug PHP installation
         run: |
@@ -37,12 +40,12 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-suggest --no-progress -o
+        run: composer install --prefer-dist -o
 
   unit-tests:
     needs:
       - validate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: Unit tests
     services:
       mongodb:
@@ -51,10 +54,13 @@ jobs:
           - 27017:27017
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: imagick
 
-      - name: Install system packages
-        run: sudo apt-get install php-imagick
+      - uses: actions/checkout@v2
 
       - name: Get Composer Cache Directory
         id: composer-cache-dir
@@ -71,7 +77,7 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-suggest --no-progress -o
+        run: composer install --prefer-dist -o
 
       - name: Run unit tests using PHPUnit
         run: composer run test:phpunit
@@ -79,7 +85,7 @@ jobs:
   integration-tests-mongodb-gridfs:
     needs:
       - validate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: Integration tests (MongoDB / GridFS)
     services:
       mongodb:
@@ -88,10 +94,13 @@ jobs:
           - 27017:27017
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: imagick
 
-      - name: Install system packages
-        run: sudo apt-get install php-imagick
+      - uses: actions/checkout@v2
 
       - name: Get Composer Cache Directory
         id: composer-cache-dir
@@ -108,7 +117,7 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-suggest --no-progress -o
+        run: composer install --prefer-dist -o
 
       - name: Start PHP web server
         run: composer run dev --timeout=0 &
@@ -124,7 +133,7 @@ jobs:
   integration-tests-mongodb-filesystem:
     needs:
       - validate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: Integration tests (MongoDB / Filesystem)
     services:
       mongodb:
@@ -133,10 +142,13 @@ jobs:
           - 27017:27017
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: imagick
 
-      - name: Install system packages
-        run: sudo apt-get install php-imagick
+      - uses: actions/checkout@v2
 
       - name: Get Composer Cache Directory
         id: composer-cache-dir
@@ -153,7 +165,7 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-suggest --no-progress -o
+        run: composer install --prefer-dist -o
 
       - name: Start PHP web server
         run: composer run dev --timeout=0 &
@@ -169,7 +181,7 @@ jobs:
   integration-tests-doctrine-sqlite-filesystem:
     needs:
       - validate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: Integration tests (SQLite / Filesystem)
     services:
       mongodb:
@@ -178,10 +190,13 @@ jobs:
           - 27017:27017
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: imagick
 
-      - name: Install system packages
-        run: sudo apt-get install php-imagick
+      - uses: actions/checkout@v2
 
       - name: Get Composer Cache Directory
         id: composer-cache-dir
@@ -198,7 +213,7 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-suggest --no-progress -o
+        run: composer install --prefer-dist -o
 
       - name: Start PHP web server
         run: composer run dev --timeout=0 &
@@ -214,7 +229,7 @@ jobs:
   integration-tests-doctrine-mysql-filesystem:
     needs:
       - validate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: Integration tests (MySQL / Filesystem)
     services:
       mongodb:
@@ -233,10 +248,13 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: imagick
 
-      - name: Install system packages
-        run: sudo apt-get install php-imagick
+      - uses: actions/checkout@v2
 
       - name: Get Composer Cache Directory
         id: composer-cache-dir
@@ -253,7 +271,7 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-suggest --no-progress -o
+        run: composer install --prefer-dist -o
 
       - name: Start PHP web server
         run: composer run dev --timeout=0 &

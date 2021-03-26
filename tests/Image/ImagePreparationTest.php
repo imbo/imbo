@@ -120,8 +120,6 @@ class ImagePreparationTest extends TestCase {
      * @covers ::prepareImage
      */
     public function testThrowsExceptionWhenImageIsSlightlyBroken() : void {
-        $this->markTestSkipped('Test causes seg fault');
-
         $filePath = FIXTURES_DIR . '/slightly-broken-image.png';
 
         $this->inputLoaderManager
