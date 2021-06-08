@@ -28,6 +28,20 @@ Imbo access control - ``accessControl``
 
 Imbo catalogs stored images under a ``user``. To add an image to a given user, you need a public and private key pair. This pair is used to sign requests to Imbo's API and ensures that the API can't be accessed without knowing the private key.
 
+====================================================
+On users and keys
+====================================================
+A little note on terminology: in Imbo a "user" is not a person or function, it's more like a section of a newspaper or a brand in a publishing house. A paper section might be "sports", "politics", "tech" or "business".  These might make sense to use as users in Imbo.  A "public key" in Imbo identifies a entity using Imbo: a person or or a automatisc process/software. In other software this entity would be called a "user".  Each public key is associated with a private key which is akin to a password.  As you shall se it's never used as a password, it's used to create hashes (HMACs) to sign requests that authenticates API calls in Imbo.
+
+Due to the legacy of Imbo the public key and the user name might be identical, but in version 2 of Imbo it need not be.
+
+In other words the private and public keys in Imbo are not the same as used in SSH, gpg and other applications using public/private keys cryptography.
+
+You might give a keypair to a person, and equally well you might give keypairs to s publishing suite, a management tool, or a piece of frontend software just getting images from Imbo. And so on.  The publishing suite can then (given the right ACLs) publish images into differnet user spaces (sections) using just one public/private key pair and does not need different authentication for each user space.
+
+ACLs in Imbo are associated with the public key and can give various access to different users (sections) and resources.
+====================================================
+
 Multiple public keys can be given access to a user, and you can also configure a public key to have access to several users. It's important to note that a ``user`` doesn't have to be created in any way - as long as a public key is defined to have access to a given user, you're ready to start adding images.
 
 Public keys can be configured to have varying degrees of access. For instance, you might want one public key for write operations (such as adding and deleting images) and a different public key for read operations (such as viewing images and applying transformations to them). Access is defined on a ``resource`` basis - which basically translates to an API endpoint and an HTTP method. To retrieve an image, for instance, you would give access to the ``image.get`` resource.
