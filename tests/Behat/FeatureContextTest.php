@@ -51,7 +51,7 @@ class FeatureContextTest extends TestCase {
         $this->cacheUtil = $this->createMock(CacheUtil::class);
 
         $this->context = new FeatureContext($this->cacheUtil);
-        $this->context->setClient($this->client);
+        $this->context->setClient($this->client, $this->baseUri);
     }
 
     /**
@@ -83,11 +83,11 @@ class FeatureContextTest extends TestCase {
             )
             ->willReturnOnConsecutiveCalls(
                 $handlerStack,
-                'http://localhost:8080',
+                $this->baseUri,
             );
 
         $context = new FeatureContext();
-        $this->assertSame($context, $context->setClient($client));
+        $this->assertSame($context, $context->setClient($client, $this->baseUri));
     }
 
     /**
