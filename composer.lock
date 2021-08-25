@@ -2355,12 +2355,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-filesystem-adapters.git",
-                "reference": "bd036dbb058f4cf7d3641100dcf18631f37a6b25"
+                "reference": "eaadb734218695ef05251d2bb4a5a5e993bea23c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-filesystem-adapters/zipball/bd036dbb058f4cf7d3641100dcf18631f37a6b25",
-                "reference": "bd036dbb058f4cf7d3641100dcf18631f37a6b25",
+                "url": "https://api.github.com/repos/imbo/imbo-filesystem-adapters/zipball/eaadb734218695ef05251d2bb4a5a5e993bea23c",
+                "reference": "eaadb734218695ef05251d2bb4a5a5e993bea23c",
                 "shasum": ""
             },
             "require": {
@@ -2370,18 +2370,16 @@
                 "christeredvartsen/testfs": "^0.3",
                 "imbo/imbo": "dev-develop",
                 "imbo/imbo-adapters-sdk": "dev-main",
-                "phpstan/extension-installer": "^1.0",
-                "phpstan/phpstan": "^0.12",
-                "phpstan/phpstan-phpunit": "^0.12",
+                "imbo/imbo-coding-standard": "^2.0",
                 "phpunit/phpunit": "^9.3",
-                "psalm/plugin-phpunit": "^0.13.0",
+                "psalm/plugin-phpunit": "^0.16.1",
                 "vimeo/psalm": "^4.1"
             },
             "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Imbo\\Storage\\": "src/"
+                    "Imbo\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -2408,7 +2406,7 @@
                 "issues": "https://github.com/imbo/imbo-filesystem-adapters/issues",
                 "source": "https://github.com/imbo/imbo-filesystem-adapters/tree/main"
             },
-            "time": "2020-11-15T13:27:42+00:00"
+            "time": "2021-08-25T21:31:11+00:00"
         },
         {
             "name": "micheh/psr7-cache",
