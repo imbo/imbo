@@ -207,7 +207,7 @@ class FeatureContext extends ApiContext {
      *
      * @throws RuntimeException
      */
-    public function setClient(ClientInterface $client) {
+    public function setClient(ClientInterface $client, string $baseUri) {
         $handler = $client->getConfig('handler');
         $handler->push(Middleware::history($this->history), self::MIDDLEWARE_HISTORY);
         $handler->push(Middleware::mapRequest(function (RequestInterface $request) {
@@ -218,7 +218,7 @@ class FeatureContext extends ApiContext {
                 ->withHeader('X-Behat-Storage-Test-Config', urlencode(json_encode(self::$storageTestConfig)));
         }), self::MIDDLEWARE_BEHAT_CONTEXT_CLASS);
 
-        return parent::setClient($client);
+        return parent::setClient($client, $baseUri);
     }
 
     /**
