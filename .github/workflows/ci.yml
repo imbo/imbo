@@ -7,8 +7,15 @@ jobs:
       matrix:
         operating-system: ['ubuntu-20.04']
         php-versions: ['7.4']
+        mongodb-versions: ['5.0.2']
 
     runs-on: ${{ matrix.operating-system }}
+
+    services:
+      mongodb:
+        image: mongo:${{ matrix.mongodb-versions }}
+        ports:
+          - 27017:27017
 
     steps:
       - name: Setup PHP
