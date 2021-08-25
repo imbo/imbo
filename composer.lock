@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1361a7976e623d5964726221dc00cdd0",
+    "content-hash": "073872c8185c91846865d299e9f563f3",
     "packages": [
         {
             "name": "guzzlehttp/psr7",
@@ -2407,6 +2407,66 @@
                 "source": "https://github.com/imbo/imbo-filesystem-adapters/tree/main"
             },
             "time": "2021-08-25T21:31:11+00:00"
+        },
+        {
+            "name": "imbo/imbo-mongodb-adapters",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/imbo/imbo-mongodb-adapters.git",
+                "reference": "3a5a91968ebab7d4ca30c66a613d380862211dda"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/imbo/imbo-mongodb-adapters/zipball/3a5a91968ebab7d4ca30c66a613d380862211dda",
+                "reference": "3a5a91968ebab7d4ca30c66a613d380862211dda",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mongodb": "^1.10",
+                "mongodb/mongodb": "^1.6",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "imbo/imbo": "dev-develop",
+                "imbo/imbo-adapters-sdk": "dev-main",
+                "imbo/imbo-coding-standard": "^2.0",
+                "phpunit/phpunit": "^9.3",
+                "psalm/plugin-phpunit": "^0.16.1",
+                "vimeo/psalm": "^4.9"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Imbo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christer Edvartsen",
+                    "email": "cogo@starzinger.net",
+                    "homepage": "https://github.com/christeredvartsen"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/imbo"
+                }
+            ],
+            "description": "MongoDB adapters for Imbo",
+            "homepage": "https://imbo.io/",
+            "keywords": [
+                "imbo"
+            ],
+            "support": {
+                "issues": "https://github.com/imbo/imbo-mongodb-adapters/issues",
+                "source": "https://github.com/imbo/imbo-mongodb-adapters/tree/main"
+            },
+            "time": "2021-08-25T19:07:19+00:00"
         },
         {
             "name": "micheh/psr7-cache",
@@ -5225,7 +5285,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "imbo/imbo-filesystem-adapters": 20
+        "imbo/imbo-filesystem-adapters": 20,
+        "imbo/imbo-mongodb-adapters": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

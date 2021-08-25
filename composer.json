@@ -2,7 +2,11 @@
   "name": "imbo/imbo",
   "type": "project",
   "description": "RESTful image server that handles image storage/transformations and metadata",
-  "keywords": [ "image storage", "image transformation", "image metadata" ],
+  "keywords": [
+    "image storage",
+    "image transformation",
+    "image metadata"
+  ],
   "homepage": "http://imbo.io/",
   "license": "MIT",
   "authors": [
@@ -11,7 +15,8 @@
       "email": "cogo@starzinger.net",
       "role": "Project lead",
       "homepage": "https://github.com/christeredvartsen"
-    }, {
+    },
+    {
       "name": "Contributors",
       "homepage": "https://github.com/imbo/imbo/graphs/contributors"
     }
@@ -25,20 +30,21 @@
   "require": {
     "php": ">=7.4",
     "ext-imagick": "^3.4",
-    "symfony/http-foundation": "^4.3",
-    "symfony/console": "^5.1",
+    "guzzlehttp/psr7": "^1.6",
     "ramsey/uuid": "^3.9",
-    "guzzlehttp/psr7": "^1.6"
+    "symfony/console": "^5.1",
+    "symfony/http-foundation": "^4.3"
   },
   "require-dev": {
     "ext-mongodb": "^1.6",
-    "phpunit/phpunit": "^9.2",
-    "mongodb/mongodb": "^1.6",
-    "imbo/behat-api-extension": "^2.2",
-    "doctrine/dbal": "^2.10",
-    "micheh/psr7-cache": "^0.5",
     "christeredvartsen/testfs": "^0.3.0",
-    "imbo/imbo-filesystem-adapters": "dev-main"
+    "doctrine/dbal": "^2.10",
+    "imbo/behat-api-extension": "^2.2",
+    "imbo/imbo-filesystem-adapters": "dev-main",
+    "imbo/imbo-mongodb-adapters": "dev-main",
+    "micheh/psr7-cache": "^0.5",
+    "mongodb/mongodb": "^1.6",
+    "phpunit/phpunit": "^9.2"
   },
   "suggest": {
     "ext-mongodb": "Enables usage of MongoDB and GridFS as database and image storage. version: ^1.6",
@@ -104,5 +110,8 @@
       "mkdir -p build/logs",
       "php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &"
     ]
+  },
+  "config": {
+    "sort-packages": true
   }
 }
