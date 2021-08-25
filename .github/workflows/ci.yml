@@ -5,20 +5,20 @@ jobs:
     name: Unit tests
     strategy:
       matrix:
-        operating-system: ['ubuntu-20.04']
-        php-versions: ['7.4']
-        mongodb-versions: ['5.0.2']
+        os: [ubuntu-20.04]
+        php: [7.4]
         experimental: [false]
         include:
-          - php-versions: '8.0'
+          - os: ubuntu-20.04
+            php: 8.0
             experimental: true
 
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
 
     services:
       mongodb:
-        image: mongo:${{ matrix.mongodb-versions }}
+        image: mongo:5.0.2
         ports:
           - 27017:27017
 
@@ -26,7 +26,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: ${{ matrix.php }}
           extensions: imagick
 
       - uses: actions/checkout@v2
