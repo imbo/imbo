@@ -1212,6 +1212,42 @@ class FeatureContext extends ApiContext {
     }
 
     /**
+     * Assert the hex value of a given coordinate in the image found in the current response has an approximate color
+     *
+     * @param string $coordinates X and Y coordinates, separated by a comma
+     * @param string $color Hex color value
+     * @return self
+     *
+     * @Then the pixel at coordinate :coordinates has an approximate color of :color
+     */
+    public function assertApproximateImagePixelColor($coordinates, $color) {
+        $this->requireResponse();
+
+        $expected = $this->hexToRgb($color);
+        $actual = $this->hexToRgb($this->getImagePixelInfo($coordinates)['color']);
+
+        foreach (['r' => 'red', 'g' => 'green', 'b' => 'blue'] as $component => $componentName) {
+            $lower = $expected[$component] - 2;
+            $upper = $expected[$component] + 2;
+
+            Assertion::between(
+                $actual[$component],
+                $lower,
+                $upper,
+                sprintf(
+                    'Color approximation failed for %s color, expected "%d - %d", got "%s".',
+                    $componentName,
+                    $lower,
+                    $upper,
+                    $actual[$component],
+                )
+            );
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert the alpha value of a given coordinate in the image found in the current response
      *
      * @param string $coordinates X and Y coordinates, separated by a comma
@@ -1900,5 +1936,21 @@ class FeatureContext extends ApiContext {
                 );
             }
         }
+    }
+
+    /**
+     * Convert a hex value to RGB
+     *
+     * @param string $hex
+     * @return array{r: int, g: int, b: int}
+     */
+    private function hexToRgb(string $hex): array {
+        $hex = ltrim(strtolower($hex), '#');
+
+        return [
+            'r' => hexdec(substr($hex, 0, 2)),
+            'g' => hexdec(substr($hex, 2, 2)),
+            'b' => hexdec(substr($hex, 4, 4)),
+        ];
     }
 }

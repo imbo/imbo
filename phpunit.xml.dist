@@ -13,7 +13,7 @@
   <coverage processUncoveredFiles="true">
     <include>
       <directory suffix=".php">src</directory>
-      <directory>tests/behat/features/bootstrap</directory>
+      <file>features/bootstrap/FeatureContext.php</file>
     </include>
   </coverage>
 

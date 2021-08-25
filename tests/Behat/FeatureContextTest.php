@@ -2773,4 +2773,42 @@ class FeatureContextTest extends TestCase {
             $this->createMock(ScenarioInterface::class)
         ));
     }
+
+    /**
+     * @testWith ["22,22", "#333333", "Color approximation failed for red color, expected \"49 - 53\", got \"255\"."]
+     *           ["22,22", "#ff3333", "Color approximation failed for green color, expected \"49 - 53\", got \"0\"."]
+     *           ["22,22", "#ff0033", "Color approximation failed for blue color, expected \"49 - 53\", got \"255\"."]
+     * @covers ::assertApproximateImagePixelColor
+     */
+    public function testAssertApproximatePixelColorCanFail(string $coordinates, string $color, string $exceptionMessage): void {
+        $this->mockHandler->append(
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/colors.png'))
+        );
+
+        $this->context->requestPath('/path');
+        $this->expectException(Assert\InvalidArgumentException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+        $this->context->assertApproximateImagePixelColor($coordinates, $color);
+    }
+
+    /**
+     * @testWith ["35,35", "#008000"]
+     *           ["35,35", "#008100"]
+     *           ["35,35", "#008200"]
+     *           ["35,35", "#008300"]
+     * @covers ::assertApproximateImagePixelColor
+     * @covers ::hexToRgb
+     */
+    public function testAssertApproximatePixelColor(string $coordinates, string $color): void {
+        $this->mockHandler->append(
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/colors.png'))
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->assertApproximateImagePixelColor($coordinates, $color),
+        );
+    }
 }
