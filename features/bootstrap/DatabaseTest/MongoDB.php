@@ -37,8 +37,6 @@ class MongoDB implements AdapterTest {
     }
 
     static public function getAdapter(array $config) : Database {
-        return new Database([
-            'databaseName' => $config['databaseName'],
-        ]);
+        return new Database($config['databaseName']);
     }
 }

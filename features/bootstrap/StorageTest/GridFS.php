@@ -37,8 +37,6 @@ class GridFS implements AdapterTest {
     }
 
     static public function getAdapter(array $config) : Storage {
-        return new Storage([
-            'databaseName' => $config['databaseName'],
-        ]);
+        return new Storage($config['databaseName']);
     }
 }
