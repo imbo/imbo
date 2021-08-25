@@ -18,8 +18,7 @@ return [
                     'params'  => ['databaseName' => 'imbo_testing'],
                 ],
                 'storage' => [
-                    'adapter' => GridFS::class,
-                    'params'  => ['databaseName' => 'imbo_testing'],
+                    'adapter' => fn() => new GridFS('imbo_testing'),
                 ],
                 'widths'    => [320],
                 'minWidth'  => 100,
