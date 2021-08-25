@@ -1,63 +1,20 @@
 name: CI build
 on: push
 jobs:
-  validate:
-    runs-on: ubuntu-20.04
-    name: Validate Composer files and lint code
-    steps:
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '7.4'
-          extensions: imagick
-
-      - uses: actions/checkout@v2
-
-      - name: Debug PHP installation
-        run: |
-            php -v
-            php -i
-            php -m
-
-      - name: Validate composer files
-        run: composer validate --strict
-
-      - name: Lint all PHP files
-        run: composer run lint
-
-      - name: Get Composer Cache Directory
-        id: composer-cache-dir
-        run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
-
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composer-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
-
-      - name: Install dependencies
-        run: composer install --prefer-dist -o
-
   unit-tests:
-    needs:
-      - validate
-    runs-on: ubuntu-20.04
     name: Unit tests
-    services:
-      mongodb:
-        image: mongo:4.2.8
-        ports:
-          - 27017:27017
+    strategy:
+      matrix:
+        operating-system: ['ubuntu-20.04']
+        php-versions: ['7.4']
+
+    runs-on: ${{ matrix.operating-system }}
 
     steps:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: ${{ matrix.php-versions }}
           extensions: imagick
 
       - uses: actions/checkout@v2
@@ -77,19 +34,24 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --prefer-dist -o
+        run: composer install
 
       - name: Run unit tests using PHPUnit
-        run: composer run test:phpunit
+        run: vendor/bin/phpunit --verbose
 
   integration-tests-mongodb-gridfs:
-    needs:
-      - validate
-    runs-on: ubuntu-20.04
     name: Integration tests (MongoDB / GridFS)
+    strategy:
+      matrix:
+        operating-system: ['ubuntu-20.04']
+        php-versions: ['7.4']
+        mongodb-versions: ['5.0.2']
+
+    runs-on: ${{ matrix.operating-system }}
+
     services:
       mongodb:
-        image: mongo:4.2.8
+        image: mongo:${{ matrix.mongodb-versions }}
         ports:
           - 27017:27017
 
@@ -97,7 +59,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: ${{ matrix.php-versions }}
           extensions: imagick
 
       - uses: actions/checkout@v2
@@ -117,13 +79,15 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --prefer-dist -o
+        run: composer install
 
       - name: Start PHP web server
-        run: composer run dev --timeout=0 &
+        run: |
+          mkdir -p build/logs
+          php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &
 
       - name: Run integration tests using Behat
-        run: composer run test:behat:mongodb-gridfs
+        run: vendor/bin/behat --strict --suite=mongodb-gridfs
 
       - uses: actions/upload-artifact@v2
         with:
@@ -131,13 +95,18 @@ jobs:
           path: build/logs
 
   integration-tests-mongodb-filesystem:
-    needs:
-      - validate
-    runs-on: ubuntu-20.04
     name: Integration tests (MongoDB / Filesystem)
+    strategy:
+      matrix:
+        operating-system: ['ubuntu-20.04']
+        php-versions: ['7.4']
+        mongodb-versions: ['5.0.2']
+
+    runs-on: ${{ matrix.operating-system }}
+
     services:
       mongodb:
-        image: mongo:4.2.8
+        image: mongo:${{ matrix.mongodb-versions }}
         ports:
           - 27017:27017
 
@@ -145,7 +114,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: ${{ matrix.php-versions }}
           extensions: imagick
 
       - uses: actions/checkout@v2
@@ -165,13 +134,15 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --prefer-dist -o
+        run: composer install
 
       - name: Start PHP web server
-        run: composer run dev --timeout=0 &
+        run: |
+          mkdir -p build/logs
+          php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &
 
       - name: Run integration tests using Behat
-        run: composer run test:behat:mongodb-filesystem
+        run: vendor/bin/behat --strict --suite=mongodb-filesystem
 
       - uses: actions/upload-artifact@v2
         with:
@@ -179,13 +150,18 @@ jobs:
           path: build/logs
 
   integration-tests-doctrine-sqlite-filesystem:
-    needs:
-      - validate
-    runs-on: ubuntu-20.04
     name: Integration tests (SQLite / Filesystem)
+    strategy:
+      matrix:
+        operating-system: ['ubuntu-20.04']
+        php-versions: ['7.4']
+        mongodb-versions: ['5.0.2']
+
+    runs-on: ${{ matrix.operating-system }}
+
     services:
       mongodb:
-        image: mongo:4.2.8
+        image: mongo:${{ matrix.mongodb-versions }}
         ports:
           - 27017:27017
 
@@ -193,7 +169,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: ${{ matrix.php-versions }}
           extensions: imagick
 
       - uses: actions/checkout@v2
@@ -213,13 +189,15 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --prefer-dist -o
+        run: composer install
 
       - name: Start PHP web server
-        run: composer run dev --timeout=0 &
+        run: |
+          mkdir -p build/logs
+          php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &
 
       - name: Run integration tests using Behat
-        run: composer run test:behat:doctrine-sqlite-filesystem
+        run: vendor/bin/behat --strict --suite=doctrine-sqlite-filesystem
 
       - uses: actions/upload-artifact@v2
         with:
@@ -227,17 +205,25 @@ jobs:
           path: build/logs
 
   integration-tests-doctrine-mysql-filesystem:
-    needs:
-      - validate
-    runs-on: ubuntu-20.04
     name: Integration tests (MySQL / Filesystem)
+
+    strategy:
+      matrix:
+        operating-system: ['ubuntu-20.04']
+        php-versions: ['7.4']
+        mongodb-versions: ['5.0.2']
+        mysql-versions: ['8.0.20']
+
+    runs-on: ${{ matrix.operating-system }}
+
     services:
       mongodb:
-        image: mongo:4.2.8
+        image: mongo:${{ matrix.mongodb-versions }}
         ports:
           - 27017:27017
+
       mysql:
-        image: mysql:8.0.20
+        image: mysql:${{ matrix.mysql-versions }}
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: imbo_test
@@ -251,7 +237,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: ${{ matrix.php-versions }}
           extensions: imagick
 
       - uses: actions/checkout@v2
@@ -271,10 +257,12 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --prefer-dist -o
+        run: composer install
 
       - name: Start PHP web server
-        run: composer run dev --timeout=0 &
+        run: |
+          mkdir -p build/logs
+          php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &
 
       - name: Update MySQL configuration for the Behat suite
         run: |
@@ -286,7 +274,7 @@ jobs:
           echo "================================="
 
       - name: Run integration tests using Behat
-        run: composer run test:behat:doctrine-mysql-filesystem
+        run: vendor/bin/behat --strict --suite=doctrine-mysql-filesystem
 
       - uses: actions/upload-artifact@v2
         with:
