@@ -48,8 +48,8 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
     public function getGroups(GroupQuery $query, GroupsModel $model): array {
         $model->setHits(count($this->groups));
 
-        $offset = ($query->page() - 1) * $query->limit();
-        return array_slice($this->groups, $offset, $query->limit(), true);
+        $offset = ($query->getPage() - 1) * $query->getLimit();
+        return array_slice($this->groups, $offset, $query->getLimit(), true);
     }
 
     public function groupExists(string $groupName): bool {

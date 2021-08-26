@@ -181,8 +181,8 @@ class ArrayAdapterTest extends TestCase {
                 ['g1' => [], 'g2' => [], 'g3' => [], 'g4' => [], 'g5' => []],
                 ['g3' => [], 'g4' => []],
                 (new GroupQuery())
-                    ->page(2)
-                    ->limit(2),
+                    ->setPage(2)
+                    ->setLimit(2),
             ],
         ];
     }

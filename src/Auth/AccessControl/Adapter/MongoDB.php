@@ -114,8 +114,8 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
     public function getGroups(GroupQuery $query, GroupsModel $model): array {
         $cursor = $this->getGroupsCollection()
             ->find([], [
-                'skip' => ($query->page() - 1) * $query->limit(),
-                'limit' => $query->limit(),
+                'skip' => ($query->getPage() - 1) * $query->getLimit(),
+                'limit' => $query->getLimit(),
             ]);
 
         $groups = [];

@@ -1,53 +1,28 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Auth\AccessControl;
 
 /**
  * Abstract query interface for access control
  */
 abstract class AbstractQuery {
-    /**
-     * Limit
-     *
-     * @var int
-     */
-    private $limit = 20;
+    private int $limit = 20;
+    private int $page = 1;
 
-    /**
-     * Page
-     *
-     * @var int
-     */
-    private $page = 1;
-
-    /**
-     * Set or get the limit
-     *
-     * @param int $limit The limit to set. Skip to get the current value
-     * @return self|int
-     */
-    public function limit($limit = null) {
-        if ($limit === null) {
-            return $this->limit;
-        }
-
-        $this->limit = (int) $limit;
-
+    public function setLimit(int $limit): self {
+        $this->limit = $limit;
         return $this;
     }
 
-    /**
-     * Set or get the page
-     *
-     * @param int $page The page to set. Skip to get the current value
-     * @return self|int
-     */
-    public function page($page = null) {
-        if ($page === null) {
-            return $this->page;
-        }
+    public function getLimit(): int {
+        return $this->limit;
+    }
 
-        $this->page = (int) $page;
-
+    public function setPage(int $page): self {
+        $this->page = $page;
         return $this;
+    }
+
+    public function getPage(): int {
+        return $this->page;
     }
 }

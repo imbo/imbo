@@ -14,20 +14,22 @@ class GroupQueryTest extends TestCase {
     }
 
     /**
-     * @covers ::limit
+     * @covers ::setLimit
+     * @covers ::getLimit
      */
     public function testSetAndGetLimit() : void {
-        $this->assertSame(20, $this->query->limit());
-        $this->assertSame($this->query, $this->query->limit(10));
-        $this->assertSame(10, $this->query->limit());
+        $this->assertSame(20, $this->query->getLimit());
+        $this->assertSame($this->query, $this->query->setLimit(10));
+        $this->assertSame(10, $this->query->getLimit());
     }
 
     /**
-     * @covers ::page
+     * @covers ::setPage
+     * @covers ::getPage
      */
     public function testSetAndGetPage() : void {
-        $this->assertSame(1, $this->query->page());
-        $this->assertSame($this->query, $this->query->page(2));
-        $this->assertSame(2, $this->query->page());
+        $this->assertSame(1, $this->query->getPage());
+        $this->assertSame($this->query, $this->query->setPage(2));
+        $this->assertSame(2, $this->query->getPage());
     }
 }
