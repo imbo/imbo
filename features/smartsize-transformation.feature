@@ -64,7 +64,6 @@ Feature: Imbo can crop images using smart size and POIs
         And the pixel at coordinate "125,125" has a color of "#00ff00"
         And the "X-Imbo-POIs-Used" response header is "1"
 
-    @test
     Scenario Outline: Smart size falls back to simple crop/resize when no POI data is found
         Given the request body is:
             """
