@@ -18,20 +18,13 @@ class SimpleArrayAdapter extends ArrayAdapter implements AdapterInterface {
     }
 
     /**
-     * Returns whether the access control list is empty or not
-     *
-     * @return boolean True if list is empty, false otherwise
-     */
-    public function isEmpty() {
-        return empty($this->accessList);
-    }
-
-    /**
      * Converts public => private key pairs into the array format accepted by ArrayAdapter
      *
      * @param array $accessList
+     * @throws InvalidArgumentException
+     * @return array
      */
-    public function getExpandedAclList(array $accessList) {
+    private function getExpandedAclList(array $accessList): array {
         $entries = [];
 
         foreach ($accessList as $publicKey => $privateKey) {

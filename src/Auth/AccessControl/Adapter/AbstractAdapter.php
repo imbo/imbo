@@ -25,21 +25,22 @@ abstract class AbstractAdapter implements AdapterInterface {
 
             // If a user is specified, ensure the public key has access to the user
             $userAccess = !$user || $acl['users'] === '*' || in_array($user, $acl['users']);
+
             if (!$userAccess) {
                 continue;
             }
 
             // Figure out which resources the public key has access to, based on group or
             // explicit definition
-            $resources = isset($acl['resources']) ? $acl['resources'] : [];
-            $group = isset($acl['group']) ? $acl['group'] : false;
+            $resources = $acl['resources'] ?? [];
+            $group = $acl['group'] ?? false;
 
             // If we the rule contains a group, get resource from it
             if ($group) {
                 $resources = $this->getGroup($group);
 
                 // If the group has not been defined, throw an exception to help debug the problem
-                if ($resources === false) {
+                if ($resources === null) {
                     throw new InvalidArgumentException('Group "' . $group . '" is not defined', 500);
                 }
             }
@@ -53,32 +54,20 @@ abstract class AbstractAdapter implements AdapterInterface {
     }
 
     public function getUsersForResource(string $publicKey, string $resource): array {
-        if (!$publicKey || !$resource) {
-            return [];
-        }
-
         $accessList = $this->getAccessListForPublicKey($publicKey);
+        $userLists = array_filter(array_map(fn($acl) => $acl['users'] ?? false, $accessList));
+        $users = array_merge(...$userLists);
 
-        // Get all user lists
-        $userLists = array_filter(array_map(function($acl) {
-            return isset($acl['users']) ? $acl['users'] : false;
-        }, $accessList));
-
-        // Merge user lists
-        $users = call_user_func_array('array_merge', $userLists);
-
-        // Check if public key has access to user with same name
         if ($this->hasAccess($publicKey, $resource, $publicKey)) {
             $userList[] = $publicKey;
         }
 
-        // Check for each user specified in acls
         foreach ($users as $user) {
             if ($this->hasAccess($publicKey, $resource, $user)) {
                 $userList[] = $user;
             }
         }
 
-        return $userList;
+        return array_values(array_unique($userList));
     }
 }

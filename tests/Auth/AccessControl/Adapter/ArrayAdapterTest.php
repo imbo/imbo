@@ -33,6 +33,14 @@ class ArrayAdapterTest extends TestCase {
                     'resources' => [Resource::IMAGES_GET],
                     'users' => ['user2', 'user3', '*'],
                 ]]
+            ],
+            [
+                'publicKey' => 'pubKey3',
+                'privateKey' => 'privateKey3',
+                'acl' => [[
+                    'resources' => [Resource::IMAGES_GET],
+                    'users' => ['user4', 'pubKey3'],
+                ]]
             ]
         ]);
 
@@ -42,8 +50,13 @@ class ArrayAdapterTest extends TestCase {
         );
 
         $this->assertEquals(
-            ['user1', 'user2'],
-            $accessControl->getUsersForResource('pubKey1', Resource::IMAGES_GET)
+            ['user2', 'user3', '*'],
+            $accessControl->getUsersForResource('pubKey2', Resource::IMAGES_GET)
+        );
+
+        $this->assertEquals(
+            ['pubKey3', 'user4'],
+            $accessControl->getUsersForResource('pubKey3', Resource::IMAGES_GET)
         );
     }
 
@@ -51,6 +64,7 @@ class ArrayAdapterTest extends TestCase {
      * @covers ::__construct
      * @covers ::validateAccessList
      * @covers ::getPrivateKey
+     * @covers ::getKeysFromAcl
      */
     public function testGetPrivateKey() : void {
         $accessControl = new ArrayAdapter([
@@ -296,5 +310,126 @@ class ArrayAdapterTest extends TestCase {
     public function testGetAccessRule(array $acl, string $publicKey, int $ruleId, ?array $rule) : void {
         $adapter = new ArrayAdapter($acl);
         $this->assertSame($rule, $adapter->getAccessRule($publicKey, $ruleId));
+    }
+
+    /**
+     * @testWith [[], "some-group", null]
+     *           [{"foo": {"some": "data"}, "some-group": {"other": "data"}}, "some-group", {"other": "data"}]
+     * @covers ::getGroup
+     */
+    public function testCanGetGroup(array $groups, string $group, $result): void {
+        $adapter = new ArrayAdapter([], $groups);
+        $this->assertSame($result, $adapter->getGroup($group));
+    }
+
+    public function getDataForAccessListTest(): array {
+        return [
+            'no acls' => [
+                'acl' => [],
+                'publicKey' => 'some-public-key',
+                'result' => [],
+            ],
+            'no matching keys' => [
+                'acl' => [
+                    [
+                        'publicKey' => 'key',
+                        'privateKey' => 'private1',
+                        'acl' => [[
+                            'foo' => 'bar',
+                        ]],
+                    ],
+                    [
+                        'publicKey' => 'other-key',
+                        'privateKey' => 'private2',
+                        'acl' => [[
+                            'foo' => 'bar',
+                        ]],
+                    ],
+
+                ],
+                'publicKey' => 'some-public-key',
+                'result' => [],
+            ],
+            'match' => [
+                'acl' => [
+                    [
+                        'publicKey' => 'key',
+                        'privateKey' => 'private1',
+                        'acl' => [[
+                            'foo' => 'bar',
+                        ]],
+                    ],
+                    [
+                        'publicKey' => 'other-key',
+                        'privateKey' => 'private2',
+                        'acl' => [[
+                            'foo' => 'bar',
+                        ]],
+                    ],
+
+                ],
+                'publicKey' => 'other-key',
+                'result' => [[
+                    'id' => 1,
+                    'foo' => 'bar',
+                ]],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getDataForAccessListTest
+     * @covers ::getAccessListForPublicKey
+     */
+    public function testCanGetAccessListForPublicKey(array $acl, string $publicKey, array $result): void {
+        $adapter = new ArrayAdapter($acl, []);
+        $this->assertSame($result, $adapter->getAccessListForPublicKey($publicKey));
+    }
+
+    /**
+     * @covers ::hasAccess
+     */
+    public function testThrowsExceptionWhenMissingUsersFromAcl(): void {
+        $adapter = new ArrayAdapter([[
+            'publicKey' => 'public-key',
+            'privateKey' => 'some-private-key',
+            'acl' => [
+                ['foo' => 'bar']
+            ],
+        ]]);
+
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Missing property "users" in access rule',
+            500,
+        ));
+
+        $adapter->hasAccess('public-key', 'resource');
+    }
+
+    /**
+     * @covers ::hasAccess
+     */
+    public function testThrowsExceptionWhenGroupIsNotDefined(): void {
+        $acl = [
+            [
+                'publicKey'  => 'pubkey',
+                'privateKey' => 'privkey',
+                'acl' => [
+                    [
+                        'group' => 'user-stats',
+                        'users' => ['user1']
+                    ]
+                ]
+            ]
+        ];
+
+        $adapter = new ArrayAdapter($acl, []);
+
+        $this->expectExceptionObject(new InvalidArgumentException(
+            'Group "user-stats" is not defined',
+            500,
+        ));
+
+        $this->assertFalse($adapter->hasAccess('pubkey', Resource::IMAGES_GET, 'user1'));
     }
 }

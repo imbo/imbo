@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 namespace Imbo\Auth\AccessControl\Adapter;
 
-use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
 use Imbo\Resource;
 use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -24,17 +23,8 @@ class SimpleArrayAdapterTest extends TestCase {
     }
 
     /**
-     * @dataProvider getAuthConfig
-     * @covers ::getPrivateKey
-     */
-    public function testCanSetKeys(array $users, string $publicKey, ?string $privateKey) : void {
-        $accessControl = new SimpleArrayAdapter($users);
-
-        $this->assertSame($privateKey, $accessControl->getPrivateKey($publicKey));
-    }
-
-    /**
      * @covers ::__construct
+     * @covers ::getExpandedAclList
      */
     public function testThrowsOnMultiplePrivateKeysPerPublicKey() : void {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -47,7 +37,8 @@ class SimpleArrayAdapterTest extends TestCase {
     }
 
     /**
-     * @covers ::hasAccess
+     * @covers ::__construct
+     * @covers ::getExpandedAclList
      */
     public function testLegacyConfigKeysHaveWriteAccess() : void {
         $accessControl = new SimpleArrayAdapter([
@@ -61,24 +52,5 @@ class SimpleArrayAdapterTest extends TestCase {
                 'publicKey'
             )
         );
-    }
-
-    /**
-     * @covers ::__construct
-     */
-    public function testExtendsArrayAdapter() : void {
-        $accessControl = new SimpleArrayAdapter(['publicKey' => 'key']);
-        $this->assertTrue($accessControl instanceof ArrayAdapter);
-    }
-
-    /**
-     * @covers ::isEmpty
-     */
-    public function testIsEmpty() : void {
-        $accessControl = new SimpleArrayAdapter();
-        $this->assertTrue($accessControl->isEmpty());
-
-        $accessControl = new SimpleArrayAdapter(['foo' => 'bar']);
-        $this->assertFalse($accessControl->isEmpty());
     }
 }
