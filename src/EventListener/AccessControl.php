@@ -154,11 +154,11 @@ class AccessControl implements ListenerInterface {
         $params = $event->getRequest()->query;
 
         if ($params->has('page')) {
-            $query->page($params->get('page'));
+            $query->setPage($params->get('page'));
         }
 
         if ($params->has('limit')) {
-            $query->limit($params->get('limit'));
+            $query->setLimit($params->get('limit'));
         }
 
         $response = $event->getResponse();
@@ -166,8 +166,8 @@ class AccessControl implements ListenerInterface {
 
         // Create the model and set some pagination values
         $model = new GroupsModel();
-        $model->setLimit($query->limit())
-              ->setPage($query->page());
+        $model->setLimit($query->getLimit())
+              ->setPage($query->getPage());
 
         $groups = $aclAdapter->getGroups($query, $model);
         $modelGroups = [];
