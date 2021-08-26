@@ -164,7 +164,7 @@ class ResponseFormatter implements ListenerInterface {
             }
 
             $formatter = $supportedTypes[$mime];
-        } else {
+        } else if (null !== $model) {
             // Set Vary to Accept since we are doing content negotiation based on Accept
             $response->setVary('Accept', false);
 
