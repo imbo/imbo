@@ -152,24 +152,23 @@ class ArrayAdapterTest extends TestCase {
     }
 
     public function getGroupsData() : array {
-        $query = new GroupQuery();
-        $query
-            ->page(2)
-            ->limit(2);
-
         return [
             'no groups' => [
                 [],
                 [],
+                new GroupQuery(),
             ],
             'some groups' => [
                 ['g1' => [], 'g2' => [], 'g3' => []],
                 ['g1' => [], 'g2' => [], 'g3' => []],
+                new GroupQuery(),
             ],
             'groups with query object' => [
                 ['g1' => [], 'g2' => [], 'g3' => [], 'g4' => [], 'g5' => []],
                 ['g3' => [], 'g4' => []],
-                $query
+                (new GroupQuery())
+                    ->page(2)
+                    ->limit(2),
             ],
         ];
     }
@@ -178,7 +177,7 @@ class ArrayAdapterTest extends TestCase {
      * @dataProvider getGroupsData
      * @covers ::getGroups
      */
-    public function testCanGetGroups(array $groups, array $result, ?GroupQuery $query = null) : void {
+    public function testCanGetGroups(array $groups, array $result, GroupQuery $query) : void {
         $numGroups = count($groups);
 
         $model = $this->createMock(Groups::class);

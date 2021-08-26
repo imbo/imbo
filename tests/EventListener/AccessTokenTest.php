@@ -65,6 +65,10 @@ class AccessTokenTest extends ListenerTests {
             ->method('getRawUri')
             ->willReturn('someuri');
 
+        $this->request
+            ->method('getPublicKey')
+            ->willReturn('some-key');
+
         $this->expectExceptionObject(new RuntimeException('Incorrect access token', 400));
         $this->listener->checkAccessToken($this->event);
     }
@@ -276,6 +280,11 @@ class AccessTokenTest extends ListenerTests {
             ->method('getUriAsIs')
             ->willReturn($url);
 
+        $this->request
+            ->expects($this->atLeastOnce())
+            ->method('getPublicKey')
+            ->willReturn('some-key');
+
         $this->accessControl
             ->expects($this->once())
             ->method('getPrivateKey')
@@ -332,6 +341,7 @@ class AccessTokenTest extends ListenerTests {
                 $request = $this->createConfiguredMock(Request::class, [
                     'getRawUri' => urldecode($url),
                     'getUriAsIs' => $url,
+                    'getPublicKey' => 'some-key',
                 ]);
                 $request->query = $query;
 
@@ -387,6 +397,11 @@ class AccessTokenTest extends ListenerTests {
             ->expects($this->atLeastOnce())
             ->method('getUriAsIs')
             ->willReturn($url);
+
+        $this->request
+            ->expects($this->atLeastOnce())
+            ->method('getPublicKey')
+            ->willReturn('some-key');
 
         $this->accessControl
             ->expects($this->once())
@@ -483,6 +498,11 @@ class AccessTokenTest extends ListenerTests {
             ->expects($this->atLeastOnce())
             ->method('getUriAsIs')
             ->willReturn($url);
+
+        $this->request
+            ->expects($this->atLeastOnce())
+            ->method('getPublicKey')
+            ->willReturn('some-key');
 
         $this->accessControl
             ->expects($this->once())
@@ -590,6 +610,10 @@ class AccessTokenTest extends ListenerTests {
         $this->request
             ->method('getUriAsIs')
             ->willReturn($url);
+
+        $this->request
+            ->method('getPublicKey')
+            ->willReturn('some-key');
 
         $this->accessControl
             ->method('getPrivateKey')

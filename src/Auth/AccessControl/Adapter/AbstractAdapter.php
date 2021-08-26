@@ -10,25 +10,11 @@ use Imbo\Model\Groups as GroupsModel;
  * Abstract access control adapter
  */
 abstract class AbstractAdapter implements AdapterInterface {
-    /**
-     * {@inheritdoc}
-     */
-    abstract public function getGroups(GroupQuery $query = null, GroupsModel $model);
+    abstract public function getGroups(GroupQuery $query, GroupsModel $model): array;
+    abstract public function groupExists(string $groupName): bool;
+    abstract public function getGroup(string $groupName): ?array;
 
-    /**
-     * {@inheritdoc}
-     */
-    abstract public function groupExists($groupName);
-
-    /**
-     * {@inheritdoc}
-     */
-    abstract public function getGroup($groupName);
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasAccess($publicKey, $resource, $user = null) {
+    public function hasAccess(string $publicKey, string $resource, string $user = null): bool {
         $accessList = $this->getAccessListForPublicKey($publicKey) ?: [];
 
         foreach ($accessList as $acl) {
@@ -66,10 +52,7 @@ abstract class AbstractAdapter implements AdapterInterface {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getUsersForResource($publicKey, $resource) {
+    public function getUsersForResource(string $publicKey, string $resource): array {
         if (!$publicKey || !$resource) {
             return [];
         }

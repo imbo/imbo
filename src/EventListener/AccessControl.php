@@ -111,7 +111,7 @@ class AccessControl implements ListenerInterface {
         $publicKey = $request->getPublicKey();
         $user = $request->getUser();
 
-        $hasAccess = $aclAdapter->hasAccess($publicKey, $resource, $user);
+        $hasAccess = $aclAdapter->hasAccess((string) $publicKey, $resource, $user);
 
         if ($hasAccess) {
             return;

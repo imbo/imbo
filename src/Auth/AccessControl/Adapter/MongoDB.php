@@ -111,14 +111,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
         $this->bsonToArray = $bsonToArray;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getGroups(GroupQuery $query = null, GroupsModel $model) {
-        if ($query === null) {
-            $query = new GroupQuery();
-        }
-
+    public function getGroups(GroupQuery $query, GroupsModel $model): array {
         $cursor = $this->getGroupsCollection()
             ->find([], [
                 'skip' => ($query->page() - 1) * $query->limit(),
@@ -140,19 +133,13 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
         return $groups;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function groupExists($groupName) {
+    public function groupExists(string $groupName): bool {
         return (boolean) $this->getGroupsCollection()->findOne([
             'name' => $groupName
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getGroup($groupName) {
+    public function getGroup(string $groupName): ?array {
         if (isset($this->groups[$groupName])) {
             return $this->groups[$groupName];
         }
@@ -167,13 +154,10 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
             return $this->groups[$groupName];
         }
 
-        return false;
+        return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPrivateKey($publicKey) {
+    public function getPrivateKey(string $publicKey): ?string {
         $info = $this->getPublicKeyDetails($publicKey);
 
         if (!$info || !isset($info['privateKey'])) {
@@ -183,10 +167,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
         return $info['privateKey'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addKeyPair($publicKey, $privateKey) {
+    public function addKeyPair(string $publicKey, string $privateKey): bool {
         try {
             $result = $this->getAclCollection()->insertOne([
                 'publicKey' => $publicKey,
@@ -200,10 +181,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deletePublicKey($publicKey) {
+    public function deletePublicKey(string $publicKey): bool {
         try {
             $result = $this->getAclCollection()->deleteOne([
                 'publicKey' => $publicKey
@@ -217,10 +195,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function updatePrivateKey($publicKey, $privateKey) {
+    public function updatePrivateKey(string $publicKey, string $privateKey): bool {
         try {
             $result = $this->getAclCollection()->updateOne(
                 ['publicKey' => $publicKey],
@@ -235,10 +210,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAccessRule($publicKey, $accessId) {
+    public function getAccessRule(string $publicKey, $accessId): ?array {
         $rules = $this->getAccessListForPublicKey($publicKey) ?: [];
 
         foreach ($rules as $rule) {
@@ -250,10 +222,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addAccessRule($publicKey, array $accessRule) {
+    public function addAccessRule(string $publicKey, array $accessRule): string {
         try {
             $result = $this->getAclCollection()->updateOne(
                 ['publicKey' => $publicKey],
@@ -269,10 +238,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteAccessRule($publicKey, $accessId) {
+    public function deleteAccessRule(string $publicKey, string $accessId): bool {
         try {
             $result = $this->getAclCollection()->updateOne(
                 ['publicKey' => $publicKey],
@@ -291,10 +257,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addResourceGroup($groupName, array $resources = []) {
+    public function addResourceGroup(string $groupName, array $resources = []): bool {
         try {
             $this->getGroupsCollection()->insertOne([
                 'name' => $groupName,
@@ -307,10 +270,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function updateResourceGroup($groupName, array $resources) {
+    public function updateResourceGroup(string $groupName, array $resources): bool {
         try {
             $this->getGroupsCollection()->updateOne([
                 'name' => $groupName
@@ -320,15 +280,14 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
 
             // Remove from local cache
             unset($this->groups[$groupName]);
+
+            return true;
         } catch (MongoException $e) {
             throw new DatabaseException('Could not update resource group in database', 500, $e);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteResourceGroup($groupName) {
+    public function deleteResourceGroup(string $groupName): bool {
         try {
             $result = $this->getGroupsCollection()->deleteOne([
                 'name' => $groupName,
@@ -357,21 +316,15 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function publicKeyExists($publicKey) {
+    public function publicKeyExists(string $publicKey): bool {
         return (bool) $this->getPublicKeyDetails($publicKey);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAccessListForPublicKey($publicKey) {
+    public function getAccessListForPublicKey(string $publicKey): array {
         $info = $this->getPublicKeyDetails($publicKey);
 
         if (!$info || !isset($info['acl'])) {
-            return null;
+            return [];
         }
 
         return array_map(function($info) {
@@ -387,7 +340,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      * @param  string $publicKey
      * @return array
      */
-    private function getPublicKeyDetails($publicKey) {
+    private function getPublicKeyDetails(string $publicKey): array {
         if (isset($this->publicKeys[$publicKey])) {
             return $this->publicKeys[$publicKey];
         }
@@ -413,7 +366,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      *
      * @return MongoCollection
      */
-    private function getAclCollection() {
+    private function getAclCollection(): MongoCollection {
         if ($this->aclCollection === null) {
             try {
                 $this->aclCollection = $this->getMongoClient()->selectCollection(
@@ -433,7 +386,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      *
      * @return MongoCollection
      */
-    private function getGroupsCollection() {
+    private function getGroupsCollection(): MongoCollection {
         if ($this->aclGroupCollection === null) {
             try {
                 $this->aclGroupCollection = $this->getMongoClient()->selectCollection(
@@ -453,7 +406,7 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface {
      *
      * @return MongoClient
      */
-    private function getMongoClient() {
+    private function getMongoClient(): MongoClient {
         if ($this->mongoClient === null) {
             try {
                 $this->mongoClient = new MongoClient($this->params['server'], $this->params['options']);

@@ -45,38 +45,22 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
         $this->validateAccessList();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getGroups(GroupQuery $query = null, GroupsModel $model) {
-        if ($query === null) {
-            $query = new GroupQuery();
-        }
-
+    public function getGroups(GroupQuery $query, GroupsModel $model): array {
         $model->setHits(count($this->groups));
 
         $offset = ($query->page() - 1) * $query->limit();
         return array_slice($this->groups, $offset, $query->limit(), true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function groupExists($groupName) {
+    public function groupExists(string $groupName): bool {
         return isset($this->groups[$groupName]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getGroup($groupName) {
-        return isset($this->groups[$groupName]) ? $this->groups[$groupName] : false;
+    public function getGroup(string $groupName): ?array {
+        return isset($this->groups[$groupName]) ? $this->groups[$groupName] : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPrivateKey($publicKey) {
+    public function getPrivateKey(string $publicKey): ?string {
         if (isset($this->keys[$publicKey])) {
             return $this->keys[$publicKey];
         }
@@ -84,17 +68,11 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function publicKeyExists($publicKey) {
+    public function publicKeyExists(string $publicKey): bool {
         return isset($this->keys[$publicKey]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAccessListForPublicKey($publicKey) {
+    public function getAccessListForPublicKey(string $publicKey): array {
         $accessList = [];
 
         foreach ($this->accessList as $i => $access) {
@@ -112,10 +90,7 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface {
         return $accessList;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAccessRule($publicKey, $accessRuleId) {
+    public function getAccessRule(string $publicKey, $accessRuleId): ?array {
         foreach ($this->getAccessListForPublicKey($publicKey) as $rule) {
             if ($rule['id'] == $accessRuleId) {
                 return $rule;

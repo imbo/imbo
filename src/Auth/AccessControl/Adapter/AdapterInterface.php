@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Auth\AccessControl\Adapter;
 
 use Imbo\Auth\AccessControl\GroupQuery;
@@ -11,21 +11,21 @@ interface AdapterInterface {
     /**
      * Get a list of users the public key has access for on a given resource
      *
-     * @param  string $publicKey Public key to check access for
-     * @param  string $resource  Resource identifier (e.g. image.get, images.post)
-     * @return array             List of users the public key kan access the given resource for
+     * @param string $publicKey Public key to check access for
+     * @param string $resource  Resource identifier (e.g. image.get, images.post)
+     * @return array List of users the public key kan access the given resource for
      */
-    function getUsersForResource($publicKey, $resource);
+    function getUsersForResource(string $publicKey, string $resource): array;
 
     /**
      * Check if a given public key has access to a given resource
      *
-     * @param  string  $publicKey Public key to check access for
-     * @param  string  $resource  Resource identifier (e.g. image.get, images.post)
-     * @param  string  $user      Optional user which the resource belongs to
-     * @return boolean            True if public key has access, false otherwise
+     * @param string $publicKey Public key to check access for
+     * @param string $resource Resource identifier (e.g. image.get, images.post)
+     * @param string $user Optional user which the resource belongs to
+     * @return bool True if public key has access, false otherwise
      */
-    function hasAccess($publicKey, $resource, $user = null);
+    function hasAccess(string $publicKey, string $resource, string $user = null): bool;
 
     /**
      * Fetch a list of available resource groups
@@ -34,15 +34,15 @@ interface AdapterInterface {
      * @param GroupsModel $model Groups model to populate total number of hits with
      * @return array
      */
-    function getGroups(GroupQuery $query = null, GroupsModel $model);
+    function getGroups(GroupQuery $query, GroupsModel $model): array;
 
     /**
      * Check whether or not a group exists
      *
      * @param string $groupName Name of the group
-     * @return boolean
+     * @return bool
      */
-    function groupExists($groupName);
+    function groupExists(string $groupName): bool;
 
     /**
      * Fetch a resource group with the given name
@@ -50,38 +50,38 @@ interface AdapterInterface {
      * @param string $groupName Name of the group
      * @return array Array of resources the group consists of
      */
-    function getGroup($groupName);
+    function getGroup(string $groupName): ?array;
 
     /**
      * Return the private key for a given public key
      *
-     * @param  string $publicKey The public key to fetch matching private key for
-     * @return string Returns the private key for the public key
+     * @param string $publicKey The public key to fetch matching private key for
+     * @return ?string Returns the private key for the public key
      */
-    function getPrivateKey($publicKey);
+    function getPrivateKey(string $publicKey): ?string;
 
     /**
      * Get whether a public key exists or not
      *
      * @param string $publicKey Public key to check
-     * @return boolean
+     * @return bool
      */
-    function publicKeyExists($publicKey);
+    function publicKeyExists(string $publicKey): bool;
 
     /**
      * Get the access control list for a given public key
      *
-     * @param  string $publicKey
+     * @param string $publicKey
      * @return array
      */
-    function getAccessListForPublicKey($publicKey);
+    function getAccessListForPublicKey(string $publicKey): array;
 
     /**
      * Get an access rule by id
      *
-     * @param  string $publicKey    Public key to add access rule to
-     * @param  array  $accessRuleId Access rule id
+     * @param string $publicKey    Public key to add access rule to
+     * @param int|string $accessRuleId Access rule id
      * @return array Access rule
      */
-    function getAccessRule($publicKey, $accessRuleId);
+    function getAccessRule(string $publicKey, $accessRuleId): ?array;
 }

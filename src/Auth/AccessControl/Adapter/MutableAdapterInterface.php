@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Auth\AccessControl\Adapter;
 
 /**
@@ -10,68 +10,68 @@ interface MutableAdapterInterface extends AdapterInterface {
      *
      * @param string $publicKey  Public key to add
      * @param string $privateKey Corresponding private key
-     * @return boolean
+     * @return bool
      */
-    function addKeyPair($publicKey, $privateKey);
+    function addKeyPair(string $publicKey, string $privateKey): bool;
 
     /**
      * Delete a public key
      *
-     * @param  string $publicKey Public key to delete
-     * @return boolean
+     * @param string $publicKey Public key to delete
+     * @return bool
      */
-    function deletePublicKey($publicKey);
+    function deletePublicKey(string $publicKey): bool;
 
     /**
      * Update the private key for a public key
      *
      * @param string $publicKey Public key to update
      * @param string $privateKey Private key to set
-     * @return boolean
+     * @return bool
      */
-    function updatePrivateKey($publicKey, $privateKey);
+    function updatePrivateKey(string $publicKey, string $privateKey): bool;
 
     /**
      * Add a new access rule to the given public key
      *
-     * @param  string $publicKey  Public key to add access rule to
-     * @param  array  $accessRule Access rule definition
+     * @param string $publicKey  Public key to add access rule to
+     * @param array  $accessRule Access rule definition
      * @return string Returns a generated access ID
      */
-    function addAccessRule($publicKey, array $accessRule);
+    function addAccessRule(string $publicKey, array $accessRule): string;
 
     /**
      * Delete an access rule
      *
-     * @param  string $publicKey Public key the access rule belongs to
-     * @param  string $accessId  Access ID of the rule
-     * @return boolean
+     * @param string $publicKey Public key the access rule belongs to
+     * @param string $accessId  Access ID of the rule
+     * @return bool
      */
-    function deleteAccessRule($publicKey, $accessId);
+    function deleteAccessRule(string $publicKey, string $accessId): bool;
 
     /**
      * Add a new group containing the given resources
      *
      * @param string $groupName Group name
-     * @param array  $resources Array of resources (eg. 'image.get', 'user.head' etc)
-     * @return boolean
+     * @param array $resources Array of resources (eg. 'image.get', 'user.head' etc)
+     * @return bool
      */
-    function addResourceGroup($groupName, array $resources = []);
+    function addResourceGroup(string $groupName, array $resources = []): bool;
 
     /**
      * Update resources for an existing resource group
      *
      * @param string $groupName Group to add resources to
      * @param array $resources Array of resources (eg. 'image.get', 'user.head' etc)
-     * @param boolean
+     * @param bool
      */
-    function updateResourceGroup($groupName, array $resources);
+    function updateResourceGroup(string $groupName, array $resources): bool;
 
     /**
      * Delete a resource group
      *
-     * @param  string $groupName Group name of the group to delete
-     * @return boolean
+     * @param string $groupName Group name of the group to delete
+     * @return bool
      */
-    function deleteResourceGroup($groupName);
+    function deleteResourceGroup(string $groupName): bool;
 }

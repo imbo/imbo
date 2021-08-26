@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace Imbo\Auth\AccessControl\Adapter;
 
+use Imbo\Auth\AccessControl\GroupQuery;
 use Imbo\Exception\DatabaseException;
 use Imbo\Model\Groups;
 use PHPUnit\Framework\TestCase;
@@ -26,7 +27,7 @@ abstract class AdapterTests extends TestCase {
         $model = $this->createMock(Groups::class);
         $model->expects($this->once())->method('setHits')->with(0);
 
-        $this->assertSame([], $this->adapter->getGroups(null, $model));
+        $this->assertSame([], $this->adapter->getGroups(new GroupQuery(), $model));
     }
 
     /**
@@ -35,8 +36,8 @@ abstract class AdapterTests extends TestCase {
      * @covers ::getGroups
      */
     public function testCanAddAndFetchGroups() : void {
-        $this->assertFalse($this->adapter->getGroup('g1'), 'Did not expect group to exist');
-        $this->assertFalse($this->adapter->getGroup('g2'), 'Did not expect group to exist');
+        $this->assertNull($this->adapter->getGroup('g1'), 'Did not expect group to exist');
+        $this->assertNull($this->adapter->getGroup('g2'), 'Did not expect group to exist');
 
         $this->adapter->addResourceGroup('g1', ['images.get', 'images.head']);
         $this->adapter->addResourceGroup('g2', ['status.get']);
@@ -50,7 +51,7 @@ abstract class AdapterTests extends TestCase {
             ->method('setHits')
             ->with(2);
 
-        $groups = $this->adapter->getGroups(null, $model);
+        $groups = $this->adapter->getGroups(new GroupQuery(), $model);
 
         $this->assertArrayHasKey('g1', $groups);
         $this->assertArrayHasKey('g2', $groups);
@@ -104,7 +105,7 @@ abstract class AdapterTests extends TestCase {
         $this->assertTrue($this->adapter->addResourceGroup('g1', ['images.get', 'images.head']));
         $this->assertSame(['images.get', 'images.head'], $this->adapter->getGroup('g1'));
         $this->assertTrue($this->adapter->deleteResourceGroup('g1'));
-        $this->assertSame(false, $this->adapter->getGroup('g1'));
+        $this->assertNull($this->adapter->getGroup('g1'));
     }
 
     /**
