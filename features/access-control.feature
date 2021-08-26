@@ -96,6 +96,10 @@ Feature: Imbo provides a way to access control resources on a per-public key bas
         And Imbo uses the "custom-access-control.php" configuration
         When I request "/users/public"
         Then the response status line is "200 OK"
+        And the response body contains JSON:
+            """
+            {"user":"public","numImages":0,"lastModified":"@isDate()"}
+            """
 
     Scenario Outline: Request open resources with default configuration
         Given the "Accept" request header is "application/json"

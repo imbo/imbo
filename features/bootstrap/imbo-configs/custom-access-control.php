@@ -7,43 +7,39 @@ use Imbo\Auth\AccessControl\GroupQuery;
 use Imbo\Model\Groups as GroupsModel;
 
 class StaticAccessControl extends AbstractAdapter implements AdapterInterface {
-    public function hasAccess($publicKey, $resource, $user = null) {
+    public function hasAccess(string $publicKey, string $resource, string $user = null): bool {
         return $publicKey === 'public';
     }
 
-    public function getPrivateKey($publicKey) {
+    public function getPrivateKey(string $publicKey): ?string {
         return 'private';
     }
 
-    public function getGroups(GroupQuery $query = null, GroupsModel $model) {
+    public function getGroups(GroupQuery $query, GroupsModel $model): array {
         return [];
     }
 
-    public function getGroup($groupName) {
+    public function getGroup(string $groupName): ?array {
+        return null;
+    }
+
+    public function groupExists(string $groupName): bool {
         return false;
     }
 
-    public function groupExists($groupName) {
-        return false;
-    }
-
-    public function userExists($publicKey) {
+    public function publicKeyExists(string $publicKey): bool {
         return $publicKey === 'public';
     }
 
-    public function publicKeyExists($publicKey) {
-        return $publicKey === 'public';
-    }
-
-    public function getAccessListForPublicKey($publicKey) {
+    public function getAccessListForPublicKey(string $publicKey): array {
         return [];
     }
 
-    public function getUsersForResource($publicKey, $resource) {
+    public function getUsersForResource(string $publicKey, string $resource): array {
         return [];
     }
 
-    public function getAccessRule($publicKey, $accessRuleId) {
+    public function getAccessRule(string $publicKey, $accessRuleId): ?array {
         return null;
     }
 }
