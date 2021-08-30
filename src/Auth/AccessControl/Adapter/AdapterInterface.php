@@ -13,7 +13,7 @@ interface AdapterInterface {
      *
      * @param string $publicKey Public key to check access for
      * @param string $resource  Resource identifier (e.g. image.get, images.post)
-     * @return array List of users the public key kan access the given resource for
+     * @return array<string> List of users the public key kan access the given resource for
      */
     function getUsersForResource(string $publicKey, string $resource): array;
 
@@ -32,7 +32,7 @@ interface AdapterInterface {
      *
      * @param GroupQuery $query A query object used to filter the groups returned
      * @param GroupsModel $model Groups model to populate total number of hits with
-     * @return array
+     * @return array<string,array<string>>
      */
     function getGroups(GroupQuery $query, GroupsModel $model): array;
 
@@ -48,7 +48,7 @@ interface AdapterInterface {
      * Fetch a resource group with the given name
      *
      * @param string $groupName Name of the group
-     * @return array Array of resources the group consists of
+     * @return array<string> Array of resources the group consists of
      */
     function getGroup(string $groupName): ?array;
 
@@ -72,7 +72,7 @@ interface AdapterInterface {
      * Get the access control list for a given public key
      *
      * @param string $publicKey
-     * @return array
+     * @return array<array{id:int|string,users:array<string>,resources:array<string>}>
      */
     function getAccessListForPublicKey(string $publicKey): array;
 
@@ -81,7 +81,7 @@ interface AdapterInterface {
      *
      * @param string $publicKey    Public key to add access rule to
      * @param int|string $accessRuleId Access rule id
-     * @return array Access rule
+     * @return array{id:int|string,users:array<string>,resources:array<string>} Access rule
      */
     function getAccessRule(string $publicKey, $accessRuleId): ?array;
 }

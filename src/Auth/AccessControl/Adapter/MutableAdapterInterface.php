@@ -35,8 +35,8 @@ interface MutableAdapterInterface extends AdapterInterface {
      * Add a new access rule to the given public key
      *
      * @param string $publicKey  Public key to add access rule to
-     * @param array  $accessRule Access rule definition
-     * @return string Returns a generated access ID
+     * @param array{resources:array<string>,users:array<string>} $accessRule Access rule definition
+     * @return string Returns a generated access rule ID
      */
     function addAccessRule(string $publicKey, array $accessRule): string;
 
@@ -44,16 +44,16 @@ interface MutableAdapterInterface extends AdapterInterface {
      * Delete an access rule
      *
      * @param string $publicKey Public key the access rule belongs to
-     * @param string $accessId  Access ID of the rule
+     * @param string $accessRuleId ID of the access rule
      * @return bool
      */
-    function deleteAccessRule(string $publicKey, string $accessId): bool;
+    function deleteAccessRule(string $publicKey, string $accessRuleId): bool;
 
     /**
      * Add a new group containing the given resources
      *
      * @param string $groupName Group name
-     * @param array $resources Array of resources (eg. 'image.get', 'user.head' etc)
+     * @param array<string> $resources Array of resources (eg. 'image.get', 'user.head' etc)
      * @return bool
      */
     function addResourceGroup(string $groupName, array $resources = []): bool;
@@ -62,7 +62,7 @@ interface MutableAdapterInterface extends AdapterInterface {
      * Update resources for an existing resource group
      *
      * @param string $groupName Group to add resources to
-     * @param array $resources Array of resources (eg. 'image.get', 'user.head' etc)
+     * @param array<string> $resources Array of resources (eg. 'image.get', 'user.head' etc)
      * @param bool
      */
     function updateResourceGroup(string $groupName, array $resources): bool;
