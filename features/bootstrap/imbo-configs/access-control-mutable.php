@@ -4,9 +4,5 @@ namespace Imbo\Behat;
 use Imbo\Auth\AccessControl\Adapter\MongoDB;
 
 return [
-    'accessControl' => function() {
-        return new MongoDB([
-            'databaseName' => 'imbo_testing',
-        ]);
-    },
+    'accessControl' => new MongoDB('imbo_testing'),
 ];
