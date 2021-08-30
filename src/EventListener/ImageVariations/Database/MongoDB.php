@@ -67,10 +67,7 @@ class MongoDB implements DatabaseInterface {
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function storeImageVariationMetadata($user, $imageIdentifier, $width, $height) {
+    public function storeImageVariationMetadata(string $user, string $imageIdentifier, int $width, int $height): bool {
         try {
             $this->getCollection()->insertOne([
                 'added' => time(),
@@ -86,10 +83,7 @@ class MongoDB implements DatabaseInterface {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBestMatch($user, $imageIdentifier, $width) {
+    public function getBestMatch(string $user, string $imageIdentifier, int $width): ?array {
         $query = [
             'user' => $user,
             'imageIdentifier' => $imageIdentifier,
@@ -113,10 +107,7 @@ class MongoDB implements DatabaseInterface {
         return $result ? $result->getArrayCopy() : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteImageVariations($user, $imageIdentifier, $width = null) {
+    public function deleteImageVariations(string $user, string $imageIdentifier, int $width = null): bool {
         $query = [
             'user' => $user,
             'imageIdentifier' => $imageIdentifier,

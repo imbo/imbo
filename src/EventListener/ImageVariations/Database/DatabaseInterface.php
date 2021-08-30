@@ -15,9 +15,9 @@ interface DatabaseInterface {
      * @param int $width The width of the variation
      * @param int $height The height of the variation
      * @throws DatabaseException
-     * @return boolean
+     * @return bool
      */
-    function storeImageVariationMetadata($user, $imageIdentifier, $width, $height);
+    function storeImageVariationMetadata(string $user, string $imageIdentifier, int $width, int $height): bool;
 
     /**
      * Fetch the best match of an image
@@ -25,9 +25,9 @@ interface DatabaseInterface {
      * @param string $user The user which the image belongs to
      * @param string $imageIdentifier The image identifier of the original
      * @param int $width The width we want to resize the image to
-     * @return int|null Returns the closest width, or null
+     * @return ?array{width:int,height:int} Returns the closest width, or null
      */
-    function getBestMatch($user, $imageIdentifier, $width);
+    function getBestMatch(string $user, string $imageIdentifier, int $width): ?array;
 
     /**
      * Remove all metadata about image variations for an image
@@ -35,7 +35,7 @@ interface DatabaseInterface {
      * @param string $user The user which the image belongs to
      * @param string $imageIdentifier The image identifier
      * @param int $width Only delete the variation with this width
-     * @return boolean
+     * @return bool
      */
-    function deleteImageVariations($user, $imageIdentifier, $width = null);
+    function deleteImageVariations(string $user, string $imageIdentifier, int $width = null): bool;
 }

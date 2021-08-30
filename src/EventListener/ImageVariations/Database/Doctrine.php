@@ -46,11 +46,8 @@ class Doctrine implements DatabaseInterface {
         $this->params = array_merge($this->params, $params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function storeImageVariationMetadata($user, $imageIdentifier, $width, $height) {
-        return (boolean) $this->getConnection()->insert($this->params['tableName'], [
+    public function storeImageVariationMetadata(string $user, string $imageIdentifier, int $width, int $height): bool {
+        return (bool) $this->getConnection()->insert($this->params['tableName'], [
             'added'           => time(),
             'user'            => $user,
             'imageIdentifier' => $imageIdentifier,
@@ -59,10 +56,7 @@ class Doctrine implements DatabaseInterface {
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBestMatch($user, $imageIdentifier, $width) {
+    public function getBestMatch(string $user, string $imageIdentifier, int $width): ?array {
         $qb = $this->getConnection()->createQueryBuilder();
         $qb->select('width', 'height')
            ->from($this->params['tableName'], 'iv')
@@ -83,10 +77,7 @@ class Doctrine implements DatabaseInterface {
         return $row ? array_map('intval', $row) : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteImageVariations($user, $imageIdentifier, $width = null) {
+    public function deleteImageVariations(string $user, string $imageIdentifier, int $width = null): bool {
         $qb = $this->getConnection()->createQueryBuilder();
 
         $qb->delete($this->params['tableName'])
@@ -102,7 +93,7 @@ class Doctrine implements DatabaseInterface {
                ->setParameter(':width', $width);
         }
 
-        return (boolean) $qb->execute();
+        return (bool) $qb->execute();
     }
 
     /**
