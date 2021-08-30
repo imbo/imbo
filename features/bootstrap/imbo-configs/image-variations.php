@@ -14,11 +14,10 @@ return [
             'listener' => ImageVariations::class,
             'params' => [
                 'database' => [
-                    'adapter' => MongoDB::class,
-                    'params'  => ['databaseName' => 'imbo_testing'],
+                    'adapter' => new MongoDB('imbo_testing'),
                 ],
                 'storage' => [
-                    'adapter' => fn() => new GridFS('imbo_testing'),
+                    'adapter' => new GridFS('imbo_testing'),
                 ],
                 'widths'    => [320],
                 'minWidth'  => 100,
