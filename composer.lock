@@ -2591,12 +2591,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-mongodb-adapters.git",
-                "reference": "462b5289142bffe5f0a4711c223f219ef0fcb0a3"
+                "reference": "8f7367d11671087e2d205ee79a79fe976b841580"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-mongodb-adapters/zipball/462b5289142bffe5f0a4711c223f219ef0fcb0a3",
-                "reference": "462b5289142bffe5f0a4711c223f219ef0fcb0a3",
+                "url": "https://api.github.com/repos/imbo/imbo-mongodb-adapters/zipball/8f7367d11671087e2d205ee79a79fe976b841580",
+                "reference": "8f7367d11671087e2d205ee79a79fe976b841580",
                 "shasum": ""
             },
             "require": {
@@ -2643,7 +2643,7 @@
                 "issues": "https://github.com/imbo/imbo-mongodb-adapters/issues",
                 "source": "https://github.com/imbo/imbo-mongodb-adapters/tree/main"
             },
-            "time": "2021-08-30T08:37:16+00:00"
+            "time": "2021-08-30T10:52:49+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
