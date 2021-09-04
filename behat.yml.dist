@@ -14,6 +14,7 @@ default:
       contexts: [Imbo\Behat\FeatureContext]
       database: MongoDB
       database.uri: mongodb://localhost:27017
+      database.name: imbo_behat_test_database
       database.username: admin
       database.password: password
       storage: Filesystem
