@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eb8e4bf807513451e3fde38e30a3a566",
+    "content-hash": "dd5f469f962595bf6687bf4d80b37705",
     "packages": [
         {
             "name": "guzzlehttp/psr7",
@@ -2532,12 +2532,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-filesystem-adapters.git",
-                "reference": "eaadb734218695ef05251d2bb4a5a5e993bea23c"
+                "reference": "661a2eebf2effc53a835c46ecbafb65c5a180e72"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-filesystem-adapters/zipball/eaadb734218695ef05251d2bb4a5a5e993bea23c",
-                "reference": "eaadb734218695ef05251d2bb4a5a5e993bea23c",
+                "url": "https://api.github.com/repos/imbo/imbo-filesystem-adapters/zipball/661a2eebf2effc53a835c46ecbafb65c5a180e72",
+                "reference": "661a2eebf2effc53a835c46ecbafb65c5a180e72",
                 "shasum": ""
             },
             "require": {
@@ -2583,7 +2583,7 @@
                 "issues": "https://github.com/imbo/imbo-filesystem-adapters/issues",
                 "source": "https://github.com/imbo/imbo-filesystem-adapters/tree/main"
             },
-            "time": "2021-08-25T21:31:11+00:00"
+            "time": "2021-09-03T05:50:58+00:00"
         },
         {
             "name": "imbo/imbo-mongodb-adapters",
@@ -2591,12 +2591,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-mongodb-adapters.git",
-                "reference": "8f7367d11671087e2d205ee79a79fe976b841580"
+                "reference": "5f3ca08d2ea032b0dc745015be70dcf99f0b4b63"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-mongodb-adapters/zipball/8f7367d11671087e2d205ee79a79fe976b841580",
-                "reference": "8f7367d11671087e2d205ee79a79fe976b841580",
+                "url": "https://api.github.com/repos/imbo/imbo-mongodb-adapters/zipball/5f3ca08d2ea032b0dc745015be70dcf99f0b4b63",
+                "reference": "5f3ca08d2ea032b0dc745015be70dcf99f0b4b63",
                 "shasum": ""
             },
             "require": {
@@ -2643,7 +2643,125 @@
                 "issues": "https://github.com/imbo/imbo-mongodb-adapters/issues",
                 "source": "https://github.com/imbo/imbo-mongodb-adapters/tree/main"
             },
-            "time": "2021-08-30T10:52:49+00:00"
+            "time": "2021-09-02T22:40:42+00:00"
+        },
+        {
+            "name": "imbo/imbo-mysql-adapters",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/imbo/imbo-mysql-adapters.git",
+                "reference": "d17f4c5f8cafe0fb4692945ce81006ff5ebe11c4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/imbo/imbo-mysql-adapters/zipball/d17f4c5f8cafe0fb4692945ce81006ff5ebe11c4",
+                "reference": "d17f4c5f8cafe0fb4692945ce81006ff5ebe11c4",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pdo": "*",
+                "ext-pdo_mysql": "*",
+                "imbo/imbo-pdo-adapters": "dev-main",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "imbo/imbo": "dev-develop",
+                "imbo/imbo-adapters-sdk": "dev-main",
+                "imbo/imbo-coding-standard": "^2.0",
+                "phpunit/phpunit": "^9.3",
+                "psalm/plugin-phpunit": "^0.16.1",
+                "vimeo/psalm": "^4.9"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Imbo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christer Edvartsen",
+                    "email": "cogo@starzinger.net",
+                    "homepage": "https://github.com/christeredvartsen"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/imbo"
+                }
+            ],
+            "description": "MySQL adapters for Imbo",
+            "homepage": "https://imbo.io/",
+            "keywords": [
+                "imbo"
+            ],
+            "support": {
+                "issues": "https://github.com/imbo/imbo-mysql-adapters/issues",
+                "source": "https://github.com/imbo/imbo-mysql-adapters/tree/main"
+            },
+            "time": "2021-09-03T05:51:56+00:00"
+        },
+        {
+            "name": "imbo/imbo-pdo-adapters",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/imbo/imbo-pdo-adapters.git",
+                "reference": "69471fc4c4e6aefe5b6abf261a677816cb9863c7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/imbo/imbo-pdo-adapters/zipball/69471fc4c4e6aefe5b6abf261a677816cb9863c7",
+                "reference": "69471fc4c4e6aefe5b6abf261a677816cb9863c7",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pdo": "*",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "imbo/imbo": "dev-develop",
+                "imbo/imbo-coding-standard": "^2.0",
+                "psalm/plugin-phpunit": "^0.16.1",
+                "vimeo/psalm": "^4.9"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Imbo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christer Edvartsen",
+                    "email": "cogo@starzinger.net",
+                    "homepage": "https://github.com/christeredvartsen"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/imbo"
+                }
+            ],
+            "description": "PDO adapters for Imbo",
+            "homepage": "https://imbo.io/",
+            "keywords": [
+                "imbo"
+            ],
+            "support": {
+                "issues": "https://github.com/imbo/imbo-pdo-adapters/issues",
+                "source": "https://github.com/imbo/imbo-pdo-adapters/tree/main"
+            },
+            "time": "2021-09-03T05:44:04+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -3596,16 +3714,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "9.5.8",
+            "version": "9.5.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "191768ccd5c85513b4068bdbe99bb6390c7d54fb"
+                "reference": "ea8c2dfb1065eb35a79b3681eee6e6fb0a6f273b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/191768ccd5c85513b4068bdbe99bb6390c7d54fb",
-                "reference": "191768ccd5c85513b4068bdbe99bb6390c7d54fb",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/ea8c2dfb1065eb35a79b3681eee6e6fb0a6f273b",
+                "reference": "ea8c2dfb1065eb35a79b3681eee6e6fb0a6f273b",
                 "shasum": ""
             },
             "require": {
@@ -3683,7 +3801,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.5.8"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.5.9"
             },
             "funding": [
                 {
@@ -3695,7 +3813,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-07-31T15:17:34+00:00"
+            "time": "2021-08-31T06:47:40+00:00"
         },
         {
             "name": "psr/event-dispatcher",
@@ -4652,6 +4770,7 @@
                     "type": "github"
                 }
             ],
+            "abandoned": true,
             "time": "2020-09-28T06:45:17+00:00"
         },
         {
@@ -5594,12 +5713,13 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": {
         "imbo/imbo-filesystem-adapters": 20,
-        "imbo/imbo-mongodb-adapters": 20
+        "imbo/imbo-mongodb-adapters": 20,
+        "imbo/imbo-mysql-adapters": 20
     },
-    "prefer-stable": false,
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.4",
