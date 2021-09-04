@@ -37,7 +37,6 @@
   },
   "require-dev": {
     "christeredvartsen/testfs": "^0.3.0",
-    "doctrine/dbal": "^2.10",
     "imbo/behat-api-extension": "^3.0",
     "imbo/imbo-adapters-sdk": "dev-main",
     "imbo/imbo-filesystem-adapters": "dev-main",
