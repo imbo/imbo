@@ -18,6 +18,6 @@ try {
     if (!empty($config['rethrowFinalException'])) {
         throw $e;
     } else {
-        trigger_error('Uncaught Exception with message: ' . $e->getMessage(), E_USER_ERROR);
+        trigger_error('Uncaught Exception (' . get_class($e) . ') with message: ' . $e->getMessage(), E_USER_ERROR);
     }
 }
