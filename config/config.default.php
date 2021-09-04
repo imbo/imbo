@@ -1,6 +1,16 @@
 <?php
 namespace Imbo;
 
+use Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter;
+use Imbo\Database\MongoDB;
+use Imbo\EventListener;
+use Imbo\EventListener\Initializer\Imagick as ImagickInitializer;
+use Imbo\Image\Identifier\Generator\RandomString;
+use Imbo\Image\InputLoader\Basic as BasicInput;
+use Imbo\Image\OutputConverter\Basic as BasicOutput;
+use Imbo\Image\Transformation;
+use Imbo\Storage\GridFS;
+
 // Require composer autoloader
 if (is_file(__DIR__ . '/../../../autoload.php')) {
     // Someone has installed Imbo via a custom composer.json, so the Imbo installation is inside a
@@ -33,11 +43,9 @@ $defaultConfig = [
      * control, please take a look at the other adapters available, many of which are mutable -
      * meaning you can use the Imbo API to alter access control on the fly.
      *
-     * @var Auth\AccessControl\Adapter\AdapterInterface|Closure
+     * @var Imbo\Auth\AccessControl\Adapter\AdapterInterface|Closure
      */
-    'accessControl' => function() {
-        return new Auth\AccessControl\Adapter\SimpleArrayAdapter([]);
-    },
+    'accessControl' => fn() => new SimpleArrayAdapter([]),
 
     /**
      * Database adapter
@@ -48,9 +56,7 @@ $defaultConfig = [
      *
      * @var Imbo\Database\DatabaseInterface|Closure
      */
-    'database' => function() {
-        return new Database\MongoDB();
-    },
+    'database' => fn() => new MongoDB(),
 
     /**
      * Storage adapter
@@ -61,9 +67,7 @@ $defaultConfig = [
      *
      * @var Imbo\Storage\StorageInterface|Closure
      */
-    'storage' => function() {
-        return new Storage\GridFS();
-    },
+    'storage' => fn() => new GridFS(),
 
     /**
      * Image identifier generator
@@ -74,9 +78,7 @@ $defaultConfig = [
      *
      * @var Imbo\Image\Identifier\Generator\GeneratorInterface|Closure
      */
-    'imageIdentifierGenerator' => function() {
-        return new Image\Identifier\Generator\RandomString();
-    },
+    'imageIdentifierGenerator' => fn() => new RandomString(),
 
     /**
      * Keep errors as exceptions
@@ -95,7 +97,7 @@ $defaultConfig = [
      * deliver the image in the format it was originally added as. Note that this does not
      * affect images requested with a specific extension (.jpg/.png/.gif etc).
      *
-     * @var boolean
+     * @var bool
      */
     'contentNegotiateImages' => true,
 
@@ -116,7 +118,7 @@ $defaultConfig = [
          * some parameters will be one pixel off. Image quality should be the same for
          * most images, but there is always the possibility of slightly worse quality
          *
-         * @var boolean
+         * @var bool
          */
         'jpegSizeHint' => true,
     ],
@@ -190,35 +192,35 @@ $defaultConfig = [
      * @var array
      */
     'transformations' => [
-        'autoRotate' => 'Imbo\Image\Transformation\AutoRotate',
-        'blur' => 'Imbo\Image\Transformation\Blur',
-        'border' => 'Imbo\Image\Transformation\Border',
-        'canvas' => 'Imbo\Image\Transformation\Canvas',
-        'clip' => 'Imbo\Image\Transformation\Clip',
-        'compress' => 'Imbo\Image\Transformation\Compress',
-        'contrast' => 'Imbo\Image\Transformation\Contrast',
-        'convert' => 'Imbo\Image\Transformation\Convert',
-        'crop' => 'Imbo\Image\Transformation\Crop',
-        'desaturate' => 'Imbo\Image\Transformation\Desaturate',
-        'drawPois' => 'Imbo\Image\Transformation\DrawPois',
-        'flipHorizontally' => 'Imbo\Image\Transformation\FlipHorizontally',
-        'flipVertically' => 'Imbo\Image\Transformation\FlipVertically',
-        'histogram' => 'Imbo\Image\Transformation\Histogram',
-        'level' => 'Imbo\Image\Transformation\Level',
-        'maxSize' => 'Imbo\Image\Transformation\MaxSize',
-        'modulate' => 'Imbo\Image\Transformation\Modulate',
-        'progressive' => 'Imbo\Image\Transformation\Progressive',
-        'resize' => 'Imbo\Image\Transformation\Resize',
-        'rotate' => 'Imbo\Image\Transformation\Rotate',
-        'sepia' => 'Imbo\Image\Transformation\Sepia',
-        'sharpen' => 'Imbo\Image\Transformation\Sharpen',
-        'smartSize' => 'Imbo\Image\Transformation\SmartSize',
-        'strip' => 'Imbo\Image\Transformation\Strip',
-        'thumbnail' => 'Imbo\Image\Transformation\Thumbnail',
-        'transpose' => 'Imbo\Image\Transformation\Transpose',
-        'transverse' => 'Imbo\Image\Transformation\Transverse',
-        'vignette' => 'Imbo\Image\Transformation\Vignette',
-        'watermark' => 'Imbo\Image\Transformation\Watermark',
+        'autoRotate'       => Transformation\AutoRotate::class,
+        'blur'             => Transformation\Blur::class,
+        'border'           => Transformation\Border::class,
+        'canvas'           => Transformation\Canvas::class,
+        'clip'             => Transformation\Clip::class,
+        'compress'         => Transformation\Compress::class,
+        'contrast'         => Transformation\Contrast::class,
+        'convert'          => Transformation\Convert::class,
+        'crop'             => Transformation\Crop::class,
+        'desaturate'       => Transformation\Desaturate::class,
+        'drawPois'         => Transformation\DrawPois::class,
+        'flipHorizontally' => Transformation\FlipHorizontally::class,
+        'flipVertically'   => Transformation\FlipVertically::class,
+        'histogram'        => Transformation\Histogram::class,
+        'level'            => Transformation\Level::class,
+        'maxSize'          => Transformation\MaxSize::class,
+        'modulate'         => Transformation\Modulate::class,
+        'progressive'      => Transformation\Progressive::class,
+        'resize'           => Transformation\Resize::class,
+        'rotate'           => Transformation\Rotate::class,
+        'sepia'            => Transformation\Sepia::class,
+        'sharpen'          => Transformation\Sharpen::class,
+        'smartSize'        => Transformation\SmartSize::class,
+        'strip'            => Transformation\Strip::class,
+        'thumbnail'        => Transformation\Thumbnail::class,
+        'transpose'        => Transformation\Transpose::class,
+        'transverse'       => Transformation\Transverse::class,
+        'vignette'         => Transformation\Vignette::class,
+        'watermark'        => Transformation\Watermark::class,
     ],
 
     /**
@@ -324,21 +326,21 @@ $defaultConfig = [
      * @var array
      */
     'eventListeners' => [
-        'accessControl' => 'Imbo\EventListener\AccessControl',
-        'accessToken' => 'Imbo\EventListener\AccessToken',
-        'auth' => 'Imbo\EventListener\Authenticate',
+        'accessControl' => EventListener\AccessControl::class,
+        'accessToken' => EventListener\AccessToken::class,
+        'auth' => EventListener\Authenticate::class,
         'statsAccess' => [
-            'listener' => 'Imbo\EventListener\StatsAccess',
+            'listener' => EventListener\StatsAccess::class,
             'params' => [
                 'allow' => ['127.0.0.1', '::1'],
             ],
         ],
 
         // Imagick-specific event listener for the built in image transformations
-        'imagick' => 'Imbo\EventListener\Imagick',
+        'imagick' => EventListener\Imagick::class,
 
         // Pluggable output conversion
-        'outputConverter' => 'Imbo\EventListener\LoaderOutputConverterImagick',
+        'outputConverter' => EventListener\LoaderOutputConverterImagick::class,
     ],
 
     /**
@@ -351,7 +353,7 @@ $defaultConfig = [
      * @var array
      */
     'eventListenerInitializers' => [
-        'imagick' => 'Imbo\EventListener\Initializer\Imagick',
+        'imagick' => ImagickInitializer::class,
     ],
 
     /**
@@ -437,10 +439,10 @@ $defaultConfig = [
      * See the Imbo\Image\InputLoader\Basic input loader for the default fallback loader as an
      * example.
      *
-     * @var Imbo\Image\InputLoader\InputLoaderInterface[]|string[]
+     * @var array<string,Imbo\Image\InputLoader\InputLoaderInterface>|array<string,string>
      */
     'inputLoaders' => [
-        'basic' => Image\InputLoader\Basic::class,
+        'basic' => BasicInput::class,
     ],
 
     /**
@@ -457,10 +459,10 @@ $defaultConfig = [
      * _don't_ call `$image->setHasBeenTransformed(true)` as you've handled the conversion to binary
      * data yourself.
      *
-     * @var Imbo\Image\OutputConverter\OutputConverterInterface[]|string[]
+     * @var array<string,Imbo\Image\OutputConverter\OutputConverterInterface>|array<string,string>
      */
     'outputConverters' => [
-        'basic' => Image\OutputConverter\Basic::class,
+        'basic' => BasicOutput::class,
     ],
 ];
 
