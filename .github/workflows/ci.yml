@@ -355,7 +355,7 @@ jobs:
         run: composer install
 
       - name: Create database tables
-        run: psql postgresql://imbo_test:imbo_test@127.0.0.1:5555/imbo_test -f ./vendor/imbo/imbo-mysql-adapters/setup/000-imbo.sql
+        run: psql postgresql://imbo_test:imbo_test@127.0.0.1:5555/imbo_test -f ./vendor/imbo/imbo-postgresql-adapters/setup/000-imbo.sql
 
       - name: Start PHP web server
         run: |
