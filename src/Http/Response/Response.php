@@ -18,7 +18,7 @@ class Response extends SymfonyResponse {
     /**
      * Get the model instance
      *
-     * @return null|ModelInterface
+     * @return null|Model\ModelInterface
      */
     public function getModel() {
         return $this->model;
@@ -27,7 +27,7 @@ class Response extends SymfonyResponse {
     /**
      * Set the model instance
      *
-     * @param ModelInterface $model A model instance
+     * @param Model\ModelInterface $model A model instance
      * @return Response
      */
     public function setModel(Model\ModelInterface $model = null) {
