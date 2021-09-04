@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "54335ae1e33df0b80fd2499dd6ab54e1",
+    "content-hash": "7db37e80729d5633f5b27420407d1eef",
     "packages": [
         {
             "name": "guzzlehttp/psr7",
@@ -2656,59 +2656,6 @@
                 "source": "https://github.com/Jean85/pretty-package-versions/tree/2.0.4"
             },
             "time": "2021-05-26T08:46:42+00:00"
-        },
-        {
-            "name": "micheh/psr7-cache",
-            "version": "0.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/micheh/psr7-cache.git",
-                "reference": "b99e8ae6d024d8c70945084b5b979a62cfd05df4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/micheh/psr7-cache/zipball/b99e8ae6d024d8c70945084b5b979a62cfd05df4",
-                "reference": "b99e8ae6d024d8c70945084b5b979a62cfd05df4",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4",
-                "psr/http-message": "~1.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.0||~5.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Micheh\\Cache\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "description": "Cache and conditional request helpers for PSR-7 HTTP Messages",
-            "keywords": [
-                "cache",
-                "conditional",
-                "http",
-                "http-message",
-                "if-match",
-                "if-modified-since",
-                "if-none-match",
-                "if-unmodified-since",
-                "psr",
-                "psr-7",
-                "request",
-                "response"
-            ],
-            "support": {
-                "issues": "https://github.com/micheh/psr7-cache/issues",
-                "source": "https://github.com/micheh/psr7-cache/tree/master"
-            },
-            "abandoned": true,
-            "time": "2016-04-15T16:31:14+00:00"
         },
         {
             "name": "mongodb/mongodb",

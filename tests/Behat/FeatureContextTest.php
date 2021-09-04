@@ -4,7 +4,6 @@ namespace Imbo\Behat;
 use Imbo\Behat\FeatureContext;
 use Imbo\BehatApiExtension\Exception\AssertionFailedException;
 use Imbo\BehatApiExtension\ArrayContainsComparator;
-use Micheh\Cache\CacheUtil;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -24,13 +23,13 @@ use Assert;
 use RuntimeException;
 use InvalidArgumentException;
 use PHPUnit\Framework\ExpectationFailedException;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * @coversDefaultClass Imbo\Behat\FeatureContext
  */
 class FeatureContextTest extends TestCase {
     private $context;
-    private $cacheUtil;
     private $client;
     private $history;
     private $mockHandler;
@@ -49,9 +48,8 @@ class FeatureContextTest extends TestCase {
             'handler' => $this->handlerStack,
             'base_uri' => $this->baseUri,
         ]);
-        $this->cacheUtil = $this->createMock(CacheUtil::class);
 
-        $this->context = new FeatureContext($this->cacheUtil);
+        $this->context = new FeatureContext();
         $this->context->setClient($this->client, $this->baseUri);
     }
 
@@ -2133,22 +2131,30 @@ class FeatureContextTest extends TestCase {
     public function getCacheabilityData() : array {
         return [
             'cacheable, expect cacheable' => [
-                'cacheable' => true,
+                'response' => new Response(200),
                 'expected' => true,
             ],
             'not cacheable, expect not cacheable' => [
-                'cacheable' => false,
+                'response' => new Response(400),
                 'expected' => false,
             ],
             'cacheable, expect not cacheable' => [
-                'cacheable' => true,
+                'response' => new Response(200),
                 'expected' => false,
                 'exceptionMessage' => 'Response was not supposed to be cacheable, but it is.',
             ],
             'not cacheable, expect cacheable' => [
-                'cacheable' => false,
+                'cacheable' => new Response(400),
                 'expected' => true,
                 'exceptionMessage' => 'Response was supposed to be cacheble, but it\'s not.',
+            ],
+            'not cacheable (no-store)' => [
+                'response' => new Response(200, ['cache-control' => 'no-store']),
+                'expected' => false,
+            ],
+            'not cacheable (private)' => [
+                'response' => new Response(200, ['cache-control' => 'private']),
+                'expected' => false,
             ],
         ];
     }
@@ -2158,14 +2164,8 @@ class FeatureContextTest extends TestCase {
      * @covers ::__construct
      * @covers ::assertCacheability
      */
-    public function testCanAssertResponseCacheability(bool $actual, bool $expected, string $exceptionMessage = null) : void {
-        $this->cacheUtil
-            ->expects($this->once())
-            ->method('isCacheable')
-            ->with($this->isInstanceOf(Response::class))
-            ->willReturn($actual);
-
-        $this->mockHandler->append(new Response(200));
+    public function testCanAssertResponseCacheability(ResponseInterface $response, bool $expected, string $exceptionMessage = null) : void {
+        $this->mockHandler->append($response);
         $this->context->requestPath('/path');
 
         if ($exceptionMessage) {

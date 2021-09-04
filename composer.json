@@ -44,7 +44,6 @@
     "imbo/imbo-mysql-adapters": "dev-main",
     "imbo/imbo-postgresql-adapters": "dev-main",
     "imbo/imbo-sqlite-adapters": "dev-main",
-    "micheh/psr7-cache": "^0.5",
     "phpunit/phpunit": "^9.2"
   },
   "suggest": {

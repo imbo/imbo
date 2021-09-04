@@ -13,7 +13,7 @@ use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
 use Behat\Gherkin\Node\TableNode;
 use Assert\Assertion;
-use Micheh\Cache\CacheUtil;
+use GuzzleHttp\Psr7\Header;
 use MongoDB\Client as MongoClient;
 use RuntimeException;
 use InvalidArgumentException;
@@ -22,6 +22,7 @@ use RecursiveDirectoryIterator;
 use Imagick;
 use ImagickException;
 use Imbo\Constraint\MultidimensionalArrayIsEqual;
+use Psr\Http\Message\ResponseInterface;
 
 class FeatureContext extends ApiContext {
     /**
@@ -33,11 +34,6 @@ class FeatureContext extends ApiContext {
     const MIDDLEWARE_APPEND_ACCESS_TOKEN = 'imbo-behat-append-access-token';
     const MIDDLEWARE_HISTORY = 'imbo-behat-history';
     const MIDDLEWARE_BEHAT_CONTEXT_CLASS = 'imbo-behat-context-class';
-
-    /**
-     * @var CacheUtil
-     */
-    private $cacheUtil;
 
     /**
      * The public key used by the client
@@ -131,21 +127,6 @@ class FeatureContext extends ApiContext {
      * @var array
      */
     static private $storageTestConfig;
-
-    /**
-     * Class constructor
-     *
-     * @param CacheUtil $cacheUtil
-     */
-    public function __construct(CacheUtil $cacheUtil = null) {
-        // @codeCoverageIgnoreStart
-        if ($cacheUtil === null) {
-            $cacheUtil = new CacheUtil();
-        }
-        // @codeCoverageIgnoreEnd
-
-        $this->cacheUtil = $cacheUtil;
-    }
 
     /**
      * Set up adapters for the suite
@@ -1352,6 +1333,29 @@ class FeatureContext extends ApiContext {
     }
 
     /**
+     * Check if the response is cacheable
+     *
+     * @param ResponseInterface $response
+     * @return bool
+     */
+    private function isCacheable(ResponseInterface $response): bool {
+        if (!in_array($response->getStatusCode(), [200, 203, 204, 206, 300, 301, 404, 405, 410, 414, 501])) {
+            return false;
+        }
+
+        if (!$response->hasHeader('Cache-Control')) {
+            return true;
+        }
+
+        $cacheControl = array_fill_keys(
+            Header::normalize($response->getHeaderLine('Cache-Control')),
+            true,
+        );
+
+        return !array_key_exists('no-store', $cacheControl) && !array_key_exists('private', $cacheControl);
+    }
+
+    /**
      * Check whether or not the response can be cached
      *
      * @param boolean $cacheable
@@ -1368,7 +1372,7 @@ class FeatureContext extends ApiContext {
 
         Assertion::same(
             $cacheable,
-            $this->cacheUtil->isCacheable($this->response),
+            $this->isCacheable($this->response),
             $cacheable ?
                 'Response was supposed to be cacheble, but it\'s not.' :
                 'Response was not supposed to be cacheable, but it is.'
