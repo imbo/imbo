@@ -211,7 +211,7 @@ jobs:
           name: httpd-logs-doctrine-sqlite-filesystem
           path: build/logs
 
-  integration-tests-doctrine-mysql-filesystem:
+  integration-tests-mysql-filesystem:
     name: Integration tests (MySQL / Filesystem)
 
     strategy:
@@ -237,7 +237,7 @@ jobs:
           MYSQL_USER: imbo_test
           MYSQL_PASSWORD: imbo_test
         ports:
-          - 3306
+          - 3333:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
@@ -266,24 +266,18 @@ jobs:
       - name: Install dependencies
         run: composer install
 
+      - name: Create database tables
+        run: mysql -uimbo_test -pimbo_test -h127.0.0.1 -P3333 imbo_test < ./vendor/imbo/imbo-mysql-adapters/setup/000-imbo.sql
+
       - name: Start PHP web server
         run: |
           mkdir -p build/logs
           php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &
 
-      - name: Update MySQL configuration for the Behat suite
-        run: |
-          sed -i 's/\(database.port: \)3306/\1${{ job.services.mysql.ports['3306'] }}/g' behat.yml.dist
-          sed -i 's/\(database.hostname: \)localhost/\1127.0.0.1/g' behat.yml.dist
-          echo "Updated Behat configuration file:"
-          echo "================================="
-          cat behat.yml.dist
-          echo "================================="
-
       - name: Run integration tests using Behat
-        run: vendor/bin/behat --strict --suite=doctrine-mysql-filesystem
+        run: vendor/bin/behat --strict --suite=mysql-filesystem
 
       - uses: actions/upload-artifact@v2
         with:
-          name: httpd-logs-doctrine-mysql-filesystem
+          name: httpd-logs-mysql-filesystem
           path: build/logs

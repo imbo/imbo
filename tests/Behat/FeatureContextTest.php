@@ -23,6 +23,7 @@ use PHPUnit\Framework\TestCase;
 use Assert;
 use RuntimeException;
 use InvalidArgumentException;
+use PHPUnit\Framework\ExpectationFailedException;
 
 /**
  * @coversDefaultClass Imbo\Behat\FeatureContext
@@ -2672,18 +2673,6 @@ class FeatureContextTest extends TestCase {
                 ]),
                 'exceptionMessage' => 'Expected image in response 2 to be 1023 pixel(s) high, actual: 1024.',
             ],
-            'body is' => [
-                'responses' => [
-                    new Response(200, [], '{"foo":"bar"}'),
-                    new Response(200, [], '{"bar":"foo"}'),
-                ],
-                'match' => new TableNode([
-                    ['response', 'body is'         ],
-                    ['1',        '{"foo":"bar"}'   ],
-                    ['2',        '{"bar":"foobar"}'],
-                ]),
-                'exceptionMessage' => 'Incorrect response body for request 2, expected "{"bar":"foobar"}", got: "{"bar":"foo"}".',
-            ],
         ];
     }
 
@@ -2702,6 +2691,28 @@ class FeatureContextTest extends TestCase {
         $this->expectExceptionMessage($exceptionMessage);
 
         $this->context->assertLastResponsesMatch($table);
+    }
+
+    /**
+     * @covers ::assertLastResponsesMatch
+     */
+    public function testAssertLastResponsesMatchCanFailForJsonMatching() : void {
+        $this->mockHandler->append(
+            new Response(200, [], '{"foo":"bar"}'),
+            new Response(200, [], '{"bar":"foo"}'),
+        );
+
+        $this->context->requestPath('/path');
+        $this->context->requestPath('/path');
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Incorrect response body for request 2, expected "{"bar":"foobar"}", got: "{"bar":"foo"}".');
+
+        $this->context->assertLastResponsesMatch(new TableNode([
+            ['response', 'body is'         ],
+            ['1',        '{"foo":"bar"}'   ],
+            ['2',        '{"bar":"foobar"}'],
+        ]));
     }
 
     /**

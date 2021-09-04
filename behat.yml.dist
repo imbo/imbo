@@ -15,15 +15,13 @@ default:
       contexts: [Imbo\Behat\FeatureContext]
       database: DoctrineSQLite
       storage: Filesystem
-    doctrine-mysql-filesystem:
+    mysql-filesystem:
       project_root: "%paths.base%"
       contexts: [Imbo\Behat\FeatureContext]
-      database: DoctrineMySQL
-      database.hostname: localhost
-      database.database: imbo_test
+      database: MySQL
+      database.dsn: mysql:host=127.0.0.1;port=3333;dbname=imbo_test
       database.username: imbo_test
       database.password: imbo_test
-      database.port: 3306
       storage: Filesystem
 
   extensions:

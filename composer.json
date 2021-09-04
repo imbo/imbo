@@ -39,6 +39,7 @@
     "christeredvartsen/testfs": "^0.3.0",
     "doctrine/dbal": "^2.10",
     "imbo/behat-api-extension": "^3.0",
+    "imbo/imbo-adapters-sdk": "dev-main",
     "imbo/imbo-filesystem-adapters": "dev-main",
     "imbo/imbo-mongodb-adapters": "dev-main",
     "imbo/imbo-mysql-adapters": "dev-main",
@@ -88,12 +89,12 @@
       "@test:behat:mongodb-gridfs",
       "@test:behat:mongodb-filesystem",
       "@test:behat:doctrine-sqlite-filesystem",
-      "@test:behat:doctrine-mysql-filesystem"
+      "@test:behat:mysql-filesystem"
     ],
     "test:behat:mongodb-gridfs": "vendor/bin/behat --strict --suite=mongodb-gridfs",
     "test:behat:mongodb-filesystem": "vendor/bin/behat --strict --suite=mongodb-filesystem",
     "test:behat:doctrine-sqlite-filesystem": "vendor/bin/behat --strict --suite=doctrine-sqlite-filesystem",
-    "test:behat:doctrine-mysql-filesystem": "vendor/bin/behat --strict --suite=doctrine-mysql-filesystem",
+    "test:behat:mysql-filesystem": "vendor/bin/behat --strict --suite=mysql-filesystem",
     "test": [
       "@test:phpunit",
       "@test:behat"

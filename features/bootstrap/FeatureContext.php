@@ -21,6 +21,7 @@ use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 use Imagick;
 use ImagickException;
+use Imbo\Constraint\MultidimensionalArrayIsEqual;
 
 class FeatureContext extends ApiContext {
     /**
@@ -1719,16 +1720,13 @@ class FeatureContext extends ApiContext {
             }
 
             if (!empty($row['body is'])) {
-                Assertion::same(
+                $constraint = new MultidimensionalArrayIsEqual(json_decode($row['body is'], true));
+                $constraint->evaluate(json_decode($actualBody = (string) $response->getBody(), true), sprintf(
+                    'Incorrect response body for request %d, expected "%s", got: "%s".',
+                    $row['response'],
                     $row['body is'],
-                    $actualBody = (string) $response->getBody(),
-                    sprintf(
-                        'Incorrect response body for request %d, expected "%s", got: "%s".',
-                        $row['response'],
-                        $row['body is'],
-                        $actualBody
-                    )
-                );
+                    $actualBody
+                ));
             }
         }
 

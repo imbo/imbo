@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dd5f469f962595bf6687bf4d80b37705",
+    "content-hash": "5640202aa4610caab9d9597f74aa7bf5",
     "packages": [
         {
             "name": "guzzlehttp/psr7",
@@ -2525,6 +2525,63 @@
                 "source": "https://github.com/imbo/behat-api-extension"
             },
             "time": "2021-05-25T06:18:52+00:00"
+        },
+        {
+            "name": "imbo/imbo-adapters-sdk",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/imbo/imbo-adapters-sdk.git",
+                "reference": "b275f66ee48fc54dc9b481fb63554cfd7a185604"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/imbo/imbo-adapters-sdk/zipball/b275f66ee48fc54dc9b481fb63554cfd7a185604",
+                "reference": "b275f66ee48fc54dc9b481fb63554cfd7a185604",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "imbo/imbo": "dev-develop",
+                "imbo/imbo-coding-standard": "^2.0",
+                "phpunit/phpunit": "^9.5",
+                "psalm/plugin-phpunit": "^0.16.1",
+                "vimeo/psalm": "^4.9"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Imbo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christer Edvartsen",
+                    "email": "cogo@starzinger.net",
+                    "homepage": "https://github.com/christeredvartsen"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/imbo"
+                }
+            ],
+            "description": "SDK for Imbo adapters",
+            "homepage": "https://imbo.io/",
+            "keywords": [
+                "imbo"
+            ],
+            "support": {
+                "issues": "https://github.com/imbo/imbo-adapters-sdk/issues",
+                "source": "https://github.com/imbo/imbo-adapters-sdk/tree/main"
+            },
+            "time": "2021-09-03T05:44:38+00:00"
         },
         {
             "name": "imbo/imbo-filesystem-adapters",
@@ -5715,6 +5772,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "imbo/imbo-adapters-sdk": 20,
         "imbo/imbo-filesystem-adapters": 20,
         "imbo/imbo-mongodb-adapters": 20,
         "imbo/imbo-mysql-adapters": 20
