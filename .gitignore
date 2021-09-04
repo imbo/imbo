@@ -10,3 +10,5 @@ behat.yml
 phpunit.xml
 .phpunit.result.cache
 test.php
+.php-cs-fixer.cache
+.vscode
