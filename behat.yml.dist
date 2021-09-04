@@ -32,6 +32,14 @@ default:
       database.username: imbo_test
       database.password: imbo_test
       storage: Filesystem
+    postgresql-filesystem:
+      project_root: "%paths.base%"
+      contexts: [Imbo\Behat\FeatureContext]
+      database: PostgreSQL
+      database.dsn: pgsql:host=127.0.0.1;port=5555;dbname=imbo_test
+      database.username: imbo_test
+      database.password: imbo_test
+      storage: Filesystem
 
   extensions:
     Imbo\BehatApiExtension:

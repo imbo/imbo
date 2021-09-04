@@ -43,6 +43,7 @@
     "imbo/imbo-filesystem-adapters": "dev-main",
     "imbo/imbo-mongodb-adapters": "dev-main",
     "imbo/imbo-mysql-adapters": "dev-main",
+    "imbo/imbo-postgresql-adapters": "dev-main",
     "imbo/imbo-sqlite-adapters": "dev-main",
     "micheh/psr7-cache": "^0.5",
     "phpunit/phpunit": "^9.2"
@@ -54,6 +55,7 @@
     "imbo/imbo-metadata-cache": "Enables caching of metadata through an event listener",
     "imbo/imbo-mysql-adapters": "Enables usage of MySQL as database",
     "imbo/imbo-mongodb-adapters": "Enables usage of MongoDB for storing images",
+    "imbo/imbo-postgresql-adapters": "Enables usage of PostgreSQL as database",
     "imbo/imbo-sqlite-adapters": "Enables usage of SQLite as database"
   },
   "autoload": {
@@ -91,12 +93,14 @@
       "@test:behat:mongodb-gridfs",
       "@test:behat:mongodb-filesystem",
       "@test:behat:sqlite-filesystem",
-      "@test:behat:mysql-filesystem"
+      "@test:behat:mysql-filesystem",
+      "@test:behat:postgresql-filesystem"
     ],
     "test:behat:mongodb-gridfs": "vendor/bin/behat --strict --suite=mongodb-gridfs",
     "test:behat:mongodb-filesystem": "vendor/bin/behat --strict --suite=mongodb-filesystem",
     "test:behat:sqlite-filesystem": "vendor/bin/behat --strict --suite=sqlite-filesystem",
     "test:behat:mysql-filesystem": "vendor/bin/behat --strict --suite=mysql-filesystem",
+    "test:behat:postgresql-filesystem": "vendor/bin/behat --strict --suite=postgresql-filesystem",
     "test": [
       "@test:phpunit",
       "@test:behat"

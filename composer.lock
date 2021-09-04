@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2f443cf78759cb3a36a81f48d74f128d",
+    "content-hash": "f7cc7c2ee63c2d5144ba3912ed39fa67",
     "packages": [
         {
             "name": "guzzlehttp/psr7",
@@ -2819,6 +2819,67 @@
                 "source": "https://github.com/imbo/imbo-pdo-adapters/tree/main"
             },
             "time": "2021-09-04T12:37:11+00:00"
+        },
+        {
+            "name": "imbo/imbo-postgresql-adapters",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/imbo/imbo-postgresql-adapters.git",
+                "reference": "692a857d37891dd0fc7abaa027797501c9d08556"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/imbo/imbo-postgresql-adapters/zipball/692a857d37891dd0fc7abaa027797501c9d08556",
+                "reference": "692a857d37891dd0fc7abaa027797501c9d08556",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pdo": "*",
+                "ext-pdo_pgsql": "*",
+                "imbo/imbo-pdo-adapters": "dev-main",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "imbo/imbo": "dev-develop",
+                "imbo/imbo-adapters-sdk": "dev-main",
+                "imbo/imbo-coding-standard": "^2.0",
+                "phpunit/phpunit": "^9.3",
+                "psalm/plugin-phpunit": "^0.16.1",
+                "vimeo/psalm": "^4.9"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Imbo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christer Edvartsen",
+                    "email": "cogo@starzinger.net",
+                    "homepage": "https://github.com/christeredvartsen"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/imbo"
+                }
+            ],
+            "description": "PostgreSQL adapters for Imbo",
+            "homepage": "https://imbo.io/",
+            "keywords": [
+                "imbo"
+            ],
+            "support": {
+                "issues": "https://github.com/imbo/imbo-postgresql-adapters/issues",
+                "source": "https://github.com/imbo/imbo-postgresql-adapters/tree/main"
+            },
+            "time": "2021-09-04T12:41:34+00:00"
         },
         {
             "name": "imbo/imbo-sqlite-adapters",
@@ -5837,6 +5898,7 @@
         "imbo/imbo-filesystem-adapters": 20,
         "imbo/imbo-mongodb-adapters": 20,
         "imbo/imbo-mysql-adapters": 20,
+        "imbo/imbo-postgresql-adapters": 20,
         "imbo/imbo-sqlite-adapters": 20
     },
     "prefer-stable": true,
