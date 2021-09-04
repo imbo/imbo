@@ -9,34 +9,29 @@ use MongoDB\Client as MongoClient;
  * Class for suites that want to use the MongoDB database adapter
  */
 class MongoDB implements AdapterTest {
-    /**
-     * {@inheritdoc}
-     */
     static public function setUp(array $config) {
-        $databaseName = 'imbo_behat_test_database';
+        $client = new MongoClient(
+            $config['database.uri'],
+            [
+                'username' => $config['database.username'],
+                'password' => $config['database.password'],
+            ],
+        );
+        $client->{$config['database.name']}->drop();
 
-        self::removeDatabase($databaseName);
-
-        return ['databaseName' => $databaseName];
+        return $config;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    static public function tearDown(array $config) {
-        self::removeDatabase($config['databaseName']);
-    }
-
-    /**
-     * Remove the test database
-     *
-     * @param string $databaseName Name of the database to drop
-     */
-    static private function removeDatabase($databaseName) {
-        (new MongoClient())->{$databaseName}->drop();
-    }
+    static public function tearDown(array $config) {}
 
     static public function getAdapter(array $config) : Database {
-        return new Database($config['databaseName']);
+        return new Database(
+            $config['database.name'],
+            $config['database.uri'],
+            [
+                'username' => $config['database.username'],
+                'password' => $config['database.password'],
+            ],
+        );
     }
 }

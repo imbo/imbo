@@ -4,16 +4,24 @@ default:
       project_root: "%paths.base%"
       contexts: [Imbo\Behat\FeatureContext]
       database: MongoDB
+      database.uri: mongodb://localhost:27017
+      database.name: imbo_behat_test_database
+      database.username: admin
+      database.password: password
       storage: GridFS
     mongodb-filesystem:
       project_root: "%paths.base%"
       contexts: [Imbo\Behat\FeatureContext]
       database: MongoDB
+      database.uri: mongodb://localhost:27017
+      database.username: admin
+      database.password: password
       storage: Filesystem
-    doctrine-sqlite-filesystem:
+    sqlite-filesystem:
       project_root: "%paths.base%"
       contexts: [Imbo\Behat\FeatureContext]
-      database: DoctrineSQLite
+      database: SQLite
+      database.dsn: sqlite:/tmp/imbo-sqlite-integration-test.sq3
       storage: Filesystem
     mysql-filesystem:
       project_root: "%paths.base%"

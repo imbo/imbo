@@ -13,30 +13,30 @@ class GridFS implements AdapterTest {
      * {@inheritdoc}
      */
     static public function setUp(array $config) {
-        $databaseName = 'imbo_behat_test_storage';
+        $config['databaseName'] = 'imbo_behat_test_storage';
 
-        self::removeDatabase($databaseName);
+        $client = new MongoClient(
+            $config['database.uri'],
+            [
+                'username' => $config['database.username'],
+                'password' => $config['database.password'],
+            ],
+        );
+        $client->{$config['databaseName']}->drop();
 
-        return ['databaseName' => $databaseName];
+        return $config;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    static public function tearDown(array $config) {
-        self::removeDatabase($config['databaseName']);
-    }
-
-    /**
-     * Remove the test database
-     *
-     * @param string $databaseName Name of the database to drop
-     */
-    static private function removeDatabase($databaseName) {
-        (new MongoClient())->{$databaseName}->drop();
-    }
+    static public function tearDown(array $config) {}
 
     static public function getAdapter(array $config) : Storage {
-        return new Storage($config['databaseName']);
+        return new Storage(
+            $config['databaseName'],
+            $config['database.uri'],
+            [
+                'username' => $config['database.username'],
+                'password' => $config['database.password'],
+            ],
+        );
     }
 }

@@ -16,6 +16,9 @@ jobs:
         image: mongo:${{ matrix.mongodb-versions }}
         ports:
           - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: admin
+          MONGO_INITDB_ROOT_PASSWORD: password
 
     steps:
       - name: Setup PHP
@@ -61,6 +64,9 @@ jobs:
         image: mongo:${{ matrix.mongodb-versions }}
         ports:
           - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: admin
+          MONGO_INITDB_ROOT_PASSWORD: password
 
     steps:
       - name: Setup PHP
@@ -116,6 +122,9 @@ jobs:
         image: mongo:${{ matrix.mongodb-versions }}
         ports:
           - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: admin
+          MONGO_INITDB_ROOT_PASSWORD: password
 
     steps:
       - name: Setup PHP
@@ -156,7 +165,7 @@ jobs:
           name: httpd-logs-mongodb-filesystem
           path: build/logs
 
-  integration-tests-doctrine-sqlite-filesystem:
+  integration-tests-sqlite-filesystem:
     name: Integration tests (SQLite / Filesystem)
     strategy:
       matrix:
@@ -171,6 +180,9 @@ jobs:
         image: mongo:${{ matrix.mongodb-versions }}
         ports:
           - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: admin
+          MONGO_INITDB_ROOT_PASSWORD: password
 
     steps:
       - name: Setup PHP
@@ -198,17 +210,20 @@ jobs:
       - name: Install dependencies
         run: composer install
 
+      - name: Create tables
+        run: sqlite3 /tmp/imbo-sqlite-integration-test.sq3 < ./vendor/imbo/imbo-sqlite-adapters/setup/000-imbo.sql
+
       - name: Start PHP web server
         run: |
           mkdir -p build/logs
           php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &
 
       - name: Run integration tests using Behat
-        run: vendor/bin/behat --strict --suite=doctrine-sqlite-filesystem
+        run: vendor/bin/behat --strict --suite=sqlite-filesystem
 
       - uses: actions/upload-artifact@v2
         with:
-          name: httpd-logs-doctrine-sqlite-filesystem
+          name: httpd-logs-sqlite-filesystem
           path: build/logs
 
   integration-tests-mysql-filesystem:
@@ -228,6 +243,9 @@ jobs:
         image: mongo:${{ matrix.mongodb-versions }}
         ports:
           - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: admin
+          MONGO_INITDB_ROOT_PASSWORD: password
 
       mysql:
         image: mysql:${{ matrix.mysql-versions }}

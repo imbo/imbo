@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5640202aa4610caab9d9597f74aa7bf5",
+    "content-hash": "2f443cf78759cb3a36a81f48d74f128d",
     "packages": [
         {
             "name": "guzzlehttp/psr7",
@@ -2708,12 +2708,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-mysql-adapters.git",
-                "reference": "d17f4c5f8cafe0fb4692945ce81006ff5ebe11c4"
+                "reference": "cb1fc22e71ccacfbc1ee68ffe2cb5d1709fa2005"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-mysql-adapters/zipball/d17f4c5f8cafe0fb4692945ce81006ff5ebe11c4",
-                "reference": "d17f4c5f8cafe0fb4692945ce81006ff5ebe11c4",
+                "url": "https://api.github.com/repos/imbo/imbo-mysql-adapters/zipball/cb1fc22e71ccacfbc1ee68ffe2cb5d1709fa2005",
+                "reference": "cb1fc22e71ccacfbc1ee68ffe2cb5d1709fa2005",
                 "shasum": ""
             },
             "require": {
@@ -2761,7 +2761,7 @@
                 "issues": "https://github.com/imbo/imbo-mysql-adapters/issues",
                 "source": "https://github.com/imbo/imbo-mysql-adapters/tree/main"
             },
-            "time": "2021-09-03T05:51:56+00:00"
+            "time": "2021-09-04T12:38:31+00:00"
         },
         {
             "name": "imbo/imbo-pdo-adapters",
@@ -2769,12 +2769,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-pdo-adapters.git",
-                "reference": "69471fc4c4e6aefe5b6abf261a677816cb9863c7"
+                "reference": "eade96abb3f6a27b17853fe629ac298bb27672d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-pdo-adapters/zipball/69471fc4c4e6aefe5b6abf261a677816cb9863c7",
-                "reference": "69471fc4c4e6aefe5b6abf261a677816cb9863c7",
+                "url": "https://api.github.com/repos/imbo/imbo-pdo-adapters/zipball/eade96abb3f6a27b17853fe629ac298bb27672d1",
+                "reference": "eade96abb3f6a27b17853fe629ac298bb27672d1",
                 "shasum": ""
             },
             "require": {
@@ -2818,7 +2818,68 @@
                 "issues": "https://github.com/imbo/imbo-pdo-adapters/issues",
                 "source": "https://github.com/imbo/imbo-pdo-adapters/tree/main"
             },
-            "time": "2021-09-03T05:44:04+00:00"
+            "time": "2021-09-04T12:37:11+00:00"
+        },
+        {
+            "name": "imbo/imbo-sqlite-adapters",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/imbo/imbo-sqlite-adapters.git",
+                "reference": "6152eaf4ba9220c145bb3bbb69034f8cddd951e1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/imbo/imbo-sqlite-adapters/zipball/6152eaf4ba9220c145bb3bbb69034f8cddd951e1",
+                "reference": "6152eaf4ba9220c145bb3bbb69034f8cddd951e1",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pdo": "*",
+                "ext-pdo_sqlite": "*",
+                "imbo/imbo-pdo-adapters": "dev-main",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "imbo/imbo": "dev-develop",
+                "imbo/imbo-adapters-sdk": "dev-main",
+                "imbo/imbo-coding-standard": "^2.0",
+                "phpunit/phpunit": "^9.3",
+                "psalm/plugin-phpunit": "^0.16.1",
+                "vimeo/psalm": "^4.9"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Imbo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christer Edvartsen",
+                    "email": "cogo@starzinger.net",
+                    "homepage": "https://github.com/christeredvartsen"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/imbo"
+                }
+            ],
+            "description": "SQLite adapters for Imbo",
+            "homepage": "https://imbo.io/",
+            "keywords": [
+                "imbo"
+            ],
+            "support": {
+                "issues": "https://github.com/imbo/imbo-sqlite-adapters/issues",
+                "source": "https://github.com/imbo/imbo-sqlite-adapters/tree/main"
+            },
+            "time": "2021-09-04T12:43:11+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -5775,7 +5836,8 @@
         "imbo/imbo-adapters-sdk": 20,
         "imbo/imbo-filesystem-adapters": 20,
         "imbo/imbo-mongodb-adapters": 20,
-        "imbo/imbo-mysql-adapters": 20
+        "imbo/imbo-mysql-adapters": 20,
+        "imbo/imbo-sqlite-adapters": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

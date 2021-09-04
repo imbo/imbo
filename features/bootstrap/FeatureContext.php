@@ -685,7 +685,7 @@ class FeatureContext extends ApiContext {
             ));
         }
 
-        $mongoDB = (new MongoClient())->imbo_testing;
+        $mongoDB = (new MongoClient('mongodb://localhost:27017', ['username' => 'admin', 'password' => 'password']))->imbo_testing;
 
         foreach ($fixtures as $collection => $data) {
             $mongoDB->$collection->drop();
