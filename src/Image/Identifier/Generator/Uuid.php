@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Identifier\Generator;
 
 use Imbo\Model\Image;
@@ -7,18 +7,15 @@ use Ramsey\Uuid\Uuid as UuidFactory;
 /**
  * UUID image identifier generator
  */
-class Uuid implements GeneratorInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public function generate(Image $image) {
+class Uuid implements GeneratorInterface
+{
+    public function generate(Image $image): string
+    {
         return (string) UuidFactory::uuid4();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isDeterministic() {
+    public function isDeterministic(): bool
+    {
         return false;
     }
 }

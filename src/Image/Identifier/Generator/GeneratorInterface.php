@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Identifier\Generator;
 
 use Imbo\Model\Image;
@@ -6,20 +6,21 @@ use Imbo\Model\Image;
 /**
  * Image identifier generator interface
  */
-interface GeneratorInterface {
+interface GeneratorInterface
+{
     /**
      * Generate an image identifier
      *
-     * @param Imbo\Model\Image $image The image to generate an image identifier for
+     * @param Image $image The image to generate an image identifier for
      * @return string A valid image identifier, between 1 and 255 characters
      */
-    function generate(Image $image);
+    public function generate(Image $image): string;
 
     /**
-     * Return a boolean indicating whether or not the generator is deterministic. Meaning
+     * Return a bool indicating whether or not the generator is deterministic. Meaning
      * that it will always return the same identifier for the same image.
      *
-     * @return boolean
+     * @return bool
      */
-    function isDeterministic();
+    public function isDeterministic(): bool;
 }

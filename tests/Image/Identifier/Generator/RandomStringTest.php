@@ -8,11 +8,13 @@ use PHPUnit\Framework\TestCase;
 /**
  * @coversDefaultClass Imbo\Image\Identifier\Generator\RandomString
  */
-class RandomStringTest extends TestCase {
+class RandomStringTest extends TestCase
+{
     /**
      * @covers ::generate
      */
-    public function testGeneratesUniqueStrings() : void {
+    public function testGeneratesUniqueStrings(): void
+    {
         $stringLength = 15;
 
         $image = $this->createMock(Image::class);
@@ -25,12 +27,16 @@ class RandomStringTest extends TestCase {
             // Does it have the right format?
             $this->assertMatchesRegularExpression(
                 '/^[A-Za-z0-9_-]{' . $stringLength . '}$/',
-                $imageIdentifier
+                $imageIdentifier,
             );
 
             $generated[] = $imageIdentifier;
         }
 
-        $this->assertSame(count($generated), count(array_unique($generated)), 'Expected array to have unique values');
+        $this->assertSame(
+            count($generated),
+            count(array_unique($generated)),
+            'Expected array to have unique values',
+        );
     }
 }

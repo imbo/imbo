@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Identifier\Generator;
 
 use Imbo\Model\Image;
@@ -6,20 +6,22 @@ use Imbo\Model\Image;
 /**
  * Random string image identifier generator
  */
-class RandomString implements GeneratorInterface {
+class RandomString implements GeneratorInterface
+{
+    private int $stringLength;
+
     /**
      * Class constructor
      *
-     * @param integer $length The length of the randomly generated string
+     * @param int $length The length of the randomly generated string
      */
-    public function __construct($length = 12) {
+    public function __construct(int $length = 12)
+    {
         $this->stringLength = $length;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function generate(Image $image) {
+    public function generate(Image $image): string
+    {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-';
         $charsLen = strlen($chars);
         $key = '';
@@ -31,10 +33,8 @@ class RandomString implements GeneratorInterface {
         return $key;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isDeterministic() {
+    public function isDeterministic(): bool
+    {
         return false;
     }
 }
