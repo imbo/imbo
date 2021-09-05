@@ -120,6 +120,42 @@ class SmartSizeTest extends TestCase {
                 ['width' => 800, 'height' => 1800],
                 ['width' => 800, 'height' => 300, 'poi' => '100,700', 'crop' => 'wide'],
                 ['width' => 800, 'height' => 300, 'x' => 0, 'y' => 550]
+            ],
+
+            'Square, full crop, (800,300) poi on landscape image' => [
+                ['width' => 1200, 'height' => 700],
+                ['width' => 400, 'height' => 400, 'poi' => '800,300', 'crop' => 'full'],
+                ['width' => 700, 'height' => 700, 'x' => 450, 'y' => 0]
+            ],
+
+            'Square, full crop, (0,0) poi on portrait image' => [
+                ['width' => 700, 'height' => 1200],
+                ['width' => 400, 'height' => 400, 'poi' => '0,0', 'crop' => 'full'],
+                ['width' => 700, 'height' => 700, 'x' => 0, 'y' => 0]
+            ],
+
+            'Square, full crop, (0,700) poi on portrait image' => [
+                ['width' => 700, 'height' => 1200],
+                ['width' => 400, 'height' => 400, 'poi' => '0,700', 'crop' => 'full'],
+                ['width' => 700, 'height' => 700, 'x' => 0, 'y' => 350]
+            ],
+
+            'Square, full crop, (500,500) poi on square image' => [
+                ['width' => 1200, 'height' => 1200],
+                ['width' => 400, 'height' => 400, 'poi' => '500,500', 'crop' => 'full'],
+                ['width' => 1200, 'height' => 1200, 'x' => 0, 'y' => 0]
+            ],
+
+            'Portrait, full crop, (600,300) poi on landscape image' => [
+                ['width' => 1200, 'height' => 600],
+                ['width' => 400, 'height' => 700, 'poi' => '600,300', 'crop' => 'full'],
+                ['width' => 343, 'height' => 600, 'x' => 429, 'y' => 0]
+            ],
+
+            'Panorama, full crop, (100,700) poi on portrait image' => [
+                ['width' => 800, 'height' => 1800],
+                ['width' => 800, 'height' => 300, 'poi' => '100,700', 'crop' => 'full'],
+                ['width' => 800, 'height' => 300, 'x' => 0, 'y' => 550]
             ]
         ];
     }
