@@ -8,23 +8,26 @@ use PHPUnit\Framework\TestCase;
 /**
  * @coversDefaultClass Imbo\Router
  */
-class RouterTest extends TestCase {
+class RouterTest extends TestCase
+{
     /**
      * @covers ::route
      */
-    public function testCanBeATeaPot() : void {
+    public function testCanBeATeaPot(): void
+    {
         $request = $this->createConfiguredMock(Request::class, [
             'getMethod' => 'BREW',
         ]);
         $this->expectExceptionObject(new RuntimeException('I\'m a teapot', 418));
 
-        (new Router)->route($request);
+        (new Router())->route($request);
     }
 
     /**
      * @covers ::route
      */
-    public function testThrowsExceptionOnUnsupportedHttpMethod() : void {
+    public function testThrowsExceptionOnUnsupportedHttpMethod(): void
+    {
         $request = $this->createConfiguredMock(Request::class, [
             'getMethod' => 'TRACE',
         ]);
@@ -33,7 +36,8 @@ class RouterTest extends TestCase {
         (new Router())->route($request);
     }
 
-    public function getInvalidRoutes() : array {
+    public function getInvalidRoutes(): array
+    {
         return [
             ['/foobar'],
             ['/status.json/'],
@@ -53,7 +57,8 @@ class RouterTest extends TestCase {
      * @dataProvider getInvalidRoutes
      * @covers ::route
      */
-    public function testThrowsExceptionWhenNoRouteMatches(string $route) : void {
+    public function testThrowsExceptionWhenNoRouteMatches(string $route): void
+    {
         $request = $this->createConfiguredMock(Request::class, [
             'getMethod'   => 'GET',
             'getPathInfo' => $route,
@@ -63,7 +68,8 @@ class RouterTest extends TestCase {
         (new Router())->route($request);
     }
 
-    public function getValidRoutes() : array {
+    public function getValidRoutes(): array
+    {
         return [
             // Global short URL resource
             ['/s/asdfghj', 'globalshorturl'],
@@ -127,7 +133,8 @@ class RouterTest extends TestCase {
      * @dataProvider getValidRoutes
      * @covers ::route
      */
-    public function testCanMatchValidRoutes(string $route, string $resource, ?string $user = null, ?string $imageIdentifier = null, ?string $extension = null) : void {
+    public function testCanMatchValidRoutes(string $route, string $resource, ?string $user = null, ?string $imageIdentifier = null, ?string $extension = null): void
+    {
         $request = $this
             ->getMockBuilder(Request::class)
             ->setMethods(['getPathInfo', 'getMethod'])
@@ -156,7 +163,8 @@ class RouterTest extends TestCase {
      * @covers ::route
      * @covers ::__construct
      */
-    public function testCanMatchCustomRoute() : void {
+    public function testCanMatchCustomRoute(): void
+    {
         $request = $this
             ->getMockBuilder(Request::class)
             ->setMethods(['getPathInfo', 'getMethod'])

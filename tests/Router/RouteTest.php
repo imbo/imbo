@@ -6,17 +6,20 @@ use PHPUnit\Framework\TestCase;
 /**
  * @coversDefaultClass Imbo\Router\Route
  */
-class RouteTest extends TestCase {
-    private $route;
+class RouteTest extends TestCase
+{
+    private Route $route;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->route = new Route();
     }
 
     /**
      * @covers ::__toString
      */
-    public function testReturnsNullWhenNameIsNotSet() : void {
+    public function testReturnsNullWhenNameIsNotSet(): void
+    {
         $this->assertSame('', (string) $this->route);
     }
 
@@ -24,7 +27,8 @@ class RouteTest extends TestCase {
      * @covers ::setName
      * @covers ::__toString
      */
-    public function testReturnsTheSetName() : void {
+    public function testReturnsTheSetName(): void
+    {
         $this->assertSame($this->route, $this->route->setName('name'));
         $this->assertSame('name', (string) $this->route);
     }

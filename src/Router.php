@@ -1,20 +1,21 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo;
 
-use Imbo\Http\Request\Request;
 use Imbo\Exception\RuntimeException;
+use Imbo\Http\Request\Request;
 use Imbo\Router\Route;
 
 /**
  * Router class containing supported routes
  */
-class Router {
+class Router
+{
     /**
      * HTTP methods supported one way or another in Imbo
      *
-     * @var array
+     * @var array<string,bool>
      */
-    static private $supportedHttpMethods = [
+    private static array $supportedHttpMethods = [
         'GET'     => true,
         'POST'    => true,
         'PUT'     => true,
@@ -27,9 +28,9 @@ class Router {
     /**
      * The different routes that imbo handles
      *
-     * @var array
+     * @var array<string,string>
      */
-    private $routes = [
+    private array $routes = [
         'image'          => '#^/users/(?<user>[a-z0-9_-]{1,})/images/(?<imageIdentifier>[A-Za-z0-9_-]{1,255})(\.(?<extension>[^/]*))?$#',
         'globalshorturl' => '#^/s/(?<shortUrlId>[a-zA-Z0-9]{7})$#',
         'status'         => '#^/status(/|(\.(?<extension>json)))?$#',
@@ -51,9 +52,10 @@ class Router {
     /**
      * Class constructor
      *
-     * @param array $extraRoutes Extra routes passed in from configuration
+     * @param array<string,string> $extraRoutes Extra routes passed in from configuration
      */
-    public function __construct(array $extraRoutes = []) {
+    public function __construct(array $extraRoutes = [])
+    {
         $this->routes = array_merge($this->routes, $extraRoutes);
     }
 
@@ -61,8 +63,11 @@ class Router {
      * Route the current request
      *
      * @param Request $request The current request
+     * @throws RuntimeException
+     * @return void
      */
-    public function route(Request $request) {
+    public function route(Request $request): void
+    {
         $httpMethod = $request->getMethod();
 
         if ($httpMethod === 'BREW') {
@@ -82,12 +87,10 @@ class Router {
             }
         }
 
-        // Path matched no route
-        if (!$matches) {
+        if ([] === $matches) {
             throw new RuntimeException('Not Found', 404);
         }
 
-        // Create and populate a route instance that we want to inject into the request
         $route = new Route();
         $route->setName($resourceName);
 
@@ -98,7 +101,6 @@ class Router {
             }
         }
 
-        // Store the route in the request
         $request->setRoute($route);
     }
 }
