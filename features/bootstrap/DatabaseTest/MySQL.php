@@ -3,30 +3,34 @@ namespace Imbo\Behat\DatabaseTest;
 
 use Imbo\Behat\AdapterTest;
 use Imbo\Database\MySQL as DatabaseAdapter;
-use Imbo\Database\PDOAdapter;
 use PDO;
 
-/**
- * Class for suites that want to use the MySQL database adapter
- */
-class MySQL implements AdapterTest {
-    static public function setUp(array $config) {
+class MySQL implements AdapterTest
+{
+    public static function setUp(array $config): array
+    {
         $pdo = new PDO(
             $config['database.dsn'],
             $config['database.username'],
             $config['database.password'],
+            [
+                PDO::ATTR_PERSISTENT => true,
+            ],
         );
 
-        foreach ([PDOAdapter::SHORTURL_TABLE, PDOAdapter::IMAGEINFO_TABLE] as $table) {
+        foreach ([DatabaseAdapter::SHORTURL_TABLE, DatabaseAdapter::IMAGEINFO_TABLE] as $table) {
             $pdo->query("DELETE FROM `{$table}`");
         }
 
         return $config;
     }
 
-    static public function tearDown(array $config) {}
+    public static function tearDown(array $config): void
+    {
+    }
 
-    static public function getAdapter(array $config) : DatabaseAdapter {
+    public static function getAdapter(array $config): DatabaseAdapter
+    {
         return new DatabaseAdapter(
             $config['database.dsn'],
             $config['database.username'],

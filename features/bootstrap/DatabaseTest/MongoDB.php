@@ -2,14 +2,13 @@
 namespace Imbo\Behat\DatabaseTest;
 
 use Imbo\Behat\AdapterTest;
-use Imbo\Database\MongoDB as Database;
+use Imbo\Database\MongoDB as DatabaseAdapter;
 use MongoDB\Client as MongoClient;
 
-/**
- * Class for suites that want to use the MongoDB database adapter
- */
-class MongoDB implements AdapterTest {
-    static public function setUp(array $config) {
+class MongoDB implements AdapterTest
+{
+    public static function setUp(array $config): array
+    {
         $client = new MongoClient(
             $config['database.uri'],
             [
@@ -22,10 +21,13 @@ class MongoDB implements AdapterTest {
         return $config;
     }
 
-    static public function tearDown(array $config) {}
+    public static function tearDown(array $config): void
+    {
+    }
 
-    static public function getAdapter(array $config) : Database {
-        return new Database(
+    public static function getAdapter(array $config): DatabaseAdapter
+    {
+        return new DatabaseAdapter(
             $config['database.name'],
             $config['database.uri'],
             [

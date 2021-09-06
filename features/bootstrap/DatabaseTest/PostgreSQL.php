@@ -5,15 +5,17 @@ use Imbo\Behat\AdapterTest;
 use Imbo\Database\PostgreSQL as DatabaseAdapter;
 use PDO;
 
-/**
- * Class for suites that want to use the PostgreSQL database adapter
- */
-class PostgreSQL implements AdapterTest {
-    static public function setUp(array $config) {
+class PostgreSQL implements AdapterTest
+{
+    public static function setUp(array $config): array
+    {
         $pdo = new PDO(
             $config['database.dsn'],
             $config['database.username'],
             $config['database.password'],
+            [
+                PDO::ATTR_PERSISTENT => true,
+            ],
         );
 
         foreach ([DatabaseAdapter::SHORTURL_TABLE, DatabaseAdapter::IMAGEINFO_TABLE] as $table) {
@@ -23,9 +25,12 @@ class PostgreSQL implements AdapterTest {
         return $config;
     }
 
-    static public function tearDown(array $config) {}
+    public static function tearDown(array $config): void
+    {
+    }
 
-    static public function getAdapter(array $config) : DatabaseAdapter {
+    public static function getAdapter(array $config): DatabaseAdapter
+    {
         return new DatabaseAdapter(
             $config['database.dsn'],
             $config['database.username'],

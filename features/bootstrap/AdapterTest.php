@@ -7,7 +7,8 @@ use Imbo\Storage\StorageInterface;
 /**
  * Interface for adapter test classes
  */
-interface AdapterTest {
+interface AdapterTest
+{
     /**
      * Set up the environment for the adapter that is being tested
      *
@@ -18,7 +19,7 @@ interface AdapterTest {
      * @param array $config Suite configuration from from behat.yml[.dist]
      * @return array
      */
-    static public function setUp(array $config);
+    public static function setUp(array $config): array;
 
     /**
      * Tear down the environment for the adapter that is being tested
@@ -28,7 +29,7 @@ interface AdapterTest {
      *
      * @param array $config Configuration returned from the setUp method
      */
-    static public function tearDown(array $config);
+    public static function tearDown(array $config): void;
 
     /**
      * Get an instance of the adapter under test
@@ -40,5 +41,5 @@ interface AdapterTest {
      * @param array $config Configuration returned from the setUp method
      * @return DatabaseInterface|StorageInterface
      */
-    static public function getAdapter(array $config);
+    public static function getAdapter(array $config);
 }

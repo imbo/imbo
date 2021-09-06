@@ -2,27 +2,28 @@
 namespace Imbo\Behat\DatabaseTest;
 
 use Imbo\Behat\AdapterTest;
-use Imbo\Database\PDOAdapter;
 use Imbo\Database\SQLite as DatabaseAdapter;
 use PDO;
 
-/**
- * Class for suites that want to use the SQLite database adapter
- */
-class SQLite implements AdapterTest {
-    static public function setUp(array $config) {
+class SQLite implements AdapterTest
+{
+    public static function setUp(array $config): array
+    {
         $pdo = new PDO($config['database.dsn']);
 
-        foreach ([PDOAdapter::SHORTURL_TABLE, PDOAdapter::IMAGEINFO_TABLE] as $table) {
+        foreach ([DatabaseAdapter::SHORTURL_TABLE, DatabaseAdapter::IMAGEINFO_TABLE] as $table) {
             $pdo->query("DELETE FROM `{$table}`");
         }
 
         return $config;
     }
 
-    static public function tearDown(array $config) {}
+    public static function tearDown(array $config): void
+    {
+    }
 
-    static public function getAdapter(array $config) : DatabaseAdapter {
+    public static function getAdapter(array $config): DatabaseAdapter
+    {
         return new DatabaseAdapter($config['database.dsn']);
     }
 }
