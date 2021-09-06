@@ -15,7 +15,7 @@ class Webp implements OutputConverterInterface
         ];
     }
 
-    public function convert(Imagick $imagick, Image $image, string $extension, string $mime)
+    public function convert(Imagick $imagick, Image $image, string $extension, string $mimeType = null)
     {
         try {
             $imagick->setImageFormat($extension);

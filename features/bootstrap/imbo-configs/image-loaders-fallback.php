@@ -1,17 +1,20 @@
 <?php declare(strict_types=1);
 namespace Imbo\Behat;
 
-use Imbo\Image\InputLoader\InputLoaderInterface;
 use Imagick;
+use Imbo\Image\InputLoader\InputLoaderInterface;
 
-class OverrideJpegDummyLoader implements InputLoaderInterface {
-    public function getSupportedMimeTypes() {
+class OverrideJpegDummyLoader implements InputLoaderInterface
+{
+    public function getSupportedMimeTypes(): array
+    {
         return [
             'image/jpeg' => 'jpg',
         ];
     }
 
-    public function load(Imagick $imagick, $blob, $mimeType) {
+    public function load(Imagick $imagick, string $blob, string $mimeType)
+    {
         $im = imagecreatetruecolor(300, 300);
 
         ob_start();
@@ -23,14 +26,17 @@ class OverrideJpegDummyLoader implements InputLoaderInterface {
     }
 }
 
-class NullImplementation implements InputLoaderInterface {
-    public function getSupportedMimeTypes() {
+class NullImplementation implements InputLoaderInterface
+{
+    public function getSupportedMimeTypes(): array
+    {
         return [
             'image/jpeg' => 'jpg',
         ];
     }
 
-    public function load(Imagick $imagick, $blob, $mimeType) {
+    public function load(Imagick $imagick, string $blob, string $mimeType)
+    {
         return false;
     }
 }

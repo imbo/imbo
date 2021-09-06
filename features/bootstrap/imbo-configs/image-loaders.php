@@ -1,22 +1,25 @@
 <?php declare(strict_types=1);
 namespace Imbo\Behat;
 
-use Imbo\Image\InputLoader\InputLoaderInterface;
 use Imagick;
+use Imbo\Image\InputLoader\InputLoaderInterface;
 
 /**
  * Text .. image .. loader. Renders text to a 300x300 texture.
  *
  * This loader is an example and should never be used in production.
  */
-class Text implements InputLoaderInterface {
-    public function getSupportedMimeTypes() {
+class Text implements InputLoaderInterface
+{
+    public function getSupportedMimeTypes(): array
+    {
         return [
             'text/plain' => 'txt',
         ];
     }
 
-    public function load(Imagick $imagick, $blob, $mimeType) {
+    public function load(Imagick $imagick, string $blob, string $mimeType)
+    {
         $im = imagecreatetruecolor(300, 300);
         $textColor = imagecolorallocate($im, 0x00, 0x00, 0x00);
         $backgroundColor = imagecolorallocate($im, 0xff, 0xff, 0xff);

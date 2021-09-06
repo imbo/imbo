@@ -33,7 +33,7 @@
     "guzzlehttp/psr7": "^2.0",
     "ramsey/uuid": "^4.2",
     "symfony/console": "^5.1",
-    "symfony/http-foundation": "^4.3"
+    "symfony/http-foundation": "^5.3"
   },
   "require-dev": {
     "christeredvartsen/testfs": "^0.3.0",

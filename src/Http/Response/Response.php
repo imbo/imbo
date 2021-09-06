@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Http\Response;
 
 use Imbo\Model;
@@ -7,7 +7,8 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 /**
  * Response object from the server to the client
  */
-class Response extends SymfonyResponse {
+class Response extends SymfonyResponse
+{
     /**
      * Model instance
      *
@@ -20,7 +21,8 @@ class Response extends SymfonyResponse {
      *
      * @return null|Model\ModelInterface
      */
-    public function getModel() {
+    public function getModel()
+    {
         return $this->model;
     }
 
@@ -30,7 +32,8 @@ class Response extends SymfonyResponse {
      * @param Model\ModelInterface $model A model instance
      * @return Response
      */
-    public function setModel(Model\ModelInterface $model = null) {
+    public function setModel(Model\ModelInterface $model = null)
+    {
         $this->model = $model;
 
         return $this;
@@ -39,7 +42,8 @@ class Response extends SymfonyResponse {
     /**
      * Marks the response as not modified as per the Symfony
      */
-    public function setNotModified() {
+    public function setNotModified(): object
+    {
         parent::setNotModified();
         $this->setModel(null);
 
@@ -52,7 +56,8 @@ class Response extends SymfonyResponse {
      * @param Model\Error $error An error model instance
      * @return Response
      */
-    public function setError(Model\Error $error) {
+    public function setError(Model\Error $error)
+    {
         $errorMessage = $error->getErrorMessage();
 
         $this->headers->add([
