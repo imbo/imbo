@@ -243,9 +243,11 @@ class AutoRotateTest extends TransformationTests
     public function testThrowsCustomExceptionsOnPixelException()
     {
         $pixelException = new ImagickPixelException('some error');
-        $imagick = $this->createConfiguredMock(Imagick::class, [
-            'getImageOrientation' => $this->throwException($pixelException),
-        ]);
+        $imagick = $this->createMock(Imagick::class);
+        $imagick
+            ->expects($this->once())
+            ->method('getImageOrientation')
+            ->willThrowException($pixelException);
 
         $this->expectExceptionObject(new TransformationException('some error', 400, $pixelException));
 
