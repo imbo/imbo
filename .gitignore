@@ -12,3 +12,4 @@ phpunit.xml
 test.php
 .php-cs-fixer.cache
 .vscode
+.psalm

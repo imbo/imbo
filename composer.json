@@ -45,7 +45,9 @@
     "imbo/imbo-mysql-adapters": "dev-main",
     "imbo/imbo-postgresql-adapters": "dev-main",
     "imbo/imbo-sqlite-adapters": "dev-main",
-    "phpunit/phpunit": "^9.2"
+    "phpunit/phpunit": "^9.2",
+    "psalm/plugin-phpunit": "^0.16.1",
+    "vimeo/psalm": "^4.10"
   },
   "suggest": {
     "imbo/imbo-s3-adapters": "Enables usage of AWS S3 for storing images",
@@ -109,6 +111,7 @@
       "cd docs; make html"
     ],
     "cs": "php-cs-fixer fix --dry-run --diff",
+    "sa": "vendor/bin/psalm",
     "dev": [
       "mkdir -p build/logs",
       "php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &"
