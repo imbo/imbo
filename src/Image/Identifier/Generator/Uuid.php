@@ -4,9 +4,6 @@ namespace Imbo\Image\Identifier\Generator;
 use Imbo\Model\Image;
 use Ramsey\Uuid\Uuid as UuidFactory;
 
-/**
- * UUID image identifier generator
- */
 class Uuid implements GeneratorInterface
 {
     public function generate(Image $image): string

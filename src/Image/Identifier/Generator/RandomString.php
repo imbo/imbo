@@ -3,9 +3,6 @@ namespace Imbo\Image\Identifier\Generator;
 
 use Imbo\Model\Image;
 
-/**
- * Random string image identifier generator
- */
 class RandomString implements GeneratorInterface
 {
     private int $stringLength;

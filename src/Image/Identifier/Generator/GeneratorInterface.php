@@ -3,9 +3,6 @@ namespace Imbo\Image\Identifier\Generator;
 
 use Imbo\Model\Image;
 
-/**
- * Image identifier generator interface
- */
 interface GeneratorInterface
 {
     /**
