@@ -1,27 +1,29 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image\OutputConverter;
 
-use Imbo\Image\OutputConverter\Bmp;
+use Imagick;
+use ImagickException;
 use Imbo\Exception\OutputConverterException;
 use Imbo\Model\Image;
 use PHPUnit\Framework\TestCase;
-use Imagick;
-use ImagickException;
 
 /**
  * @coversDefaultClass Imbo\Image\OutputConverter\Bmp
  */
-class BmpTest extends TestCase {
-    private $converter;
+class BmpTest extends TestCase
+{
+    private Bmp $converter;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->converter = new Bmp();
     }
 
     /**
      * @covers ::getSupportedMimeTypes
      */
-    public function testReturnsSupportedMimeTypes() : void {
+    public function testReturnsSupportedMimeTypes(): void
+    {
         $types = $this->converter->getSupportedMimeTypes();
 
         $this->assertIsArray($types);
@@ -31,7 +33,8 @@ class BmpTest extends TestCase {
     /**
      * @covers ::convert
      */
-    public function testCanConvertImage() : void {
+    public function testCanConvertImage(): void
+    {
         $extension = 'bmp';
         $mimeType = 'image/bmp';
 
@@ -53,7 +56,8 @@ class BmpTest extends TestCase {
     /**
      * @covers ::convert
      */
-    public function testThrowsExceptionOnImagickFailure() : void {
+    public function testThrowsExceptionOnImagickFailure(): void
+    {
         $extension = 'bmp';
 
         $imagick = $this->createMock(Imagick::class);
@@ -68,7 +72,7 @@ class BmpTest extends TestCase {
             $imagick,
             $this->createMock(Image::class),
             $extension,
-            'image/bmp'
+            'image/bmp',
         );
     }
 }

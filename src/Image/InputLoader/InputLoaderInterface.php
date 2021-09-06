@@ -1,21 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\InputLoader;
 
 use Imagick;
 
-/**
- * Input loader interface
- */
-interface InputLoaderInterface {
+interface InputLoaderInterface
+{
     /**
      * Get mime types supported by the loader
      *
      * Each element in the returned array represents a supported image format, with the mime types
      * as the key and the extension as the value.
      *
-     * @return array
+     * @return array<string,string>
      */
-    function getSupportedMimeTypes();
+    public function getSupportedMimeTypes(): array;
 
     /**
      * Load data from a blob in a specific format into the provided Imagick instance.
@@ -28,5 +26,5 @@ interface InputLoaderInterface {
      *               return values (including null / void) means that the loader successfully
      *               managed to load the image.
      */
-    function load(Imagick $imagick, $blob, $mimeType);
+    public function load(Imagick $imagick, string $blob, string $mimeType);
 }

@@ -1,28 +1,22 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\InputLoader;
 
 use Imagick;
 
-/**
- * Basic image loader / fallback image loader
- */
-class Basic implements InputLoaderInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public function getSupportedMimeTypes() {
+class Basic implements InputLoaderInterface
+{
+    public function getSupportedMimeTypes(): array
+    {
         return [
-            'image/png' => 'png',
+            'image/png'  => 'png',
             'image/jpeg' => 'jpg',
-            'image/gif' => 'gif',
+            'image/gif'  => 'gif',
             'image/tiff' => 'tif',
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function load(Imagick $imagick, $blob, $mimeType) {
+    public function load(Imagick $imagick, string $blob, string $mimeType)
+    {
         $imagick->readImageBlob($blob);
     }
 }

@@ -1,28 +1,22 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\OutputConverter;
 
-use Imbo\Exception\OutputConverterException;
-use Imbo\Model\Image;
 use Imagick;
 use ImagickException;
+use Imbo\Exception\OutputConverterException;
+use Imbo\Model\Image;
 
-/**
- * Output converter for outputting Webp
- */
-class Webp implements OutputConverterInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public function getSupportedMimeTypes() {
+class Webp implements OutputConverterInterface
+{
+    public function getSupportedMimeTypes(): array
+    {
         return [
             'image/webp' => 'webp',
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function convert(Imagick $imagick, Image $image, $extension, $mime) {
+    public function convert(Imagick $imagick, Image $image, string $extension, string $mime)
+    {
         try {
             $imagick->setImageFormat($extension);
         } catch (ImagickException $e) {

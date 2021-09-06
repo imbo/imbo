@@ -1,28 +1,22 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\OutputConverter;
 
-use Imbo\Exception\OutputConverterException;
-use Imbo\Model\Image;
 use Imagick;
 use ImagickException;
+use Imbo\Exception\OutputConverterException;
+use Imbo\Model\Image;
 
-/**
- * Output converter for outputting BMP. Make the web great again.
- */
-class Bmp implements OutputConverterInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public function getSupportedMimeTypes() {
+class Bmp implements OutputConverterInterface
+{
+    public function getSupportedMimeTypes(): array
+    {
         return [
             'image/bmp' => 'bmp',
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function convert(Imagick $imagick, Image $image, $extension, $mime) {
+    public function convert(Imagick $imagick, Image $image, string $extension, string $mime)
+    {
         try {
             $imagick->setImageFormat($extension);
         } catch (ImagickException $e) {

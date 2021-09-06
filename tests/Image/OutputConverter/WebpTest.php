@@ -1,27 +1,29 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image\OutputConverter;
 
-use Imbo\Image\OutputConverter\Webp;
-use Imbo\Exception\OutputConverterException;
-use PHPUnit\Framework\TestCase;
 use Imagick;
 use ImagickException;
+use Imbo\Exception\OutputConverterException;
 use Imbo\Model\Image;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Image\OutputConverter\Webp
  */
-class WebpTest extends TestCase {
-    private $converter;
+class WebpTest extends TestCase
+{
+    private Webp $converter;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->converter = new Webp();
     }
 
     /**
      * @covers ::getSupportedMimeTypes
      */
-    public function testReturnsSupportedMimeTypes() : void {
+    public function testReturnsSupportedMimeTypes(): void
+    {
         $types = $this->converter->getSupportedMimeTypes();
 
         $this->assertIsArray($types);
@@ -31,7 +33,8 @@ class WebpTest extends TestCase {
     /**
      * @covers ::convert
      */
-    public function testCanConvertImage() : void {
+    public function testCanConvertImage(): void
+    {
         $extension = 'webp';
         $mimeType = 'image/webp';
 
@@ -53,7 +56,8 @@ class WebpTest extends TestCase {
     /**
      * @covers ::convert
      */
-    public function testThrowsExceptionOnImagickFailure() : void {
+    public function testThrowsExceptionOnImagickFailure(): void
+    {
         $extension = 'webp';
 
         $imagick = $this->createMock(Imagick::class);
@@ -68,7 +72,7 @@ class WebpTest extends TestCase {
             $imagick,
             $this->createMock(Image::class),
             $extension,
-            'image/webp'
+            'image/webp',
         );
     }
 }

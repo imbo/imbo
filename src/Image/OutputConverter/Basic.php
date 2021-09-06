@@ -1,30 +1,27 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\OutputConverter;
 
-use Imbo\Exception\OutputConverterException;
-use Imbo\Model\Image;
 use Imagick;
 use ImagickException;
+use Imbo\Exception\OutputConverterException;
+use Imbo\Model\Image;
 
-/**
- * Basic output converter that supports gif/png/jpg.
- */
-class Basic implements OutputConverterInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public function getSupportedMimeTypes() {
+class Basic implements OutputConverterInterface
+{
+    public function getSupportedMimeTypes(): array
+    {
         return [
-            'image/jpeg' => ['jpg', 'jpeg'],
-            'image/png' => 'png',
-            'image/gif' => 'gif',
+            'image/jpeg' => [
+                'jpg',
+                'jpeg',
+            ],
+            'image/png'  => 'png',
+            'image/gif'  => 'gif',
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function convert(Imagick $imagick, Image $image, $extension, $mimeType) {
+    public function convert(Imagick $imagick, Image $image, string $extension, string $mimeType)
+    {
         try {
             $imagick->setImageFormat($extension);
 
@@ -32,7 +29,7 @@ class Basic implements OutputConverterInterface {
             // meaning for these two image types. For PNG's a high level will mean more compression,
             // which usually results in a smaller file size, as for JPEG's, a high level means a
             // higher quality, resulting in a larger file size.
-            if ($image->getOutputQualityCompression() !== null && ($mimeType !== 'image/gif')) {
+            if (null !== $image->getOutputQualityCompression() && ('image/gif' !== $mimeType)) {
                 $imagick->setImageCompressionQuality($image->getOutputQualityCompression());
             }
         } catch (ImagickException $e) {
