@@ -1,4 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Exception;
 
-class OutputConverterException extends RuntimeException {}
+class OutputConverterException extends RuntimeException
+{
+}

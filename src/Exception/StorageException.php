@@ -1,7 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Exception;
 
-/**
- * Storage exception
- */
-class StorageException extends RuntimeException {}
+class StorageException extends RuntimeException
+{
+}

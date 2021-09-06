@@ -6,11 +6,15 @@ use PHPUnit\Framework\TestCase;
 /**
  * @coversDefaultClass Imbo\Exception\InvalidArgumentException
  */
-class InvalidArgumentExceptionTest extends TestCase {
-    public function getErrorCodes() : array {
+class InvalidArgumentExceptionTest extends TestCase
+{
+    /**
+     * @return array<int,array{0:int,1:int}>
+     */
+    public function getErrorCodes(): array
+    {
         return [
             [123, 123],
-            ['123', 123],
             [0, 0],
         ];
     }
@@ -20,7 +24,8 @@ class InvalidArgumentExceptionTest extends TestCase {
      * @covers ::getImboErrorCode
      * @covers ::setImboErrorCode
      */
-    public function testSetAndGetImboErrorCode($actual, int $expected) : void {
+    public function testSetAndGetImboErrorCode(int $actual, int $expected): void
+    {
         $exception = new InvalidArgumentException();
         $this->assertSame($exception, $exception->setImboErrorCode($actual));
         $this->assertSame($expected, $exception->getImboErrorCode());

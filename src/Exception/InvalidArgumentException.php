@@ -1,33 +1,21 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Exception;
 
 use Imbo\Exception;
 use InvalidArgumentException as BaseInvalidArgumentException;
 
-/**
- * Invalid argument exception
- */
-class InvalidArgumentException extends BaseInvalidArgumentException implements Exception {
-    /**
-     * Internal Imbo error code injected into the error output
-     *
-     * @var int
-     */
-    private $imboCode;
+class InvalidArgumentException extends BaseInvalidArgumentException implements Exception
+{
+    private ?int $imboCode = null;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setImboErrorCode($code) {
-        $this->imboCode = (int) $code;
-
+    public function setImboErrorCode(int $code): self
+    {
+        $this->imboCode = $code;
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getImboErrorCode() {
+    public function getImboErrorCode(): ?int
+    {
         return $this->imboCode;
     }
 }
