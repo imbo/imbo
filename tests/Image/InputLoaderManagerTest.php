@@ -1,38 +1,44 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image;
 
+use Imagick;
+use Imbo\Exception\InvalidArgumentException;
 use Imbo\Image\InputLoader\Basic;
 use Imbo\Image\InputLoader\InputLoaderInterface;
-use Imbo\Image\InputLoaderManager;
-use Imbo\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Imagick;
 use stdClass;
 
 /**
  * @coversDefaultClass Imbo\Image\InputLoaderManager
  */
-class InputLoaderManagerTest extends TestCase {
-    private $manager;
+class InputLoaderManagerTest extends TestCase
+{
+    private InputLoaderManager $manager;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->manager = new InputLoaderManager();
     }
 
     /**
      * @covers ::setImagick
      */
-    public function testCanSetImagickInstance() : void {
-        $this->assertSame($this->manager, $this->manager->setImagick($this->createMock(Imagick::class)));
+    public function testCanSetImagickInstance(): void
+    {
+        $this->assertSame(
+            $this->manager,
+            $this->manager->setImagick($this->createMock(Imagick::class)),
+        );
     }
 
     /**
      * @covers ::addLoaders
      */
-    public function testThrowsExceptionWhenRegisteringWrongLoader() : void {
+    public function testThrowsExceptionWhenRegisteringWrongLoader(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException(
             'Given loader (stdClass) does not implement LoaderInterface',
-            500
+            500,
         ));
         $this->manager->addLoaders([new stdClass()]);
     }
@@ -40,17 +46,22 @@ class InputLoaderManagerTest extends TestCase {
     /**
      * @covers ::addLoaders
      */
-    public function testCanAddLoadersAsStrings() : void {
-        $this->assertSame($this->manager, $this->manager->addLoaders([
-            new Basic(),
-        ]));
+    public function testCanAddLoadersAsStrings(): void
+    {
+        $this->assertSame(
+            $this->manager,
+            $this->manager->addLoaders([
+                new Basic(),
+            ]),
+        );
     }
 
     /**
      * @covers ::registerLoader
      * @covers ::getExtensionFromMimeType
      */
-    public function testCanGetExtensionFromMimeType() : void {
+    public function testCanGetExtensionFromMimeType(): void
+    {
         $this->manager->addLoaders([
             new Basic(),
         ]);
@@ -64,7 +75,8 @@ class InputLoaderManagerTest extends TestCase {
      * @covers ::registerLoader
      * @covers ::load
      */
-    public function testCanRegisterAndUseLoaders() : void {
+    public function testCanRegisterAndUseLoaders(): void
+    {
         $imagick = $this->createMock(Imagick::class);
         $mime = 'image/png';
         $blob = 'some data';
@@ -100,14 +112,15 @@ class InputLoaderManagerTest extends TestCase {
 
         $this->assertSame(
             $imagick,
-            $this->manager->load($mime, $blob)
+            $this->manager->load($mime, $blob),
         );
     }
 
     /**
      * @covers ::load
      */
-    public function testManagerReturnsFalseWhenNoLoaderManagesToLoadTheImage() : void {
+    public function testManagerReturnsFalseWhenNoLoaderManagesToLoadTheImage(): void
+    {
         $loader = $this->createConfiguredMock(InputLoaderInterface::class, [
             'getSupportedMimeTypes' => ['image/png' => 'png'],
             'load' => false,
@@ -117,14 +130,15 @@ class InputLoaderManagerTest extends TestCase {
             $this->manager
                 ->setImagick($this->createMock(Imagick::class))
                 ->registerLoader($loader)
-                ->load('image/png', 'some data')
+                ->load('image/png', 'some data'),
         );
     }
 
     /**
      * @covers ::load
      */
-    public function testManagerReturnsNullWhenNoLoadersExist() : void {
+    public function testManagerReturnsNullWhenNoLoadersExist(): void
+    {
         $this->assertNull($this->manager->load('image/png', 'some data'));
     }
 }
