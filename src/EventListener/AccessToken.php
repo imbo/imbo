@@ -8,7 +8,7 @@ use Imbo\Exception\RuntimeException;
 use Imbo\Exception\ConfigurationException;
 use Imbo\Helpers\Urls;
 use Imbo\EventListener\AccessToken\SHA256;
-use GuzzleHttp\Psr7;
+use GuzzleHttp\Psr7\Query;
 
 /**
  * Access token event listener
@@ -221,7 +221,7 @@ class AccessToken implements ListenerInterface {
         $queryString = $urlParts['query'];
         $fixKeyPattern = '#\[[0-9]+\]$#';
 
-        $parsed = Psr7\parse_query($queryString);
+        $parsed = Query::parse($queryString);
         $newArguments = array();
 
         foreach ($parsed as $key => $value) {
@@ -249,7 +249,7 @@ class AccessToken implements ListenerInterface {
             }
         }
 
-        $urlParts['query'] = Psr7\build_query($newArguments, $encoding);
+        $urlParts['query'] = Query::build($newArguments, $encoding);
         $url = Urls::buildFromParseUrlParts($urlParts);
 
         return $url;
