@@ -145,6 +145,8 @@ class IccTest extends TestCase {
      * @covers ::transform
      */
     public function testStripProfileOnMismatch() : void {
+        $this->markTestSkipped('Skip for now because of type issues: https://github.com/Imagick/imagick/issues/456');
+
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -180,6 +182,8 @@ class IccTest extends TestCase {
      * @covers ::transform
      */
     public function testThrowsExceptionWhenApplyingStrippedProfileFails() : void {
+        $this->markTestSkipped('Skip for now because of type issues: https://github.com/Imagick/imagick/issues/456');
+
         $profilePath = DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc';
         $profile = file_get_contents($profilePath);
 
