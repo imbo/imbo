@@ -2859,12 +2859,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-mongodb-adapters.git",
-                "reference": "5f3ca08d2ea032b0dc745015be70dcf99f0b4b63"
+                "reference": "6da28dfa0a376447b570817db340aed62ff170f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-mongodb-adapters/zipball/5f3ca08d2ea032b0dc745015be70dcf99f0b4b63",
-                "reference": "5f3ca08d2ea032b0dc745015be70dcf99f0b4b63",
+                "url": "https://api.github.com/repos/imbo/imbo-mongodb-adapters/zipball/6da28dfa0a376447b570817db340aed62ff170f8",
+                "reference": "6da28dfa0a376447b570817db340aed62ff170f8",
                 "shasum": ""
             },
             "require": {
@@ -2911,7 +2911,7 @@
                 "issues": "https://github.com/imbo/imbo-mongodb-adapters/issues",
                 "source": "https://github.com/imbo/imbo-mongodb-adapters/tree/main"
             },
-            "time": "2021-09-02T22:40:42+00:00"
+            "time": "2021-09-07T18:44:44+00:00"
         },
         {
             "name": "imbo/imbo-mysql-adapters",
