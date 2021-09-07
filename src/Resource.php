@@ -1,75 +1,74 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo;
 
-/**
- * Resource class
- */
-class Resource {
-    const GROUPS_GET              = 'groups.get';
-    const GROUPS_HEAD             = 'groups.head';
-    const GROUPS_OPTIONS          = 'groups.options';
+class Resource
+{
+    public const GROUPS_GET              = 'groups.get';
+    public const GROUPS_HEAD             = 'groups.head';
+    public const GROUPS_OPTIONS          = 'groups.options';
 
-    const GROUP_GET               = 'group.get';
-    const GROUP_HEAD              = 'group.head';
-    const GROUP_PUT               = 'group.put';
-    const GROUP_DELETE            = 'group.delete';
-    const GROUP_OPTIONS           = 'group.options';
+    public const GROUP_GET               = 'group.get';
+    public const GROUP_HEAD              = 'group.head';
+    public const GROUP_PUT               = 'group.put';
+    public const GROUP_DELETE            = 'group.delete';
+    public const GROUP_OPTIONS           = 'group.options';
 
-    const KEYS_PUT                = 'keys.put';
-    const KEYS_HEAD               = 'keys.head';
-    const KEYS_DELETE             = 'keys.delete';
-    const KEYS_OPTIONS            = 'keys.options';
+    public const KEYS_PUT                = 'keys.put';
+    public const KEYS_HEAD               = 'keys.head';
+    public const KEYS_DELETE             = 'keys.delete';
+    public const KEYS_OPTIONS            = 'keys.options';
 
-    const ACCESS_RULE_GET         = 'accessrule.get';
-    const ACCESS_RULE_HEAD        = 'accessrule.head';
-    const ACCESS_RULE_DELETE      = 'accessrule.delete';
-    const ACCESS_RULE_OPTIONS     = 'accessrule.options';
+    public const ACCESS_RULE_GET         = 'accessrule.get';
+    public const ACCESS_RULE_HEAD        = 'accessrule.head';
+    public const ACCESS_RULE_DELETE      = 'accessrule.delete';
+    public const ACCESS_RULE_OPTIONS     = 'accessrule.options';
 
-    const ACCESS_RULES_GET        = 'accessrules.get';
-    const ACCESS_RULES_HEAD       = 'accessrules.head';
-    const ACCESS_RULES_POST       = 'accessrules.post';
-    const ACCESS_RULES_OPTIONS    = 'accessrules.options';
+    public const ACCESS_RULES_GET        = 'accessrules.get';
+    public const ACCESS_RULES_HEAD       = 'accessrules.head';
+    public const ACCESS_RULES_POST       = 'accessrules.post';
+    public const ACCESS_RULES_OPTIONS    = 'accessrules.options';
 
-    const USER_GET                = 'user.get';
-    const USER_HEAD               = 'user.head';
-    const USER_OPTIONS            = 'user.options';
+    public const USER_GET                = 'user.get';
+    public const USER_HEAD               = 'user.head';
+    public const USER_OPTIONS            = 'user.options';
 
-    const IMAGE_GET               = 'image.get';
-    const IMAGE_HEAD              = 'image.head';
-    const IMAGE_DELETE            = 'image.delete';
-    const IMAGE_OPTIONS           = 'image.options';
+    public const IMAGE_GET               = 'image.get';
+    public const IMAGE_HEAD              = 'image.head';
+    public const IMAGE_DELETE            = 'image.delete';
+    public const IMAGE_OPTIONS           = 'image.options';
 
-    const IMAGES_GET              = 'images.get';
-    const IMAGES_HEAD             = 'images.head';
-    const IMAGES_POST             = 'images.post';
-    const IMAGES_OPTIONS          = 'images.options';
+    public const IMAGES_GET              = 'images.get';
+    public const IMAGES_HEAD             = 'images.head';
+    public const IMAGES_POST             = 'images.post';
+    public const IMAGES_OPTIONS          = 'images.options';
 
-    const GLOBAL_IMAGES_GET       = 'globalimages.get';
-    const GLOBAL_IMAGES_HEAD      = 'globalimages.head';
-    const GLOBAL_IMAGES_OPTIONS   = 'globalimages.options';
+    public const GLOBAL_IMAGES_GET       = 'globalimages.get';
+    public const GLOBAL_IMAGES_HEAD      = 'globalimages.head';
+    public const GLOBAL_IMAGES_OPTIONS   = 'globalimages.options';
 
-    const METADATA_GET            = 'metadata.get';
-    const METADATA_HEAD           = 'metadata.head';
-    const METADATA_PUT            = 'metadata.put';
-    const METADATA_POST           = 'metadata.post';
-    const METADATA_DELETE         = 'metadata.delete';
-    const METADATA_OPTIONS        = 'metadata.options';
+    public const METADATA_GET            = 'metadata.get';
+    public const METADATA_HEAD           = 'metadata.head';
+    public const METADATA_PUT            = 'metadata.put';
+    public const METADATA_POST           = 'metadata.post';
+    public const METADATA_DELETE         = 'metadata.delete';
+    public const METADATA_OPTIONS        = 'metadata.options';
 
-    const SHORTURL_GET            = 'shorturl.get';
-    const SHORTURL_HEAD           = 'shorturl.head';
-    const SHORTURL_DELETE         = 'shorturl.delete';
-    const SHORTURL_OPTIONS        = 'shorturl.options';
+    public const SHORTURL_GET            = 'shorturl.get';
+    public const SHORTURL_HEAD           = 'shorturl.head';
+    public const SHORTURL_DELETE         = 'shorturl.delete';
+    public const SHORTURL_OPTIONS        = 'shorturl.options';
 
-    const SHORTURLS_POST          = 'shorturls.post';
-    const SHORTURLS_DELETE        = 'shorturls.delete';
-    const SHORTURLS_OPTIONS       = 'shorturls.options';
+    public const SHORTURLS_POST          = 'shorturls.post';
+    public const SHORTURLS_DELETE        = 'shorturls.delete';
+    public const SHORTURLS_OPTIONS       = 'shorturls.options';
 
     /**
      * Returns a list of resources which should be accessible for read-only public keys
      *
-     * @return array
+     * @return array<string>
      */
-    final public static function getReadOnlyResources() {
+    final public static function getReadOnlyResources(): array
+    {
         return [
             self::USER_GET,
             self::USER_HEAD,
@@ -102,11 +101,13 @@ class Resource {
     /**
      * Returns a list of resources which should be accessible for read+write public keys
      *
-     * @return array
+     * @return array<string>
      */
-    final public static function getReadWriteResources() {
+    final public static function getReadWriteResources(): array
+    {
         return array_merge(
-            self::getReadOnlyResources(), [
+            self::getReadOnlyResources(),
+            [
                 self::IMAGE_DELETE,
                 self::IMAGES_POST,
 
@@ -118,18 +119,20 @@ class Resource {
 
                 self::SHORTURLS_POST,
                 self::SHORTURLS_DELETE,
-            ]
+            ],
         );
     }
 
     /**
      * Returns a list of all resources available, including those which involves access control
      *
-     * @return array
+     * @return array<string>
      */
-    final public static function getAllResources() {
+    final public static function getAllResources(): array
+    {
         return array_merge(
-            self::getReadWriteResources(), [
+            self::getReadWriteResources(),
+            [
                 self::KEYS_PUT,
                 self::KEYS_HEAD,
                 self::KEYS_DELETE,
@@ -154,7 +157,7 @@ class Resource {
                 self::GROUP_PUT,
                 self::GROUP_DELETE,
                 self::GROUP_OPTIONS,
-            ]
+            ],
         );
     }
 }
