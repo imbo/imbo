@@ -71,7 +71,7 @@ class Icc extends Transformation {
             if ($e->getCode() == 465) {
                 try {
                     // strip the existing profile, relying in color space to be correct
-                    $this->imagick->profileImage('*', null);
+                    $this->imagick->profileImage('*', '');
 
                     // try to apply the profile again
                     $this->imagick->profileImage('icc', $iccProfile);
