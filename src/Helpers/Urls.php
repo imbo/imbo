@@ -1,17 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Helpers;
 
-/**
- * Helper class for useful functions for building/manipulating URLs
- */
-class Urls {
+class Urls
+{
     /**
      * Generate a URL from an array with similar structure as returned from parse_url.
      *
      * @param array $parts An array in the format produced from parse_url
      * @return string
      */
-    public static function buildFromParseUrlParts(array $parts) {
+    public static function buildFromParseUrlParts(array $parts): string
+    {
         $url = '';
 
         $url .= isset($parts['scheme']) ? $parts['scheme'] : 'http';
