@@ -1059,6 +1059,37 @@ class FeatureContext extends ApiContext {
     }
 
     /**
+     * Make a request for the short URL parameters generated in the previous request
+     *
+     * @throws RuntimeException
+     * @return self
+     *
+     * @When I request the shorturl params using the generated short URL
+     */
+    public function requestShortUrlParameters() {
+        $this->requireResponse();
+        $body = json_decode((string) $this->response->getBody(), true);
+
+        if (!is_array($body) || json_last_error() !== JSON_ERROR_NONE) {
+            throw new RuntimeException('Invalid response body in the current response instance');
+        } else if (empty($body['id'])) {
+            throw new RuntimeException(sprintf(
+                'Missing "id" from body: "%s".',
+                (string) $this->response->getBody()
+            ));
+        }
+
+        $params = $this->getUserAndImageIdentifierOfPreviouslyAddedImage();
+
+        return $this->requestPath(sprintf(
+            '/users/%s/images/%s/shorturls/%s',
+            $params['user'],
+            $params['imageIdentifier'],
+            $body['id'],
+        ), 'GET');
+    }
+
+    /**
      * Assert the contents of an imbo error message
      *
      * @param string $message The error message

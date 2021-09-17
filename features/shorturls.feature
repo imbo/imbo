@@ -79,3 +79,26 @@ Feature: Imbo can generate short URLs for images on demand
             | {"user": "user", "query": "t[]=thumbnail"}                                                       | image/png  | 50    | 50     |
             | {"user": "user", "query": "t[]=thumbnail:width=45,height=55&t[]=desaturate"}                     | image/png  | 45    | 55     |
             | {"user": "user", "extension": "jpg", "query": "t[]=thumbnail:width=45,height=55&t[]=desaturate"} | image/jpeg | 45    | 55     |
+
+    Scenario Outline: Request short URL parameters
+        Given I use "publicKey" and "privateKey" for public and private keys
+        And I sign the request
+        And I generate a short URL for "tests/Fixtures/image.png" with the following parameters:
+            """
+            <params>
+            """
+
+        When I include an access token in the query string
+        And I request the shorturl params using the generated short URL
+        Then the response status line is "200 OK"
+        And the "Content-Type" response header is "application/json"
+        And the response body contains JSON:
+            """
+            <response>
+            """
+
+        Examples:
+            | params                                                           | response                                                     |
+            | {"user": "user"}                                                 | {"user": "user", "imageIdentifier": "@variableType(string)", "extension": null, "query": []} |
+            | {"user": "user", "extension": "gif"}                             | {"user": "user", "imageIdentifier": "@variableType(string)", "extension": "gif", "query": []} |
+            | {"user": "user", "query": "t[]=thumbnail&t[]=transpose&foo=bar"} | {"user": "user", "imageIdentifier": "@variableType(string)", "extension": null, "query": {"t": ["thumbnail", "transpose"], "foo": "bar"}} |

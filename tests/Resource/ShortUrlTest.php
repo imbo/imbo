@@ -12,18 +12,21 @@ use Imbo\Router\Route;
 /**
  * @coversDefaultClass Imbo\Resource\ShortUrl
  */
-class ShortUrlTest extends ResourceTests {
+class ShortUrlTest extends ResourceTests
+{
     private $request;
     private $route;
     private $response;
     private $database;
     private $event;
 
-    protected function getNewResource() : ShortUrl {
+    protected function getNewResource(): ShortUrl
+    {
         return new ShortUrl();
     }
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->resource = $this->getNewResource();
         $this->route = $this->createMock(Route::class);
         $this->request = $this->createConfiguredMock(Request::class, [
@@ -43,7 +46,8 @@ class ShortUrlTest extends ResourceTests {
     /**
      * @covers ::deleteShortUrl
      */
-    public function testThrowsAnExceptionWhenTheShortUrlDoesNotExist() : void {
+    public function testThrowsAnExceptionWhenTheShortUrlDoesNotExistWhenDeleting(): void
+    {
         $this->route
             ->expects($this->once())
             ->method('get')
@@ -62,7 +66,8 @@ class ShortUrlTest extends ResourceTests {
     /**
      * @covers ::deleteShortUrl
      */
-    public function testThrowsAnExceptionWhenUserOrPrivateKeyDoesNotMatch() : void {
+    public function testThrowsAnExceptionWhenUserOrImageIdentifierDoesNotMatchWhenDeleting(): void
+    {
         $this->route
             ->expects($this->once())
             ->method('get')
@@ -84,7 +89,8 @@ class ShortUrlTest extends ResourceTests {
     /**
      * @covers ::deleteShortUrl
      */
-    public function testCanDeleteAShortUrl() : void {
+    public function testCanDeleteAShortUrl(): void
+    {
         $this->route
             ->expects($this->once())
             ->method('get')
@@ -108,5 +114,84 @@ class ShortUrlTest extends ResourceTests {
             ->with($this->isInstanceOf(ArrayModel::class));
 
         $this->getNewResource()->deleteShortUrl($this->event);
+    }
+
+    /**
+     * @covers ::getShortUrl
+     */
+    public function testThrowsAnExceptionWhenTheShortUrlDoesNotExistWhenGetting(): void
+    {
+        $this->route
+            ->expects($this->once())
+            ->method('get')
+            ->with('shortUrlId')
+            ->willReturn('aaaaaaa');
+        $this->database
+            ->expects($this->once())
+            ->method('getShortUrlParams')
+            ->with('aaaaaaa')
+            ->willReturn(null);
+
+        $this->expectExceptionObject(new ResourceException('ShortURL not found', 404));
+        $this->getNewResource()->getShortUrl($this->event);
+    }
+
+    /**
+     * @covers ::getShortUrl
+     */
+    public function testThrowsAnExceptionWhenUserOrImageIdentifierDoesNotMatchWhenGetting(): void
+    {
+        $this->route
+            ->expects($this->once())
+            ->method('get')
+            ->with('shortUrlId')
+            ->willReturn('aaaaaaa');
+        $this->database
+            ->expects($this->once())
+            ->method('getShortUrlParams')
+            ->with('aaaaaaa')
+            ->willReturn([
+                'user' => 'otheruser',
+                'imageIdentifier' => 'id',
+            ]);
+
+        $this->expectExceptionObject(new ResourceException('ShortURL not found', 404));
+        $this->getNewResource()->getShortUrl($this->event);
+    }
+
+    /**
+     * @covers ::getShortUrl
+     */
+    public function testCanGetAShortUrl(): void
+    {
+        $this->route
+            ->expects($this->once())
+            ->method('get')
+            ->with('shortUrlId')
+            ->willReturn('aaaaaaa');
+
+        $params = [
+            'user' => 'user',
+            'imageIdentifier' => 'id',
+            'extension' => 'gif',
+            'query' => [
+                't' => [
+                    'thumbnail',
+                ],
+            ],
+        ];
+
+        $this->database
+            ->expects($this->once())
+            ->method('getShortUrlParams')
+            ->with('aaaaaaa')
+            ->willReturn($params);
+
+        $this->response
+            ->expects($this->once())
+            ->method('setModel')
+            ->with($this->callback(fn (ArrayModel $model): bool => $model->getData() === $params));
+
+        $this->getNewResource()->getShortUrl($this->event);
     }
 }
