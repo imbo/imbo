@@ -181,7 +181,7 @@ class DatabaseOperations implements ListenerInterface {
         }
 
         if ($params->has('limit')) {
-            $query->setLimit($params->get('limit'));
+            $query->setLimit((int) $params->get('limit'));
         }
 
         if ($params->has('metadata')) {
@@ -190,11 +190,11 @@ class DatabaseOperations implements ListenerInterface {
         }
 
         if ($params->has('from')) {
-            $query->setFrom($params->get('from'));
+            $query->setFrom((int) $params->get('from'));
         }
 
         if ($params->has('to')) {
-            $query->setTo($params->get('to'));
+            $query->setTo((int) $params->get('to'));
         }
 
         if ($params->has('sort')) {
