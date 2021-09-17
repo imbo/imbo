@@ -65,4 +65,4 @@ Feature: Imbo provides a groups endpoint
 
     Scenario: Fetch list of groups without specifying a public key
         When I request "/groups.json"
-        Then the response status line is "400 Permission denied (public key)"
+        Then the response status line is "400 Missing public key"

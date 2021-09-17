@@ -108,9 +108,13 @@ class AccessControl implements ListenerInterface {
         $request = $event->getRequest();
         $aclAdapter = $event->getAccessControl();
         $resource = $event->getName();
-        $publicKey = $request->getPublicKey();
-        $user = $request->getUser();
+        $publicKey = (string) $request->getPublicKey();
 
+        if ('' === $publicKey) {
+            throw new RuntimeException('Missing public key', 400);
+        }
+
+        $user = $request->getUser();
         $hasAccess = $aclAdapter->hasAccess((string) $publicKey, $resource, $user);
 
         if ($hasAccess) {
