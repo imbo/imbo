@@ -1977,16 +1977,16 @@
         },
         {
             "name": "composer/package-versions-deprecated",
-            "version": "1.11.99.3",
+            "version": "1.11.99.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/package-versions-deprecated.git",
-                "reference": "fff576ac850c045158a250e7e27666e146e78d18"
+                "reference": "b174585d1fe49ceed21928a945138948cb394600"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/package-versions-deprecated/zipball/fff576ac850c045158a250e7e27666e146e78d18",
-                "reference": "fff576ac850c045158a250e7e27666e146e78d18",
+                "url": "https://api.github.com/repos/composer/package-versions-deprecated/zipball/b174585d1fe49ceed21928a945138948cb394600",
+                "reference": "b174585d1fe49ceed21928a945138948cb394600",
                 "shasum": ""
             },
             "require": {
@@ -2030,7 +2030,7 @@
             "description": "Composer plugin that provides efficient querying for installed package versions (no runtime IO)",
             "support": {
                 "issues": "https://github.com/composer/package-versions-deprecated/issues",
-                "source": "https://github.com/composer/package-versions-deprecated/tree/1.11.99.3"
+                "source": "https://github.com/composer/package-versions-deprecated/tree/1.11.99.4"
             },
             "funding": [
                 {
@@ -2046,7 +2046,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-08-17T13:49:14+00:00"
+            "time": "2021-09-13T08:41:34+00:00"
         },
         {
             "name": "composer/semver",
@@ -2691,19 +2691,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-adapters-sdk.git",
-                "reference": "b275f66ee48fc54dc9b481fb63554cfd7a185604"
+                "reference": "f750f59bf277ff53639331fe9bb05f06a3022695"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-adapters-sdk/zipball/b275f66ee48fc54dc9b481fb63554cfd7a185604",
-                "reference": "b275f66ee48fc54dc9b481fb63554cfd7a185604",
+                "url": "https://api.github.com/repos/imbo/imbo-adapters-sdk/zipball/f750f59bf277ff53639331fe9bb05f06a3022695",
+                "reference": "f750f59bf277ff53639331fe9bb05f06a3022695",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.4"
             },
             "require-dev": {
-                "imbo/imbo": "dev-develop",
+                "imbo/imbo": "dev-main",
                 "imbo/imbo-coding-standard": "^2.0",
                 "phpunit/phpunit": "^9.5",
                 "psalm/plugin-phpunit": "^0.16.1",
@@ -2740,7 +2740,7 @@
                 "issues": "https://github.com/imbo/imbo-adapters-sdk/issues",
                 "source": "https://github.com/imbo/imbo-adapters-sdk/tree/main"
             },
-            "time": "2021-09-03T05:44:38+00:00"
+            "time": "2021-09-07T19:43:21+00:00"
         },
         {
             "name": "imbo/imbo-coding-standard",
@@ -2800,12 +2800,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-filesystem-adapters.git",
-                "reference": "661a2eebf2effc53a835c46ecbafb65c5a180e72"
+                "reference": "1bd3483ea5788ef0716468e80e9ce74b0caab7bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-filesystem-adapters/zipball/661a2eebf2effc53a835c46ecbafb65c5a180e72",
-                "reference": "661a2eebf2effc53a835c46ecbafb65c5a180e72",
+                "url": "https://api.github.com/repos/imbo/imbo-filesystem-adapters/zipball/1bd3483ea5788ef0716468e80e9ce74b0caab7bb",
+                "reference": "1bd3483ea5788ef0716468e80e9ce74b0caab7bb",
                 "shasum": ""
             },
             "require": {
@@ -2813,7 +2813,7 @@
             },
             "require-dev": {
                 "christeredvartsen/testfs": "^0.3",
-                "imbo/imbo": "dev-develop",
+                "imbo/imbo": "dev-main",
                 "imbo/imbo-adapters-sdk": "dev-main",
                 "imbo/imbo-coding-standard": "^2.0",
                 "phpunit/phpunit": "^9.3",
@@ -2851,7 +2851,7 @@
                 "issues": "https://github.com/imbo/imbo-filesystem-adapters/issues",
                 "source": "https://github.com/imbo/imbo-filesystem-adapters/tree/main"
             },
-            "time": "2021-09-03T05:50:58+00:00"
+            "time": "2021-09-07T19:41:28+00:00"
         },
         {
             "name": "imbo/imbo-mongodb-adapters",
@@ -2859,12 +2859,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-mongodb-adapters.git",
-                "reference": "6da28dfa0a376447b570817db340aed62ff170f8"
+                "reference": "6d16cad4ca0a19b6dcda287dab665e6219003141"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-mongodb-adapters/zipball/6da28dfa0a376447b570817db340aed62ff170f8",
-                "reference": "6da28dfa0a376447b570817db340aed62ff170f8",
+                "url": "https://api.github.com/repos/imbo/imbo-mongodb-adapters/zipball/6d16cad4ca0a19b6dcda287dab665e6219003141",
+                "reference": "6d16cad4ca0a19b6dcda287dab665e6219003141",
                 "shasum": ""
             },
             "require": {
@@ -2873,7 +2873,7 @@
                 "php": ">=7.4"
             },
             "require-dev": {
-                "imbo/imbo": "dev-develop",
+                "imbo/imbo": "dev-main",
                 "imbo/imbo-adapters-sdk": "dev-main",
                 "imbo/imbo-coding-standard": "^2.0",
                 "phpunit/phpunit": "^9.3",
@@ -2911,7 +2911,7 @@
                 "issues": "https://github.com/imbo/imbo-mongodb-adapters/issues",
                 "source": "https://github.com/imbo/imbo-mongodb-adapters/tree/main"
             },
-            "time": "2021-09-07T18:44:44+00:00"
+            "time": "2021-09-07T19:27:02+00:00"
         },
         {
             "name": "imbo/imbo-mysql-adapters",
@@ -2919,12 +2919,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-mysql-adapters.git",
-                "reference": "5ee61408efbdba167c774d8c2ed28f7365b9bcdc"
+                "reference": "b5845be470b0135a162b70544eac2c62c4efe0d9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-mysql-adapters/zipball/5ee61408efbdba167c774d8c2ed28f7365b9bcdc",
-                "reference": "5ee61408efbdba167c774d8c2ed28f7365b9bcdc",
+                "url": "https://api.github.com/repos/imbo/imbo-mysql-adapters/zipball/b5845be470b0135a162b70544eac2c62c4efe0d9",
+                "reference": "b5845be470b0135a162b70544eac2c62c4efe0d9",
                 "shasum": ""
             },
             "require": {
@@ -2934,7 +2934,7 @@
                 "php": ">=7.4"
             },
             "require-dev": {
-                "imbo/imbo": "dev-develop",
+                "imbo/imbo": "dev-main",
                 "imbo/imbo-adapters-sdk": "dev-main",
                 "imbo/imbo-coding-standard": "^2.0",
                 "phpunit/phpunit": "^9.3",
@@ -2972,7 +2972,7 @@
                 "issues": "https://github.com/imbo/imbo-mysql-adapters/issues",
                 "source": "https://github.com/imbo/imbo-mysql-adapters/tree/main"
             },
-            "time": "2021-09-04T14:00:14+00:00"
+            "time": "2021-09-07T19:32:09+00:00"
         },
         {
             "name": "imbo/imbo-pdo-adapters",
@@ -2980,12 +2980,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-pdo-adapters.git",
-                "reference": "e0d585c6f243b39a110e6cf387168d0a05bd2b5a"
+                "reference": "0b74332a849622bbb9103dcc76619d56bc1b72ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-pdo-adapters/zipball/e0d585c6f243b39a110e6cf387168d0a05bd2b5a",
-                "reference": "e0d585c6f243b39a110e6cf387168d0a05bd2b5a",
+                "url": "https://api.github.com/repos/imbo/imbo-pdo-adapters/zipball/0b74332a849622bbb9103dcc76619d56bc1b72ef",
+                "reference": "0b74332a849622bbb9103dcc76619d56bc1b72ef",
                 "shasum": ""
             },
             "require": {
@@ -2993,7 +2993,7 @@
                 "php": ">=7.4"
             },
             "require-dev": {
-                "imbo/imbo": "dev-develop",
+                "imbo/imbo": "dev-main",
                 "imbo/imbo-coding-standard": "^2.0",
                 "psalm/plugin-phpunit": "^0.16.1",
                 "vimeo/psalm": "^4.9"
@@ -3029,7 +3029,7 @@
                 "issues": "https://github.com/imbo/imbo-pdo-adapters/issues",
                 "source": "https://github.com/imbo/imbo-pdo-adapters/tree/main"
             },
-            "time": "2021-09-04T13:57:25+00:00"
+            "time": "2021-09-07T19:33:30+00:00"
         },
         {
             "name": "imbo/imbo-postgresql-adapters",
@@ -3037,12 +3037,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-postgresql-adapters.git",
-                "reference": "ce19ae73ad593469ec7bb594003c8ba0876d1915"
+                "reference": "7c2ec9ea163bc7f3fa8f874a1e2a8239664d4129"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-postgresql-adapters/zipball/ce19ae73ad593469ec7bb594003c8ba0876d1915",
-                "reference": "ce19ae73ad593469ec7bb594003c8ba0876d1915",
+                "url": "https://api.github.com/repos/imbo/imbo-postgresql-adapters/zipball/7c2ec9ea163bc7f3fa8f874a1e2a8239664d4129",
+                "reference": "7c2ec9ea163bc7f3fa8f874a1e2a8239664d4129",
                 "shasum": ""
             },
             "require": {
@@ -3052,7 +3052,7 @@
                 "php": ">=7.4"
             },
             "require-dev": {
-                "imbo/imbo": "dev-develop",
+                "imbo/imbo": "dev-main",
                 "imbo/imbo-adapters-sdk": "dev-main",
                 "imbo/imbo-coding-standard": "^2.0",
                 "phpunit/phpunit": "^9.3",
@@ -3090,7 +3090,7 @@
                 "issues": "https://github.com/imbo/imbo-postgresql-adapters/issues",
                 "source": "https://github.com/imbo/imbo-postgresql-adapters/tree/main"
             },
-            "time": "2021-09-04T14:15:18+00:00"
+            "time": "2021-09-07T19:29:47+00:00"
         },
         {
             "name": "imbo/imbo-sqlite-adapters",
@@ -3098,12 +3098,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-sqlite-adapters.git",
-                "reference": "05d7c0a424e28c8640da96d4e2af49455ef74d11"
+                "reference": "5d982d8f338c9e73d418933b428c3dcaf38a38b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-sqlite-adapters/zipball/05d7c0a424e28c8640da96d4e2af49455ef74d11",
-                "reference": "05d7c0a424e28c8640da96d4e2af49455ef74d11",
+                "url": "https://api.github.com/repos/imbo/imbo-sqlite-adapters/zipball/5d982d8f338c9e73d418933b428c3dcaf38a38b8",
+                "reference": "5d982d8f338c9e73d418933b428c3dcaf38a38b8",
                 "shasum": ""
             },
             "require": {
@@ -3113,7 +3113,7 @@
                 "php": ">=7.4"
             },
             "require-dev": {
-                "imbo/imbo": "dev-develop",
+                "imbo/imbo": "dev-main",
                 "imbo/imbo-adapters-sdk": "dev-main",
                 "imbo/imbo-coding-standard": "^2.0",
                 "phpunit/phpunit": "^9.3",
@@ -3151,7 +3151,7 @@
                 "issues": "https://github.com/imbo/imbo-sqlite-adapters/issues",
                 "source": "https://github.com/imbo/imbo-sqlite-adapters/tree/main"
             },
-            "time": "2021-09-04T14:10:42+00:00"
+            "time": "2021-09-16T07:30:45+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -3770,33 +3770,33 @@
         },
         {
             "name": "phpspec/prophecy",
-            "version": "1.13.0",
+            "version": "1.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpspec/prophecy.git",
-                "reference": "be1996ed8adc35c3fd795488a653f4b518be70ea"
+                "reference": "d86dfc2e2a3cd366cee475e52c6bb3bbc371aa0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/be1996ed8adc35c3fd795488a653f4b518be70ea",
-                "reference": "be1996ed8adc35c3fd795488a653f4b518be70ea",
+                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/d86dfc2e2a3cd366cee475e52c6bb3bbc371aa0e",
+                "reference": "d86dfc2e2a3cd366cee475e52c6bb3bbc371aa0e",
                 "shasum": ""
             },
             "require": {
                 "doctrine/instantiator": "^1.2",
-                "php": "^7.2 || ~8.0, <8.1",
+                "php": "^7.2 || ~8.0, <8.2",
                 "phpdocumentor/reflection-docblock": "^5.2",
                 "sebastian/comparator": "^3.0 || ^4.0",
                 "sebastian/recursion-context": "^3.0 || ^4.0"
             },
             "require-dev": {
-                "phpspec/phpspec": "^6.0",
+                "phpspec/phpspec": "^6.0 || ^7.0",
                 "phpunit/phpunit": "^8.0 || ^9.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.11.x-dev"
+                    "dev-master": "1.x-dev"
                 }
             },
             "autoload": {
@@ -3831,29 +3831,29 @@
             ],
             "support": {
                 "issues": "https://github.com/phpspec/prophecy/issues",
-                "source": "https://github.com/phpspec/prophecy/tree/1.13.0"
+                "source": "https://github.com/phpspec/prophecy/tree/1.14.0"
             },
-            "time": "2021-03-17T13:42:18+00:00"
+            "time": "2021-09-10T09:02:12+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "9.2.6",
+            "version": "9.2.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "f6293e1b30a2354e8428e004689671b83871edde"
+                "reference": "d4c798ed8d51506800b441f7a13ecb0f76f12218"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/f6293e1b30a2354e8428e004689671b83871edde",
-                "reference": "f6293e1b30a2354e8428e004689671b83871edde",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/d4c798ed8d51506800b441f7a13ecb0f76f12218",
+                "reference": "d4c798ed8d51506800b441f7a13ecb0f76f12218",
                 "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
                 "ext-libxml": "*",
                 "ext-xmlwriter": "*",
-                "nikic/php-parser": "^4.10.2",
+                "nikic/php-parser": "^4.12.0",
                 "php": ">=7.3",
                 "phpunit/php-file-iterator": "^3.0.3",
                 "phpunit/php-text-template": "^2.0.2",
@@ -3902,7 +3902,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/9.2.6"
+                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/9.2.7"
             },
             "funding": [
                 {
@@ -3910,7 +3910,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-03-28T07:26:59+00:00"
+            "time": "2021-09-17T05:39:03+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -5321,7 +5321,6 @@
                     "type": "github"
                 }
             ],
-            "abandoned": true,
             "time": "2020-09-28T06:45:17+00:00"
         },
         {
