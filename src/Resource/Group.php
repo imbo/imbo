@@ -1,37 +1,34 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface;
-use Imbo\Exception\ResourceException;
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Exception\ResourceException;
 use Imbo\Model\Group as GroupModel;
 
-class Group implements ResourceInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedMethods() {
+class Group implements ResourceInterface
+{
+    public function getAllowedMethods(): array
+    {
         return ['GET', 'HEAD', 'PUT', 'DELETE'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents(): array
+    {
         return [
             'group.get'    => 'getGroup',
             'group.head'   => 'getGroup',
-            'group.put'    => 'addGroup',
+            'group.put'    => 'updateGroup',
             'group.delete' => 'deleteGroup',
         ];
     }
 
     /**
      * Get the resources associated with a specific group
-     *
-     * @param EventInterface $event The current event
      */
-    public function getGroup(EventInterface $event) {
+    public function getGroup(EventInterface $event): void
+    {
         $route = $event->getRequest()->getRoute();
         $groupName = $route->get('group');
 
@@ -53,10 +50,9 @@ class Group implements ResourceInterface {
 
     /**
      * Add resources to a group
-     *
-     * @param EventInterface $event The current event
      */
-    public function addGroup(EventInterface $event) {
+    public function updateGroup(EventInterface $event): void
+    {
         $accessControl = $event->getAccessControl();
         if (!($accessControl instanceof MutableAdapterInterface)) {
             throw new ResourceException('Access control adapter is immutable', 405);
@@ -64,39 +60,47 @@ class Group implements ResourceInterface {
 
         $request = $event->getRequest();
         $route = $request->getRoute();
-        $groupName = $route->get('group');
+        $name = $route->get('group');
 
-        $group = $accessControl->getGroup($groupName);
-        $groupExists = !empty($group);
+        $group = $accessControl->getGroup($name);
 
-        $resources = json_decode($request->getContent(), true);
-
-        if (!is_array($resources)) {
-            throw new ResourceException('Invalid data. Array of resource strings is expected', 400);
+        if (null === $group) {
+            throw new ResourceException('Group does not exist', 404);
         }
+
+        $body = json_decode($request->getContent(), true);
+
+        if ($body === null || json_last_error() !== JSON_ERROR_NONE) {
+            throw new InvalidArgumentException('Invalid JSON data', 400);
+        }
+
+        if (!array_key_exists('resources', $body) || !is_array($body['resources'])) {
+            throw new InvalidArgumentException('Resource list missing', 400);
+        }
+
+        $resources = $body['resources'];
 
         foreach ($resources as $resource) {
             if (!is_string($resource)) {
-               throw new ResourceException('Invalid value in the resources array. Only strings are allowed', 400);
+                throw new ResourceException('Resources must be specified as strings', 400);
             }
         }
 
-        if ($groupExists) {
-            $accessControl->updateResourceGroup($groupName, $resources);
-        } else {
-            $accessControl->addResourceGroup($groupName, $resources);
-        }
+        $accessControl->updateResourceGroup($name, $resources);
 
-        $response = $event->getResponse();
-        $response->setStatusCode($groupExists ? 200 : 201);
+        $model = new GroupModel();
+        $model
+            ->setName($name)
+            ->setResources($resources);
+
+        $event->getResponse()->setModel($model);
     }
 
     /**
      * Delete a resource group
-     *
-     * @param EventInterface $event The current event
      */
-    public function deleteGroup(EventInterface $event) {
+    public function deleteGroup(EventInterface $event): void
+    {
         $accessControl = $event->getAccessControl();
         if (!($accessControl instanceof MutableAdapterInterface)) {
             throw new ResourceException('Access control adapter is immutable', 405);
@@ -111,5 +115,5 @@ class Group implements ResourceInterface {
         }
 
         $accessControl->deleteResourceGroup($groupName);
-   }
+    }
 }

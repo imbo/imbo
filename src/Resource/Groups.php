@@ -1,32 +1,89 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Resource;
 
+use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
 use Imbo\EventManager\EventInterface;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Exception\ResourceException;
+use Imbo\Model\Group;
 
-class Groups implements ResourceInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedMethods() {
+class Groups implements ResourceInterface
+{
+    public function getAllowedMethods(): array
+    {
         return ['GET', 'HEAD'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents(): array
+    {
         return [
-            'groups.get' => 'listGroups',
+            'groups.get'  => 'listGroups',
             'groups.head' => 'listGroups',
+            'groups.post' => 'addGroup',
         ];
     }
 
     /**
      * Get a list of available resource groups
-     *
-     * @param EventInterface $event The current event
      */
-    public function listGroups(EventInterface $event) {
+    public function listGroups(EventInterface $event): void
+    {
         $event->getManager()->trigger('acl.groups.load');
+    }
+
+    /**
+     * Add a new group
+     */
+    public function addGroup(EventInterface $event): void
+    {
+        $accessControl = $event->getAccessControl();
+        if (!($accessControl instanceof MutableAdapterInterface)) {
+            throw new ResourceException('Access control adapter is immutable', 405);
+        }
+
+        $request = $event->getRequest();
+        $body    = $request->getContent();
+
+        if (empty($body)) {
+            throw new InvalidArgumentException('Missing JSON data', 400);
+        } else {
+            $body = json_decode($body, true);
+
+            if ($body === null || json_last_error() !== JSON_ERROR_NONE) {
+                throw new InvalidArgumentException('Invalid JSON data', 400);
+            }
+        }
+
+        if (!array_key_exists('name', $body) || '' === trim((string) $body['name'])) {
+            throw new InvalidArgumentException('Group name missing', 400);
+        } elseif (!array_key_exists('resources', $body) || !is_array($body['resources'])) {
+            throw new InvalidArgumentException('Resource list missing', 400);
+        }
+
+        $name      = $body['name'];
+        $resources = $body['resources'];
+
+        $group = $accessControl->getGroup($name);
+
+        if (null !== $group) {
+            throw new InvalidArgumentException('Group already exists', 400);
+        }
+
+        foreach ($resources as $resource) {
+            if (!is_string($resource)) {
+                throw new ResourceException('Resources must be specified as strings', 400);
+            }
+        }
+
+        $accessControl->addResourceGroup($name, $resources);
+
+        $model = new Group();
+        $model
+            ->setName($name)
+            ->setResources($resources);
+
+        $event->getResponse()
+            ->setModel($model)
+            ->setStatusCode(201);
     }
 }

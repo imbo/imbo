@@ -29,16 +29,16 @@ Feature: Imbo provides a group endpoint
           """
           <data>
           """
-        When I request "/groups/read-images" using HTTP "PUT"
+        When I request "/groups" using HTTP "POST"
         Then the response status line is "<response>"
 
         Examples:
-            | data               | response                                                           |
-            |                    | 400 Invalid data. Array of resource strings is expected            |
-            | true               | 400 Invalid data. Array of resource strings is expected            |
-            | "string"           | 400 Invalid data. Array of resource strings is expected            |
-            | [123]              | 400 Invalid value in the resources array. Only strings are allowed |
-            | [123,"images.get"] | 400 Invalid value in the resources array. Only strings are allowed |
+            | data                                                     | response                                                           |
+            | {}                                                       | 400 Group name missing                                             |
+            |                                                          | 400 Missing JSON data                                              |
+            | {"name": "read-images"}                                  | 400 Resource list missing                                          |
+            | {"name": "read-images", "resources": "image.get"}        | 400 Resource list missing                                          |
+            | {"name": "read-images", "resources": ["image.get", 123]} | 400 Resources must be specified as strings                         |
 
     Scenario: Create a resource group
         Given Imbo uses the "access-control-mutable.php" configuration
@@ -47,9 +47,9 @@ Feature: Imbo provides a group endpoint
         And I sign the request
         And the request body is:
           """
-          ["images.get"]
+          {"name": "read-images", "resources": ["images.get"]}
           """
-        When I request "/groups/read-images" using HTTP "PUT"
+        When I request "/groups" using HTTP "POST"
         Then the response status line is "201 Created"
 
     Scenario: Update a resource group
@@ -59,7 +59,7 @@ Feature: Imbo provides a group endpoint
         And I sign the request
         And the request body is:
           """
-          ["images.get", "images.head"]
+          {"resources": ["images.get", "images.head"]}
           """
         When I request "/groups/existing-group" using HTTP "PUT"
         Then the response status line is "200 OK"
