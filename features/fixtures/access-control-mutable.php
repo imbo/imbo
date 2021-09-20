@@ -11,9 +11,10 @@ return [
                 [
                     'id' => new MongoId(),
                     'resources' => [
-                        Resource::KEYS_PUT,
-                        Resource::KEYS_HEAD,
-                        Resource::KEYS_DELETE,
+                        Resource::KEY_PUT,
+                        Resource::KEY_HEAD,
+                        Resource::KEY_DELETE,
+                        Resource::KEYS_POST,
 
                         Resource::ACCESS_RULE_GET,
                         Resource::ACCESS_RULE_HEAD,
@@ -25,14 +26,14 @@ return [
 
                         Resource::GROUP_DELETE,
                     ],
-                    'users' => []
+                    'users' => [],
                 ],
                 [
                     'id' => new MongoId(),
                     'group' => 'something',
-                    'users' => ['some-user']
-                ]
-            ]
+                    'users' => ['some-user'],
+                ],
+            ],
         ],
         [
             'publicKey' => 'foobar',
@@ -40,14 +41,17 @@ return [
             'acl' => [
                 [
                     'id' => new MongoId('100000000000000000001337'),
-                    'resources' => ['access.get', 'access.head'],
-                    'users' => ['foobar']
+                    'resources' => [
+                        Resource::ACCESS_RULE_GET,
+                        Resource::ACCESS_RULE_HEAD,
+                    ],
+                    'users' => ['foobar'],
                 ], [
                     'id' => new MongoId('100000000000000000002468'),
-                    'resources' => ['images.get'],
-                    'users' => ['barfoo']
-                ]
-            ]
+                    'resources' => [Resource::IMAGES_GET],
+                    'users' => ['barfoo'],
+                ],
+            ],
         ],
         [
             'publicKey' => 'acl-creator',
@@ -55,12 +59,23 @@ return [
             'acl' => [[
                 'id' => new MongoId(),
                 'resources' => [
-                    'group.get', 'group.head', 'group.put', 'group.delete',
-                    'accessrules.get', 'accessrules.head', 'accessrules.post',
-                    'keys.head', 'keys.put', 'keys.delete', 'groups.get'
+                    Resource::GROUP_GET,
+                    Resource::GROUP_HEAD,
+                    Resource::GROUP_PUT,
+                    Resource::GROUP_DELETE,
+                    Resource::GROUPS_GET,
+                    Resource::GROUPS_POST,
+
+                    Resource::ACCESS_RULES_GET,
+                    Resource::ACCESS_RULES_HEAD,
+                    Resource::ACCESS_RULES_POST,
+
+                    Resource::KEY_HEAD,
+                    Resource::KEY_PUT,
+                    Resource::KEY_DELETE,
                 ],
                 'users' => [],
-            ]]
+            ]],
         ],
         [
             'publicKey' => 'wildcarded',
@@ -68,8 +83,8 @@ return [
             'acl' => [[
                 'id' => new MongoId(),
                 'group' => 'user-stats',
-                'users' => '*'
-            ]]
+                'users' => '*',
+            ]],
         ],
         [
             'publicKey' => 'group-based',
@@ -77,8 +92,8 @@ return [
             'acl' => [[
                 'id' => new MongoId('100000000000000000001942'),
                 'group' => 'user-stats',
-                'users' => ['user1']
-            ]]
+                'users' => ['user1'],
+            ]],
         ],
 
         [
@@ -88,22 +103,28 @@ return [
                 'id' => new MongoId(),
                 'resources' => [Resource::ACCESS_RULE_GET],
                 'users' => [],
-            ]]
-        ]
+            ]],
+        ],
     ],
 
     'accesscontrolgroup' => [
         [
             'name' => 'existing-group',
-            'resources' => ['group.get', 'group.head'],
+            'resources' => [
+                Resource::GROUP_GET,
+                Resource::GROUP_HEAD,
+            ],
         ],
         [
             'name' => 'user-stats',
-            'resources' => ['user.get', 'user.head'],
+            'resources' => [
+                Resource::USER_GET,
+                Resource::USER_HEAD,
+            ],
         ],
         [
             'name' => 'something',
-            'resources' => []
-        ]
+            'resources' => [],
+        ],
     ],
 ];

@@ -2,30 +2,34 @@
 namespace Imbo\Behat;
 
 use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
-use Imbo\Resource\ResourceInterface;
+use Imbo\EventListener\AccessControl;
 use Imbo\EventManager\EventInterface;
 use Imbo\Model\ListModel;
 use Imbo\Resource;
-use Imbo\EventListener\AccessControl;
+use Imbo\Resource\ResourceInterface;
 
-class Foobar implements ResourceInterface {
-    public function getAllowedMethods() {
+class Foobar implements ResourceInterface
+{
+    public function getAllowedMethods()
+    {
         return ['GET'];
     }
 
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             'foobar.get' => 'get',
         ];
     }
 
-    public function get(EventInterface $event) {
+    public function get(EventInterface $event)
+    {
         $event->getResponse()->setModel(new ListModel('foo', [1, 2, 3]));
     }
 }
 
 return [
-    'accessControl' => function() {
+    'accessControl' => function () {
         return new ArrayAdapter([
             [
                 'publicKey' => 'valid-pubkey',
@@ -36,9 +40,10 @@ return [
                         'foobar.get',
 
                         Resource::USER_GET,
-                        Resource::KEYS_PUT,
-                        Resource::KEYS_HEAD,
-                        Resource::KEYS_DELETE,
+                        Resource::KEYS_POST,
+                        Resource::KEY_PUT,
+                        Resource::KEY_HEAD,
+                        Resource::KEY_DELETE,
                         Resource::ACCESS_RULE_GET,
                         Resource::ACCESS_RULE_HEAD,
                         Resource::ACCESS_RULE_DELETE,
@@ -53,7 +58,10 @@ return [
                 'publicKey' => 'valid-pubkey-with-wildcard',
                 'privateKey' => 'foobar',
                 'acl' => [[
-                    'resources' => [Resource::USER_GET, 'foobar.get'],
+                    'resources' => [
+                        Resource::USER_GET,
+                        'foobar.get',
+                    ],
                     'users' => '*',
                 ]],
             ],
@@ -63,12 +71,18 @@ return [
                 'privateKey' => 'foobar',
                 'acl' => [[
                     'group' => 'images-read',
-                    'users' => ['user', 'user2'],
+                    'users' => [
+                        'user',
+                        'user2',
+                    ],
                 ], [
                     'group' => 'groups-read',
                     'users' => '*',
                 ], [
-                    'resources' => [Resource::GROUP_DELETE, Resource::GROUP_PUT],
+                    'resources' => [
+                        Resource::GROUP_DELETE,
+                        Resource::GROUP_PUT,
+                    ],
                     'users' => '*',
                 ]],
             ],
@@ -80,9 +94,12 @@ return [
                     'resources' => [Resource::ACCESS_RULE_GET],
                     'users' => [],
                 ]],
-                ],
+            ],
         ], [
-            'images-read' => [Resource::IMAGES_GET, Resource::IMAGES_HEAD],
+            'images-read' => [
+                Resource::IMAGES_GET,
+                Resource::IMAGES_HEAD,
+            ],
             'groups-read' => [
                 Resource::GROUP_GET,
                 Resource::GROUP_HEAD,

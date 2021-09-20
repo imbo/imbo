@@ -20,9 +20,10 @@ Feature: Imbo provides a keys endpoint
                 "id": "@regExp(/[a-z0-9]+/)",
                 "resources":
                 [
-                  "keys.put",
-                  "keys.head",
-                  "keys.delete",
+                  "key.put",
+                  "key.head",
+                  "key.delete",
+                  "keys.post",
                   "accessrule.get",
                   "accessrule.head",
                   "accessrule.delete",
@@ -90,9 +91,9 @@ Feature: Imbo provides a keys endpoint
         And I sign the request
         And the request body is:
             """
-            {"privateKey":"the-private-key"}
+            {"publicKey": "the-public-key", "privateKey":"the-private-key"}
             """
-        When I request "/keys/the-public-key" using HTTP "PUT"
+        When I request "/keys" using HTTP "POST"
         Then the response status line is "201 Created"
 
     Scenario Outline: Check if a public key exist

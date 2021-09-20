@@ -1,58 +1,28 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface;
-use Imbo\Exception\RuntimeException;
-use Imbo\Exception\ResourceException;
-use Imbo\Exception\InvalidArgumentException;
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Exception\ResourceException;
+use Imbo\Model\ArrayModel;
 
-/**
- * Keys resource
- *
- * This resource can be used to manipulate the public keys for an instance,
- * given that a mutable access control adapter is used.
- */
-class Keys implements ResourceInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedMethods() {
-        return ['HEAD', 'PUT', 'DELETE'];
+class Keys implements ResourceInterface
+{
+    public function getAllowedMethods()
+    {
+        return ['POST'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
-            'keys.put' => 'setKey',
-            'keys.head' => 'getKey',
-            'keys.delete' => 'deleteKey'
+            'keys.post' => 'createKey',
         ];
     }
 
-    /**
-     * Get a public key, but return only status code, not private key information
-     *
-     * @param EventInterface $event The current event
-     */
-    public function getKey(EventInterface $event) {
-        $acl = $event->getAccessControl();
-
-        $publicKey = $event->getRequest()->getRoute()->get('publickey');
-
-        if (!$acl->publicKeyExists($publicKey)) {
-            throw new RuntimeException('Public key not found', 404);
-        }
-    }
-
-    /**
-     * Add or update public key
-     *
-     * @param EventInterface $event The current event
-     */
-    public function setKey(EventInterface $event) {
+    public function createKey(EventInterface $event): void
+    {
         $acl = $event->getAccessControl();
 
         if (!($acl instanceof MutableAdapterInterface)) {
@@ -60,50 +30,37 @@ class Keys implements ResourceInterface {
         }
 
         $request = $event->getRequest();
-        $data = json_decode($request->getContent(), true);
+        $body    = $request->getContent();
 
-        if (!isset($data['privateKey'])) {
-            throw new InvalidArgumentException('No privateKey provided', 400);
-        }
-
-        $publicKey = $request->getRoute()->get('publickey');
-        $privateKey = $data['privateKey'];
-
-        $keyExists = $acl->publicKeyExists($publicKey);
-
-        if ($keyExists) {
-            $acl->updatePrivateKey($publicKey, $privateKey);
+        if (empty($body)) {
+            throw new InvalidArgumentException('Missing JSON data', 400);
         } else {
-            $acl->addKeyPair($publicKey, $privateKey);
+            $body = json_decode($body, true);
+
+            if ($body === null || json_last_error() !== JSON_ERROR_NONE) {
+                throw new InvalidArgumentException('Invalid JSON data', 400);
+            }
         }
 
-        $event->getResponse()->setStatusCode($keyExists ? 200 : 201);
-    }
+        $publicKey  = $body['publicKey'] ?? null;
+        $privateKey = $body['privateKey'] ?? null;
 
-    /**
-     * Delete public key
-     *
-     * @param EventInterface $event The current event
-     */
-    public function deleteKey(EventInterface $event) {
-        $acl = $event->getAccessControl();
-
-        if (!($acl instanceof MutableAdapterInterface)) {
-            throw new ResourceException('Access control adapter is immutable', 405);
+        if (null === $publicKey) {
+            throw new InvalidArgumentException('Missing public key', 400);
+        } elseif (null === $privateKey) {
+            throw new InvalidArgumentException('Missing private key', 400);
+        } elseif (!preg_match('/^[a-z0-9_-]{1,}$/', $publicKey)) {
+            throw new InvalidArgumentException('Invalid public key', 400);
         }
 
-        $request = $event->getRequest();
-        $publicKey = $request->getRoute()->get('publickey');
-
-        $keyExists = $acl->publicKeyExists($publicKey);
-
-        if (!$keyExists) {
-            throw new RuntimeException('Public key not found', 404);
+        if ($acl->publicKeyExists($publicKey)) {
+            throw new InvalidArgumentException('Public key already exists', 400);
         }
 
-        $request = $event->getRequest();
-        $publicKey = $request->getRoute()->get('publickey');
+        $acl->addKeyPair($publicKey, $privateKey);
 
-        $acl->deletePublicKey($publicKey);
+        $event->getResponse()
+            ->setStatusCode(201)
+            ->setModel((new ArrayModel())->setData(['publicKey' => $publicKey]));
     }
 }
