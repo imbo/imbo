@@ -4,6 +4,7 @@ namespace Imbo\EventListener;
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception\RuntimeException;
 use Imbo\Exception;
+use Imbo\Resource;
 
 /**
  * Authentication event listener
@@ -32,21 +33,22 @@ class Authenticate implements ListenerInterface {
     public static function getSubscribedEvents() {
         $callbacks = [];
         $events = [
-            'groups.post',       // Create resource group
-            'group.put',         // Update resource group
-            'group.delete',      // Delete a resource group
-            'keys.put',          // Create a public key
-            'keys.delete',       // Delete a public key
-            'accessrule.delete', // Delete an access rule
-            'accessrules.post',  // Update access rules
-            'image.delete',      // When deleting images
-            'images.post',       // When adding images
-            'metadata.put',      // When adding/replacing metadata
-            'metadata.post',     // When adding/patching metadata
-            'metadata.delete',   // When deleting metadata
-            'shorturl.delete',   // Delete a single short URL
-            'shorturls.post',    // Add a short URL
-            'shorturls.delete',  // Delete a collection of short URLs
+            Resource::GROUPS_POST,        // Create resource group
+            Resource::GROUP_PUT,          // Update resource group
+            Resource::GROUP_DELETE,       // Delete a resource group
+            Resource::KEYS_POST,          // Create a public key
+            Resource::KEY_PUT,            // Update a public key
+            Resource::KEY_DELETE,         // Delete a public key
+            Resource::ACCESS_RULE_DELETE, // Delete an access rule
+            Resource::ACCESS_RULES_POST,  // Update access rules
+            Resource::IMAGE_DELETE,       // When deleting images
+            Resource::IMAGES_POST,        // When adding images
+            Resource::METADATA_PUT,       // When adding/replacing metadata
+            Resource::METADATA_POST,      // When adding/patching metadata
+            Resource::METADATA_DELETE,    // When deleting metadata
+            Resource::SHORTURL_DELETE,    // Delete a single short URL
+            Resource::SHORTURLS_POST,     // Add a short URL
+            Resource::SHORTURLS_DELETE,   // Delete a collection of short URLs
 
             'auth.authenticate', // Authenticate event
         ];

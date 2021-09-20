@@ -9,6 +9,7 @@ use Imbo\Exception\ConfigurationException;
 use Imbo\Helpers\Urls;
 use Imbo\EventListener\AccessToken\SHA256;
 use GuzzleHttp\Psr7\Query;
+use Imbo\Resource;
 
 /**
  * Access token event listener
@@ -88,26 +89,27 @@ class AccessToken implements ListenerInterface {
     public static function getSubscribedEvents() {
         $callbacks = [];
         $events = [
-            'groups.get',
-            'groups.head',
-            'group.get',
-            'group.head',
-            'accessrule.get',
-            'accessrule.head',
-            'accessrules.get',
-            'accessrules.head',
-            'user.get',
-            'user.header',
-            'image.get',
-            'image.head',
-            'images.get',
-            'images.head',
-            'globalimages.get',
-            'globalimages.head',
-            'metadata.get',
-            'metadata.head',
-            'shorturl.get',
-            'shorturl.head',
+            Resource::GROUPS_GET,
+            Resource::GROUPS_HEAD,
+            Resource::GROUP_GET,
+            Resource::GROUP_HEAD,
+            Resource::KEY_HEAD,
+            Resource::ACCESS_RULE_GET,
+            Resource::ACCESS_RULE_HEAD,
+            Resource::ACCESS_RULES_GET,
+            Resource::ACCESS_RULES_GET,
+            Resource::USER_GET,
+            Resource::USER_HEAD,
+            Resource::IMAGE_GET,
+            Resource::IMAGE_HEAD,
+            Resource::IMAGES_GET,
+            Resource::IMAGES_HEAD,
+            Resource::GLOBAL_IMAGES_GET,
+            Resource::GLOBAL_IMAGES_HEAD,
+            Resource::METADATA_GET,
+            Resource::METADATA_HEAD,
+            Resource::SHORTURL_GET,
+            Resource::SHORTURL_HEAD,
 
             'auth.accesstoken'
         ];
