@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
 namespace Imbo;
 
-interface Exception
+use Throwable;
+
+interface Exception extends Throwable
 {
     public const ERR_UNSPECIFIED = 0;
 
