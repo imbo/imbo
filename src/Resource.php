@@ -5,6 +5,7 @@ class Resource
 {
     public const GROUPS_GET              = 'groups.get';
     public const GROUPS_HEAD             = 'groups.head';
+    public const GROUPS_POST             = 'groups.post';
     public const GROUPS_OPTIONS          = 'groups.options';
 
     public const GROUP_GET               = 'group.get';
@@ -13,10 +14,13 @@ class Resource
     public const GROUP_DELETE            = 'group.delete';
     public const GROUP_OPTIONS           = 'group.options';
 
-    public const KEYS_PUT                = 'keys.put';
-    public const KEYS_HEAD               = 'keys.head';
-    public const KEYS_DELETE             = 'keys.delete';
+    public const KEYS_POST               = 'keys.post';
     public const KEYS_OPTIONS            = 'keys.options';
+
+    public const KEY_HEAD                = 'key.head';
+    public const KEY_PUT                 = 'key.put';
+    public const KEY_DELETE              = 'key.delete';
+    public const KEY_OPTIONS             = 'key.options';
 
     public const ACCESS_RULE_GET         = 'accessrule.get';
     public const ACCESS_RULE_HEAD        = 'accessrule.head';
@@ -133,10 +137,13 @@ class Resource
         return array_merge(
             self::getReadWriteResources(),
             [
-                self::KEYS_PUT,
-                self::KEYS_HEAD,
-                self::KEYS_DELETE,
+                self::KEYS_POST,
                 self::KEYS_OPTIONS,
+
+                self::KEY_PUT,
+                self::KEY_HEAD,
+                self::KEY_DELETE,
+                self::KEY_OPTIONS,
 
                 self::ACCESS_RULE_GET,
                 self::ACCESS_RULE_HEAD,
@@ -150,6 +157,7 @@ class Resource
 
                 self::GROUPS_GET,
                 self::GROUPS_HEAD,
+                self::GROUPS_POST,
                 self::GROUPS_OPTIONS,
 
                 self::GROUP_GET,
