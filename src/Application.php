@@ -140,6 +140,7 @@ class Application {
             'Imbo\Resource\Groups',
             'Imbo\Resource\Group',
             'Imbo\Resource\Keys',
+            'Imbo\Resource\Key',
             'Imbo\Resource\AccessRules',
             'Imbo\Resource\AccessRule',
             'Imbo\Http\Response\ResponseFormatter' => [
