@@ -89,9 +89,8 @@ class Group implements ResourceInterface
         $accessControl->updateResourceGroup($name, $resources);
 
         $model = new GroupModel();
-        $model
-            ->setName($name)
-            ->setResources($resources);
+        $model->setName($name);
+        $model->setResources($resources);
 
         $event->getResponse()->setModel($model);
     }
@@ -108,12 +107,18 @@ class Group implements ResourceInterface
 
         $route = $event->getRequest()->getRoute();
         $groupName = $route->get('group');
-        $group = $accessControl->getGroup($groupName);
+        $resources = $accessControl->getGroup($groupName);
 
-        if (!$group) {
+        if (!$resources) {
             throw new ResourceException('Resource group not found', 404);
         }
 
         $accessControl->deleteResourceGroup($groupName);
+
+        $model = new GroupModel();
+        $model->setName($groupName);
+        $model->setResources($resources);
+
+        $event->getResponse()->setModel($model);
     }
 }
