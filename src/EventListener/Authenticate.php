@@ -32,7 +32,8 @@ class Authenticate implements ListenerInterface {
     public static function getSubscribedEvents() {
         $callbacks = [];
         $events = [
-            'group.put',         // Add/update resource group
+            'groups.post',       // Create resource group
+            'group.put',         // Update resource group
             'group.delete',      // Delete a resource group
             'keys.put',          // Create a public key
             'keys.delete',       // Delete a public key
@@ -149,7 +150,7 @@ class Authenticate implements ListenerInterface {
      * @param string $httpMethod The current HTTP method
      * @param string $url The accessed URL
      * @param string $publicKey The current public key
-     * @param array  $privateKey The private key to sign the hash with
+     * @param string  $privateKey The private key to sign the hash with
      * @param string $timestamp A valid timestamp
      * @param string $signature The signature to compare with
      * @return boolean
