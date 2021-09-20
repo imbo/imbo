@@ -44,7 +44,8 @@ class Router
         'shorturl'       => '#^/users/(?<user>[a-z0-9_-]{1,})/images/(?<imageIdentifier>[A-Za-z0-9_-]{1,255})/shorturls/(?<shortUrlId>[a-zA-Z0-9]{7})$#',
         'groups'         => '#^/groups(/|(\.(?<extension>json)))?$#',
         'group'          => '#^/groups/(?<group>[a-z0-9_-]{1,})(/|\.(?<extension>json))?$#',
-        'keys'           => '#^/keys/(?<publickey>[a-z0-9_-]{1,})$#',
+        'keys'           => '#^/keys(/|(\.(?<extension>json)))?$#',
+        'key'            => '#^/keys/(?<publickey>[a-z0-9_-]{1,})$#',
         'accessrules'    => '#^/keys/(?<publickey>[a-z0-9_-]{1,})/access(/|(\.(?<extension>json)))?$#',
         'accessrule'     => '#^/keys/(?<publickey>[a-z0-9_-]{1,})/access/(?<accessRuleId>[a-f0-9]{1,})(\.(?<extension>json))?$#',
     ];
