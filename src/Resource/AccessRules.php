@@ -7,6 +7,7 @@ use Imbo\Exception\RuntimeException;
 use Imbo\Exception\ResourceException;
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
 use Imbo\Model\AccessRules as AccessRulesModel;
+use Imbo\Model\ArrayModel;
 
 class AccessRules implements ResourceInterface {
     /**
@@ -94,9 +95,14 @@ class AccessRules implements ResourceInterface {
         }
 
         // Insert the rules
+        $rules = [];
+
         foreach ($data as $rule) {
-            $accessControl->addAccessRule($publicKey, $rule);
+            $rule['id'] = $accessControl->addAccessRule($publicKey, $rule);
+            $rules[] = $rule;
         }
+
+        $event->getResponse()->setModel((new ArrayModel())->setData($rules));
     }
 
     /**

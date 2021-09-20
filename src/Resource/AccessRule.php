@@ -6,6 +6,7 @@ use Imbo\Exception\RuntimeException;
 use Imbo\Exception\ResourceException;
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
 use Imbo\Model\AccessRule as AccessRuleModel;
+use Imbo\Model\ArrayModel;
 
 /**
  * Access rule resource
@@ -97,5 +98,7 @@ class AccessRule implements ResourceInterface {
         }
 
         $acl->deleteAccessRule($publicKey, $accessRuleId);
+
+        $event->getResponse()->setModel((new ArrayModel())->setData($accessRule));
     }
 }
