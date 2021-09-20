@@ -107,6 +107,11 @@ class Authenticate implements ListenerInterface {
         }
 
         $publicKey = $request->getPublicKey();
+
+        if (null === $publicKey) {
+            throw new RuntimeException('Missing public key', 400);
+        }
+
         $privateKey = $event->getAccessControl()->getPrivateKey($publicKey);
 
         $url = $request->getRawUri();
