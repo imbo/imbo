@@ -96,10 +96,10 @@ class AccessRule implements ModelInterface {
     /**
      * Set the users
      *
-     * @param string[] $users
+     * @param string|string[] $users
      * @return self
      */
-    public function setUsers(array $users) {
+    public function setUsers($users) {
         $this->users = $users;
 
         return $this;
@@ -108,7 +108,7 @@ class AccessRule implements ModelInterface {
     /**
      * Get the users
      *
-     * @return string[]
+     * @return string|string[]
      */
     public function getUsers() {
         return $this->users;
