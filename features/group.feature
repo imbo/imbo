@@ -52,6 +52,23 @@ Feature: Imbo provides a group endpoint
         When I request "/groups" using HTTP "POST"
         Then the response status line is "201 Created"
 
+    Scenario: Create a resource group with an invalid name
+        Given Imbo uses the "access-control-mutable.php" configuration
+        And I prime the database with "access-control-mutable.php"
+        And I use "acl-creator" and "someprivkey" for public and private keys
+        And I sign the request
+        And the request body is:
+            """
+            {
+                "name": "my group",
+                "resources": [
+                    "images.get"
+                ]
+            }
+            """
+        When I request "/groups" using HTTP "POST"
+        Then the response status line is "400 Invalid group name"
+
     Scenario: Update a resource group
         Given Imbo uses the "access-control-mutable.php" configuration
         And I prime the database with "access-control-mutable.php"

@@ -58,6 +58,8 @@ class Groups implements ResourceInterface
             throw new InvalidArgumentException('Group name missing', 400);
         } elseif (!array_key_exists('resources', $body) || !is_array($body['resources'])) {
             throw new InvalidArgumentException('Resource list missing', 400);
+        } else if (!preg_match('/^[a-z0-9_-]{1,}$/', $body['name'])) {
+            throw new InvalidArgumentException('Invalid group name', 400);
         }
 
         $name      = $body['name'];
