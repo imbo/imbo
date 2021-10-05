@@ -24,5 +24,6 @@ class Basic implements InputLoaderInterface {
      */
     public function load(Imagick $imagick, $blob, $mimeType) {
         $imagick->readImageBlob($blob);
+        $imagick->setIteratorIndex(0);
     }
 }
