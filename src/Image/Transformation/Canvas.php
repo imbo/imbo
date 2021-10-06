@@ -70,7 +70,7 @@ class Canvas extends Transformation implements InputSizeConstraint {
 
             $this->imagick->newImage($width, $height, $bg);
             $this->imagick->setImageFormat($original->getImageFormat());
-            $this->imagick->setImageColorspace($original->getImageColorspace());
+            $this->imagick->transformImageColorspace($original->getImageColorspace());
 
             $originalGeometry = $original->getImageGeometry();
 
