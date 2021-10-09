@@ -1,34 +1,34 @@
 <?php declare(strict_types=1);
 namespace Imbo\Behat;
 
-use Imbo\Behat\FeatureContext;
-use Imbo\BehatApiExtension\Exception\AssertionFailedException;
-use Imbo\BehatApiExtension\ArrayContainsComparator;
+use Assert;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\FeatureNode;
+use Behat\Gherkin\Node\PyStringNode;
+use Behat\Gherkin\Node\ScenarioInterface;
+use Behat\Gherkin\Node\TableNode;
+use Behat\Testwork\Environment\Environment;
+use Behat\Testwork\Suite\Suite;
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\ClientInterface;
-use Behat\Gherkin\Node\PyStringNode;
-use Behat\Gherkin\Node\TableNode;
-use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Gherkin\Node\FeatureNode;
-use Behat\Gherkin\Node\ScenarioInterface;
-use Behat\Testwork\Environment\Environment;
-use Behat\Testwork\Suite\Suite;
-use PHPUnit\Framework\TestCase;
-use Assert;
-use RuntimeException;
+use Imbo\BehatApiExtension\ArrayContainsComparator;
+use Imbo\BehatApiExtension\Exception\AssertionFailedException;
 use InvalidArgumentException;
 use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use RuntimeException;
 
 /**
  * @coversDefaultClass Imbo\Behat\FeatureContext
  */
-class FeatureContextTest extends TestCase {
+class FeatureContextTest extends TestCase
+{
     private $context;
     private $client;
     private $history;
@@ -38,7 +38,8 @@ class FeatureContextTest extends TestCase {
     private $publicKey = 'publicKey';
     private $privateKey = 'privateKey';
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->history = [];
 
         $this->mockHandler = new MockHandler();
@@ -56,7 +57,8 @@ class FeatureContextTest extends TestCase {
     /**
      * Convenience method to make a single request and return the request instance
      */
-    private function makeRequest(string $path = '/somepath') : Request {
+    private function makeRequest(string $path = '/somepath'): Request
+    {
         $this->mockHandler->append(new Response(200));
         $this->context->requestPath($path);
 
@@ -66,7 +68,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::setClient
      */
-    public function testCanSetAnApiClient() : void {
+    public function testCanSetAnApiClient(): void
+    {
         $handlerStack = $this->createMock(HandlerStack::class);
         $handlerStack
             ->expects($this->exactly(2))
@@ -92,7 +95,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::setArrayContainsComparator
      */
-    public function testAttachesComparatorFunctions() : void {
+    public function testAttachesComparatorFunctions(): void
+    {
         $comparator = $this->createMock(ArrayContainsComparator::class);
         $comparator
             ->expects($this->once())
@@ -104,23 +108,25 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::setRequestHeader
      */
-    public function testCanSetRequestHeader() : void {
+    public function testCanSetRequestHeader(): void
+    {
         $this->assertSame($this->context, $this->context->setRequestHeader('X-Foo', 'current-timestamp'));
         $this->assertSame($this->context, $this->context->setRequestHeader('X-Bar', 'current'));
 
         $request = $this->makeRequest();
 
         $this->assertTrue(
-            (boolean) preg_match(
+            (bool) preg_match(
                 '/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$/',
-                $request->getHeaderLine('X-Foo')
+                $request->getHeaderLine('X-Foo'),
             ),
-            'setRequestHeader does not support the magic "current-timestamp" value.'
+            'setRequestHeader does not support the magic "current-timestamp" value.',
         );
         $this->assertSame('current', $request->getHeaderLine('X-Bar'));
     }
 
-    public function getValidDates() : array {
+    public function getValidDates(): array
+    {
         return [
             ['date' => 'Wed, 15 Mar 2017 21:28:14 GMT'],
         ];
@@ -130,20 +136,23 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getValidDates
      * @covers ::isDate
      */
-    public function testIsDateFunctionValidatesDates(string $date) : void {
+    public function testIsDateFunctionValidatesDates(string $date): void
+    {
         $this->assertNull($this->context->isDate($date));
     }
 
     /**
      * @covers ::isDate
      */
-    public function testIsDateFunctionCanFail() : void {
+    public function testIsDateFunctionCanFail(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException('Date is not properly formatted: "invalid date".'));
         $this->context->isDate('invalid date');
     }
 
-    public function getImboConfigFiles() : array {
-        return array_map(function($file) {
+    public function getImboConfigFiles(): array
+    {
+        return array_map(function ($file) {
             return [basename($file)];
         }, glob(__DIR__ . '/../../features/bootstrap/imbo-configs/*.php'));
     }
@@ -152,7 +161,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getImboConfigFiles
      * @covers ::setImboConfigHeader
      */
-    public function testCanSetAConfigHeader(string $path) : void {
+    public function testCanSetAConfigHeader(string $path): void
+    {
         $this->assertSame($this->context, $this->context->setImboConfigHeader($path));
         $this->assertSame($path, $this->makeRequest()->getHeaderLine('X-Imbo-Test-Config-File'));
     }
@@ -160,10 +170,11 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::setImboConfigHeader
      */
-    public function testSettingConfigHeaderFailsWithNonExistingFile() : void {
+    public function testSettingConfigHeaderFailsWithNonExistingFile(): void
+    {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches(
-            '|Configuration file "foobar" does not exist in the ".*?[\\/]imbo-configs" directory\.|'
+            '|Configuration file "foobar" does not exist in the ".*?[\\/]imbo-configs" directory\.|',
         );
 
         $this->context->setImboConfigHeader('foobar');
@@ -172,12 +183,14 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::statsAllowedBy
      */
-    public function testCanSetStatsAllowedByHeader() : void {
+    public function testCanSetStatsAllowedByHeader(): void
+    {
         $this->assertSame($this->context, $this->context->statsAllowedBy('*'));
         $this->assertSame('*', $this->makeRequest()->getHeaderLine('X-Imbo-Stats-Allowed-By'));
     }
 
-    public function getAdaptersForFailure() : array {
+    public function getAdaptersForFailure(): array
+    {
         return [
             ['adapter' => 'database', 'header' => 'X-Imbo-Status-Database-Failure'],
             ['adapter' => 'storage', 'header' => 'X-Imbo-Status-Storage-Failure'],
@@ -188,7 +201,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getAdaptersForFailure
      * @covers ::forceAdapterFailure
      */
-    public function testCanForceAdapterFailureBySettingAHeader(string $adapter, string $header) : void {
+    public function testCanForceAdapterFailureBySettingAHeader(string $adapter, string $header): void
+    {
         $this->assertSame($this->context, $this->context->forceAdapterFailure($adapter));
         $this->assertSame('1', $this->makeRequest()->getHeaderLine($header));
     }
@@ -196,7 +210,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::forceAdapterFailure
      */
-    public function testThrowsExecptionWhenSpecifyingInvalidAdapterForFailure() : void {
+    public function testThrowsExecptionWhenSpecifyingInvalidAdapterForFailure(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid adapter: "foobar".'));
         $this->context->forceAdapterFailure('foobar');
     }
@@ -205,12 +220,13 @@ class FeatureContextTest extends TestCase {
      * @covers ::setPublicAndPrivateKey
      * @covers ::signRequest
      */
-    public function testCanSignRequest() : void {
+    public function testCanSignRequest(): void
+    {
         $this->assertSame(
             $this->context,
             $this->context
                 ->setPublicAndPrivateKey($this->publicKey, $this->privateKey)
-                ->signRequest()
+                ->signRequest(),
         );
         $path = '/path';
         $request = $this->makeRequest($path);
@@ -220,11 +236,12 @@ class FeatureContextTest extends TestCase {
         $query = [];
         parse_str($uri['query'], $query);
 
-        $data = sprintf('%s|%s|%s|%s',
+        $data = sprintf(
+            '%s|%s|%s|%s',
             $request->getMethod(),
             sprintf('%s%s?publicKey=%s', $this->baseUri, $path, $this->publicKey),
             $this->publicKey,
-            $query['timestamp']
+            $query['timestamp'],
         );
         $signature = hash_hmac('sha256', $data, $this->privateKey);
 
@@ -237,12 +254,13 @@ class FeatureContextTest extends TestCase {
      * @covers ::signRequestUsingHttpHeaders
      * @covers ::signRequest
      */
-    public function testCanSignRequestUsingHttpHeaders() : void {
+    public function testCanSignRequestUsingHttpHeaders(): void
+    {
         $this->assertSame(
             $this->context,
             $this->context
                 ->setPublicAndPrivateKey($this->publicKey, $this->privateKey)
-                ->signRequestUsingHttpHeaders()
+                ->signRequestUsingHttpHeaders(),
         );
         $path = '/path';
         $request = $this->makeRequest($path);
@@ -251,11 +269,12 @@ class FeatureContextTest extends TestCase {
         $this->assertTrue($request->hasHeader('X-Imbo-Authenticate-Signature'));
         $this->assertTrue($request->hasHeader('X-Imbo-Authenticate-Timestamp'));
 
-        $data = sprintf('%s|%s|%s|%s',
+        $data = sprintf(
+            '%s|%s|%s|%s',
             $request->getMethod(),
             sprintf('%s%s', $this->baseUri, $path),
             $this->publicKey,
-            $request->getHeaderLine('X-Imbo-Authenticate-Timestamp')
+            $request->getHeaderLine('X-Imbo-Authenticate-Timestamp'),
         );
         $signature = hash_hmac('sha256', $data, $this->privateKey);
 
@@ -266,15 +285,17 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::signRequest
      */
-    public function testCanNotAttachSignatureHandlerMoreThanOnce() : void {
+    public function testCanNotAttachSignatureHandlerMoreThanOnce(): void
+    {
         $this->context->signRequest();
         $this->expectExceptionObject(new RuntimeException(
-            'The authentication handler is currently added to the stack. It can not be added more than once.'
+            'The authentication handler is currently added to the stack. It can not be added more than once.',
         ));
         $this->context->signRequest();
     }
 
-    public function getDataForAccessTokens() : array {
+    public function getDataForAccessTokens(): array
+    {
         return [
             'path with no query params' => [
                 'path' => '/path',
@@ -296,12 +317,13 @@ class FeatureContextTest extends TestCase {
      * @covers ::setPublicAndPrivateKey
      * @covers ::appendAccessToken
      */
-    public function testCanAppendAccessToken(string $path, string $expectedUrl) : void {
+    public function testCanAppendAccessToken(string $path, string $expectedUrl): void
+    {
         $this->assertSame(
             $this->context,
             $this->context
                 ->setPublicAndPrivateKey($this->publicKey, $this->privateKey)
-                ->appendAccessToken()
+                ->appendAccessToken(),
         );
         $request = $this->makeRequest($path);
 
@@ -312,10 +334,11 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::appendAccessToken
      */
-    public function testCanNotAttachAccessTokenHandlerMoreThanOnce() : void {
+    public function testCanNotAttachAccessTokenHandlerMoreThanOnce(): void
+    {
         $this->context->appendAccessToken();
         $this->expectExceptionObject(new RuntimeException(
-            'The access token handler is currently added to the stack. It can not be added more than once.'
+            'The access token handler is currently added to the stack. It can not be added more than once.',
         ));
         $this->context->appendAccessToken();
     }
@@ -323,10 +346,11 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::signRequest
      */
-    public function testCanNotAddBothAccessTokenAndSignatureHandlers() : void {
+    public function testCanNotAddBothAccessTokenAndSignatureHandlers(): void
+    {
         $this->context->appendAccessToken();
         $this->expectExceptionObject(new RuntimeException(
-            'The access token handler is currently added to the stack. These handlers should not be added to the same request.'
+            'The access token handler is currently added to the stack. These handlers should not be added to the same request.',
         ));
         $this->context->signRequest();
     }
@@ -334,10 +358,11 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::appendAccessToken
      */
-    public function testCanNotAddBothSignatureAndAccessTokenHandlers() : void {
+    public function testCanNotAddBothSignatureAndAccessTokenHandlers(): void
+    {
         $this->context->signRequest();
         $this->expectExceptionObject(new RuntimeException(
-            'The authentication handler is currently added to the stack. These handlers should not be added to the same request.'
+            'The authentication handler is currently added to the stack. These handlers should not be added to the same request.',
         ));
         $this->context->appendAccessToken();
     }
@@ -345,9 +370,10 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::addUserImageToImbo
      */
-    public function testThrowsExceptionWhenAddingUserImageWithUnknownUser() : void {
+    public function testThrowsExceptionWhenAddingUserImageWithUnknownUser(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'No keys exist for user "some user".'
+            'No keys exist for user "some user".',
         ));
         $this->context->addUserImageToImbo(__FILE__, 'some user');
     }
@@ -355,9 +381,10 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::addUserImageToImbo
      */
-    public function testThrowsExceptionWhenAddingUserImageWithInvalidFilename() : void {
+    public function testThrowsExceptionWhenAddingUserImageWithInvalidFilename(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'File does not exist: "/some/path".'
+            'File does not exist: "/some/path".',
         ));
         $this->context->addUserImageToImbo('/some/path', 'user');
     }
@@ -365,10 +392,11 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::addUserImageToImbo
      */
-    public function testAddingUserImageToImboFailsWhenImboDoesNotIncludeImageIdentifierInResponse() : void {
+    public function testAddingUserImageToImboFailsWhenImboDoesNotIncludeImageIdentifierInResponse(): void
+    {
         $this->mockHandler->append(new Response(400, ['Content-Type' => 'application/json'], '{"error": {"message": "some id"}}'));
         $this->expectExceptionObject(new RuntimeException(
-            'Image was not successfully added. Response body:'
+            'Image was not successfully added. Response body:',
         ));
         $this->context->addUserImageToImbo(FIXTURES_DIR . '/image1.png', 'user');
     }
@@ -376,25 +404,26 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::addUserImageToImbo
      */
-    public function testCanAddUserImageToImbo() : void {
+    public function testCanAddUserImageToImbo(): void
+    {
         $this->mockHandler->append(new Response(200, ['Content-Type' => 'application/json'], '{"imageIdentifier": "some id"}'));
 
         $this->assertSame(
             $this->context,
-            $this->context->addUserImageToImbo(FIXTURES_DIR . '/image1.png', 'user')
+            $this->context->addUserImageToImbo(FIXTURES_DIR . '/image1.png', 'user'),
         );
 
         $this->assertSame(
             1,
             $num = count($this->history),
-            sprintf('There should be exactly 1 transction in the history, found %d.', $num)
+            sprintf('There should be exactly 1 transction in the history, found %d.', $num),
         );
 
         $request = $this->history[0]['request'];
 
         $this->assertStringStartsWith(
             'http://localhost:8080/users/user/images?publicKey=publicKey&signature=',
-            (string) $request->getUri()
+            (string) $request->getUri(),
         );
         $this->assertSame('POST', $request->getMethod());
     }
@@ -402,10 +431,11 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::addUserImageToImbo
      */
-    public function testCanAddUserImageWithMetadataToImbo() : void {
+    public function testCanAddUserImageWithMetadataToImbo(): void
+    {
         $this->mockHandler->append(
             new Response(200, [], '{"imageIdentifier": "imageId"}'),
-            new Response(200)
+            new Response(200),
         );
 
         $this->assertSame(
@@ -413,14 +443,14 @@ class FeatureContextTest extends TestCase {
             $this->context->addUserImageToImbo(
                 FIXTURES_DIR . '/image1.png',
                 'user',
-                new PyStringNode(['{"foo": "bar"}'], 1)
-            )
+                new PyStringNode(['{"foo": "bar"}'], 1),
+            ),
         );
 
         $this->assertSame(
             2,
             $num = count($this->history),
-            sprintf('There should be exactly 2 transctions in the history, found %d.', $num)
+            sprintf('There should be exactly 2 transctions in the history, found %d.', $num),
         );
 
         $imageRequest = $this->history[0]['request'];
@@ -428,13 +458,13 @@ class FeatureContextTest extends TestCase {
 
         $this->assertStringStartsWith(
             'http://localhost:8080/users/user/images?publicKey=publicKey&signature=',
-            (string) $imageRequest->getUri()
+            (string) $imageRequest->getUri(),
         );
         $this->assertSame('POST', $imageRequest->getMethod());
 
         $this->assertStringStartsWith(
             'http://localhost:8080/users/user/images/imageId/metadata?publicKey=publicKey&signature=',
-            (string) $metadataRequest->getUri()
+            (string) $metadataRequest->getUri(),
         );
         $this->assertSame('POST', $metadataRequest->getMethod());
     }
@@ -442,11 +472,12 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::setClientIp
      */
-    public function testCanSetClientIpHeader() : void {
+    public function testCanSetClientIpHeader(): void
+    {
         $ip = '1.2.3.4';
         $this->assertSame(
             $this->context,
-            $this->context->setClientIp($ip)
+            $this->context->setClientIp($ip),
         );
         $request = $this->makeRequest('/path');
 
@@ -458,17 +489,18 @@ class FeatureContextTest extends TestCase {
      * @covers ::applyTransformation
      * @covers ::setRequestQueryParameter
      */
-    public function testCanApplyImageTransformation() : void {
+    public function testCanApplyImageTransformation(): void
+    {
         $this->assertSame(
             $this->context,
-            $this->context->applyTransformation('t1')
+            $this->context->applyTransformation('t1'),
         );
 
         $request = $this->makeRequest('/path');
 
         $this->assertSame(
             'http://localhost:8080/path?t%5B0%5D=t1',
-            (string) $request->getUri()
+            (string) $request->getUri(),
         );
     }
 
@@ -477,27 +509,29 @@ class FeatureContextTest extends TestCase {
      * @covers ::applyTransformation
      * @covers ::setRequestQueryParameter
      */
-    public function testCanApplyImageTransformations() : void {
+    public function testCanApplyImageTransformations(): void
+    {
         $this->assertSame(
             $this->context,
-            $this->context->applyTransformations(new PyStringNode(['t1', 't2', 't3'], 1))
+            $this->context->applyTransformations(new PyStringNode(['t1', 't2', 't3'], 1)),
         );
 
         $request = $this->makeRequest('/path');
 
         $this->assertSame(
             'http://localhost:8080/path?t%5B0%5D=t1&t%5B1%5D=t2&t%5B2%5D=t3',
-            (string) $request->getUri()
+            (string) $request->getUri(),
         );
     }
 
     /**
      * @covers ::primeDatabase
      */
-    public function testThrowsExceptionWhenPrimingDatabaseWithScriptThatDoesNotExist() : void {
+    public function testThrowsExceptionWhenPrimingDatabaseWithScriptThatDoesNotExist(): void
+    {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches(
-            '|Fixture file "foobar.php" does not exist in ".*?[\\/]features[\\/]fixtures"\.|'
+            '|Fixture file "foobar.php" does not exist in ".*?[\\/]features[\\/]fixtures"\.|',
         );
         $this->context->primeDatabase('foobar.php');
     }
@@ -505,14 +539,16 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::authenticateRequest
      */
-    public function testThrowsExceptionWhenSpecifyingInvalidAuthenticationType() : void {
+    public function testThrowsExceptionWhenSpecifyingInvalidAuthenticationType(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Invalid authentication method: "auth".'
+            'Invalid authentication method: "auth".',
         ));
         $this->context->authenticateRequest('auth');
     }
 
-    public function getAuthDetails() : array {
+    public function getAuthDetails(): array
+    {
         return [
             'access-token' => [
                 'publicKey' => 'publicKey',
@@ -551,7 +587,7 @@ class FeatureContextTest extends TestCase {
                     'X-Imbo-PublicKey' => '/^publicKey$/',
                     'X-Imbo-Authenticate-Signature' => '/^[a-z0-9]{64}$/',
                     'X-Imbo-Authenticate-Timestamp' => '/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$/',
-                ]
+                ],
             ],
             'signature (headers) #2' => [
                 'publicKey' => 'key',
@@ -562,7 +598,7 @@ class FeatureContextTest extends TestCase {
                     'X-Imbo-PublicKey' => '/^key$/',
                     'X-Imbo-Authenticate-Signature' => '/^[a-z0-9]{64}$/',
                     'X-Imbo-Authenticate-Timestamp' => '/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$/',
-                ]
+                ],
             ],
         ];
     }
@@ -572,14 +608,15 @@ class FeatureContextTest extends TestCase {
      * @covers ::setPublicAndPrivateKey
      * @covers ::authenticateRequest
      */
-    public function testCanUseDifferentAuthenticationMethods(string $publicKey, string $privateKey, string $authMethod, string $uriRegExp, array $headers = []) : void {
+    public function testCanUseDifferentAuthenticationMethods(string $publicKey, string $privateKey, string $authMethod, string $uriRegExp, array $headers = []): void
+    {
         $this->assertSame(
             $this->context,
-            $this->context->setPublicAndPrivateKey($publicKey, $privateKey)
+            $this->context->setPublicAndPrivateKey($publicKey, $privateKey),
         );
         $this->assertSame(
             $this->context,
-            $this->context->authenticateRequest($authMethod)
+            $this->context->authenticateRequest($authMethod),
         );
 
         $request = $this->makeRequest('/path');
@@ -591,7 +628,8 @@ class FeatureContextTest extends TestCase {
         }
     }
 
-    public function getRequestQueryParams() : array {
+    public function getRequestQueryParams(): array
+    {
         return [
             'single key / value' => [
                 'params' => [
@@ -630,11 +668,12 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getRequestQueryParams
      * @covers ::setRequestQueryParameter
      */
-    public function testCanSetRequestQueryParameters(array $params, string $uri) : void {
+    public function testCanSetRequestQueryParameters(array $params, string $uri): void
+    {
         foreach ($params as $param) {
             $this->assertSame(
                 $this->context,
-                $this->context->setRequestQueryParameter($param['name'], $param['value'])
+                $this->context->setRequestQueryParameter($param['name'], $param['value']),
             );
         }
 
@@ -644,10 +683,11 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::setRequestQueryParameter
      */
-    public function testThrowsExceptionWhenAppendingArrayParamToRegularParam() : void {
+    public function testThrowsExceptionWhenAppendingArrayParamToRegularParam(): void
+    {
         $this->context->setRequestQueryParameter('t', 'border');
         $this->expectExceptionObject(new InvalidArgumentException(
-            'The "t" query parameter already exists and it\'s not an array, so can\'t append more values to it.'
+            'The "t" query parameter already exists and it\'s not an array, so can\'t append more values to it.',
         ));
         $this->context->setRequestQueryParameter('t[]', 'thumb');
     }
@@ -655,9 +695,10 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::setRequestParameterToImageIdentifier
      */
-    public function testThrowsExceptionWhenSettingARequestParameterToAnNonExistingImageIdentifier() : void {
+    public function testThrowsExceptionWhenSettingARequestParameterToAnNonExistingImageIdentifier(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'No image identifier exists for image: "/path".'
+            'No image identifier exists for image: "/path".',
         ));
         $this->context->setRequestParameterToImageIdentifier('foo', '/path');
     }
@@ -665,11 +706,12 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::setRequestParameterToImageIdentifier
      */
-    public function testCanSetQueryParameterToImageIdentifier() : void {
+    public function testCanSetQueryParameterToImageIdentifier(): void
+    {
         $this->mockHandler->append(
             new Response(200, [], '{"imageIdentifier": "1"}'),
             new Response(200, [], '{"imageIdentifier": "2"}'),
-            new Response(200, [], '{"imageIdentifier": "3"}')
+            new Response(200, [], '{"imageIdentifier": "3"}'),
         );
 
         $this->assertSame(
@@ -677,7 +719,7 @@ class FeatureContextTest extends TestCase {
             $this->context
                 ->addUserImageToImbo(FIXTURES_DIR . '/image1.png', 'user')
                 ->addUserImageToImbo(FIXTURES_DIR . '/image2.png', 'user')
-                ->addUserImageToImbo(FIXTURES_DIR . '/image3.png', 'user')
+                ->addUserImageToImbo(FIXTURES_DIR . '/image3.png', 'user'),
         );
 
         $this->assertSame(
@@ -685,26 +727,28 @@ class FeatureContextTest extends TestCase {
             $this->context
                 ->setRequestParameterToImageIdentifier('id1', FIXTURES_DIR . '/image1.png')
                 ->setRequestParameterToImageIdentifier('id2', FIXTURES_DIR . '/image2.png')
-                ->setRequestParameterToImageIdentifier('id3', FIXTURES_DIR . '/image3.png')
+                ->setRequestParameterToImageIdentifier('id3', FIXTURES_DIR . '/image3.png'),
         );
 
         $this->assertSame(
             'http://localhost:8080/path?id1=1&id2=2&id3=3',
-            (string) $this->makeRequest('/path')->getUri()
+            (string) $this->makeRequest('/path')->getUri(),
         );
     }
 
     /**
      * @covers ::generateShortImageUrl
      */
-    public function testThrowsExceptionWheyGeneratingShortImageUrlForNonExistingImage() : void {
+    public function testThrowsExceptionWheyGeneratingShortImageUrlForNonExistingImage(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'No image identifier exists for path: "/path".'
+            'No image identifier exists for path: "/path".',
         ));
         $this->context->generateShortImageUrl('/path', new PyStringNode([], 1));
     }
 
-    public function getShortUrlParams() : array {
+    public function getShortUrlParams(): array
+    {
         return [
             [
                 'image' => FIXTURES_DIR . '/image1.png',
@@ -749,57 +793,61 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getShortUrlParams
      * @covers ::generateShortImageUrl
      */
-    public function testCanGenerateShortUrls(string $image, string $user, string $imageIdentifier, array $params) : void {
+    public function testCanGenerateShortUrls(string $image, string $user, string $imageIdentifier, array $params): void
+    {
         $this->mockHandler->append(
             new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
-            new Response(200)
+            new Response(200),
         );
 
         $this->assertSame(
             $this->context,
-            $this->context->addUserImageToImbo($image, $user)
+            $this->context->addUserImageToImbo($image, $user),
         );
 
         $this->assertSame(
             $this->context,
             $this->context->generateShortImageUrl(
                 $image,
-                new PyStringNode([json_encode($params)], 1)
-            )
+                new PyStringNode([json_encode($params)], 1),
+            ),
         );
 
         $this->assertCount(
             2,
             $this->history,
-            'There should exist exactly 2 requests in the history, found %d.'
+            'There should exist exactly 2 requests in the history, found %d.',
         );
 
         $request = $this->history[1]['request'];
 
         $this->assertSame(
             sprintf('http://localhost:8080/users/user/images/%s/shorturls', $imageIdentifier),
-            (string) $request->getUri()
+            (string) $request->getUri(),
         );
 
         $this->assertSame('POST', $request->getMethod());
 
         $this->assertSame(
             array_merge($params, ['imageIdentifier' => $imageIdentifier]),
-            json_decode((string) $request->getBody(), true))
+            json_decode((string) $request->getBody(), true),
+        )
         ;
     }
 
     /**
      * @covers ::specifyAsTheWatermarkImage
      */
-    public function testThrowsExceptionWhenSpecifyingWatermarkImageThatDoesNotExist() : void {
+    public function testThrowsExceptionWhenSpecifyingWatermarkImageThatDoesNotExist(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'No image exists for path: "/path".'
+            'No image exists for path: "/path".',
         ));
         $this->context->specifyAsTheWatermarkImage('/path');
     }
 
-    public function getDataForWatermarkImages() : array {
+    public function getDataForWatermarkImages(): array
+    {
         return [
             'no params' => [
                 'image' => FIXTURES_DIR . '/image1.png',
@@ -812,7 +860,7 @@ class FeatureContextTest extends TestCase {
                 'imageIdentifier' => 'someId',
                 'params' => 'x=10,y=5,position=bottom-right,width=20,height=20',
                 'uri' => 'http://localhost:8080/path?t%5B0%5D=watermark%3Aimg%3DsomeId%2Cx%3D10%2Cy%3D5%2Cposition%3Dbottom-right%2Cwidth%3D20%2Cheight%3D20',
-            ]
+            ],
         ];
     }
 
@@ -820,20 +868,21 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getDataForWatermarkImages
      * @covers ::specifyAsTheWatermarkImage
      */
-    public function testCanSpecifyWatermarkImage(string $image, string $imageIdentifier, ?string $params = null, string $uri) : void {
+    public function testCanSpecifyWatermarkImage(string $image, string $imageIdentifier, ?string $params = null, string $uri): void
+    {
         $this->mockHandler->append(
             new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
-            new Response(200)
+            new Response(200),
         );
 
         $this->assertSame(
             $this->context,
-            $this->context->addUserImageToImbo($image, 'user')
+            $this->context->addUserImageToImbo($image, 'user'),
         );
 
         $this->assertSame(
             $this->context,
-            $this->context->specifyAsTheWatermarkImage($image, $params)
+            $this->context->specifyAsTheWatermarkImage($image, $params),
         );
 
         $request = $this->makeRequest('/path');
@@ -845,16 +894,18 @@ class FeatureContextTest extends TestCase {
      * @covers ::requestPreviouslyAddedImage
      * @covers ::getUserAndImageIdentifierOfPreviouslyAddedImage
      */
-    public function testThrowsExceptionWhenTryingToRequestPreviouslyAddedImageWhenNoImageHasBeenAdded() : void {
+    public function testThrowsExceptionWhenTryingToRequestPreviouslyAddedImageWhenNoImageHasBeenAdded(): void
+    {
         $this->mockHandler->append(new Response(200));
         $this->context->requestPath('/path');
         $this->expectExceptionObject(new RuntimeException(
-            'Could not find any response in the history with an image identifier.'
+            'Could not find any response in the history with an image identifier.',
         ));
         $this->context->requestPreviouslyAddedImage();
     }
 
-    public function getDataForRequestingPreviouslyAddedImage() : array {
+    public function getDataForRequestingPreviouslyAddedImage(): array
+    {
         return [
             'HTTP GET' => [
                 'imageIdentifier' => 'imageId',
@@ -873,23 +924,24 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getDataForRequestingPreviouslyAddedImage
      * @covers ::requestPreviouslyAddedImage
      */
-    public function testCanRequestPreviouslyAddedImage(string $imageIdentifier, string $image, string $method) : void {
+    public function testCanRequestPreviouslyAddedImage(string $imageIdentifier, string $image, string $method): void
+    {
         $this->mockHandler->append(
             new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
-            new Response(200)
+            new Response(200),
         );
 
         $this->assertSame(
             $this->context,
             $this->context
                 ->addUserImageToImbo($image, 'user')
-                ->requestPreviouslyAddedImage($method)
+                ->requestPreviouslyAddedImage($method),
         );
 
         $this->assertCount(
             2,
             $this->history,
-            sprintf('Expected exactly 2 requests, got: %d.', count($this->history))
+            sprintf('Expected exactly 2 requests, got: %d.', count($this->history)),
         );
 
         $request = $this->history[1]['request'];
@@ -899,13 +951,14 @@ class FeatureContextTest extends TestCase {
         $this->assertSame(
             sprintf(
                 'http://localhost:8080/users/user/images/%s',
-                $imageIdentifier
+                $imageIdentifier,
             ),
-            (string) $request->getUri()
+            (string) $request->getUri(),
         );
     }
 
-    public function getDataForRequestingPreviouslyAddedImageWithExtension() : array {
+    public function getDataForRequestingPreviouslyAddedImageWithExtension(): array
+    {
         return [
             [
                 'imageIdentifier' => 'imageId',
@@ -927,23 +980,24 @@ class FeatureContextTest extends TestCase {
      * @covers ::requestPreviouslyAddedImageAsType
      * @covers ::getUserAndImageIdentifierOfPreviouslyAddedImage
      */
-    public function testCanRequestPreviouslyAddedImageUsingAlternativeMethod(string $imageIdentifier, string $image, string $method, string $extension) : void {
+    public function testCanRequestPreviouslyAddedImageUsingAlternativeMethod(string $imageIdentifier, string $image, string $method, string $extension): void
+    {
         $this->mockHandler->append(
             new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
-            new Response(200)
+            new Response(200),
         );
 
         $this->assertSame(
             $this->context,
             $this->context
                 ->addUserImageToImbo($image, 'user')
-                ->requestPreviouslyAddedImageAsType($extension, $method)
+                ->requestPreviouslyAddedImageAsType($extension, $method),
         );
 
         $this->assertCount(
             2,
             $this->history,
-            sprintf('Expected exactly 2 requests, got: %d.', count($this->history))
+            sprintf('Expected exactly 2 requests, got: %d.', count($this->history)),
         );
 
         $request = $this->history[1]['request'];
@@ -954,21 +1008,23 @@ class FeatureContextTest extends TestCase {
             sprintf(
                 'http://localhost:8080/users/user/images/%s%s',
                 $imageIdentifier,
-                $extension ? '.' . $extension : ''
+                $extension ? '.' . $extension : '',
             ),
-            (string) $request->getUri()
+            (string) $request->getUri(),
         );
     }
 
     /**
      * @covers ::makeSameRequest
      */
-    public function testThrowsExceptionWhenTryingToReplayRequestWhenNoRequestHasBeenMade() : void {
+    public function testThrowsExceptionWhenTryingToReplayRequestWhenNoRequestHasBeenMade(): void
+    {
         $this->expectExceptionObject(new RuntimeException('No request has been made yet.'));
         $this->context->makeSameRequest();
     }
 
-    public function getDataForReplayingRequests() : array {
+    public function getDataForReplayingRequests(): array
+    {
         return [
             'use original method' => [
                 'orignalMethod' => 'GET',
@@ -1005,7 +1061,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getDataForReplayingRequests
      * @covers ::makeSameRequest
      */
-    public function testCanReplayTheLastRequest(string $originalMethod, ?string $method, string $expectedUrl, ?string $publicKey, ?string $privateKey) : void {
+    public function testCanReplayTheLastRequest(string $originalMethod, ?string $method, string $expectedUrl, ?string $publicKey, ?string $privateKey): void
+    {
         $this->mockHandler->append(new Response(200), new Response(200));
 
         $this->context->setPublicAndPrivateKey($publicKey, $privateKey);
@@ -1018,13 +1075,13 @@ class FeatureContextTest extends TestCase {
 
         $this->assertSame(
             $this->context,
-            $this->context->makeSameRequest($method)
+            $this->context->makeSameRequest($method),
         );
 
         $this->assertCount(
             2,
             $this->history,
-            sprintf('Expected exactly 2 requests, got: %d.', count($this->history))
+            sprintf('Expected exactly 2 requests, got: %d.', count($this->history)),
         );
 
         $this->assertSame($originalMethod, $this->history[0]['request']->getMethod());
@@ -1032,18 +1089,19 @@ class FeatureContextTest extends TestCase {
         $this->assertSame($expectedUrl, (string) $this->history[0]['request']->getUri());
         $this->assertSame(
             (string) $this->history[0]['request']->getUri(),
-            (string) $this->history[1]['request']->getUri()
+            (string) $this->history[1]['request']->getUri(),
         );
     }
 
     /**
      * @covers ::requestMetadataOfPreviouslyAddedImage
      */
-    public function testThrowsExceptionWhenRequestingMetadataOfPreviouslyAddedImageWhenNoImageHasBeenAdded() : void {
+    public function testThrowsExceptionWhenRequestingMetadataOfPreviouslyAddedImageWhenNoImageHasBeenAdded(): void
+    {
         $this->makeRequest('/path');
         $this->makeRequest('/anotherPath');
         $this->expectExceptionObject(new RuntimeException(
-            'Could not find any response in the history with an image identifier.'
+            'Could not find any response in the history with an image identifier.',
         ));
         $this->context->requestMetadataOfPreviouslyAddedImage();
     }
@@ -1051,14 +1109,16 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::requestMetadataOfPreviouslyAddedImage
      */
-    public function testThrowsExceptionWhenRequestingMetadataOfPreviouslyAddedImageWhenNoRequestHasBeenMade() : void {
+    public function testThrowsExceptionWhenRequestingMetadataOfPreviouslyAddedImageWhenNoRequestHasBeenMade(): void
+    {
         $this->expectExceptionObject(new RuntimeException(
-            'Could not find any response in the history with an image identifier.'
+            'Could not find any response in the history with an image identifier.',
         ));
         $this->context->requestMetadataOfPreviouslyAddedImage();
     }
 
-    public function getDataForRequestingMetadataOfPreviouslyAddedImage() : array {
+    public function getDataForRequestingMetadataOfPreviouslyAddedImage(): array
+    {
         return [
             'no metadata' => [
                 'imageIdentifier' => 'imageId',
@@ -1079,23 +1139,24 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getDataForRequestingMetadataOfPreviouslyAddedImage
      * @covers ::requestMetadataOfPreviouslyAddedImage
      */
-    public function testCanRequestMetadataOfPreviouslyAddedImage(string $imageIdentifier, string $image, string $method, array $metadata) : void {
+    public function testCanRequestMetadataOfPreviouslyAddedImage(string $imageIdentifier, string $image, string $method, array $metadata): void
+    {
         $this->mockHandler->append(
             new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
-            new Response(200, [], json_encode($metadata))
+            new Response(200, [], json_encode($metadata)),
         );
 
         $this->assertSame(
             $this->context,
             $this->context
                 ->addUserImageToImbo($image, 'user')
-                ->requestMetadataOfPreviouslyAddedImage($method)
+                ->requestMetadataOfPreviouslyAddedImage($method),
         );
 
         $this->assertCount(
             2,
             $this->history,
-            sprintf('Expected exactly 2 requests, got: %d.', count($this->history))
+            sprintf('Expected exactly 2 requests, got: %d.', count($this->history)),
         );
 
         $request = $this->history[1]['request'];
@@ -1105,9 +1166,9 @@ class FeatureContextTest extends TestCase {
         $this->assertSame(
             sprintf(
                 'http://localhost:8080/users/user/images/%s/metadata',
-                $imageIdentifier
+                $imageIdentifier,
             ),
-            (string) $request->getUri()
+            (string) $request->getUri(),
         );
         $this->assertSame($metadata, json_decode((string) $this->history[1]['response']->getBody(), true));
     }
@@ -1115,15 +1176,17 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::requestImageResourceForLocalImage
      */
-    public function testThrowsExceptionWhenTryingToRequestImageUsingLocalPathAndImageDoesNotExistInImbo() : void {
+    public function testThrowsExceptionWhenTryingToRequestImageUsingLocalPathAndImageDoesNotExistInImbo(): void
+    {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches(
-            '|Image URL for image with path ".*?[\\/]tests[\\/]Fixtures[\\/]image1\.png" can not be found\.|'
+            '|Image URL for image with path ".*?[\\/]tests[\\/]Fixtures[\\/]image1\.png" can not be found\.|',
         );
         $this->context->requestImageResourceForLocalImage(FIXTURES_DIR . '/image1.png');
     }
 
-    public function getDataForRequestingImageWithLocalPath() : array {
+    public function getDataForRequestingImageWithLocalPath(): array
+    {
         return [
             'default values' => [
                 'image' => FIXTURES_DIR . '/image1.png',
@@ -1146,23 +1209,24 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getDataForRequestingImageWithLocalPath
      * @covers ::requestImageResourceForLocalImage
      */
-    public function testCanRequestImageUsingLocalFilePath(string $image, string $imageIdentifier, ?string $extension, string $method, string $expectedPath) : void {
+    public function testCanRequestImageUsingLocalFilePath(string $image, string $imageIdentifier, ?string $extension, string $method, string $expectedPath): void
+    {
         $this->mockHandler->append(
             new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
-            new Response(200)
+            new Response(200),
         );
 
         $this->assertSame(
             $this->context,
             $this->context
                 ->addUserImageToImbo($image, 'user')
-                ->requestImageResourceForLocalImage($image, $extension, $method)
+                ->requestImageResourceForLocalImage($image, $extension, $method),
         );
 
         $this->assertCount(
             2,
             $this->history,
-            sprintf('Expected exactly 2 transactions in the history, got %d.', count($this->history))
+            sprintf('Expected exactly 2 transactions in the history, got %d.', count($this->history)),
         );
 
         $request = $this->history[1]['request'];
@@ -1174,7 +1238,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::requestPaths
      */
-    public function testThrowsExceptionWhenBulkRequestingWithMissingPath() : void {
+    public function testThrowsExceptionWhenBulkRequestingWithMissingPath(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException('Missing or empty "path" key.'));
         $this->context->requestPaths(new TableNode([
             ['method'],
@@ -1185,22 +1250,24 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::requestPaths
      */
-    public function testThrowsExceptionWhenBulkRequestingAndUsingBothAccessTokenAndSignature() : void {
+    public function testThrowsExceptionWhenBulkRequestingAndUsingBothAccessTokenAndSignature(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Both "sign request" and "access token" can not be set to "yes".'
+            'Both "sign request" and "access token" can not be set to "yes".',
         ));
         $this->context->requestPaths(new TableNode([
             ['path',  'access token', 'sign request'],
-            ['/path', 'yes',          'yes'         ]
+            ['/path', 'yes',          'yes'         ],
         ]));
     }
 
-    public function getDataForBulkRequests() : array {
+    public function getDataForBulkRequests(): array
+    {
         return [
             'single request with no options' => [
                 'table' => new TableNode([
                     ['path'],
-                    ['/path']
+                    ['/path'],
                 ]),
                 'requests' => [
                     [
@@ -1214,7 +1281,7 @@ class FeatureContextTest extends TestCase {
             'append access token' => [
                 'table' => new TableNode([
                     ['path',  'access token'],
-                    ['/path', 'yes']
+                    ['/path', 'yes'],
                 ]),
                 'requests' => [
                     [
@@ -1228,7 +1295,7 @@ class FeatureContextTest extends TestCase {
             'add transformation' => [
                 'table' => new TableNode([
                     ['path',  'transformation'],
-                    ['/path', 'border']
+                    ['/path', 'border'],
                 ]),
                 'requests' => [
                     [
@@ -1242,7 +1309,7 @@ class FeatureContextTest extends TestCase {
             'set request body' => [
                 'table' => new TableNode([
                     ['path',  'request body'],
-                    ['/path', 'some data']
+                    ['/path', 'some data'],
                 ]),
                 'requests' => [
                     [
@@ -1260,7 +1327,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getDataForBulkRequests
      * @covers ::requestPaths
      */
-    public function testCanBulkRequest(TableNode $table, array $requests) : void {
+    public function testCanBulkRequest(TableNode $table, array $requests): void
+    {
         for ($i = 0; $i < count($table->getRows()) - 1; $i++) {
             $this->mockHandler->append(new Response(200));
         }
@@ -1269,7 +1337,7 @@ class FeatureContextTest extends TestCase {
             $this->context,
             $this->context
                 ->setPublicAndPrivateKey('publicKey', 'privateKey')
-                ->requestPaths($table)
+                ->requestPaths($table),
         );
 
         foreach ($requests as $i => $data) {
@@ -1283,7 +1351,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::requestPaths
      */
-    public function testCanBulkRequestWithPreviouslyAddedImage() : void {
+    public function testCanBulkRequestWithPreviouslyAddedImage(): void
+    {
         $this->mockHandler->append(
             // Response from adding image
             new Response(200, [], json_encode(['imageIdentifier' => 'imageId'])),
@@ -1291,7 +1360,7 @@ class FeatureContextTest extends TestCase {
             // Bulk responses
             new Response(200),
             new Response(200),
-            new Response(200)
+            new Response(200),
         );
 
         $requests = new TableNode([
@@ -1306,13 +1375,13 @@ class FeatureContextTest extends TestCase {
             $this->context
                 ->setPublicAndPrivateKey('publicKey', 'privateKey')
                 ->addUserImageToImbo(FIXTURES_DIR . '/image1.png', 'user')
-                ->requestPaths($requests)
+                ->requestPaths($requests),
         );
 
         $this->assertCount(
             4,
             $this->history,
-            sprintf('Expected exactly 3 requests, got %d.', count($this->history))
+            sprintf('Expected exactly 3 requests, got %d.', count($this->history)),
         );
 
         $this->assertSame('GET', $this->history[1]['request']->getMethod());
@@ -1331,7 +1400,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::requestPaths
      */
-    public function testCanBulkRequestWithSignedRequests() : void {
+    public function testCanBulkRequestWithSignedRequests(): void
+    {
         $requests = new TableNode([
             ['path',   'method', 'sign request'],
             ['/path1', '',       'yes'         ],
@@ -1344,27 +1414,27 @@ class FeatureContextTest extends TestCase {
         $this->mockHandler->append(
             new Response(200),
             new Response(200),
-            new Response(200)
+            new Response(200),
         );
 
         $this->assertSame(
             $this->context,
             $this->context
                 ->setPublicAndPrivateKey($publicKey, $privateKey)
-                ->requestPaths($requests)
+                ->requestPaths($requests),
         );
 
         $this->assertCount(
             3,
             $this->history,
-            sprintf('Expected exactly 1 request, got %d.', count($this->history))
+            sprintf('Expected exactly 1 request, got %d.', count($this->history)),
         );
 
         $this->assertSame('GET', $this->history[0]['request']->getMethod());
         $this->assertSame('/path1', $this->history[0]['request']->getUri()->getPath());
         $this->assertMatchesRegularExpression(
             '/^publicKey=publicKey&signature=[a-z0-9]{64}&timestamp=[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$/',
-            $this->history[0]['request']->getUri()->getQuery()
+            $this->history[0]['request']->getUri()->getQuery(),
         );
 
         $this->assertSame('GET', $this->history[1]['request']->getMethod());
@@ -1375,14 +1445,15 @@ class FeatureContextTest extends TestCase {
         $this->assertSame('/path3', $this->history[2]['request']->getUri()->getPath());
         $this->assertMatchesRegularExpression(
             '/^publicKey=publicKey&signature=[a-z0-9]{64}&timestamp=[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$/',
-            $this->history[2]['request']->getUri()->getQuery()
+            $this->history[2]['request']->getUri()->getQuery(),
         );
     }
 
     /**
      * @covers ::requestPaths
      */
-    public function testCanBulkRequestWithMetadataOfPreviouslyAddedImage() : void {
+    public function testCanBulkRequestWithMetadataOfPreviouslyAddedImage(): void
+    {
         $this->mockHandler->append(
             // Response of adding image
             new Response(200, [], json_encode(['imageIdentifier' => 'imageId'])),
@@ -1392,7 +1463,7 @@ class FeatureContextTest extends TestCase {
 
             // Responses to bulk requests
             new Response(200),
-            new Response(200)
+            new Response(200),
         );
 
         $requests = new TableNode([
@@ -1408,15 +1479,15 @@ class FeatureContextTest extends TestCase {
                 ->addUserImageToImbo(
                     FIXTURES_DIR . '/image1.png',
                     'user',
-                    new PyStringNode(['{"foo": "bar"}'], 1)
+                    new PyStringNode(['{"foo": "bar"}'], 1),
                 )
-                ->requestPaths($requests)
+                ->requestPaths($requests),
         );
 
         $this->assertCount(
             4,
             $this->history,
-            sprintf('Expected exactly 3 requests, got %d.', count($this->history))
+            sprintf('Expected exactly 3 requests, got %d.', count($this->history)),
         );
 
         $this->assertSame('GET', $this->history[2]['request']->getMethod());
@@ -1431,15 +1502,16 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::requestImageUsingShortUrl
      */
-    public function testThrowsExceptionWhenTryingToRequestImageWithShortUrlWhenResponseHasInvalidBody() : void {
+    public function testThrowsExceptionWhenTryingToRequestImageWithShortUrlWhenResponseHasInvalidBody(): void
+    {
         $this->mockHandler->append(
             new Response(200),
-            new Response(200)
+            new Response(200),
         );
 
         $this->context->requestPath('/path');
         $this->expectExceptionObject(new RuntimeException(
-            'Invalid response body in the current response instance'
+            'Invalid response body in the current response instance',
         ));
         $this->context->requestImageUsingShortUrl();
     }
@@ -1447,15 +1519,16 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::requestImageUsingShortUrl
      */
-    public function testThrowsExceptionWhenTryingToRequestImageWithShortUrlWhenResponseBodyIsMissingId() : void {
+    public function testThrowsExceptionWhenTryingToRequestImageWithShortUrlWhenResponseBodyIsMissingId(): void
+    {
         $this->mockHandler->append(
             new Response(200, [], json_encode(['foo' => 'bar'])),
-            new Response(200)
+            new Response(200),
         );
 
         $this->context->requestPath('/path');
         $this->expectExceptionObject(new RuntimeException(
-            'Missing "id" from body: "{"foo":"bar"}".'
+            'Missing "id" from body: "{"foo":"bar"}".',
         ));
         $this->context->requestImageUsingShortUrl();
     }
@@ -1463,23 +1536,24 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::requestImageUsingShortUrl
      */
-    public function testCanRequestImageUsingShortUrlCreatedInPreviousRequest() : void {
+    public function testCanRequestImageUsingShortUrlCreatedInPreviousRequest(): void
+    {
         $this->mockHandler->append(
             new Response(200, [], json_encode(['id' => 'someId'])),
-            new Response(200)
+            new Response(200),
         );
 
         $this->assertSame(
             $this->context,
             $this->context
                 ->requestPath('/path')
-                ->requestImageUsingShortUrl()
+                ->requestImageUsingShortUrl(),
         );
 
         $this->assertCount(
             2,
             $this->history,
-            sprintf('Expected exactly 2 requests, got %d.', count($this->history))
+            sprintf('Expected exactly 2 requests, got %d.', count($this->history)),
         );
 
         $request = $this->history[1]['request'];
@@ -1491,10 +1565,11 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertImboError
      */
-    public function testThrowsExceptionWhenAssertingImboErrorWhenResponseIsNotAnError() : void {
+    public function testThrowsExceptionWhenAssertingImboErrorWhenResponseIsNotAnError(): void
+    {
         $this->makeRequest('/path');
         $this->expectExceptionObject(new InvalidArgumentException(
-            'The status code of the last response is lower than 400, so it is not considered an error.'
+            'The status code of the last response is lower than 400, so it is not considered an error.',
         ));
         $this->context->assertImboError('some message');
     }
@@ -1502,12 +1577,13 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertImboError
      */
-    public function testAssertingImboErrorMessageCanFailWhenMessageIsWrong() : void {
+    public function testAssertingImboErrorMessageCanFailWhenMessageIsWrong(): void
+    {
         $this->mockHandler->append(
             new Response(500, [], json_encode(['error' => [
                 'message' => 'error message',
                 'imboErrorCode' => 1,
-            ]]))
+            ]])),
         );
 
         $this->context->requestPath('/path');
@@ -1519,12 +1595,13 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertImboError
      */
-    public function testAssertingImboErrorMessageCanFailWhenCodeIsWrong() : void {
+    public function testAssertingImboErrorMessageCanFailWhenCodeIsWrong(): void
+    {
         $this->mockHandler->append(
             new Response(500, [], json_encode(['error' => [
                 'message' => 'error message',
                 'imboErrorCode' => 1,
-            ]]))
+            ]])),
         );
 
         $this->context->requestPath('/path');
@@ -1536,34 +1613,36 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertImboError
      */
-    public function testCanAssertImboErrorMessage() : void {
+    public function testCanAssertImboErrorMessage(): void
+    {
         $this->mockHandler->append(
             new Response(500, [], json_encode(['error' => [
                 'message' => 'error message',
                 'imboErrorCode' => 1,
-            ]]))
+            ]])),
         );
 
         $this->assertSame(
             $this->context,
             $this->context
                 ->requestPath('/path')
-                ->assertImboError('error message', 1)
+                ->assertImboError('error message', 1),
         );
     }
 
     /**
      * @covers ::assertImageWidth
      */
-    public function testAssertingImageWidthCanFail() : void {
+    public function testAssertingImageWidthCanFail(): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
         );
 
         $this->context->requestPath('/path');
         $this->expectException(Assert\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Incorrect image width, expected 123, got 599.'
+            'Incorrect image width, expected 123, got 599.',
         );
         $this->context->assertImageWidth(123);
     }
@@ -1571,20 +1650,22 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertImageWidth
      */
-    public function testCanAssertImageWidth() : void {
+    public function testCanAssertImageWidth(): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
         );
 
         $this->assertSame(
             $this->context,
             $this->context
                 ->requestPath('/path')
-                ->assertImageWidth(599)
+                ->assertImageWidth(599),
         );
     }
 
-    public function getApproximateImageWidths() : array {
+    public function getApproximateImageWidths(): array
+    {
         return [
             ['598±1'],
             ['600±1'],
@@ -1598,20 +1679,22 @@ class FeatureContextTest extends TestCase {
      * @covers ::assertImageWidth
      * @covers ::validateImageDimensions
      */
-    public function testCanAssertApproximateImageWidth(string $approximateWidth) : void {
+    public function testCanAssertApproximateImageWidth(string $approximateWidth): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
         );
 
         $this->assertSame(
             $this->context,
             $this->context
                 ->requestPath('/path')
-                ->assertImageWidth($approximateWidth)
+                ->assertImageWidth($approximateWidth),
         );
     }
 
-    public function getApproximateImageWidthsForFailure() : array {
+    public function getApproximateImageWidthsForFailure(): array
+    {
         return [
             [
                 'approximateWidth' => '597±1',
@@ -1637,9 +1720,10 @@ class FeatureContextTest extends TestCase {
      * @covers ::assertImageWidth
      * @covers ::validateImageDimensions
      */
-    public function testAssertingApproximateImageWidthCanFail(string $approximateWidth, string $exceptionMessage) : void {
+    public function testAssertingApproximateImageWidthCanFail(string $approximateWidth, string $exceptionMessage): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
         );
 
         $this->context->requestPath('/path');
@@ -1651,15 +1735,16 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertImageHeight
      */
-    public function testAssertingImageHeightCanFail() : void {
+    public function testAssertingImageHeightCanFail(): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
         );
 
         $this->context->requestPath('/path');
         $this->expectException(Assert\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Incorrect image height, expected 123, got 417.'
+            'Incorrect image height, expected 123, got 417.',
         );
         $this->context->assertImageHeight(123);
     }
@@ -1667,20 +1752,22 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertImageHeight
      */
-    public function testCanAssertImageHeight() : void {
+    public function testCanAssertImageHeight(): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
         );
 
         $this->assertSame(
             $this->context,
             $this->context
                 ->requestPath('/path')
-                ->assertImageHeight(417)
+                ->assertImageHeight(417),
         );
     }
 
-    public function getApproximateImageHeights() : array {
+    public function getApproximateImageHeights(): array
+    {
         return [
             ['416±1'],
             ['418±1'],
@@ -1694,20 +1781,22 @@ class FeatureContextTest extends TestCase {
      * @covers ::assertImageHeight
      * @covers ::validateImageDimensions
      */
-    public function testCanAssertApproximateImageHeight(string $approximateHeight) : void {
+    public function testCanAssertApproximateImageHeight(string $approximateHeight): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
         );
 
         $this->assertSame(
             $this->context,
             $this->context
                 ->requestPath('/path')
-                ->assertImageHeight($approximateHeight)
+                ->assertImageHeight($approximateHeight),
         );
     }
 
-    public function getApproximateImageHeightsForFailure() : array {
+    public function getApproximateImageHeightsForFailure(): array
+    {
         return [
             [
                 'approximateHeight' => '415±1',
@@ -1733,9 +1822,10 @@ class FeatureContextTest extends TestCase {
      * @covers ::assertImageHeight
      * @covers ::validateImageDimensions
      */
-    public function testAssertingApproximateImageHeightCanFail(string $approximateHeight, string $exceptionMessage) : void {
+    public function testAssertingApproximateImageHeightCanFail(string $approximateHeight, string $exceptionMessage): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
         );
 
         $this->context->requestPath('/path');
@@ -1744,7 +1834,8 @@ class FeatureContextTest extends TestCase {
         $this->context->assertImageHeight($approximateHeight);
     }
 
-    public function getDataForImageDimensionAssertion() : array {
+    public function getDataForImageDimensionAssertion(): array
+    {
         $image1 = file_get_contents(FIXTURES_DIR . '/image1.png');
         $image2 = file_get_contents(FIXTURES_DIR . '/image2.png');
 
@@ -1776,9 +1867,10 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getDataForImageDimensionAssertion
      * @covers ::assertImageDimension
      */
-    public function testAssertingImageDimensionCanFail(string $imageData, string $dimension, string $exceptionMessage) : void {
+    public function testAssertingImageDimensionCanFail(string $imageData, string $dimension, string $exceptionMessage): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], $imageData)
+            new Response(200, [], $imageData),
         );
 
         $this->context->requestPath('/path');
@@ -1790,13 +1882,14 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertImageDimension
      */
-    public function testThrowsExceptionWhenAssertingImageDimensionWhenInvalidDimensionString() : void {
+    public function testThrowsExceptionWhenAssertingImageDimensionWhenInvalidDimensionString(): void
+    {
         $this->mockHandler->append(
-            new Response(200)
+            new Response(200),
         );
         $this->context->requestPath('/path');
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Invalid dimension value: "123 x 456". Specify "<width>x<height>".'
+            'Invalid dimension value: "123 x 456". Specify "<width>x<height>".',
         ));
         $this->context->assertImageDimension('123 x 456');
     }
@@ -1804,20 +1897,22 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertImageDimension
      */
-    public function testCanAssertImageDimension() : void {
+    public function testCanAssertImageDimension(): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
         );
 
         $this->assertSame(
             $this->context,
             $this->context
                 ->requestPath('/path')
-                ->assertImageDimension('599x417')
+                ->assertImageDimension('599x417'),
         );
     }
 
-    public function getApproximateImageDimensions() : array {
+    public function getApproximateImageDimensions(): array
+    {
         return [
             ['598±1x415±2'],
             ['600±1x419±2'],
@@ -1831,20 +1926,22 @@ class FeatureContextTest extends TestCase {
      * @covers ::assertImageDimension
      * @covers ::validateImageDimensions
      */
-    public function testCanAssertApproximateImageDimension(string $approximateDimension) : void {
+    public function testCanAssertApproximateImageDimension(string $approximateDimension): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
         );
 
         $this->assertSame(
             $this->context,
             $this->context
                 ->requestPath('/path')
-                ->assertImageDimension($approximateDimension)
+                ->assertImageDimension($approximateDimension),
         );
     }
 
-    public function getApproximateImageDimensionsForFailure() : array {
+    public function getApproximateImageDimensionsForFailure(): array
+    {
         return [
             [
                 'approximateDimension' => '597±1x416±1',
@@ -1862,9 +1959,10 @@ class FeatureContextTest extends TestCase {
      * @covers ::assertImageWidth
      * @covers ::validateImageDimensions
      */
-    public function testAssertingApproximateImageDimensionCanFail(string $approximateDimension, string $exceptionMessage) : void {
+    public function testAssertingApproximateImageDimensionCanFail(string $approximateDimension, string $exceptionMessage): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
         );
 
         $this->context->requestPath('/path');
@@ -1873,7 +1971,8 @@ class FeatureContextTest extends TestCase {
         $this->context->assertImageDimension($approximateDimension);
     }
 
-    public function getDataForAssertingImagePixelInfoFailures() : array {
+    public function getDataForAssertingImagePixelInfoFailures(): array
+    {
         $image = file_get_contents(FIXTURES_DIR . '/image1.png');
 
         return [
@@ -1903,9 +2002,10 @@ class FeatureContextTest extends TestCase {
      * @covers ::assertImagePixelColor
      * @covers ::getImagePixelInfo
      */
-    public function testAssertingImagePixelColorCanFail(string $imageData, string $coordinate, string $color, string $exceptionMessage) : void {
+    public function testAssertingImagePixelColorCanFail(string $imageData, string $coordinate, string $color, string $exceptionMessage): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], $imageData)
+            new Response(200, [], $imageData),
         );
 
         $this->context->requestPath('/path');
@@ -1914,7 +2014,8 @@ class FeatureContextTest extends TestCase {
         $this->context->assertImagePixelColor($coordinate, $color);
     }
 
-    public function getDataForAssertingImagePixelInfo() : array {
+    public function getDataForAssertingImagePixelInfo(): array
+    {
         $image = file_get_contents(FIXTURES_DIR . '/image1.png');
 
         return [
@@ -1941,16 +2042,17 @@ class FeatureContextTest extends TestCase {
      * @covers ::assertImagePixelColor
      * @covers ::getImagePixelInfo
      */
-    public function testCanAssertImagePixelColor(string $imageData, string $coordinate, string $color) : void {
+    public function testCanAssertImagePixelColor(string $imageData, string $coordinate, string $color): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], $imageData)
+            new Response(200, [], $imageData),
         );
 
         $this->assertSame(
             $this->context,
             $this->context
                 ->requestPath('/path')
-                ->assertImagePixelColor($coordinate, $color)
+                ->assertImagePixelColor($coordinate, $color),
         );
     }
 
@@ -1958,19 +2060,21 @@ class FeatureContextTest extends TestCase {
      * @covers ::assertImagePixelColor
      * @covers ::getImagePixelInfo
      */
-    public function testThrowsExceptionWhenAssertingImagePixelColorWithInvalidCoordinate() : void {
+    public function testThrowsExceptionWhenAssertingImagePixelColorWithInvalidCoordinate(): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png'))
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
         );
 
         $this->context->requestPath('/path');
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Invalid coordinates: "1, 1". Format is "<w>x<h>", no spaces allowed.'
+            'Invalid coordinates: "1, 1". Format is "<w>x<h>", no spaces allowed.',
         ));
         $this->context->assertImagePixelColor('1, 1', 'ffffff');
     }
 
-    public function getDataForAssertingImagePixelAlphaFailures() : array {
+    public function getDataForAssertingImagePixelAlphaFailures(): array
+    {
         $image = file_get_contents(FIXTURES_DIR . '/transparency.png');
 
         return [
@@ -1994,9 +2098,10 @@ class FeatureContextTest extends TestCase {
      * @covers ::assertImagePixelAlpha
      * @covers ::getImagePixelInfo
      */
-    public function testAssertingImagePixelAlphaCanFail(string $imageData, string $coordinate, string $alpha, string $exceptionMessage) : void {
+    public function testAssertingImagePixelAlphaCanFail(string $imageData, string $coordinate, string $alpha, string $exceptionMessage): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], $imageData)
+            new Response(200, [], $imageData),
         );
 
         $this->context->requestPath('/path');
@@ -2005,7 +2110,8 @@ class FeatureContextTest extends TestCase {
         $this->context->assertImagePixelAlpha($coordinate, $alpha);
     }
 
-    public function getDataForAssertingImagePixelAlpha() : array {
+    public function getDataForAssertingImagePixelAlpha(): array
+    {
         $image = file_get_contents(FIXTURES_DIR . '/transparency.png');
 
         return [
@@ -2027,16 +2133,17 @@ class FeatureContextTest extends TestCase {
      * @covers ::assertImagePixelAlpha
      * @covers ::getImagePixelInfo
      */
-    public function testCanAssertImagePixelAlpha(string $imageData, string $coordinate, string $alpha) : void {
+    public function testCanAssertImagePixelAlpha(string $imageData, string $coordinate, string $alpha): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], $imageData)
+            new Response(200, [], $imageData),
         );
 
         $this->assertSame(
             $this->context,
             $this->context
                 ->requestPath('/path')
-                ->assertImagePixelAlpha($coordinate, $alpha)
+                ->assertImagePixelAlpha($coordinate, $alpha),
         );
     }
 
@@ -2044,14 +2151,15 @@ class FeatureContextTest extends TestCase {
      * @covers ::assertImagePixelAlpha
      * @covers ::getImagePixelInfo
      */
-    public function testThrowsExceptionWhenAssertingImagePixelAlphaWithInvalidCoordinate() : void {
+    public function testThrowsExceptionWhenAssertingImagePixelAlphaWithInvalidCoordinate(): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/transparency.png'))
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/transparency.png')),
         );
 
         $this->context->requestPath('/path');
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Invalid coordinates: "1, 1". Format is "<w>x<h>", no spaces allowed.'
+            'Invalid coordinates: "1, 1". Format is "<w>x<h>", no spaces allowed.',
         ));
         $this->context->assertImagePixelAlpha('1, 1', '1');
     }
@@ -2059,11 +2167,12 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertAclRuleWithIdDoesNotExist
      */
-    public function testThrowsExceptionWhenAssertingThatAclRuleWithIdDoesNotExistWhenItDoesExist() : void {
+    public function testThrowsExceptionWhenAssertingThatAclRuleWithIdDoesNotExistWhenItDoesExist(): void
+    {
         $this->mockHandler->append(new Response(200, [], '', '1.1', 'OK'));
         $this->expectException(Assert\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'ACL rule "someId" with public key "publicKey" still exists. Expected "404 Access rule not found", got "200 OK".'
+            'ACL rule "someId" with public key "publicKey" still exists. Expected "404 Access rule not found", got "200 OK".',
         );
         $this->context
             ->setPublicAndPrivateKey($this->publicKey, $this->privateKey)
@@ -2073,35 +2182,37 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertAclRuleWithIdDoesNotExist
      */
-    public function testCanAssertThatAclRuleWithIdDoesNotExist() : void {
+    public function testCanAssertThatAclRuleWithIdDoesNotExist(): void
+    {
         $this->mockHandler->append(new Response(404, [], '', '1.1', 'Access rule not found'));
         $this->context->setPublicAndPrivateKey($this->publicKey, $this->privateKey);
 
         $this->assertSame(
             $this->context,
-            $this->context->assertAclRuleWithIdDoesNotExist('publicKey', 'someId')
+            $this->context->assertAclRuleWithIdDoesNotExist('publicKey', 'someId'),
         );
 
         $this->assertCount(
             1,
             $this->history,
-            sprintf('Expected exactly 1 request, got %d.', count($this->history))
+            sprintf('Expected exactly 1 request, got %d.', count($this->history)),
         );
 
         $this->assertSame(
             '/keys/publicKey/access/someId',
-            $this->history[0]['request']->getUri()->getPath()
+            $this->history[0]['request']->getUri()->getPath(),
         );
     }
 
     /**
      * @covers ::assertPublicKeyDoesNotExist
      */
-    public function testThrowsExceptionWhenAssertingThatPublicKeyDoesNotExistWhenItDoes() : void {
+    public function testThrowsExceptionWhenAssertingThatPublicKeyDoesNotExistWhenItDoes(): void
+    {
         $this->mockHandler->append(new Response(200, [], '', '1.1', 'OK'));
         $this->expectException(Assert\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Public key "publicKey" still exists. Expected "404 Public key not found", got "200 OK".'
+            'Public key "publicKey" still exists. Expected "404 Public key not found", got "200 OK".',
         );
         $this->context
             ->setPublicAndPrivateKey($this->publicKey, $this->privateKey)
@@ -2111,24 +2222,26 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertPublicKeyDoesNotExist
      */
-    public function testCanAssertThatPublicKeyDoesNotExist() : void {
+    public function testCanAssertThatPublicKeyDoesNotExist(): void
+    {
         $this->mockHandler->append(new Response(404, [], '', '1.1', 'Public key not found'));
         $this->context->setPublicAndPrivateKey($this->publicKey, $this->privateKey);
         $this->assertSame(
             $this->context,
-            $this->context->assertPublicKeyDoesNotExist('publicKey', 'someId')
+            $this->context->assertPublicKeyDoesNotExist('publicKey', 'someId'),
         );
 
         $this->assertCount(
             1,
             $this->history,
-            sprintf('Expected exactly 1 request, got %d.', count($this->history))
+            sprintf('Expected exactly 1 request, got %d.', count($this->history)),
         );
 
         $this->assertSame('/keys/publicKey', $this->history[0]['request']->getUri()->getPath());
     }
 
-    public function getCacheabilityData() : array {
+    public function getCacheabilityData(): array
+    {
         return [
             'cacheable, expect cacheable' => [
                 'response' => new Response(200),
@@ -2161,10 +2274,10 @@ class FeatureContextTest extends TestCase {
 
     /**
      * @dataProvider getCacheabilityData
-     * @covers ::__construct
      * @covers ::assertCacheability
      */
-    public function testCanAssertResponseCacheability(ResponseInterface $response, bool $expected, string $exceptionMessage = null) : void {
+    public function testCanAssertResponseCacheability(ResponseInterface $response, bool $expected, string $exceptionMessage = null): void
+    {
         $this->mockHandler->append($response);
         $this->context->requestPath('/path');
 
@@ -2175,7 +2288,7 @@ class FeatureContextTest extends TestCase {
         } else {
             $this->assertSame(
                 $this->context,
-                $this->context->assertCacheability($expected)
+                $this->context->assertCacheability($expected),
             );
         }
     }
@@ -2183,11 +2296,12 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertMaxAge
      */
-    public function testThrowsExceptionWhenAssertingMaxAgeAndResponseDoesNotHaveCacheControlHeader() : void {
+    public function testThrowsExceptionWhenAssertingMaxAgeAndResponseDoesNotHaveCacheControlHeader(): void
+    {
         $this->mockHandler->append(new Response(200));
         $this->context->requestPath('/path');
         $this->expectExceptionObject(new RuntimeException(
-            'Response does not have a cache-control header.'
+            'Response does not have a cache-control header.',
         ));
         $this->context->assertMaxAge(123);
     }
@@ -2195,11 +2309,12 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertMaxAge
      */
-    public function testThrowsExceptionWhenAssertingMaxAgeAndResponseCacheControlHeaderDoesNotHaveMaxAgeDirective() : void {
+    public function testThrowsExceptionWhenAssertingMaxAgeAndResponseCacheControlHeaderDoesNotHaveMaxAgeDirective(): void
+    {
         $this->mockHandler->append(new Response(200, ['cache-control' => 'private']));
         $this->context->requestPath('/path');
         $this->expectExceptionObject(new RuntimeException(
-            'Response cache-control header does not include a max-age directive: "private".'
+            'Response cache-control header does not include a max-age directive: "private".',
         ));
         $this->context->assertMaxAge(123);
     }
@@ -2207,25 +2322,27 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertMaxAge
      */
-    public function testCanAssertResponseMaxAge() : void {
+    public function testCanAssertResponseMaxAge(): void
+    {
         $this->mockHandler->append(new Response(200, ['cache-control' => 'private, max-age=600']));
         $this->assertSame(
             $this->context,
             $this->context
                 ->requestPath('/path')
-                ->assertMaxAge(600)
+                ->assertMaxAge(600),
         );
     }
 
     /**
      * @covers ::assertMaxAge
      */
-    public function testAssertingResponseMaxAgeCanFail() : void {
+    public function testAssertingResponseMaxAgeCanFail(): void
+    {
         $this->mockHandler->append(new Response(200, ['cache-control' => 'private, max-age=456']));
         $this->context->requestPath('/path');
         $this->expectException(Assert\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'The max-age directive in the cache-control header is not correct. Expected 123, got 456. Complete cache-control header: "private, max-age=456".'
+            'The max-age directive in the cache-control header is not correct. Expected 123, got 456. Complete cache-control header: "private, max-age=456".',
         );
         $this->context->assertMaxAge(123);
     }
@@ -2233,13 +2350,14 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertResponseHasCacheControlDirective
      */
-    public function testCanAssertThatASpecificCacheControlDirectiveExists() : void {
+    public function testCanAssertThatASpecificCacheControlDirectiveExists(): void
+    {
         $this->mockHandler->append(new Response(200, ['cache-control' => 'private, max-age=600, must-revalidate']));
         $this->context->requestPath('/path');
         foreach (['private', 'max-age', 'must-revalidate'] as $directive) {
             $this->assertSame(
                 $this->context,
-                $this->context->assertResponseHasCacheControlDirective($directive)
+                $this->context->assertResponseHasCacheControlDirective($directive),
             );
         }
     }
@@ -2247,11 +2365,12 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertResponseHasCacheControlDirective
      */
-    public function testThrowsExceptionWhenAssertingCacheControlHeaderDirectiveWhenResponseDoesNotHaveACacheControlHeader() : void {
+    public function testThrowsExceptionWhenAssertingCacheControlHeaderDirectiveWhenResponseDoesNotHaveACacheControlHeader(): void
+    {
         $this->mockHandler->append(new Response(200));
         $this->context->requestPath('/path');
         $this->expectExceptionObject(new RuntimeException(
-            'Response does not have a cache-control header.'
+            'Response does not have a cache-control header.',
         ));
         $this->context->assertResponseHasCacheControlDirective('must-revalidate');
     }
@@ -2259,12 +2378,13 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertResponseHasCacheControlDirective
      */
-    public function testThrowsExceptionWhenAssertingThatACacheControlDirectiveExistsWhenItDoesNot() : void {
+    public function testThrowsExceptionWhenAssertingThatACacheControlDirectiveExistsWhenItDoesNot(): void
+    {
         $this->mockHandler->append(new Response(200, ['cache-control' => 'private, max-age=600']));
         $this->context->requestPath('/path');
         $this->expectException(Assert\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'The cache-control header does not contain the "must-revalidate" directive. Complete cache-control header: "private, max-age=600".'
+            'The cache-control header does not contain the "must-revalidate" directive. Complete cache-control header: "private, max-age=600".',
         );
         $this->context->assertResponseHasCacheControlDirective('must-revalidate');
     }
@@ -2272,13 +2392,14 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertResponseDoesNotHaveCacheControlDirective
      */
-    public function testCanAssertThatASpecificCacheControlDirectiveDoesNotExists() : void {
+    public function testCanAssertThatASpecificCacheControlDirectiveDoesNotExists(): void
+    {
         $this->mockHandler->append(new Response(200, ['cache-control' => 'private, max-age=600, must-revalidate']));
         $this->context->requestPath('/path');
         foreach (['public', 'no-cache', 'no-store'] as $directive) {
             $this->assertSame(
                 $this->context,
-                $this->context->assertResponseDoesNotHaveCacheControlDirective($directive)
+                $this->context->assertResponseDoesNotHaveCacheControlDirective($directive),
             );
         }
     }
@@ -2286,11 +2407,12 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertResponseDoesNotHaveCacheControlDirective
      */
-    public function testThrowsExceptionWhenAssertingResponseDoesNotHaveCacheControlHeaderDirectiveWhenResponseDoesNotHaveACacheControlHeader() : void {
+    public function testThrowsExceptionWhenAssertingResponseDoesNotHaveCacheControlHeaderDirectiveWhenResponseDoesNotHaveACacheControlHeader(): void
+    {
         $this->mockHandler->append(new Response(200));
         $this->context->requestPath('/path');
         $this->expectExceptionObject(new RuntimeException(
-            'Response does not have a cache-control header.'
+            'Response does not have a cache-control header.',
         ));
         $this->context->assertResponseDoesNotHaveCacheControlDirective('must-revalidate');
     }
@@ -2298,11 +2420,12 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertResponseDoesNotHaveCacheControlDirective
      */
-    public function testThrowsExceptionWhenAssertingThatACacheControlDirectiveDoesNotExistWhenItDoes() : void {
+    public function testThrowsExceptionWhenAssertingThatACacheControlDirectiveDoesNotExistWhenItDoes(): void
+    {
         $this->mockHandler->append(new Response(200, ['cache-control' => 'private, max-age=600, must-revalidate']));
         $this->context->requestPath('/path');
         $this->expectExceptionObject(new RuntimeException(
-            'The cache-control header contains the "max-age" directive when it should not. Complete cache-control header: "private, max-age=600, must-revalidate".'
+            'The cache-control header contains the "max-age" directive when it should not. Complete cache-control header: "private, max-age=600, must-revalidate".',
         ));
         $this->context->assertResponseDoesNotHaveCacheControlDirective('max-age');
     }
@@ -2310,11 +2433,12 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertLastResponseHeaders
      */
-    public function testThrowsExceptionWhenAssertingTheLastResponseHeadersAndOnlyOneResponseExist() : void {
+    public function testThrowsExceptionWhenAssertingTheLastResponseHeadersAndOnlyOneResponseExist(): void
+    {
         $this->mockHandler->append(new Response(200));
         $this->context->requestPath('/path');
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Need to compare at least 2 responses, got 1.'
+            'Need to compare at least 2 responses, got 1.',
         ));
         $this->context->assertLastResponseHeaders(1, 'content-length');
     }
@@ -2322,12 +2446,13 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertLastResponseHeaders
      */
-    public function testThrowsExceptionWhenAssertingTheLastResponseHeadersAndThereIsNotEnoughResponses() : void {
+    public function testThrowsExceptionWhenAssertingTheLastResponseHeadersAndThereIsNotEnoughResponses(): void
+    {
         $this->mockHandler->append(new Response(200), new Response(200));
         $this->context->requestPath('/path');
         $this->context->requestPath('/anotherPath');
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Not enough responses in the history. Need at least 4, there are currently 2.'
+            'Not enough responses in the history. Need at least 4, there are currently 2.',
         ));
         $this->context->assertLastResponseHeaders(4, 'content-length');
     }
@@ -2335,17 +2460,18 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertLastResponseHeaders
      */
-    public function testThrowsExceptionWhenAssertingLastResponseHeadersAndHeaderIsNotPresentInAllResponses() : void {
+    public function testThrowsExceptionWhenAssertingLastResponseHeadersAndHeaderIsNotPresentInAllResponses(): void
+    {
         $this->mockHandler->append(
             new Response(200, ['content-length' => 123]),
             new Response(200, ['content-length' => 123]),
-            new Response(200)
+            new Response(200),
         );
         $this->context->requestPath('/path1');
         $this->context->requestPath('/path2');
         $this->context->requestPath('/path3');
         $this->expectExceptionObject(new RuntimeException(
-            'The "content-length" header is not present in all of the last 3 response headers.'
+            'The "content-length" header is not present in all of the last 3 response headers.',
         ));
         $this->context->assertLastResponseHeaders(3, 'content-length');
     }
@@ -2353,11 +2479,12 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertLastResponseHeaders
      */
-    public function testCanAssertLastResponesHeadersForUniqueness() : void {
+    public function testCanAssertLastResponesHeadersForUniqueness(): void
+    {
         $this->mockHandler->append(
             new Response(200, ['content-length' => 123]),
             new Response(200, ['content-length' => 456]),
-            new Response(200, ['content-length' => 789])
+            new Response(200, ['content-length' => 789]),
         );
         $this->assertSame(
             $this->context,
@@ -2365,18 +2492,19 @@ class FeatureContextTest extends TestCase {
                 ->requestPath('/path1')
                 ->requestPath('/path2')
                 ->requestPath('/path3')
-                ->assertLastResponseHeaders(3, 'content-length', true)
+                ->assertLastResponseHeaders(3, 'content-length', true),
         );
     }
 
     /**
      * @covers ::assertLastResponseHeaders
      */
-    public function testCanAssertLastResponesHeadersForNonUniqueness() : void {
+    public function testCanAssertLastResponesHeadersForNonUniqueness(): void
+    {
         $this->mockHandler->append(
             new Response(200, ['content-length' => 123]),
             new Response(200, ['content-length' => 123]),
-            new Response(200, ['content-length' => 123])
+            new Response(200, ['content-length' => 123]),
         );
         $this->assertSame(
             $this->context,
@@ -2384,18 +2512,19 @@ class FeatureContextTest extends TestCase {
                 ->requestPath('/path1')
                 ->requestPath('/path2')
                 ->requestPath('/path3')
-                ->assertLastResponseHeaders(3, 'content-length')
+                ->assertLastResponseHeaders(3, 'content-length'),
         );
     }
 
     /**
      * @covers ::assertLastResponseHeaders
      */
-    public function testCanAssertingLastResponesHeadersForUniquenessCanFail() : void {
+    public function testCanAssertingLastResponesHeadersForUniquenessCanFail(): void
+    {
         $this->mockHandler->append(
             new Response(200, ['content-length' => 123]),
             new Response(200, ['content-length' => 456]),
-            new Response(200, ['content-length' => 456])
+            new Response(200, ['content-length' => 456]),
         );
         $this->context->requestPath('/path1');
         $this->context->requestPath('/path2');
@@ -2403,7 +2532,7 @@ class FeatureContextTest extends TestCase {
 
         $this->expectException(Assert\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Expected 3 unique values, got 2. Values compared:'
+            'Expected 3 unique values, got 2. Values compared:',
         );
 
         $this->context->assertLastResponseHeaders(3, 'content-length', true);
@@ -2412,11 +2541,12 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertLastResponseHeaders
      */
-    public function testCanAssertingLastResponesHeadersForNonUniquenessCanFail() : void {
+    public function testCanAssertingLastResponesHeadersForNonUniquenessCanFail(): void
+    {
         $this->mockHandler->append(
             new Response(200, ['content-length' => 123]),
             new Response(200, ['content-length' => 123]),
-            new Response(200, ['content-length' => 456])
+            new Response(200, ['content-length' => 456]),
         );
         $this->context->requestPath('/path1');
         $this->context->requestPath('/path2');
@@ -2424,7 +2554,7 @@ class FeatureContextTest extends TestCase {
 
         $this->expectException(Assert\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Expected all values to be the same. Values compared:'
+            'Expected all values to be the same. Values compared:',
         );
 
         $this->context->assertLastResponseHeaders(3, 'content-length');
@@ -2433,26 +2563,28 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertResponseBodySize
      */
-    public function testCanAssertResponseBodySize() : void {
+    public function testCanAssertResponseBodySize(): void
+    {
         $this->mockHandler->append(new Response(200, [], 'some string'));
         $this->assertSame(
             $this->context,
             $this->context
                 ->requestPath('/path')
-                ->assertResponseBodySize(11)
+                ->assertResponseBodySize(11),
         );
     }
 
     /**
      * @covers ::assertResponseBodySize
      */
-    public function testAssertingResponseBodySizeCanFail() : void {
+    public function testAssertingResponseBodySizeCanFail(): void
+    {
         $this->mockHandler->append(new Response(200, [], 'some string'));
         $this->context->requestPath('/path');
 
         $this->expectException(Assert\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Expected response body size: 123, actual: 11.'
+            'Expected response body size: 123, actual: 11.',
         );
 
         $this->context->assertResponseBodySize(123);
@@ -2461,7 +2593,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertLastResponsesMatch
      */
-    public function testThrowsExceptionWhenMatchingResponsesWithNoResponseKeyInTable() : void {
+    public function testThrowsExceptionWhenMatchingResponsesWithNoResponseKeyInTable(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException('Missing response column'));
         $this->context->assertLastResponsesMatch(new TableNode([['num'], ['3']]));
     }
@@ -2469,13 +2602,14 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertLastResponsesMatch
      */
-    public function testThrowsExceptionWhenMatchingMoreResponsesThanWhatIsPresentInTheHistory() : void {
+    public function testThrowsExceptionWhenMatchingMoreResponsesThanWhatIsPresentInTheHistory(): void
+    {
         $this->mockHandler->append(new Response(200), new Response(200));
         $this->context->requestPath('/path');
         $this->context->requestPath('/path');
 
         $this->expectExceptionObject(new RuntimeException(
-            'Not enough transactions in the history. Needs at least 3, actual: 2.'
+            'Not enough transactions in the history. Needs at least 3, actual: 2.',
         ));
 
         $this->context->assertLastResponsesMatch(new TableNode([
@@ -2487,13 +2621,14 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertLastResponsesMatch
      */
-    public function testThrowsExceptionWhenMatchingResponsesAndARowIsMissingResponseNumber() : void {
+    public function testThrowsExceptionWhenMatchingResponsesAndARowIsMissingResponseNumber(): void
+    {
         $this->mockHandler->append(new Response(200), new Response(200));
         $this->context->requestPath('/path');
         $this->context->requestPath('/path');
 
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Each row must refer to a response by using the "response" column.'
+            'Each row must refer to a response by using the "response" column.',
         ));
 
         $this->context->assertLastResponsesMatch(new TableNode([
@@ -2506,12 +2641,13 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertLastResponsesMatch
      */
-    public function testThrowsExceptionWhenMatchingResponsesAndAnInvalidColumnIsUsed() : void {
+    public function testThrowsExceptionWhenMatchingResponsesAndAnInvalidColumnIsUsed(): void
+    {
         $this->mockHandler->append(new Response(200));
         $this->context->requestPath('/path');
 
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Invalid column name: "foobar".'
+            'Invalid column name: "foobar".',
         ));
 
         $this->context->assertLastResponsesMatch(new TableNode([
@@ -2520,7 +2656,8 @@ class FeatureContextTest extends TestCase {
         ]));
     }
 
-    public function getDataForMatchingSeveralResponses() {
+    public function getDataForMatchingSeveralResponses()
+    {
         return [
             'status line' => [
                 'responses' => [
@@ -2568,7 +2705,7 @@ class FeatureContextTest extends TestCase {
             'image width / height' => [
                 'responses' => [
                     new Response(200, [], file_get_contents(FIXTURES_DIR . '/1024x256.png')),
-                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png'))
+                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png')),
                 ],
                 'match' => new TableNode([
                     ['response', 'image width', 'image height'],
@@ -2594,7 +2731,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getDataForMatchingSeveralResponses
      * @covers ::assertLastResponsesMatch
      */
-    public function testCanMatchResponses(array $responses, TableNode $table) : void {
+    public function testCanMatchResponses(array $responses, TableNode $table): void
+    {
         $this->mockHandler->append(...$responses);
 
         for ($i = 0; $i < count($responses); $i++) {
@@ -2603,11 +2741,12 @@ class FeatureContextTest extends TestCase {
 
         $this->assertSame(
             $this->context,
-            $this->context->assertLastResponsesMatch($table)
+            $this->context->assertLastResponsesMatch($table),
         );
     }
 
-    public function getDataForMatchingSeveralResponsesWhenFailing() : array {
+    public function getDataForMatchingSeveralResponsesWhenFailing(): array
+    {
         return [
             'status line' => [
                 'responses' => [
@@ -2652,7 +2791,7 @@ class FeatureContextTest extends TestCase {
             'image width / height (failure on width)' => [
                 'responses' => [
                     new Response(200, [], file_get_contents(FIXTURES_DIR . '/1024x256.png')),
-                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png'))
+                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png')),
                 ],
                 'match' => new TableNode([
                     ['response', 'image width', 'image height'],
@@ -2664,7 +2803,7 @@ class FeatureContextTest extends TestCase {
             'image width / height (failure on height)' => [
                 'responses' => [
                     new Response(200, [], file_get_contents(FIXTURES_DIR . '/1024x256.png')),
-                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png'))
+                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png')),
                 ],
                 'match' => new TableNode([
                     ['response', 'image width', 'image height'],
@@ -2680,7 +2819,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getDataForMatchingSeveralResponsesWhenFailing
      * @covers ::assertLastResponsesMatch
      */
-    public function testAssertLastResponsesMatchCanFail(array $responses, TableNode $table, string $exceptionMessage) : void {
+    public function testAssertLastResponsesMatchCanFail(array $responses, TableNode $table, string $exceptionMessage): void
+    {
         $this->mockHandler->append(...$responses);
 
         for ($i = 0; $i < count($responses); $i++) {
@@ -2696,7 +2836,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertLastResponsesMatch
      */
-    public function testAssertLastResponsesMatchCanFailForJsonMatching() : void {
+    public function testAssertLastResponsesMatchCanFailForJsonMatching(): void
+    {
         $this->mockHandler->append(
             new Response(200, [], '{"foo":"bar"}'),
             new Response(200, [], '{"bar":"foo"}'),
@@ -2718,7 +2859,8 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertImageProperties
      */
-    public function testThrowsExceptionWhenAssertingImagePropertiesAndResponseDoesNotContainAValidImage() : void {
+    public function testThrowsExceptionWhenAssertingImagePropertiesAndResponseDoesNotContainAValidImage(): void
+    {
         $this->mockHandler->append(new Response(200, [], 'foobar'));
         $this->context->requestPath('/path');
         $this->expectExceptionObject(new RuntimeException('Imagick could not read response body:'));
@@ -2728,29 +2870,32 @@ class FeatureContextTest extends TestCase {
     /**
      * @covers ::assertImageProperties
      */
-    public function testCanAssertThatImageDoesNotHaveAnyPropertiesWithASpecificPrefix() : void {
+    public function testCanAssertThatImageDoesNotHaveAnyPropertiesWithASpecificPrefix(): void
+    {
         $this->mockHandler->append(new Response(200, [], file_get_contents(FIXTURES_DIR . '/image.png')));
         $this->assertSame(
             $this->context,
             $this->context
                 ->requestPath('/path')
-                ->assertImageProperties('foobar')
+                ->assertImageProperties('foobar'),
         );
     }
 
     /**
      * @covers ::assertImageProperties
      */
-    public function testAssertingThatImageDoesNotHaveAnyPropertiesWithASpecificPrefixCanFail() : void {
+    public function testAssertingThatImageDoesNotHaveAnyPropertiesWithASpecificPrefixCanFail(): void
+    {
         $this->mockHandler->append(new Response(200, [], file_get_contents(FIXTURES_DIR . '/image.png')));
         $this->context->requestPath('/path');
         $this->expectExceptionObject(new AssertionFailedException(
-            'Image properties have not been properly stripped. Did not expect properties that starts with "png", found: "png:'
+            'Image properties have not been properly stripped. Did not expect properties that starts with "png", found: "png:',
         ));
         $this->context->assertImageProperties('png');
     }
 
-    public function getSuiteSettings() : array {
+    public function getSuiteSettings(): array
+    {
         return [
             'invalid database' => [
                 'settings' => [
@@ -2773,7 +2918,8 @@ class FeatureContextTest extends TestCase {
      * @dataProvider getSuiteSettings
      * @covers ::setUpAdapters
      */
-    public function testSetupAdaptersThrowsExceptionOnInvalidClassNames(array $settings, string $expectedExceptionMessage) : void {
+    public function testSetupAdaptersThrowsExceptionOnInvalidClassNames(array $settings, string $expectedExceptionMessage): void
+    {
         $suite = $this->createConfiguredMock(Suite::class, ['getSettings' => $settings]);
         $environment = $this->createConfiguredMock(Environment::class, ['getSuite' => $suite]);
 
@@ -2781,7 +2927,7 @@ class FeatureContextTest extends TestCase {
         FeatureContext::setUpAdapters(new BeforeScenarioScope(
             $environment,
             $this->createMock(FeatureNode::class),
-            $this->createMock(ScenarioInterface::class)
+            $this->createMock(ScenarioInterface::class),
         ));
     }
 
@@ -2791,9 +2937,10 @@ class FeatureContextTest extends TestCase {
      *           ["22,22", "#ff0033", "Color approximation failed for blue color, expected \"49 - 53\", got \"255\"."]
      * @covers ::assertApproximateImagePixelColor
      */
-    public function testAssertApproximatePixelColorCanFail(string $coordinates, string $color, string $exceptionMessage): void {
+    public function testAssertApproximatePixelColorCanFail(string $coordinates, string $color, string $exceptionMessage): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/colors.png'))
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/colors.png')),
         );
 
         $this->context->requestPath('/path');
@@ -2810,9 +2957,10 @@ class FeatureContextTest extends TestCase {
      * @covers ::assertApproximateImagePixelColor
      * @covers ::hexToRgb
      */
-    public function testAssertApproximatePixelColor(string $coordinates, string $color): void {
+    public function testAssertApproximatePixelColor(string $coordinates, string $color): void
+    {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/colors.png'))
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/colors.png')),
         );
 
         $this->assertSame(
