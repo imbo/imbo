@@ -16,10 +16,8 @@ use stdClass;
  * @coversDefaultClass Imbo\Application
  */
 class ApplicationTest extends TestCase {
-    private $application;
-
-    public function setUp() : void {
-        $this->application = new Application();
+    private function runImbo(array $config): void {
+        (new Application($config))->run();
     }
 
     /**
@@ -27,7 +25,7 @@ class ApplicationTest extends TestCase {
      */
     public function testThrowsExceptionWhenConfigurationHasInvalidDatabaseAdapter() : void {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid database adapter', 500));
-        $this->application->run([
+        $this->runImbo([
             'database' => function() { return new stdClass(); },
             'trustedProxies' => [],
         ]);
@@ -38,7 +36,7 @@ class ApplicationTest extends TestCase {
      */
     public function testThrowsExceptionWhenConfigurationHasInvalidStorageAdapter() : void {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid storage adapter', 500));
-        $this->application->run([
+        $this->runImbo([
             'database' => $this->createMock(DatabaseInterface::class),
             'storage' => function() { return new stdClass(); },
             'trustedProxies' => [],
@@ -50,7 +48,7 @@ class ApplicationTest extends TestCase {
      */
     public function testThrowsExceptionWhenConfigurationHasInvalidAccessControlAdapter() : void {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid access control adapter', 500));
-        $this->application->run([
+        $this->runImbo([
             'database' => $this->createMock(DatabaseInterface::class),
             'storage' => $this->createMock(StorageInterface::class),
             'routes' => [],
@@ -66,7 +64,7 @@ class ApplicationTest extends TestCase {
         $this->expectOutputRegex('|^{.*}$|');
 
         $this->assertEmpty(Request::getTrustedProxies());
-        $this->application->run([
+        $this->runImbo([
             'database' => $this->createMock(DatabaseInterface::class),
             'storage' => $this->createMock(StorageInterface::class),
             'accessControl' => $this->createMock(AdapterInterface::class),
@@ -134,7 +132,7 @@ class ApplicationTest extends TestCase {
             ],
         );
 
-        $this->application->run(array_merge($default, $test));
+        $this->runImbo(array_merge($default, $test));
     }
 
     /**
@@ -142,7 +140,7 @@ class ApplicationTest extends TestCase {
      */
     public function testCanRunWithDefaultConfiguration() : void {
         $this->expectOutputRegex('|^{.*}$|');
-        $this->application->run($this->getDefaultConfig());
+        $this->runImbo($this->getDefaultConfig());
     }
 
     /**
@@ -155,7 +153,7 @@ class ApplicationTest extends TestCase {
             'The "transformations" configuration key must be specified as an array',
             500
         ));
-        $this->application->run($config);
+        $this->runImbo($config);
     }
 
     private function getDefaultConfig(): array {

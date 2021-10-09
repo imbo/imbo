@@ -43,10 +43,10 @@ $config = array_replace_recursive(
     $extraConfig,
 );
 
-$application = new Application();
+$application = new Application($config);
 
 try {
-    $application->run($config);
+    $application->run();
 } catch (BaseException $e) {
     header('HTTP/1.1 500 Internal Server Error');
 

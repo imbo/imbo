@@ -23,33 +23,41 @@ use Imbo\Image\OutputConverterManager;
  * Imbo application
  */
 class Application {
-    /**
-     * Run the application
-     */
-    public function run(array $config) {
-        // Request and response objects
-        $request = Request::createFromGlobals();
-        Request::setTrustedProxies($config['trustedProxies'], Request::HEADER_X_FORWARDED_ALL);
+    private array $config;
+    private Request $request;
+    private Response $response;
 
-        $response = new Response();
-        $response->setPublic();
-        $response->headers->set('X-Imbo-Version', Version::VERSION);
+    public function __construct(array $config) {
+        $this->config = $config;
 
-        // Database and storage adapters
-        $database = $config['database'];
+        $this->request = Request::createFromGlobals();
+        Request::setTrustedProxies(
+            $config['trustedProxies'],
+            Request::HEADER_X_FORWARDED_FOR |
+            Request::HEADER_X_FORWARDED_HOST |
+            Request::HEADER_X_FORWARDED_PORT |
+            Request::HEADER_X_FORWARDED_PROTO,
+        );
+
+        $this->response = (new Response())->setPublic();
+        $this->response->headers->set('X-Imbo-Version', Version::VERSION);
+    }
+
+    public function run(): void {
+        $database = $this->config['database'];
 
         if (is_callable($database) && !($database instanceof DatabaseInterface)) {
-            $database = $database($request, $response);
+            $database = $database($this->request, $this->response);
         }
 
         if (!$database instanceof DatabaseInterface) {
             throw new InvalidArgumentException('Invalid database adapter', 500);
         }
 
-        $storage = $config['storage'];
+        $storage = $this->config['storage'];
 
         if (is_callable($storage) && !($storage instanceof StorageInterface)) {
-            $storage = $storage($request, $response);
+            $storage = $storage($this->request, $this->response);
         }
 
         if (!$storage instanceof StorageInterface) {
@@ -57,10 +65,10 @@ class Application {
         }
 
         // Access control adapter
-        $accessControl = $config['accessControl'];
+        $accessControl = $this->config['accessControl'];
 
         if (is_callable($accessControl) && !($accessControl instanceof AccessControlInterface)) {
-            $accessControl = $accessControl($request, $response);
+            $accessControl = $accessControl($this->request, $this->response);
         }
 
         if (!$accessControl instanceof AccessControlInterface) {
@@ -68,44 +76,44 @@ class Application {
         }
 
         // Create a router based on the routes in the configuration and internal routes
-        $router = new Router($config['routes']);
+        $router = new Router($this->config['routes']);
 
         // Create a new image transformation manager
         $transformationManager = new TransformationManager();
 
-        if (isset($config['transformations']) && !is_array($config['transformations'])) {
+        if (isset($this->config['transformations']) && !is_array($this->config['transformations'])) {
             throw new InvalidArgumentException('The "transformations" configuration key must be specified as an array', 500);
-        } else if (isset($config['transformations']) && is_array($config['transformations'])) {
-            $transformationManager->addTransformations($config['transformations']);
+        } else if (isset($this->config['transformations']) && is_array($this->config['transformations'])) {
+            $transformationManager->addTransformations($this->config['transformations']);
         }
 
         // Create a loader manager and register any loaders
         $inputLoaderManager = new InputLoaderManager();
 
-        if (isset($config['inputLoaders']) && !is_array($config['inputLoaders'])) {
+        if (isset($this->config['inputLoaders']) && !is_array($this->config['inputLoaders'])) {
             throw new InvalidArgumentException('The "inputLoaders" configuration key must be specified as an array', 500);
-        } else if (isset($config['inputLoaders']) && is_array($config['inputLoaders'])) {
-            $inputLoaderManager->addLoaders($config['inputLoaders']);
+        } else if (isset($this->config['inputLoaders']) && is_array($this->config['inputLoaders'])) {
+            $inputLoaderManager->addLoaders($this->config['inputLoaders']);
         }
 
         // Create a output conversion manager and register any converters
         $outputConverterManager = new OutputConverterManager();
 
-        if (isset($config['outputConverters']) && !is_array($config['outputConverters'])) {
+        if (isset($this->config['outputConverters']) && !is_array($this->config['outputConverters'])) {
             throw new InvalidArgumentException('The "outputConverters" configuration key must be specified as an array', 500);
-        } else if (isset($config['outputConverters']) && is_array($config['outputConverters'])) {
-            $outputConverterManager->addConverters($config['outputConverters']);
+        } else if (isset($this->config['outputConverters']) && is_array($this->config['outputConverters'])) {
+            $outputConverterManager->addConverters($this->config['outputConverters']);
         }
 
         // Create the event manager and the event template
         $eventManager = new EventManager();
         $event = new Event();
         $event->setArguments([
-            'request' => $request,
-            'response' => $response,
+            'request' => $this->request,
+            'response' => $this->response,
             'database' => $database,
             'storage' => $storage,
-            'config' => $config,
+            'config' => $this->config,
             'manager' => $eventManager,
             'accessControl' => $accessControl,
             'transformationManager' => $transformationManager,
@@ -173,7 +181,7 @@ class Application {
         }
 
         // Event listener initializers
-        foreach ($config['eventListenerInitializers'] as $name => $initializer) {
+        foreach ($this->config['eventListenerInitializers'] as $name => $initializer) {
             if (!$initializer) {
                 // The initializer has been disabled via config
                 continue;
@@ -194,7 +202,7 @@ class Application {
         }
 
         // Listeners from configuration
-        foreach ($config['eventListeners'] as $name => $definition) {
+        foreach ($this->config['eventListeners'] as $name => $definition) {
             if (!$definition) {
                 // This occurs when a user disables a default event listener
                 continue;
@@ -209,7 +217,7 @@ class Application {
 
             if (is_callable($definition) && !($definition instanceof ListenerInterface)) {
                 // Callable piece of code which is not an implementation of the listener interface
-                $definition = $definition($request, $response);
+                $definition = $definition($this->request, $this->response);
             }
 
             if ($definition instanceof ListenerInterface) {
@@ -224,7 +232,7 @@ class Application {
                 $users = isset($definition['users']) ? $definition['users'] : [];
 
                 if (is_callable($listener) && !($listener instanceof ListenerInterface)) {
-                    $listener = $listener($request, $response);
+                    $listener = $listener($this->request, $this->response);
                 }
 
                 if (!is_string($listener) && !($listener instanceof ListenerInterface)) {
@@ -263,9 +271,9 @@ class Application {
         }
 
         // Custom resources
-        foreach ($config['resources'] as $name => $resource) {
+        foreach ($this->config['resources'] as $name => $resource) {
             if (is_callable($resource)) {
-                $resource = $resource($request, $response);
+                $resource = $resource($this->request, $this->response);
             }
 
             $eventManager->addEventHandler($name, $resource)
@@ -276,18 +284,18 @@ class Application {
 
         try {
             // Route the request
-            $router->route($request);
+            $router->route($this->request);
 
             $eventManager->trigger('route.match');
 
             // Create the resource
-            $routeName = (string) $request->getRoute();
+            $routeName = (string) $this->request->getRoute();
 
-            if (isset($config['resources'][$routeName])) {
-                $resource = $config['resources'][$routeName];
+            if (isset($this->config['resources'][$routeName])) {
+                $resource = $this->config['resources'][$routeName];
 
                 if (is_callable($resource)) {
-                    $resource = $resource($request, $response);
+                    $resource = $resource($this->request, $this->response);
                 }
 
                 if (is_string($resource)) {
@@ -303,9 +311,9 @@ class Application {
             }
 
             // Inform the user agent of which methods are allowed against this resource
-            $response->headers->set('Allow', $resource->getAllowedMethods(), false);
+            $this->response->headers->set('Allow', $resource->getAllowedMethods(), false);
 
-            $methodName = strtolower($request->getMethod());
+            $methodName = strtolower($this->request->getMethod());
 
             // Generate the event name based on the accessed resource and the HTTP method
             $eventName = $routeName . '.' . $methodName;
@@ -318,8 +326,8 @@ class Application {
                          ->trigger('response.negotiate');
         } catch (Exception $exception) {
             $negotiated = false;
-            $error = Error::createFromException($exception, $request);
-            $response->setError($error);
+            $error = Error::createFromException($exception, $this->request);
+            $this->response->setError($error);
 
             // If the error is not from the previous attempt at doing content negotiation, force
             // another round since the model has changed into an error model.
@@ -329,8 +337,8 @@ class Application {
                     $negotiated = true;
                 } catch (Exception $exception) {
                     // The client does not accept any of the content types. Generate a new error
-                    $error = Error::createFromException($exception, $request);
-                    $response->setError($error);
+                    $error = Error::createFromException($exception, $this->request);
+                    $this->response->setError($error);
                 }
             }
 
