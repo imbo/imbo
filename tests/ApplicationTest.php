@@ -142,20 +142,31 @@ class ApplicationTest extends TestCase {
      */
     public function testCanRunWithDefaultConfiguration() : void {
         $this->expectOutputRegex('|^{.*}$|');
-        $this->application->run(require __DIR__ . '/../config/config.default.php');
+        $this->application->run($this->getDefaultConfig());
     }
 
     /**
      * @covers ::run
      */
     public function testThrowsExceptionIfTransformationsIsSetAndIsNotAnArray() : void {
-        $defaultConfig = require __DIR__ . '/../config/config.default.php';
-        $defaultConfig['transformations'] = function() {};
+        $config = $this->getDefaultConfig();
+        $config['transformations'] = function() {};
         $this->expectExceptionObject(new InvalidArgumentException(
             'The "transformations" configuration key must be specified as an array',
             500
         ));
-        $this->application->run($defaultConfig);
+        $this->application->run($config);
+    }
+
+    private function getDefaultConfig(): array {
+        return array_replace_recursive(
+            require __DIR__ . '/../config/config.default.php',
+            [
+                'accessControl' => $this->createMock(AdapterInterface::class),
+                'database' => $this->createMock(DatabaseInterface::class),
+                'storage' => $this->createMock(StorageInterface::class),
+            ],
+        );
     }
 }
 

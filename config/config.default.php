@@ -1,27 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo;
 
-use Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter;
-use Imbo\Database\MongoDB;
-use Imbo\EventListener;
+use Imbo\Auth\AccessControl\Adapter\AdapterInterface as AccessControlAdapter;
+use Imbo\Database\DatabaseInterface as DatabaseAdapter;
 use Imbo\EventListener\Initializer\Imagick as ImagickInitializer;
 use Imbo\Image\Identifier\Generator\RandomString;
 use Imbo\Image\InputLoader\Basic as BasicInput;
 use Imbo\Image\OutputConverter\Basic as BasicOutput;
 use Imbo\Image\Transformation;
-use Imbo\Storage\GridFS;
+use Imbo\Storage\StorageInterface as StorageAdapter;
 
-// Require composer autoloader
-if (is_file(__DIR__ . '/../../../autoload.php')) {
-    // Someone has installed Imbo via a custom composer.json, so the Imbo installation is inside a
-    // vendor dir
-    require __DIR__ . '/../../../autoload.php';
-} else {
-    // Someone has installed Imbo via a simple "git clone"
-    require __DIR__ . '/../vendor/autoload.php';
-}
-
-$defaultConfig = [
+return [
     /**
      * Access Control adapter
      *
@@ -29,23 +18,9 @@ $defaultConfig = [
      * The value must be set to a closure returning an instance of
      * Imbo\Auth\AccessControl\Adapter\AdapterInterface, or an implementation of said interface.
      *
-     * The default SimpleArrayAdapter takes an array keyed by user (which will also be used as the
-     * public key) and a private key, in the following form:
-     *
-     * [
-     *     'some-user' => 'some-private-key',
-     *     'other-user' => 'different-private-key'
-     * ]
-     *
-     * This is the absolute simplest access control implementation - for instance, there is a
-     * 1:1 correlation between a user and a public key. The public key will have read and write
-     * access to all resources belonging to that user. Should you require more fine-grained access
-     * control, please take a look at the other adapters available, many of which are mutable -
-     * meaning you can use the Imbo API to alter access control on the fly.
-     *
-     * @var Imbo\Auth\AccessControl\Adapter\AdapterInterface|Closure
+     * @var AccessControlAdapter|Closure:AccessControlAdapter
      */
-    'accessControl' => fn() => new SimpleArrayAdapter([]),
+    'accessControl' => null,
 
     /**
      * Database adapter
@@ -54,9 +29,9 @@ $defaultConfig = [
      * must be set to a closure returning an instance of Imbo\Database\DatabaseInterface, or an
      * implementation of said interface.
      *
-     * @var Imbo\Database\DatabaseInterface|Closure
+     * @var DatabaseAdapter|Closure:DatabaseAdapter
      */
-    'database' => fn() => new MongoDB(),
+    'database' => null,
 
     /**
      * Storage adapter
@@ -65,9 +40,9 @@ $defaultConfig = [
      * must be set to a closure returning an instance of Imbo\Storage\StorageInterface, or an
      * implementation of said interface.
      *
-     * @var Imbo\Storage\StorageInterface|Closure
+     * @var StorageAdapter|Closure:StorageAdapter
      */
-    'storage' => fn() => new GridFS(),
+    'storage' => null,
 
     /**
      * Image identifier generator
@@ -78,7 +53,7 @@ $defaultConfig = [
      *
      * @var Imbo\Image\Identifier\Generator\GeneratorInterface|Closure
      */
-    'imageIdentifierGenerator' => fn() => new RandomString(),
+    'imageIdentifierGenerator' => new RandomString(),
 
     /**
      * Keep errors as exceptions
@@ -88,6 +63,8 @@ $defaultConfig = [
      * instead rethrow the generated exception, giving you a full stack trace in your PHP
      * error log. This should not be enabled in production, unless you have configured
      * PHP in the recommended way with a separate error_log and display_errors=Off.
+     *
+     * @var bool
      */
     'rethrowFinalException' => false,
 
@@ -465,30 +442,3 @@ $defaultConfig = [
         'basic' => BasicOutput::class,
     ],
 ];
-
-// Keep all external configuration separate
-$extraConfig = [];
-
-// See if a custom config path has been defined. If so, don't require the custom one as this is
-// most likely a Behat test run
-if (!defined('IMBO_CONFIG_PATH')) {
-    // wrap the config loader as a closure to avoid overwriting duplicate names from local configuration files
-    $configLoader = function ($path) {
-        $config = require $path;
-
-        return is_array($config) ? $config : [];
-    };
-
-    if (is_dir(__DIR__ . '/../../../../config')) {
-        // Someone has installed Imbo via a custom composer.json, so the custom config is outside of
-        // the vendor dir. Loop through all available php files in the config dir
-        foreach (glob(__DIR__ . '/../../../../config/*.php') as $file) {
-            $extraConfig = array_replace_recursive($extraConfig, $configLoader($file));
-        }
-    } else if (file_exists(__DIR__ . '/config.php')) {
-        $extraConfig = $configLoader(__DIR__ . '/config.php');
-    }
-}
-
-// merge external configuration into default configuration
-return array_replace_recursive($defaultConfig, $extraConfig);
