@@ -103,6 +103,7 @@ jobs:
         run: vendor/bin/behat --strict --suite=mongodb-gridfs
 
       - uses: actions/upload-artifact@v2
+        if: always()
         with:
           name: httpd-logs-mongodb-gridfs
           path: build/logs
@@ -161,6 +162,7 @@ jobs:
         run: vendor/bin/behat --strict --suite=mongodb-filesystem
 
       - uses: actions/upload-artifact@v2
+        if: always()
         with:
           name: httpd-logs-mongodb-filesystem
           path: build/logs
@@ -222,6 +224,7 @@ jobs:
         run: vendor/bin/behat --strict --suite=sqlite-filesystem
 
       - uses: actions/upload-artifact@v2
+        if: always()
         with:
           name: httpd-logs-sqlite-filesystem
           path: build/logs
@@ -296,6 +299,7 @@ jobs:
         run: vendor/bin/behat --strict --suite=mysql-filesystem
 
       - uses: actions/upload-artifact@v2
+        if: always()
         with:
           name: httpd-logs-mysql-filesystem
           path: build/logs
@@ -366,6 +370,7 @@ jobs:
         run: vendor/bin/behat --strict --suite=postgresql-filesystem
 
       - uses: actions/upload-artifact@v2
+        if: always()
         with:
           name: httpd-logs-postgresql-filesystem
           path: build/logs
