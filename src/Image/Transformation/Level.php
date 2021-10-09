@@ -19,7 +19,7 @@ class Level extends Transformation
     public function transform(array $params)
     {
         $channel = isset($params['channel']) ? $params['channel'] : 'all';
-        $amount = isset($params['amount']) ? $params['amount'] : 1;
+        $amount = isset($params['amount']) ? (int) $params['amount'] : 1;
 
         if ($amount < -100) {
             $amount = -100;
