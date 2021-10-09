@@ -1,27 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Http\Response\Formatter;
 
-use Imbo\Model;
-use Imbo\Helpers\DateFormatter;
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Helpers\DateFormatter;
+use Imbo\Http\Response\Response;
+use Imbo\Model;
 
-/**
- * Abstract formatter
- */
-abstract class Formatter implements FormatterInterface {
-    /**
-     * Date formatter helper
-     *
-     * @var DateFormatter
-     */
-    protected $dateFormatter;
+abstract class Formatter implements FormatterInterface
+{
+    protected DateFormatter $dateFormatter;
 
-    /**
-     * Class constructor
-     *
-     * @param DateFormatter $formatter An instance of the date formatter helper
-     */
-    public function __construct(DateFormatter $formatter = null) {
+    public function __construct(DateFormatter $formatter = null)
+    {
         if ($formatter === null) {
             $formatter = new DateFormatter();
         }
@@ -29,36 +19,34 @@ abstract class Formatter implements FormatterInterface {
         $this->dateFormatter = $formatter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function format(Model\ModelInterface $model) {
+    public function format(Model\ModelInterface $model)
+    {
         if ($model instanceof Model\Error) {
             return $this->formatError($model);
-        } else if ($model instanceof Model\Status) {
+        } elseif ($model instanceof Model\Status) {
             return $this->formatStatus($model);
-        } else if ($model instanceof Model\User) {
+        } elseif ($model instanceof Model\User) {
             return $this->formatUser($model);
-        } else if ($model instanceof Model\Images) {
+        } elseif ($model instanceof Model\Images) {
             return $this->formatImages($model);
-        } else if ($model instanceof Model\Metadata) {
+        } elseif ($model instanceof Model\Metadata) {
             return $this->formatMetadataModel($model);
-        } else if ($model instanceof Model\Groups) {
+        } elseif ($model instanceof Model\Groups) {
             return $this->formatGroups($model);
-        } else if ($model instanceof Model\Group) {
+        } elseif ($model instanceof Model\Group) {
             return $this->formatGroup($model);
-        } else if ($model instanceof Model\AccessRule) {
+        } elseif ($model instanceof Model\AccessRule) {
             return $this->formatAccessRule($model);
-        } else if ($model instanceof Model\AccessRules) {
+        } elseif ($model instanceof Model\AccessRules) {
             return $this->formatAccessRules($model);
-        } else if ($model instanceof Model\ArrayModel) {
+        } elseif ($model instanceof Model\ArrayModel) {
             return $this->formatArrayModel($model);
-        } else if ($model instanceof Model\ListModel) {
+        } elseif ($model instanceof Model\ListModel) {
             return $this->formatListModel($model);
-        } else if ($model instanceof Model\Stats) {
+        } elseif ($model instanceof Model\Stats) {
             return $this->formatStats($model);
         }
 
-        throw new InvalidArgumentException('Unsupported model type', 500);
+        throw new InvalidArgumentException('Unsupported model type', Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 }

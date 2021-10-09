@@ -59,7 +59,7 @@ class ShortUrlTest extends ResourceTests
             ->with('aaaaaaa')
             ->willReturn(null);
 
-        $this->expectExceptionObject(new ResourceException('ShortURL not found', 404));
+        $this->expectExceptionObject(new ResourceException('ShortURL not found', Response::HTTP_NOT_FOUND));
         $this->getNewResource()->deleteShortUrl($this->event);
     }
 
@@ -82,7 +82,7 @@ class ShortUrlTest extends ResourceTests
                 'imageIdentifier' => 'id',
             ]);
 
-        $this->expectExceptionObject(new ResourceException('ShortURL not found', 404));
+        $this->expectExceptionObject(new ResourceException('ShortURL not found', Response::HTTP_NOT_FOUND));
         $this->getNewResource()->deleteShortUrl($this->event);
     }
 
@@ -132,7 +132,7 @@ class ShortUrlTest extends ResourceTests
             ->with('aaaaaaa')
             ->willReturn(null);
 
-        $this->expectExceptionObject(new ResourceException('ShortURL not found', 404));
+        $this->expectExceptionObject(new ResourceException('ShortURL not found', Response::HTTP_NOT_FOUND));
         $this->getNewResource()->getShortUrl($this->event);
     }
 
@@ -155,7 +155,7 @@ class ShortUrlTest extends ResourceTests
                 'imageIdentifier' => 'id',
             ]);
 
-        $this->expectExceptionObject(new ResourceException('ShortURL not found', 404));
+        $this->expectExceptionObject(new ResourceException('ShortURL not found', Response::HTTP_NOT_FOUND));
         $this->getNewResource()->getShortUrl($this->event);
     }
 

@@ -1,16 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException;
-use Imbo\Image\InputSizeConstraint;
 use Imagick;
 use ImagickException;
 use ImagickPixelException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
+use Imbo\Image\InputSizeConstraint;
 
 /**
  * Canvas transformation
  */
-class Canvas extends Transformation implements InputSizeConstraint {
+class Canvas extends Transformation implements InputSizeConstraint
+{
     /**
      * Canvas mode
      *
@@ -22,36 +24,26 @@ class Canvas extends Transformation implements InputSizeConstraint {
      *               placement
      * - "center-y": Places the existing image in the center of the y-axis and uses x for vertical
      *               placement
-     *
-     * @var string
      */
-    private $mode = 'free';
+    private string $mode = 'free';
 
     /**
      * X coordinate of the placement of the upper left corner of the existing image
-     *
-     * @var int
      */
-    private $x = 0;
+    private int $x = 0;
 
     /**
      * X coordinate of the placement of the upper left corner of the existing image
-     *
-     * @var int
      */
-    private $y = 0;
+    private int $y = 0;
 
     /**
      * Background color of the canvas. Defaults to white.
-     *
-     * @var string
      */
-    private $bg = '#ffffff';
+    private string $bg = '#ffffff';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function transform(array $params) {
+    public function transform(array $params): void
+    {
         $image = $this->image;
 
         $width  = !empty($params['width']) ? (int) $params['width'] : $image->getWidth();
@@ -86,7 +78,7 @@ class Canvas extends Transformation implements InputSizeConstraint {
 
                 if ($existingWidth > $width) {
                     if ($mode === 'center' || $mode === 'center-x') {
-                        $cropX = (int) ($existingWidth - $width) / 2;
+                        $cropX = (int) (($existingWidth - $width) / 2);
                     }
                 } else {
                     $cropWidth = $existingWidth;
@@ -94,7 +86,7 @@ class Canvas extends Transformation implements InputSizeConstraint {
 
                 if ($existingHeight > $height) {
                     if ($mode === 'center' || $mode === 'center-y') {
-                        $cropY = (int) ($existingHeight - $height) / 2;
+                        $cropY = (int) (($existingHeight - $height) / 2);
                     }
                 } else {
                     $cropHeight = $existingHeight;
@@ -112,9 +104,9 @@ class Canvas extends Transformation implements InputSizeConstraint {
             if ($mode === 'center') {
                 $x = ($width - $existingSize['width']) / 2;
                 $y = ($height - $existingSize['height']) / 2;
-            } else if ($mode === 'center-x') {
+            } elseif ($mode === 'center-x') {
                 $x = ($width - $existingSize['width']) / 2;
-            } else if ($mode === 'center-y') {
+            } elseif ($mode === 'center-y') {
                 $y = ($height - $existingSize['height']) / 2;
             }
 
@@ -122,13 +114,13 @@ class Canvas extends Transformation implements InputSizeConstraint {
             $this->imagick->compositeImage(
                 $original,
                 Imagick::COMPOSITE_DEFAULT,
-                $x,
-                $y
+                (int) $x,
+                (int) $y,
             );
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         } catch (ImagickPixelException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         // Store the new image
@@ -138,19 +130,15 @@ class Canvas extends Transformation implements InputSizeConstraint {
               ->setHasBeenTransformed(true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getMinimumInputSize(array $params, array $imageSize) {
+    public function getMinimumInputSize(array $params, array $imageSize)
+    {
         // Since we're modifying the input image in a way that alters the size and content,
         // we can't make any further optimizations on the input size.
         return InputSizeConstraint::STOP_RESOLVING;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function adjustParameters($ratio, array $parameters) {
+    public function adjustParameters(float $ratio, array $parameters): array
+    {
         foreach (['x', 'y', 'width', 'height'] as $param) {
             if (isset($parameters[$param])) {
                 $parameters[$param] = round($parameters[$param] / $ratio);

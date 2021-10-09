@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Http\Request;
 
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use Imbo\Router\Route;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -9,7 +10,8 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 /**
  * Request class
  */
-class Request extends SymfonyRequest {
+class Request extends SymfonyRequest
+{
     /**
      * Image instance
      *
@@ -37,7 +39,8 @@ class Request extends SymfonyRequest {
      * @param Image $image An image model instance
      * @return Request
      */
-    public function setImage(Image $image) {
+    public function setImage(Image $image)
+    {
         $this->image = $image;
 
         return $this;
@@ -48,7 +51,8 @@ class Request extends SymfonyRequest {
      *
      * @return null|Image
      */
-    public function getImage() {
+    public function getImage()
+    {
         return $this->image;
     }
 
@@ -57,7 +61,8 @@ class Request extends SymfonyRequest {
      *
      * @return string
      */
-    public function getPublicKey() {
+    public function getPublicKey()
+    {
         return (
             $this->headers->get('X-Imbo-PublicKey', null) ?:
             $this->query->get('publicKey', null) ?:
@@ -70,7 +75,8 @@ class Request extends SymfonyRequest {
      *
      * @return string
      */
-    public function getUser() {
+    public function getUser()
+    {
         return $this->route ? $this->route->get('user') : null;
     }
 
@@ -79,7 +85,8 @@ class Request extends SymfonyRequest {
      *
      * @return array Users specified in the request
      */
-    public function getUsers() {
+    public function getUsers()
+    {
         $routeUser = $this->getUser();
         $queryUsers = $this->query->get('users', []);
 
@@ -99,19 +106,20 @@ class Request extends SymfonyRequest {
      *
      * @return array
      */
-    public function getTransformations() {
+    public function getTransformations()
+    {
         if ($this->transformations === null) {
             $this->transformations = [];
 
             $transformations = $this->query->get('t', []);
 
             if (!is_array($transformations)) {
-                throw new InvalidArgumentException('Transformations must be specifed as an array', 400);
+                throw new InvalidArgumentException('Transformations must be specifed as an array', Response::HTTP_BAD_REQUEST);
             }
 
             foreach ($transformations as $transformation) {
                 if (!is_string($transformation)) {
-                    throw new InvalidArgumentException('Invalid transformation', 400);
+                    throw new InvalidArgumentException('Invalid transformation', Response::HTTP_BAD_REQUEST);
                 }
 
                 // See if the transformation has any parameters
@@ -154,7 +162,8 @@ class Request extends SymfonyRequest {
      * @param array $transformations The image transformations
      * @return self
      */
-    public function setTransformations(array $transformations) {
+    public function setTransformations(array $transformations)
+    {
         $this->transformations = $transformations;
 
         return $this;
@@ -165,7 +174,8 @@ class Request extends SymfonyRequest {
      *
      * @return string|null
      */
-    public function getImageIdentifier() {
+    public function getImageIdentifier()
+    {
         return $this->route ? $this->route->get('imageIdentifier') : null;
     }
 
@@ -174,7 +184,8 @@ class Request extends SymfonyRequest {
      *
      * @return string|null
      */
-    public function getExtension() {
+    public function getExtension()
+    {
         return $this->route ? $this->route->get('extension') : null;
     }
 
@@ -183,7 +194,8 @@ class Request extends SymfonyRequest {
      *
      * @return string
      */
-    public function getUriAsIs() {
+    public function getUriAsIs()
+    {
         $query = $this->server->get('QUERY_STRING');
 
         if (!empty($query)) {
@@ -198,7 +210,8 @@ class Request extends SymfonyRequest {
      *
      * @return string
      */
-    public function getRawUri() {
+    public function getRawUri()
+    {
         $query = $this->server->get('QUERY_STRING');
 
         if (!empty($query)) {
@@ -213,7 +226,8 @@ class Request extends SymfonyRequest {
      *
      * @return Route
      */
-    public function getRoute() {
+    public function getRoute()
+    {
         return $this->route;
     }
 
@@ -223,7 +237,8 @@ class Request extends SymfonyRequest {
      * @param Route $route The current route
      * @return self
      */
-    public function setRoute(Route $route) {
+    public function setRoute(Route $route)
+    {
         $this->route = $route;
 
         return $this;

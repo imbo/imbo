@@ -1,10 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface;
-use Imbo\Model;
 use DateTime;
 use DateTimeZone;
+use Imbo\EventManager\EventInterface;
+use Imbo\Http\Response\Response;
+use Imbo\Model;
 
 /**
  * Status resource
@@ -12,18 +13,21 @@ use DateTimeZone;
  * This resource can be used to monitor the imbo installation to see if it has access to the
  * current database and storage.
  */
-class Status implements ResourceInterface {
+class Status implements ResourceInterface
+{
     /**
      * {@inheritdoc}
      */
-    public function getAllowedMethods() {
+    public function getAllowedMethods()
+    {
         return ['GET', 'HEAD'];
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             'status.get' => 'get',
             'status.head' => 'get',
@@ -35,7 +39,8 @@ class Status implements ResourceInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function get(EventInterface $event) {
+    public function get(EventInterface $event)
+    {
         $response = $event->getResponse();
         $database = $event->getDatabase();
         $storage = $event->getStorage();
@@ -46,13 +51,13 @@ class Status implements ResourceInterface {
         if (!$databaseStatus || !$storageStatus) {
             if (!$databaseStatus && !$storageStatus) {
                 $message = 'Database and storage error';
-            } else if (!$storageStatus) {
+            } elseif (!$storageStatus) {
                 $message = 'Storage error';
             } else {
                 $message = 'Database error';
             }
 
-            $response->setStatusCode(503, $message);
+            $response->setStatusCode(Response::HTTP_SERVICE_UNAVAILABLE, $message);
         }
 
         $response->setMaxAge(0)

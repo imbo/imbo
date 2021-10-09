@@ -1,21 +1,22 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
-use Imbo\EventListener\AccessToken\AccessTokenInterface;
-use Imbo\Exception\RuntimeException;
-use Imbo\Exception\ConfigurationException;
-use Imbo\EventManager\Event;
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface as AccessControlAdapter;
+use Imbo\EventListener\AccessToken\AccessTokenInterface;
+use Imbo\EventManager\Event;
+use Imbo\Exception\ConfigurationException;
+use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
+use stdClass;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use stdClass;
 
 /**
  * @coversDefaultClass Imbo\EventListener\AccessToken
  */
-class AccessTokenTest extends ListenerTests {
+class AccessTokenTest extends ListenerTests
+{
     private $listener;
     private $event;
     private $accessControl;
@@ -24,7 +25,8 @@ class AccessTokenTest extends ListenerTests {
     private $responseHeaders;
     private $query;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->query = $this->createMock(ParameterBag::class);
 
         $this->accessControl = $this->createMock(AccessControlAdapter::class);
@@ -41,14 +43,16 @@ class AccessTokenTest extends ListenerTests {
         $this->listener = new AccessToken();
     }
 
-    protected function getListener() : AccessToken {
+    protected function getListener(): AccessToken
+    {
         return $this->listener;
     }
 
     /**
      * @covers ::checkAccessToken
      */
-    public function testRequestWithBogusAccessToken() : void {
+    public function testRequestWithBogusAccessToken(): void
+    {
         $this->query
             ->expects($this->once())
             ->method('has')
@@ -69,7 +73,7 @@ class AccessTokenTest extends ListenerTests {
             ->method('getPublicKey')
             ->willReturn('some-key');
 
-        $this->expectExceptionObject(new RuntimeException('Incorrect access token', 400));
+        $this->expectExceptionObject(new RuntimeException('Incorrect access token', Response::HTTP_BAD_REQUEST));
         $this->listener->checkAccessToken($this->event);
     }
 
@@ -77,7 +81,8 @@ class AccessTokenTest extends ListenerTests {
      * @covers ::checkAccessToken
      * @covers ::isWhitelisted
      */
-    public function testThrowsExceptionIfAnAccessTokenIsMissingFromTheRequestWhenNotWhitelisted() : void {
+    public function testThrowsExceptionIfAnAccessTokenIsMissingFromTheRequestWhenNotWhitelisted(): void
+    {
         $this->event
             ->expects($this->once())
             ->method('getName')
@@ -89,11 +94,12 @@ class AccessTokenTest extends ListenerTests {
             ->with('accessToken')
             ->willReturn(false);
 
-        $this->expectExceptionObject(new RuntimeException('Missing access token', 400));
+        $this->expectExceptionObject(new RuntimeException('Missing access token', Response::HTTP_BAD_REQUEST));
         $this->listener->checkAccessToken($this->event);
     }
 
-    public function getFilterData() : array {
+    public function getFilterData(): array
+    {
         return [
             'no filter and no transformations' => [
                 [],
@@ -173,11 +179,12 @@ class AccessTokenTest extends ListenerTests {
      * @covers ::checkAccessToken
      * @covers ::isWhitelisted
      */
-    public function testSupportsFilters(array $filter, array $transformations, bool $whitelisted) : void {
+    public function testSupportsFilters(array $filter, array $transformations, bool $whitelisted): void
+    {
         $listener = new AccessToken($filter);
 
         if (!$whitelisted) {
-            $this->expectExceptionObject(new RuntimeException('Missing access token', 400));
+            $this->expectExceptionObject(new RuntimeException('Missing access token', Response::HTTP_BAD_REQUEST));
         }
 
         $this->event
@@ -192,59 +199,60 @@ class AccessTokenTest extends ListenerTests {
         $listener->checkAccessToken($this->event);
     }
 
-    public function getAccessTokens() : array {
+    public function getAccessTokens(): array
+    {
         return [
             [
                 'http://imbo/users/christer',
                 'some access token',
                 'private key',
-                false
+                false,
             ],
             [
                 'http://imbo/users/christer',
                 '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a',
                 'private key',
-                true
+                true,
             ],
             [
                 'http://imbo/users/christer',
                 '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a',
                 'other private key',
-                false
+                false,
             ],
             // Test that checking URL "as is" works properly. This is for backwards compatibility.
             [
                 'http://imbo/users/christer?t[]=thumbnail%3Awidth%3D40%2Cheight%3D40%2Cfit%3Doutbound',
                 'f0166cb4f7c8eabbe82c5d753f681ed53bcfa10391d4966afcfff5806cc2bff4',
                 'some random private key',
-                true
+                true,
             ],
             // Test checking URL against incorrect protocol
             [
                 'https://imbo/users/christer',
                 '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a',
                 'private key',
-                false
+                false,
             ],
             // Test that URLs with t[0] and t[] can use the same accessToken
             [
                 'http://imbo/users/imbo/images/foobar?t%5B0%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B1%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50',
                 '1ae7643a70e68377502c30ba54d0ffbfedd67a1f3c4b3f038a42c0ed17ad3551',
                 'foo',
-                true
+                true,
             ],
             [
                 'http://imbo/users/imbo/images/foobar?t%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50',
                 '1ae7643a70e68377502c30ba54d0ffbfedd67a1f3c4b3f038a42c0ed17ad3551',
                 'foo',
-                true
+                true,
             ],
             // and that they still break if something else is changed
             [
                 'http://imbo/users/imbo/images/foobar?g%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50',
                 '1ae7643a70e68377502c30ba54d0ffbfedd67a1f3c4b3f038a42c0ed17ad3551',
                 'foo',
-                false
+                false,
             ],
         ];
     }
@@ -253,9 +261,10 @@ class AccessTokenTest extends ListenerTests {
      * @dataProvider getAccessTokens
      * @covers ::checkAccessToken
      */
-    public function testThrowsExceptionOnIncorrectToken(string $url, string $token, string $privateKey, bool $correct) : void {
+    public function testThrowsExceptionOnIncorrectToken(string $url, string $token, string $privateKey, bool $correct): void
+    {
         if (!$correct) {
-            $this->expectExceptionObject(new RuntimeException('Incorrect access token', 400));
+            $this->expectExceptionObject(new RuntimeException('Incorrect access token', Response::HTTP_BAD_REQUEST));
         }
 
         $this->query
@@ -296,7 +305,8 @@ class AccessTokenTest extends ListenerTests {
     /**
      * @covers ::checkAccessToken
      */
-    public function testWillSkipValidationWhenShortUrlHeaderIsPresent() : void {
+    public function testWillSkipValidationWhenShortUrlHeaderIsPresent(): void
+    {
         $this->responseHeaders
             ->expects($this->once())
             ->method('has')
@@ -313,7 +323,8 @@ class AccessTokenTest extends ListenerTests {
     /**
      * @covers ::checkAccessToken
      */
-    public function testWillAcceptBothProtocolsIfConfiguredTo() : void {
+    public function testWillAcceptBothProtocolsIfConfiguredTo(): void
+    {
         $privateKey = 'foobar';
         $baseUrl = '//imbo.host/users/some-user/imgUrl.png?t[]=smartSize:width=320,height=240';
 
@@ -351,14 +362,14 @@ class AccessTokenTest extends ListenerTests {
                     'getResponse' => $this->response,
                     'getConfig' => [
                         'authentication' => [
-                            'protocol' => 'both'
+                            'protocol' => 'both',
                         ],
                     ],
                 ]);
 
                 $this->assertTrue(
                     $this->listener->checkAccessToken($event),
-                    'Expected method to return true to signal successful comparison'
+                    'Expected method to return true to signal successful comparison',
                 );
             }
         }
@@ -367,7 +378,8 @@ class AccessTokenTest extends ListenerTests {
     /**
      * @covers ::checkAccessToken
      */
-    public function testAccessTokenArgumentKey() : void {
+    public function testAccessTokenArgumentKey(): void
+    {
         $url = 'http://imbo/users/christer';
         $token = '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a';
         $privateKey = 'private key';
@@ -411,7 +423,8 @@ class AccessTokenTest extends ListenerTests {
         $listener->checkAccessToken($this->event);
     }
 
-    public function getAccessTokensForMultipleGenerator() : array {
+    public function getAccessTokensForMultipleGenerator(): array
+    {
         $tokens = [];
 
         foreach ($this->getAccessTokens() as $token) {
@@ -425,21 +438,21 @@ class AccessTokenTest extends ListenerTests {
                 'dummy',
                 'foo',
                 true,
-                'dummy'
+                'dummy',
             ],
             [
                 'http://imbo/users/imbo/images/foobar?t%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50123',
                 'dummy',
                 'foobar',
                 true,
-                'dummy'
+                'dummy',
             ],
             [
                 'http://imbo/users/imbo/images/foobar?t%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50123',
                 'boop',
                 'foobar',
                 false,
-                'dummy'
+                'dummy',
             ],
         ]);
 
@@ -453,9 +466,10 @@ class AccessTokenTest extends ListenerTests {
      * @covers ::getUnescapedAlternativeURL
      * @covers ::getEscapedAlternativeURL
      */
-    public function testMultipleAccessTokensGenerator(string $url, string $token, string $privateKey, bool $correct, string $argumentKey) : void {
+    public function testMultipleAccessTokensGenerator(string $url, string $token, string $privateKey, bool $correct, string $argumentKey): void
+    {
         if (!$correct) {
-            $this->expectExceptionObject(new RuntimeException('Incorrect access token', 400));
+            $this->expectExceptionObject(new RuntimeException('Incorrect access token', Response::HTTP_BAD_REQUEST));
         }
 
         $dummyAccessToken = $this->createConfiguredMock(AccessTokenInterface::class, [
@@ -467,7 +481,7 @@ class AccessTokenTest extends ListenerTests {
                 'generators' => [
                     'accessToken' => new AccessToken\SHA256(),
                     'dummy' => $dummyAccessToken,
-                ]
+                ],
             ]),
         ]);
 
@@ -477,7 +491,7 @@ class AccessTokenTest extends ListenerTests {
             ->method('has')
             ->with($this->logicalOr(
                 $this->equalTo($argumentKey),
-                $this->anything()
+                $this->anything(),
             ))
             ->willReturnCallback(function ($val) use ($argumentKey) {
                 return $val == $argumentKey;
@@ -515,14 +529,16 @@ class AccessTokenTest extends ListenerTests {
     /**
      * @covers ::__construct
      */
-    public function testConfigurationExceptionOnInvalidAccessTokenGenerator() : void {
-        $this->expectExceptionObject(new ConfigurationException('Invalid accessTokenGenerator', 500));
+    public function testConfigurationExceptionOnInvalidAccessTokenGenerator(): void
+    {
+        $this->expectExceptionObject(new ConfigurationException('Invalid accessTokenGenerator', Response::HTTP_INTERNAL_SERVER_ERROR));
 
         new AccessToken(['accessTokenGenerator' => new StdClass()]);
     }
 
-    public function getRewrittenAccessTokenData() : array {
-        $getAccessToken = function(string $url) : string {
+    public function getRewrittenAccessTokenData(): array
+    {
+        $getAccessToken = function (string $url): string {
             return hash_hmac('sha256', $url, 'foobar');
         };
 
@@ -530,48 +546,48 @@ class AccessTokenTest extends ListenerTests {
             [
                 // Access token created from URL
                 $getAccessToken('http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
-                 // URL returned by Imbo
+                // URL returned by Imbo
                 'http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
                 // Protocol which Imbo is configured to rewrite incoming URL to
                 'http',
                 // Should it accept the access token as correct?
-                true
+                true,
             ],
             [
                 $getAccessToken('http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
                 'https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
                 'http',
-                true
+                true,
             ],
             [
                 $getAccessToken('https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
                 'https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
                 'http',
-                false
+                false,
             ],
             [
                 $getAccessToken('https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
                 'http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
                 'http',
-                false
+                false,
             ],
             [
                 $getAccessToken('https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
                 'http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
                 'https',
-                true
+                true,
             ],
             [
                 $getAccessToken('https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
                 'https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
                 'https',
-                true
+                true,
             ],
             [
                 $getAccessToken('http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
                 'https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
                 'https',
-                false
+                false,
             ],
         ];
     }
@@ -580,15 +596,16 @@ class AccessTokenTest extends ListenerTests {
      * @dataProvider getRewrittenAccessTokenData
      * @covers ::checkAccessToken
      */
-    public function testWillRewriteIncomingUrlToConfiguredProtocol(string $accessToken, string $url, string $protocol, bool $correct) : void {
+    public function testWillRewriteIncomingUrlToConfiguredProtocol(string $accessToken, string $url, string $protocol, bool $correct): void
+    {
         if (!$correct) {
-            $this->expectExceptionObject(new RuntimeException('Incorrect access token', 400));
+            $this->expectExceptionObject(new RuntimeException('Incorrect access token', Response::HTTP_BAD_REQUEST));
         }
 
         $event = $this->getEventMock([
             'authentication' => [
-                'protocol' => $protocol
-            ]
+                'protocol' => $protocol,
+            ],
         ]);
 
         $url = $url . '&accessToken=' . $accessToken;
@@ -621,18 +638,19 @@ class AccessTokenTest extends ListenerTests {
 
         $this->assertTrue(
             $this->listener->checkAccessToken($event),
-            'Expected method to return true to signal successful comparison'
+            'Expected method to return true to signal successful comparison',
         );
     }
 
-    protected function getEventMock(array $config = null) : Event {
+    protected function getEventMock(array $config = null): Event
+    {
         return $this->createConfiguredMock(Event::class, [
             'getAccessControl' => $this->accessControl,
             'getRequest'       => $this->request,
             'getResponse'      => $this->response,
             'getConfig'        => $config ?: [
                 'authentication' => [
-                    'protocol' => 'incoming'
+                    'protocol' => 'incoming',
                 ],
             ],
         ]);

@@ -1,18 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
+use Imagick;
+use ImagickException;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\TransformationException;
-use ImagickException;
+use Imbo\Http\Response\Response;
 
 /**
  * Clip transformation for making an image transparent outside of a clipping mask
  */
-class Clip extends Transformation {
-    /**
-     * {@inheritdoc}
-     */
-    public function transform(array $params) {
+class Clip extends Transformation
+{
+    public function transform(array $params)
+    {
         $pathName = null;
 
         if (!empty($params['path'])) {
@@ -20,7 +21,7 @@ class Clip extends Transformation {
 
             $metadata = $this->event->getDatabase()->getMetadata(
                 $this->image->getUser(),
-                $this->image->getImageIdentifier()
+                $this->image->getImageIdentifier(),
             );
 
             if (empty($metadata['paths']) || !is_array($metadata['paths']) || !in_array($pathName, $metadata['paths'])) {
@@ -28,14 +29,17 @@ class Clip extends Transformation {
                     return;
                 }
 
-                throw new InvalidArgumentException('Selected clipping path "' . $pathName . '" was not found in the image. Add the ignoreUnknownPath argument if you want to ignore this error.', 400);
+                throw new InvalidArgumentException(
+                    'Selected clipping path "' . $pathName . '" was not found in the image. Add the ignoreUnknownPath argument if you want to ignore this error.',
+                    Response::HTTP_BAD_REQUEST,
+                );
             }
         }
 
         $currentAlphaChannelMode = $this->imagick->getImageAlphaChannel();
 
         try {
-            $this->imagick->setImageAlphaChannel(\Imagick::ALPHACHANNEL_TRANSPARENT);
+            $this->imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_TRANSPARENT);
 
             // since the implementation of clipImage in ImageMagick is
             //     return(ClipImagePath(image,"#1",MagickTrue,exception));
@@ -46,7 +50,7 @@ class Clip extends Transformation {
                 $this->imagick->clipImage();
             }
 
-            $this->imagick->setImageAlphaChannel(\Imagick::ALPHACHANNEL_OPAQUE);
+            $this->imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_OPAQUE);
         } catch (ImagickException $e) {
             // NoClipPathDefined - the image doesn't have a clipping path, but this isn't a fatal error.
             if ($e->getCode() == 410) {
@@ -58,7 +62,7 @@ class Clip extends Transformation {
                 return;
             }
 
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         $this->image->setHasBeenTransformed(true);

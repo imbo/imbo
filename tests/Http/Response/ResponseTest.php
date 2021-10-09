@@ -10,10 +10,12 @@ use PHPUnit\Framework\TestCase;
 /**
  * @coversDefaultClass Imbo\Http\Response\Response
  */
-class ResponseTest extends TestCase {
+class ResponseTest extends TestCase
+{
     private $response;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->response = new Response();
     }
 
@@ -21,7 +23,8 @@ class ResponseTest extends TestCase {
      * @covers ::setModel
      * @covers ::getModel
      */
-    public function testCanSetAndGetModel() : void {
+    public function testCanSetAndGetModel(): void
+    {
         $model = $this->createMock(ModelInterface::class);
         $this->assertNull($this->response->getModel());
         $this->assertSame($this->response, $this->response->setModel($model));
@@ -34,20 +37,22 @@ class ResponseTest extends TestCase {
      * @covers ::setModel
      * @covers ::setNotModified
      */
-    public function testRemovesModelWhenMarkedAsNotModified() : void {
+    public function testRemovesModelWhenMarkedAsNotModified(): void
+    {
         $model = $this->createMock(ModelInterface::class);
         $this->assertSame($this->response, $this->response->setModel($model));
         $this->assertSame($this->response, $this->response->setNotModified());
-        $this->assertSame(304, $this->response->getStatusCode());
+        $this->assertSame(Response::HTTP_NOT_MODIFIED, $this->response->getStatusCode());
         $this->assertNull($this->response->getModel());
     }
 
     /**
      * @covers ::setError
      */
-    public function testUpdatesResponseWhenSettingAnErrorModel() : void {
+    public function testUpdatesResponseWhenSettingAnErrorModel(): void
+    {
         $message = 'You wronged';
-        $code = 404;
+        $code = Response::HTTP_NOT_FOUND;
         $imboErrorCode = '123';
         $date = new DateTime('@1361614522', new DateTimeZone('UTC'));
 

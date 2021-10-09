@@ -7,6 +7,7 @@ use Imbo\Database\DatabaseInterface;
 use Imbo\EventManager\Event;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use PHPUnit\Framework\TestCase;
 
@@ -59,7 +60,7 @@ class ClipTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/clipping path .* not found/');
-        $this->expectExceptionCode(400);
+        $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
         $this->transformation->transform(['path' => 'foo']);
     }
 
@@ -161,7 +162,7 @@ class ClipTest extends TestCase
             ->willThrowException(new ImagickException('Some error'));
 
         $this->transformation->setImagick($imagick);
-        $this->expectExceptionObject(new TransformationException('Some error', 400));
+        $this->expectExceptionObject(new TransformationException('Some error', Response::HTTP_BAD_REQUEST));
         $this->transformation->transform([]);
     }
 }

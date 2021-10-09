@@ -1,19 +1,22 @@
 <?php declare(strict_types=1);
 namespace Imbo\Model;
 
-use Imbo\Http\Request\Request;
-use Imbo\Exception\RuntimeException;
-use Imbo\Exception;
-use PHPUnit\Framework\TestCase;
 use DateTime;
+use Imbo\Exception;
+use Imbo\Exception\RuntimeException;
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Model\Error
  */
-class ErrorTest extends TestCase {
+class ErrorTest extends TestCase
+{
     private $model;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->model = new Error();
     }
 
@@ -21,17 +24,19 @@ class ErrorTest extends TestCase {
      * @covers ::getHttpCode
      * @covers ::setHttpCode
      */
-    public function testCanSetAndGetHttpCode() : void {
+    public function testCanSetAndGetHttpCode(): void
+    {
         $this->assertNull($this->model->getHttpCode());
-        $this->assertSame($this->model, $this->model->setHttpCode(404));
-        $this->assertSame(404, $this->model->getHttpCode());
+        $this->assertSame($this->model, $this->model->setHttpCode(Response::HTTP_NOT_FOUND));
+        $this->assertSame(Response::HTTP_NOT_FOUND, $this->model->getHttpCode());
     }
 
     /**
      * @covers ::getErrorMessage
      * @covers ::setErrorMessage
      */
-    public function testCanSetAndGetErrorMessage() : void {
+    public function testCanSetAndGetErrorMessage(): void
+    {
         $this->assertNull($this->model->getErrorMessage());
         $this->assertSame($this->model, $this->model->setErrorMessage('message'));
         $this->assertSame('message', $this->model->getErrorMessage());
@@ -41,7 +46,8 @@ class ErrorTest extends TestCase {
      * @covers ::getDate
      * @covers ::setDate
      */
-    public function testCanSetAndGetDate() : void {
+    public function testCanSetAndGetDate(): void
+    {
         $date = new DateTime();
         $this->assertNull($this->model->getDate());
         $this->assertSame($this->model, $this->model->setDate($date));
@@ -52,7 +58,8 @@ class ErrorTest extends TestCase {
      * @covers ::getImboErrorCode
      * @covers ::setImboErrorCode
      */
-    public function testCanSetAndGetImboErrorCode() : void {
+    public function testCanSetAndGetImboErrorCode(): void
+    {
         $this->assertNull($this->model->getImboErrorCode());
         $this->assertSame($this->model, $this->model->setImboErrorCode(100));
         $this->assertSame(100, $this->model->getImboErrorCode());
@@ -62,7 +69,8 @@ class ErrorTest extends TestCase {
      * @covers ::getImageIdentifier
      * @covers ::setImageIdentifier
      */
-    public function testCanSetAndGetImageIdentifier() : void {
+    public function testCanSetAndGetImageIdentifier(): void
+    {
         $this->assertNull($this->model->getImageIdentifier());
         $this->assertSame($this->model, $this->model->setImageIdentifier('identifier'));
         $this->assertSame('identifier', $this->model->getImageIdentifier());
@@ -71,14 +79,15 @@ class ErrorTest extends TestCase {
     /**
      * @covers ::createFromException
      */
-    public function testCanCreateAnErrorBasedOnAnException() : void {
+    public function testCanCreateAnErrorBasedOnAnException(): void
+    {
         $request = $this->createMock(Request::class);
 
-        $exception = new RuntimeException('You wronged', 400);
+        $exception = new RuntimeException('You wronged', Response::HTTP_BAD_REQUEST);
 
         $model = Error::createFromException($exception, $request);
 
-        $this->assertSame(400, $model->getHttpCode());
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $model->getHttpCode());
         $this->assertSame('You wronged', $model->getErrorMessage());
         $this->assertNull($model->getImageIdentifier());
         $this->assertSame(Exception::ERR_UNSPECIFIED, $model->getImboErrorCode());
@@ -87,13 +96,14 @@ class ErrorTest extends TestCase {
     /**
      * @covers ::createFromException
      */
-    public function testWillUseCorrectImageIdentifierFromRequestWhenCreatingError() : void {
-        $exception = new RuntimeException('You wronged', 400);
+    public function testWillUseCorrectImageIdentifierFromRequestWhenCreatingError(): void
+    {
+        $exception = new RuntimeException('You wronged', Response::HTTP_BAD_REQUEST);
         $exception->setImboErrorCode(123);
 
         $request = $this->createConfiguredMock(Request::class, [
             'getImage' => null,
-            'getImageIdentifier' => 'imageIdentifier'
+            'getImageIdentifier' => 'imageIdentifier',
         ]);
 
         $model = Error::createFromException($exception, $request);
@@ -105,8 +115,9 @@ class ErrorTest extends TestCase {
     /**
      * @covers ::createFromException
      */
-    public function testWillUseImageIdentifierFromImageModelIfRequestHasAnImageWhenCreatingError() : void {
-        $exception = new RuntimeException('You wronged', 400);
+    public function testWillUseImageIdentifierFromImageModelIfRequestHasAnImageWhenCreatingError(): void
+    {
+        $exception = new RuntimeException('You wronged', Response::HTTP_BAD_REQUEST);
         $exception->setImboErrorCode(123);
 
         $image = $this->createConfiguredMock(Image::class, [
@@ -128,17 +139,18 @@ class ErrorTest extends TestCase {
     /**
      * @covers ::getData
      */
-    public function testGetData() : void {
+    public function testGetData(): void
+    {
         $date = new DateTime();
 
-        $this->model->setHttpCode(404);
+        $this->model->setHttpCode(Response::HTTP_NOT_FOUND);
         $this->model->setErrorMessage('message');
         $this->model->setDate($date);
         $this->model->setImboErrorCode(100);
         $this->model->setImageIdentifier('identifier');
 
         $this->assertSame([
-            'httpCode' => 404,
+            'httpCode' => Response::HTTP_NOT_FOUND,
             'errorMessage' => 'message',
             'date' => $date,
             'imboErrorCode' => 100,

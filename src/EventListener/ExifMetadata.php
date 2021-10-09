@@ -1,55 +1,39 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
+use Imagick;
 use Imbo\EventManager\EventInterface;
-use Imbo\EventListener\ListenerInterface;
-use Imbo\Exception\RuntimeException;
 use Imbo\Exception\DatabaseException;
+use Imbo\Exception\RuntimeException;
+use Imbo\Http\Response\Response;
 
 /**
  * Exif metadata event listener
  *
  * This listener will look for properties stored in the image, and store them as metadata in Imbo.
  */
-class ExifMetadata implements ListenerInterface {
-    /**
-     * An array of allowed tags
-     *
-     * @var array
-     */
-    protected $allowedTags = [
+class ExifMetadata implements ListenerInterface
+{
+    protected array $allowedTags = [
         'exif:*',
     ];
-
-    /**
-     * Exif properties
-     *
-     * @var array
-     */
-    protected $properties = [];
-
-    /**
-     * Imagick instance
-     *
-     * @var \Imagick
-     */
-    private $imagick;
+    protected array $properties = [];
+    private ?Imagick $imagick = null;
 
     /**
      * Class constructor
      *
      * @param array $params Parameters for the event listener
      */
-    public function __construct(array $params = null) {
+    public function __construct(array $params = null)
+    {
         if ($params && isset($params['allowedTags'])) {
             $this->allowedTags = $params['allowedTags'];
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents(): array
+    {
         return [
             // High priority to prevent other listeners from stripping EXIF-data
             'images.post' => ['populate' => 45],
@@ -59,38 +43,23 @@ class ExifMetadata implements ListenerInterface {
         ];
     }
 
-    /**
-     * Set an Imagick instance
-     *
-     * @param \Imagick $imagick An instance of Imagick
-     * @return self
-     */
-    public function setImagick(\Imagick $imagick) {
+    public function setImagick(Imagick $imagick): self
+    {
         $this->imagick = $imagick;
-
         return $this;
     }
 
-    /**
-     * Get an Imagick instance
-     *
-     * @return \Imagick
-     */
-    public function getImagick() {
-        if ($this->imagick === null) {
-            $this->imagick = new \Imagick();
+    public function getImagick(): Imagick
+    {
+        if (null === $this->imagick) {
+            $this->imagick = new Imagick();
         }
 
         return $this->imagick;
     }
 
-    /**
-     * Read exif data from incoming image
-     *
-     * @param EventInterface $event The triggered event
-     * @return array
-     */
-    public function populate(EventInterface $event) {
+    public function populate(EventInterface $event): array
+    {
         $image = $event->getRequest()->getImage();
 
         // Get EXIF-properties from image
@@ -115,12 +84,10 @@ class ExifMetadata implements ListenerInterface {
     }
 
     /**
-     * Save metadata to database
-     *
-     * @param  EventInterface $event The triggered event
      * @throws RuntimeException
      */
-    public function save(EventInterface $event) {
+    public function save(EventInterface $event): void
+    {
         $request = $event->getRequest();
         $database = $event->getDatabase();
 
@@ -131,22 +98,16 @@ class ExifMetadata implements ListenerInterface {
             $database->updateMetadata(
                 $user,
                 $imageIdentifier,
-                $this->properties
+                $this->properties,
             );
         } catch (DatabaseException $e) {
             $database->deleteImage($user, $imageIdentifier);
-
-            throw new RuntimeException('Could not store EXIF-metadata', 500);
+            throw new RuntimeException('Could not store EXIF-metadata', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    /**
-     * Filter out any unwanted properties
-     *
-     * @param array $properties An array of properties to filter
-     * @return array A filtered array of properties
-     */
-    protected function filterProperties(array $properties) {
+    protected function filterProperties(array $properties): array
+    {
         $tags = array_fill_keys($this->allowedTags, 1);
 
         if (empty($tags) || isset($tags['*'])) {
@@ -174,13 +135,8 @@ class ExifMetadata implements ListenerInterface {
         return $filtered;
     }
 
-    /**
-     * Parse an array of properties into a storable format
-     *
-     * @param array $rawProperties An array of properties to parse
-     * @return array Parsed array of properties
-     */
-    protected function parseProperties(array $rawProperties) {
+    protected function parseProperties(array $rawProperties): array
+    {
         if (isset($rawProperties['exif:GPSLatitude']) &&
             isset($rawProperties['exif:GPSLongitude'])) {
 
@@ -188,11 +144,11 @@ class ExifMetadata implements ListenerInterface {
             $rawProperties['gps:location'] = [
                 $this->parseGpsCoordinate(
                     $rawProperties['exif:GPSLongitude'],
-                    $rawProperties['exif:GPSLongitudeRef']
+                    $rawProperties['exif:GPSLongitudeRef'],
                 ),
                 $this->parseGpsCoordinate(
                     $rawProperties['exif:GPSLatitude'],
-                    $rawProperties['exif:GPSLatitudeRef']
+                    $rawProperties['exif:GPSLatitudeRef'],
                 ),
             ];
         }
@@ -203,6 +159,7 @@ class ExifMetadata implements ListenerInterface {
         }
 
         $properties = [];
+
         foreach ($rawProperties as $key => $val) {
             // Get rid of dots in property names
             $key = str_replace('.', ':', $key);
@@ -218,14 +175,8 @@ class ExifMetadata implements ListenerInterface {
         return $properties;
     }
 
-    /**
-     * Parse GPS coordinates in hours/minutes/seconds-format to decimal degrees
-     *
-     * @param string $coordinate Coordinate in hours/minutes/seconds format
-     * @param string $hemisphere Hemisphere identifier (N, E, S, W)
-     * @return float
-     */
-    protected function parseGpsCoordinate($coordinate, $hemisphere) {
+    protected function parseGpsCoordinate(string $coordinate, string $hemisphere): float
+    {
         $coordinates = explode(' ', $coordinate);
 
         for ($i = 0; $i < 3; $i++) {
@@ -234,7 +185,7 @@ class ExifMetadata implements ListenerInterface {
 
             if ($parts === 1) {
                 $coordinates[$i] = $part[0];
-            } else if ($parts === 2) {
+            } elseif ($parts === 2) {
                 $coordinates[$i] = floatval($part[0]) / floatval($part[1]);
             } else {
                 $coordinates[$i] = 0;

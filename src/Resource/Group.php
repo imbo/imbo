@@ -5,6 +5,7 @@ use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\ResourceException;
+use Imbo\Http\Response\Response;
 use Imbo\Model\Group as GroupModel;
 
 class Group implements ResourceInterface
@@ -35,7 +36,7 @@ class Group implements ResourceInterface
         $adapter = $event->getAccessControl();
 
         if (!$adapter->groupExists($groupName)) {
-            throw new ResourceException('Resource group not found', 404);
+            throw new ResourceException('Resource group not found', Response::HTTP_NOT_FOUND);
         }
 
         $resources = $adapter->getGroup($groupName);
@@ -55,7 +56,7 @@ class Group implements ResourceInterface
     {
         $accessControl = $event->getAccessControl();
         if (!($accessControl instanceof MutableAdapterInterface)) {
-            throw new ResourceException('Access control adapter is immutable', 405);
+            throw new ResourceException('Access control adapter is immutable', Response::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $request = $event->getRequest();
@@ -65,24 +66,24 @@ class Group implements ResourceInterface
         $group = $accessControl->getGroup($name);
 
         if (null === $group) {
-            throw new ResourceException('Group does not exist', 404);
+            throw new ResourceException('Group does not exist', Response::HTTP_NOT_FOUND);
         }
 
         $body = json_decode($request->getContent(), true);
 
         if ($body === null || json_last_error() !== JSON_ERROR_NONE) {
-            throw new InvalidArgumentException('Invalid JSON data', 400);
+            throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
         }
 
         if (!array_key_exists('resources', $body) || !is_array($body['resources'])) {
-            throw new InvalidArgumentException('Resource list missing', 400);
+            throw new InvalidArgumentException('Resource list missing', Response::HTTP_BAD_REQUEST);
         }
 
         $resources = $body['resources'];
 
         foreach ($resources as $resource) {
             if (!is_string($resource)) {
-                throw new ResourceException('Resources must be specified as strings', 400);
+                throw new ResourceException('Resources must be specified as strings', Response::HTTP_BAD_REQUEST);
             }
         }
 
@@ -102,7 +103,7 @@ class Group implements ResourceInterface
     {
         $accessControl = $event->getAccessControl();
         if (!($accessControl instanceof MutableAdapterInterface)) {
-            throw new ResourceException('Access control adapter is immutable', 405);
+            throw new ResourceException('Access control adapter is immutable', Response::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $route = $event->getRequest()->getRoute();
@@ -110,7 +111,7 @@ class Group implements ResourceInterface
         $resources = $accessControl->getGroup($groupName);
 
         if (!$resources) {
-            throw new ResourceException('Resource group not found', 404);
+            throw new ResourceException('Resource group not found', Response::HTTP_NOT_FOUND);
         }
 
         $accessControl->deleteResourceGroup($groupName);

@@ -3,7 +3,6 @@ namespace Imbo\EventListener;
 
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
 use Imbo\EventManager\Event;
-use Imbo\EventListener\Authenticate;
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
@@ -14,7 +13,8 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 /**
  * @coversDefaultClass Imbo\EventListener\Authenticate
  */
-class AuthenticateTest extends ListenerTests {
+class AuthenticateTest extends ListenerTests
+{
     private $listener;
     private $event;
     private $accessControl;
@@ -23,7 +23,8 @@ class AuthenticateTest extends ListenerTests {
     private $query;
     private $headers;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->query = $this->createMock(ParameterBag::class);
         $this->headers = $this->createMock(HeaderBag::class);
         $this->accessControl = $this->createMock(AdapterInterface::class);
@@ -40,27 +41,30 @@ class AuthenticateTest extends ListenerTests {
         $this->listener = new Authenticate();
     }
 
-    protected function getListener() : Authenticate {
+    protected function getListener(): Authenticate
+    {
         return $this->listener;
     }
 
-    protected function getEventMock($config = null) : Event {
+    protected function getEventMock($config = null): Event
+    {
         return $this->createConfiguredMock(Event::class, [
             'getResponse' => $this->response,
             'getRequest' => $this->request,
             'getAccessControl' => $this->accessControl,
             'getConfig' => $config ?: [
                 'authentication' => [
-                    'protocol' => 'incoming'
-                ]
-            ]
+                    'protocol' => 'incoming',
+                ],
+            ],
         ]);
     }
 
     /**
      * @covers ::authenticate
      */
-    public function testThrowsExceptionWhenAuthInfoIsMissing() : void {
+    public function testThrowsExceptionWhenAuthInfoIsMissing(): void
+    {
         $this->headers
             ->expects($this->once())
             ->method('has')
@@ -73,14 +77,15 @@ class AuthenticateTest extends ListenerTests {
             ->with('x-imbo-authenticate-timestamp')
             ->willReturn(null);
 
-        $this->expectExceptionObject(new RuntimeException('Missing authentication timestamp', 400));
+        $this->expectExceptionObject(new RuntimeException('Missing authentication timestamp', Response::HTTP_BAD_REQUEST));
         $this->listener->authenticate($this->event);
     }
 
     /**
      * @covers ::authenticate
      */
-    public function testThrowsExceptionWhenSignatureIsMissing() : void {
+    public function testThrowsExceptionWhenSignatureIsMissing(): void
+    {
         $this->headers
             ->method('has')
             ->withConsecutive(
@@ -100,7 +105,7 @@ class AuthenticateTest extends ListenerTests {
                 null,
             );
 
-        $this->expectExceptionObject(new RuntimeException('Missing authentication signature', 400));
+        $this->expectExceptionObject(new RuntimeException('Missing authentication signature', Response::HTTP_BAD_REQUEST));
         $this->listener->authenticate($this->event);
     }
 
@@ -108,7 +113,8 @@ class AuthenticateTest extends ListenerTests {
      * @covers ::authenticate
      * @covers ::timestampIsValid
      */
-    public function testThrowsExceptionWhenTimestampIsInvalid() : void {
+    public function testThrowsExceptionWhenTimestampIsInvalid(): void
+    {
         $this->headers
             ->method('has')
             ->withConsecutive(
@@ -122,7 +128,7 @@ class AuthenticateTest extends ListenerTests {
             ->with('x-imbo-authenticate-timestamp')
             ->willReturn('some string');
 
-        $this->expectExceptionObject(new RuntimeException('Invalid timestamp: some string', 400));
+        $this->expectExceptionObject(new RuntimeException('Invalid timestamp: some string', Response::HTTP_BAD_REQUEST));
         $this->listener->authenticate($this->event);
     }
 
@@ -130,7 +136,8 @@ class AuthenticateTest extends ListenerTests {
      * @covers ::authenticate
      * @covers ::timestampHasExpired
      */
-    public function testThrowsExceptionWhenTimestampHasExpired() : void {
+    public function testThrowsExceptionWhenTimestampHasExpired(): void
+    {
         $this->headers
             ->method('has')
             ->withConsecutive(
@@ -144,14 +151,15 @@ class AuthenticateTest extends ListenerTests {
             ->with('x-imbo-authenticate-timestamp')
             ->willReturn('2010-07-10T20:02:10Z');
 
-        $this->expectExceptionObject(new RuntimeException('Timestamp has expired: 2010-07-10T20:02:10Z', 400));
+        $this->expectExceptionObject(new RuntimeException('Timestamp has expired: 2010-07-10T20:02:10Z', Response::HTTP_BAD_REQUEST));
         $this->listener->authenticate($this->event);
     }
 
     /**
      * @covers ::authenticate
      */
-    public function testThrowsExceptionWhenSignatureDoesNotMatch() : void {
+    public function testThrowsExceptionWhenSignatureDoesNotMatch(): void
+    {
         $this->headers
             ->method('has')
             ->withConsecutive(
@@ -182,7 +190,7 @@ class AuthenticateTest extends ListenerTests {
             ->with('publickey')
             ->willReturn('privateKey');
 
-        $this->expectExceptionObject(new RuntimeException('Signature mismatch', 400));
+        $this->expectExceptionObject(new RuntimeException('Signature mismatch', Response::HTTP_BAD_REQUEST));
         $this->listener->authenticate($this->event);
     }
 
@@ -192,7 +200,8 @@ class AuthenticateTest extends ListenerTests {
      * @covers ::timestampIsValid
      * @covers ::timestampHasExpired
      */
-    public function testApprovesValidSignature() : void {
+    public function testApprovesValidSignature(): void
+    {
         $httpMethod = 'GET';
         $url = 'http://imbo/users/christer/images/image';
         $publicKey = 'christer';
@@ -257,7 +266,8 @@ class AuthenticateTest extends ListenerTests {
      * @covers ::timestampIsValid
      * @covers ::timestampHasExpired
      */
-    public function testApprovesValidSignatureWithAuthInfoFromQueryParameters() : void {
+    public function testApprovesValidSignatureWithAuthInfoFromQueryParameters(): void
+    {
         $httpMethod = 'GET';
         $url = 'http://imbo/users/christer/images/image';
         $publicKey = 'christer';
@@ -325,8 +335,9 @@ class AuthenticateTest extends ListenerTests {
         $this->listener->authenticate($this->event);
     }
 
-    public function getRewrittenSignatureData() : array {
-        return array_map(function($dataSet) {
+    public function getRewrittenSignatureData(): array
+    {
+        return array_map(function ($dataSet) {
             $httpMethod = 'PUT';
             $publicKey = 'christer';
             $privateKey = 'key';
@@ -358,21 +369,21 @@ class AuthenticateTest extends ListenerTests {
                 // Expected auth URL header (all attempted variants)
                 'http://imbo/users/christer/images/image',
                 // Should it match?
-                true
+                true,
             ],
             [
                 'http://imbo/users/christer/images/image',
                 'https://imbo/users/christer/images/image',
                 'http',
                 'http://imbo/users/christer/images/image',
-                true
+                true,
             ],
             [
                 'https://imbo/users/christer/images/image',
                 'http://imbo/users/christer/images/image',
                 'https',
                 'https://imbo/users/christer/images/image',
-                true
+                true,
             ],
             // URL gets rewritten to HTTPS, which doesn't match what was used for signing
             [
@@ -380,7 +391,7 @@ class AuthenticateTest extends ListenerTests {
                 'http://imbo/users/christer/images/image',
                 'https',
                 'https://imbo/users/christer/images/image',
-                false
+                false,
             ],
             // If we allow both protocols, it shouldn't matter if its signed with HTTP or HTTPS
             [
@@ -388,14 +399,14 @@ class AuthenticateTest extends ListenerTests {
                 'https://imbo/users/christer/images/image',
                 'both',
                 'http://imbo/users/christer/images/image, https://imbo/users/christer/images/image',
-                true
+                true,
             ],
             [
                 'https://imbo/users/christer/images/image',
                 'http://imbo/users/christer/images/image',
                 'both',
                 'http://imbo/users/christer/images/image, https://imbo/users/christer/images/image',
-                true
+                true,
             ],
             // Different URLs should always fail, obviously
             [
@@ -403,7 +414,7 @@ class AuthenticateTest extends ListenerTests {
                 'http://imbo/users/christer/images/image',
                 'both',
                 'http://imbo/users/christer/images/image, https://imbo/users/christer/images/image',
-                false
+                false,
             ],
             // Different URLs should always fail, even when forced to http/https
             [
@@ -411,14 +422,14 @@ class AuthenticateTest extends ListenerTests {
                 'http://imbo/users/christer/images/image',
                 'http',
                 'http://imbo/users/christer/images/image',
-                false
+                false,
             ],
             [
                 'http://imbo/users/christer/images/someotherimage',
                 'http://imbo/users/christer/images/image',
                 'https',
                 'https://imbo/users/christer/images/image',
-                false
+                false,
             ],
         ]);
     }
@@ -430,9 +441,10 @@ class AuthenticateTest extends ListenerTests {
      * @covers ::timestampIsValid
      * @covers ::timestampHasExpired
      */
-    public function testApprovesSignaturesWhenConfigurationForcesProtocol(string $serverUrl, string $protocol, string $authHeader, bool $shouldMatch, string $signature, string $timestamp) : void {
+    public function testApprovesSignaturesWhenConfigurationForcesProtocol(string $serverUrl, string $protocol, string $authHeader, bool $shouldMatch, string $signature, string $timestamp): void
+    {
         if (!$shouldMatch) {
-            $this->expectExceptionObject(new RuntimeException('Signature mismatch', 400));
+            $this->expectExceptionObject(new RuntimeException('Signature mismatch', Response::HTTP_BAD_REQUEST));
         }
 
         $this->accessControl
@@ -493,7 +505,7 @@ class AuthenticateTest extends ListenerTests {
         $this->listener->authenticate($this->getEventMock([
             'authentication' => [
                 'protocol' => $protocol,
-            ]
+            ],
         ]));
     }
 }

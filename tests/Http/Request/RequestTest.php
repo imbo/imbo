@@ -2,6 +2,7 @@
 namespace Imbo\Http\Request;
 
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use Imbo\Router\Route;
 use PHPUnit\Framework\TestCase;
@@ -9,24 +10,28 @@ use PHPUnit\Framework\TestCase;
 /**
  * @coversDefaultClass Imbo\Http\Request\Request
  */
-class RequestTest extends TestCase {
+class RequestTest extends TestCase
+{
     private $request;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->request = new Request();
     }
 
     /**
      * @covers ::getTransformations
      */
-    public function testGetTransformationsWithNoTransformationsPresent() : void {
+    public function testGetTransformationsWithNoTransformationsPresent(): void
+    {
         $this->assertEquals([], $this->request->getTransformations());
     }
 
     /**
      * @covers ::getTransformations
      */
-    public function testGetTransformationsWithCorrectOrder() : void {
+    public function testGetTransformationsWithCorrectOrder(): void
+    {
         $query = [
             't' => [
                 'flipHorizontally',
@@ -43,7 +48,8 @@ class RequestTest extends TestCase {
     /**
      * @covers ::getTransformations
      */
-    public function testGetTransformations() : void {
+    public function testGetTransformations(): void
+    {
         $query = [
             't' => [
                 // Valid transformations with all options
@@ -61,7 +67,7 @@ class RequestTest extends TestCase {
 
                 // We handle zero-values appropriately
                 'border:color=bf1942,height=100,mode=outbound,width=0',
-                'border:color=000,height=5,width=0,mode=outbound'
+                'border:color=000,height=5,width=0,mode=outbound',
             ],
         ];
 
@@ -96,7 +102,8 @@ class RequestTest extends TestCase {
     /**
      * @covers ::getImageIdentifier
      */
-    public function testSetGetImageIdentifier() : void {
+    public function testSetGetImageIdentifier(): void
+    {
         $identifier = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
         $this->assertNull($this->request->getImageIdentifier());
 
@@ -111,7 +118,8 @@ class RequestTest extends TestCase {
     /**
      * @covers ::getExtension
      */
-    public function testSetGetExtension() : void {
+    public function testSetGetExtension(): void
+    {
         $extension = 'jpg';
         $this->assertNull($this->request->getExtension());
 
@@ -126,7 +134,8 @@ class RequestTest extends TestCase {
     /**
      * @covers ::getUser
      */
-    public function testSetGetUser() : void {
+    public function testSetGetUser(): void
+    {
         $user = 'christer';
         $this->assertNull($this->request->getUser());
 
@@ -141,7 +150,8 @@ class RequestTest extends TestCase {
     /**
      * @covers ::getPublicKey
      */
-    public function testSetGetPublicKeyThroughRoute() : void {
+    public function testSetGetPublicKeyThroughRoute(): void
+    {
         $pubkey = 'pubkey';
         $this->assertNull($this->request->getPublicKey());
 
@@ -156,7 +166,8 @@ class RequestTest extends TestCase {
     /**
      * @covers ::getPublicKey
      */
-    public function testSetGetPublicKeyThroughQuery() : void {
+    public function testSetGetPublicKeyThroughQuery(): void
+    {
         $pubkey = 'pubkey';
         $this->assertNull($this->request->getPublicKey());
 
@@ -167,7 +178,8 @@ class RequestTest extends TestCase {
     /**
      * @covers ::getPublicKey
      */
-    public function testSetGetPublicKeyThroughHeader() : void {
+    public function testSetGetPublicKeyThroughHeader(): void
+    {
         $pubkey = 'pubkey';
         $this->assertNull($this->request->getPublicKey());
 
@@ -179,7 +191,8 @@ class RequestTest extends TestCase {
      * @covers ::getImage
      * @covers ::setImage
      */
-    public function testCanSetAndGetAnImage() : void {
+    public function testCanSetAndGetAnImage(): void
+    {
         $image = $this->createMock(Image::class);
         $this->assertSame($this->request, $this->request->setImage($image));
         $this->assertSame($image, $this->request->getImage());
@@ -189,7 +202,8 @@ class RequestTest extends TestCase {
      * @covers ::getRoute
      * @covers ::setRoute
      */
-    public function testCanSetAndGetARoute() : void {
+    public function testCanSetAndGetARoute(): void
+    {
         $this->assertNull($this->request->getRoute());
         $route = $this->createMock(Route::class);
         $this->assertSame($this->request, $this->request->setRoute($route));
@@ -199,13 +213,14 @@ class RequestTest extends TestCase {
     /**
      * @covers ::getTransformations
      */
-    public function testRequiresTransformationsToBeSpecifiedAsAnArray() : void {
+    public function testRequiresTransformationsToBeSpecifiedAsAnArray(): void
+    {
         $request = new Request([
             't' => 'desaturate',
         ]);
         $this->expectExceptionObject(new InvalidArgumentException(
             'Transformations must be specifed as an array',
-            400
+            Response::HTTP_BAD_REQUEST,
         ));
         $request->getTransformations();
     }
@@ -213,7 +228,8 @@ class RequestTest extends TestCase {
     /**
      * @covers ::getTransformations
      */
-    public function testDoesNotGenerateWarningWhenTransformationIsNotAString() : void {
+    public function testDoesNotGenerateWarningWhenTransformationIsNotAString(): void
+    {
         $query = [
             't' => [
                 [
@@ -226,12 +242,13 @@ class RequestTest extends TestCase {
         $request = new Request($query);
         $this->expectExceptionObject(new InvalidArgumentException(
             'Invalid transformation',
-            400
+            Response::HTTP_BAD_REQUEST,
         ));
         $request->getTransformations();
     }
 
-    public function getQueryStrings() : array {
+    public function getQueryStrings(): array
+    {
         return [
             'transformation with params' => [
                 't[]=thumbnail:width=100',
@@ -248,7 +265,8 @@ class RequestTest extends TestCase {
      * @dataProvider getQueryStrings
      * @covers ::getRawUri
      */
-    public function testGetRawUriDecodesUri($queryString, $expectedQueryString) : void {
+    public function testGetRawUriDecodesUri($queryString, $expectedQueryString): void
+    {
         $request = new Request([], [], [], [], [], [
             'SERVER_NAME' => 'imbo',
             'SERVER_PORT' => 80,

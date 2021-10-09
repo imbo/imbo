@@ -1,19 +1,21 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\Transformation\Border;
 use Imagick;
 use Imbo\Model\Image;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Border
  */
-class BorderTest extends TransformationTests {
-    protected function getTransformation() : Border {
+class BorderTest extends TransformationTests
+{
+    protected function getTransformation(): Border
+    {
         return new Border();
     }
 
-    public function getBorderParams() : array {
+    public function getBorderParams(): array
+    {
         return [
             'inline border' => [665, 463, 3, 4, 'inset'],
             'outbound border' => [671, 471, 3, 4, 'outbound'],
@@ -24,8 +26,12 @@ class BorderTest extends TransformationTests {
      * @dataProvider getBorderParams
      * @covers ::transform
      */
-    public function testTransformationSupportsDifferentModes(int $expectedWidth, int $expectedHeight, int $borderWidth, int $borderHeight, string $borderMode) : void {
-        $image = $this->createMock(Image::class);
+    public function testTransformationSupportsDifferentModes(int $expectedWidth, int $expectedHeight, int $borderWidth, int $borderHeight, string $borderMode): void
+    {
+        $image = $this->createConfiguredMock(Image::class, [
+            'getWidth' => $expectedWidth,
+            'getHeight' => $expectedHeight,
+        ]);
         $image
             ->expects($this->once())
             ->method('setWidth')

@@ -1,26 +1,30 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
-use Imbo\Exception\DatabaseException;
-use Imbo\Exception\RuntimeException;
+use Imagick;
 use Imbo\Database\DatabaseInterface;
 use Imbo\EventManager\EventInterface;
+use Imbo\Exception\DatabaseException;
+use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
-use Imagick;
 
 /**
  * @coversDefaultClass Imbo\EventListener\EightbimMetadata
  */
-class EightbimMetadataTest extends ListenerTests {
+class EightbimMetadataTest extends ListenerTests
+{
     protected $listener;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->listener = new EightbimMetadata();
         $this->listener->setImagick(new Imagick());
     }
 
-    protected function getListener() : EightbimMetadata {
+    protected function getListener(): EightbimMetadata
+    {
         return $this->listener;
     }
 
@@ -29,7 +33,8 @@ class EightbimMetadataTest extends ListenerTests {
      * @covers ::populate
      * @covers ::save
      */
-    public function testCanExtractMetadata() : void {
+    public function testCanExtractMetadata(): void
+    {
         $user = 'user';
         $imageIdentifier = 'imageIdentifier';
         $blob = file_get_contents(FIXTURES_DIR . '/jpeg-with-multiple-paths.jpg');
@@ -69,7 +74,8 @@ class EightbimMetadataTest extends ListenerTests {
     /**
      * @covers ::save
      */
-    public function testReturnsEarlyOnMissingProperties() : void {
+    public function testReturnsEarlyOnMissingProperties(): void
+    {
         $event = $this->createMock(EventInterface::class);
         $event
             ->expects($this->never())
@@ -77,14 +83,15 @@ class EightbimMetadataTest extends ListenerTests {
 
         $this->assertNull(
             $this->listener->save($event),
-            'Did not expect method to return anything'
+            'Did not expect method to return anything',
         );
     }
 
     /**
      * @covers ::save
      */
-    public function testDeletesImageWhenStoringMetadataFails() : void {
+    public function testDeletesImageWhenStoringMetadataFails(): void
+    {
         $user = 'user';
         $imageIdentifier = 'imageIdentifier';
         $blob = file_get_contents(FIXTURES_DIR . '/jpeg-with-multiple-paths.jpg');
@@ -118,7 +125,7 @@ class EightbimMetadataTest extends ListenerTests {
         ]);
 
         $this->listener->populate($event);
-        $this->expectExceptionObject(new RuntimeException('Could not store 8BIM-metadata', 500));
+        $this->expectExceptionObject(new RuntimeException('Could not store 8BIM-metadata', Response::HTTP_INTERNAL_SERVER_ERROR));
         $this->listener->save($event);
     }
 }

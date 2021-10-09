@@ -1,51 +1,41 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException;
-use Imbo\Image\InputSizeConstraint;
-use Imbo\Model\Image;
 use Imagick;
-use ImagickPixel;
+use ImagickDraw;
 use ImagickException;
 use ImagickPixelException;
-use ImagickDraw;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
+use Imbo\Image\InputSizeConstraint;
 
 /**
  * Border transformation
  */
-class Border extends Transformation implements InputSizeConstraint {
+class Border extends Transformation implements InputSizeConstraint
+{
     /**
      * Color of the border
-     *
-     * @var string
      */
-    private $color = '#000';
+    private string $color = '#000';
 
     /**
      * Width of the border
-     *
-     * @var int
      */
-    private $width = 1;
+    private int $width = 1;
 
     /**
      * Height of the border
-     *
-     * @var int
      */
-    private $height = 1;
+    private int $height = 1;
 
     /**
      * Border mode, "inline" or "outbound"
-     *
-     * @var string
      */
-    private $mode = 'outbound';
+    private string $mode = 'outbound';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function transform(array $params) {
+    public function transform(array $params): void
+    {
         $color = !empty($params['color']) ? $this->formatColor($params['color']) : $this->color;
         $width = isset($params['width']) ? (int) $params['width'] : $this->width;
         $height = isset($params['height']) ? (int) $params['height'] : $this->height;
@@ -67,9 +57,9 @@ class Border extends Transformation implements InputSizeConstraint {
                 $this->drawBorderInside($color, $width, $height);
             }
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         } catch (ImagickPixelException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         $size = $this->imagick->getImageGeometry();
@@ -87,7 +77,8 @@ class Border extends Transformation implements InputSizeConstraint {
      * @param integer $borderWidth
      * @param integer $borderHeight
      */
-    private function expandImage($color, $borderWidth, $borderHeight) {
+    private function expandImage($color, $borderWidth, $borderHeight)
+    {
         $this->imageWidth = $this->image->getWidth();
         $this->imageHeight = $this->image->getHeight();
 
@@ -99,7 +90,7 @@ class Border extends Transformation implements InputSizeConstraint {
         $this->imagick->newImage(
             $this->imageWidth  + ($borderWidth  * 2),
             $this->imageHeight + ($borderHeight * 2),
-            $color
+            $color,
         );
         $this->imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_OPAQUE);
         $this->imagick->setImageFormat($this->image->getExtension());
@@ -108,7 +99,7 @@ class Border extends Transformation implements InputSizeConstraint {
             $original,
             Imagick::COMPOSITE_COPY,
             $borderWidth,
-            $borderHeight
+            $borderHeight,
         );
     }
 
@@ -119,7 +110,8 @@ class Border extends Transformation implements InputSizeConstraint {
      * @param integer $borderWidth
      * @param integer $borderHeight
      */
-    private function drawBorderInside($color, $borderWidth, $borderHeight) {
+    private function drawBorderInside($color, $borderWidth, $borderHeight)
+    {
         $this->imageWidth = $this->image->getWidth();
         $this->imageHeight = $this->image->getHeight();
 
@@ -144,17 +136,13 @@ class Border extends Transformation implements InputSizeConstraint {
         $this->imagick->drawImage($rect);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getMinimumInputSize(array $params, array $imageSize) {
+    public function getMinimumInputSize(array $params, array $imageSize): int
+    {
         return InputSizeConstraint::NO_TRANSFORMATION;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function adjustParameters($ratio, array $parameters) {
+    public function adjustParameters(float $ratio, array $parameters): array
+    {
         foreach (['width', 'height'] as $param) {
             if (isset($parameters[$param])) {
                 $parameters[$param] = round($parameters[$param] / $ratio);

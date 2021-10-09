@@ -1,56 +1,30 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
 use Imagick;
-use Imbo\Model\Image;
+use Imbo\EventListener\ImagickAware;
 use Imbo\EventListener\ListenerInterface;
 use Imbo\EventManager\EventInterface;
-use Imbo\EventListener\ImagickAware;
+use Imbo\Model\Image;
 
 /**
  * Abstract transformation
  */
-abstract class Transformation implements ListenerInterface, ImagickAware {
-    /**
-     * Imagick instance
-     *
-     * @var Imagick
-     */
-    protected $imagick;
+abstract class Transformation implements ListenerInterface, ImagickAware
+{
+    protected Imagick $imagick;
+    protected EventInterface $event;
+    protected Image $image;
 
-    /**
-     * Event that triggered this transformation
-     *
-     * @var EventInterface
-     */
-    protected $event;
-
-    /**
-     * Image instance
-     *
-     * @var Image
-     */
-    protected $image;
-
-    /**
-     * Set the Imagick instance
-     *
-     * @param Imagick $imagick An Imagick instance
-     * @return self
-     */
-    public function setImagick(Imagick $imagick) {
+    public function setImagick(Imagick $imagick): self
+    {
         $this->imagick = $imagick;
 
         return $this;
     }
 
-    /**
-     * Set the Image model instance
-     *
-     * @param Image $image An Image instance
-     * @return self
-     */
-    public function setImage(Image $image) {
+    public function setImage(Image $image): self
+    {
         $this->image = $image;
 
         return $this;
@@ -62,19 +36,15 @@ abstract class Transformation implements ListenerInterface, ImagickAware {
      * @param EventInterface $event An Event instance
      * @return self
      */
-    public function setEvent(EventInterface $event) {
+    public function setEvent(EventInterface $event)
+    {
         $this->event = $event;
 
         return $this;
     }
 
-    /**
-     * Attempt to format a color-string into a string Imagick can understand
-     *
-     * @param string $color
-     * @return string
-     */
-    protected function formatColor($color) {
+    protected function formatColor(string $color): string
+    {
         if (preg_match('/^[A-F0-9]{3,6}$/i', $color)) {
             return '#' . $color;
         }
@@ -82,12 +52,8 @@ abstract class Transformation implements ListenerInterface, ImagickAware {
         return $color;
     }
 
-    /**
-     * Get the quantum range of an image
-     *
-     * @return int
-     */
-    protected function getQuantumRange() {
+    protected function getQuantumRange(): int
+    {
         // Newer versions of Imagick expose getQuantumRange as a static method,
         // and won't allow phpunit to mock it even when called on an instance
         if (is_callable([$this->imagick, 'getQuantumRange'])) {
@@ -99,12 +65,8 @@ abstract class Transformation implements ListenerInterface, ImagickAware {
         return $quantumRange['quantumRangeLong'];
     }
 
-    /**
-     * Get the imagick version
-     *
-     * @return string
-     */
-    protected function getImagickVersion() {
+    protected function getImagickVersion(): string
+    {
         // Newer versions of Imagick expose getVersion as a static method,
         // and won't allow phpunit to mock it even when called on an instance
         if (method_exists('Imagick', 'getVersion')) {
@@ -122,7 +84,8 @@ abstract class Transformation implements ListenerInterface, ImagickAware {
      * @param array $parameters Transformation parameters
      * @return array Adjusted parameters
      */
-    public function adjustParameters($ratio, array $parameters) {
+    public function adjustParameters(float $ratio, array $parameters): array
+    {
         return $parameters;
     }
 
@@ -134,10 +97,8 @@ abstract class Transformation implements ListenerInterface, ImagickAware {
      */
     abstract public function transform(array $params);
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents(): array
+    {
         return [];
     }
 }

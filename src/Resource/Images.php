@@ -1,9 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception\DuplicateImageIdentifierException;
 use Imbo\Exception\ImageException;
+use Imbo\Http\Response\Response;
+use Imbo\Image\Identifier\Generator\GeneratorInterface;
 use Imbo\Model;
 
 /**
@@ -19,18 +21,21 @@ use Imbo\Model;
  * from     => Unix timestamp to fetch from
  * to       => Unit timestamp to fetch to
  */
-class Images implements ResourceInterface {
+class Images implements ResourceInterface
+{
     /**
      * {@inheritdoc}
      */
-    public function getAllowedMethods() {
+    public function getAllowedMethods()
+    {
         return ['GET', 'HEAD', 'POST'];
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             'images.get' => 'getImages',
             'images.head' => 'getImages',
@@ -43,7 +48,8 @@ class Images implements ResourceInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function getImages(EventInterface $event) {
+    public function getImages(EventInterface $event)
+    {
         $event->getManager()->trigger('db.images.load');
     }
 
@@ -52,7 +58,8 @@ class Images implements ResourceInterface {
      *
      * @param EventInterface $event
      */
-    public function addImage(EventInterface $event) {
+    public function addImage(EventInterface $event)
+    {
         $request = $event->getRequest();
         $response = $event->getResponse();
         $image = $request->getImage();
@@ -87,7 +94,7 @@ class Images implements ResourceInterface {
 
         // Image Identifier generation failed - throw exception to get us out of this state
         if ($attempt === $maxAttempts) {
-            $e = new ImageException('Failed to generate unique image identifier', 503);
+            $e = new ImageException('Failed to generate unique image identifier', Response::HTTP_SERVICE_UNAVAILABLE);
             $e->setImboErrorCode(ImageException::IMAGE_IDENTIFIER_GENERATION_FAILED);
 
             // Tell the client it's OK to retry later

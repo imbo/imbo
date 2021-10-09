@@ -1,10 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
+use Imagick;
 use Imbo\EventManager\EventInterface;
-use Imbo\EventListener\ListenerInterface;
-use Imbo\Exception\RuntimeException;
 use Imbo\Exception\DatabaseException;
+use Imbo\Exception\RuntimeException;
+use Imbo\Http\Response\Response;
 
 /**
  * 8BIM metadata event listener
@@ -12,34 +13,18 @@ use Imbo\Exception\DatabaseException;
  * This listener will look for properties stored in the image, and store certain metadata (at the
  * moment, the available clipping paths) in Imbo.
  */
-class EightbimMetadata implements ListenerInterface, ImagickAware {
-    /**
-     * @var \Imagick
-     */
-    protected $imagick;
+class EightbimMetadata implements ListenerInterface, ImagickAware
+{
+    protected Imagick $imagick;
+    protected array $properties = [];
 
-    /**
-     * Metadata extracted from 8BIM profile
-     *
-     * @var array
-     */
-    protected $properties = [];
-
-    /**
-     * Set the Imagick instance to be used - the instance will be cloned to avoid polluting the
-     * existing imagick object.
-     *
-     * @param \Imagick $imagick
-     * @return null
-     */
-    public function setImagick(\Imagick $imagick) {
+    public function setImagick(Imagick $imagick): void
+    {
         $this->imagick = clone $imagick;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents(): array
+    {
         return [
             // High priority to prevent other listeners from stripping metadata
             'images.post' => ['populate' => 45],
@@ -51,11 +36,9 @@ class EightbimMetadata implements ListenerInterface, ImagickAware {
 
     /**
      * Read 8BIM data from incoming image
-     *
-     * @param EventInterface $event The triggered event
-     * @return array
      */
-    public function populate(EventInterface $event) {
+    public function populate(EventInterface $event): array
+    {
         // Read the image
         $image = $event->getRequest()->getImage();
         $this->imagick->readImageBlob($image->getBlob());
@@ -87,10 +70,10 @@ class EightbimMetadata implements ListenerInterface, ImagickAware {
     /**
      * Save metadata to database
      *
-     * @param  EventInterface $event The triggered event
      * @throws RuntimeException
      */
-    public function save(EventInterface $event) {
+    public function save(EventInterface $event): void
+    {
         if (!$this->properties) {
             return;
         }
@@ -106,7 +89,7 @@ class EightbimMetadata implements ListenerInterface, ImagickAware {
         } catch (DatabaseException $e) {
             $database->deleteImage($user, $imageIdentifier);
 
-            throw new RuntimeException('Could not store 8BIM-metadata', 500);
+            throw new RuntimeException('Could not store 8BIM-metadata', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

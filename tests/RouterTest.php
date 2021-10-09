@@ -3,6 +3,7 @@ namespace Imbo;
 
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -18,7 +19,7 @@ class RouterTest extends TestCase
         $request = $this->createConfiguredMock(Request::class, [
             'getMethod' => 'BREW',
         ]);
-        $this->expectExceptionObject(new RuntimeException('I\'m a teapot', 418));
+        $this->expectExceptionObject(new RuntimeException('I\'m a teapot', Response::HTTP_I_AM_A_TEAPOT));
 
         (new Router())->route($request);
     }
@@ -31,7 +32,7 @@ class RouterTest extends TestCase
         $request = $this->createConfiguredMock(Request::class, [
             'getMethod' => 'TRACE',
         ]);
-        $this->expectExceptionObject(new RuntimeException('Unsupported HTTP method', 501));
+        $this->expectExceptionObject(new RuntimeException('Unsupported HTTP method', Response::HTTP_NOT_IMPLEMENTED));
 
         (new Router())->route($request);
     }
@@ -63,7 +64,7 @@ class RouterTest extends TestCase
             'getMethod'   => 'GET',
             'getPathInfo' => $route,
         ]);
-        $this->expectExceptionObject(new RuntimeException('Not Found', 404));
+        $this->expectExceptionObject(new RuntimeException('Not Found', Response::HTTP_NOT_FOUND));
 
         (new Router())->route($request);
     }

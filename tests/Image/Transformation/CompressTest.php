@@ -1,25 +1,29 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException;
-use Imbo\Model\Image;
 use Imagick;
 use Imbo\EventManager\EventInterface;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
+use Imbo\Model\Image;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Compress
  */
-class CompressTest extends TransformationTests {
+class CompressTest extends TransformationTests
+{
     private $transformation;
 
-    protected function getTransformation() : Compress {
+    protected function getTransformation(): Compress
+    {
         return new Compress();
     }
 
     /**
      * @covers ::transform
      */
-    public function testCanTransformTheImage() : void {
+    public function testCanTransformTheImage(): void
+    {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -39,17 +43,19 @@ class CompressTest extends TransformationTests {
             ->transform(['level' => 50]);
     }
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->transformation = new Compress();
     }
 
     /**
      * @covers ::transform
      */
-    public function testThrowsExceptionOnMissingLevelParameter() : void {
+    public function testThrowsExceptionOnMissingLevelParameter(): void
+    {
         $this->expectExceptionObject(new TransformationException(
             'Missing required parameter: level',
-            400
+            Response::HTTP_BAD_REQUEST,
         ));
         $this->transformation->transform([]);
     }
@@ -57,10 +63,11 @@ class CompressTest extends TransformationTests {
     /**
      * @covers ::transform
      */
-    public function testThrowsExceptionOnInvalidLevel() : void {
+    public function testThrowsExceptionOnInvalidLevel(): void
+    {
         $this->expectExceptionObject(new TransformationException(
             'level must be between 0 and 100',
-            400
+            Response::HTTP_BAD_REQUEST,
         ));
         $this->transformation->transform(['level' => 200]);
     }
@@ -68,7 +75,8 @@ class CompressTest extends TransformationTests {
     /**
      * @covers ::transform
      */
-    public function testSetsOutputQualityCompression() : void {
+    public function testSetsOutputQualityCompression(): void
+    {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())

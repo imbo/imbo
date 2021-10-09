@@ -5,6 +5,7 @@ use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\ResourceException;
+use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
 
 class Keys implements ResourceInterface
@@ -26,19 +27,19 @@ class Keys implements ResourceInterface
         $acl = $event->getAccessControl();
 
         if (!($acl instanceof MutableAdapterInterface)) {
-            throw new ResourceException('Access control adapter is immutable', 405);
+            throw new ResourceException('Access control adapter is immutable', Response::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $request = $event->getRequest();
         $body    = $request->getContent();
 
         if (empty($body)) {
-            throw new InvalidArgumentException('Missing JSON data', 400);
+            throw new InvalidArgumentException('Missing JSON data', Response::HTTP_BAD_REQUEST);
         } else {
             $body = json_decode($body, true);
 
             if ($body === null || json_last_error() !== JSON_ERROR_NONE) {
-                throw new InvalidArgumentException('Invalid JSON data', 400);
+                throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
             }
         }
 
@@ -46,21 +47,21 @@ class Keys implements ResourceInterface
         $privateKey = $body['privateKey'] ?? null;
 
         if (null === $publicKey) {
-            throw new InvalidArgumentException('Missing public key', 400);
+            throw new InvalidArgumentException('Missing public key', Response::HTTP_BAD_REQUEST);
         } elseif (null === $privateKey) {
-            throw new InvalidArgumentException('Missing private key', 400);
+            throw new InvalidArgumentException('Missing private key', Response::HTTP_BAD_REQUEST);
         } elseif (!preg_match('/^[a-z0-9_-]{1,}$/', $publicKey)) {
-            throw new InvalidArgumentException('Invalid public key', 400);
+            throw new InvalidArgumentException('Invalid public key', Response::HTTP_BAD_REQUEST);
         }
 
         if ($acl->publicKeyExists($publicKey)) {
-            throw new InvalidArgumentException('Public key already exists', 400);
+            throw new InvalidArgumentException('Public key already exists', Response::HTTP_BAD_REQUEST);
         }
 
         $acl->addKeyPair($publicKey, $privateKey);
 
         $event->getResponse()
-            ->setStatusCode(201)
+            ->setStatusCode(Response::HTTP_CREATED)
             ->setModel((new ArrayModel())->setData(['publicKey' => $publicKey]));
     }
 }

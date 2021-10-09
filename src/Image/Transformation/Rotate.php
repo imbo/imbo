@@ -1,15 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException;
-use Imbo\Image\InputSizeConstraint;
 use ImagickException;
 use ImagickPixelException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
+use Imbo\Image\InputSizeConstraint;
 
 /**
  * Rotate transformation
  */
-class Rotate extends Transformation implements InputSizeConstraint {
+class Rotate extends Transformation implements InputSizeConstraint
+{
     /**
      * Background color of the image
      *
@@ -20,9 +22,10 @@ class Rotate extends Transformation implements InputSizeConstraint {
     /**
      * {@inheritdoc}
      */
-    public function transform(array $params) {
+    public function transform(array $params)
+    {
         if (empty($params['angle'])) {
-            throw new TransformationException('Missing required parameter: angle', 400);
+            throw new TransformationException('Missing required parameter: angle', Response::HTTP_BAD_REQUEST);
         }
 
         $angle = (int) $params['angle'];
@@ -31,9 +34,9 @@ class Rotate extends Transformation implements InputSizeConstraint {
         try {
             $this->imagick->rotateImage($bg, $angle);
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         } catch (ImagickPixelException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         $size = $this->imagick->getImageGeometry();
@@ -46,9 +49,10 @@ class Rotate extends Transformation implements InputSizeConstraint {
     /**
      * {@inheritdoc}
      */
-    public function getMinimumInputSize(array $params, array $imageSize) {
+    public function getMinimumInputSize(array $params, array $imageSize)
+    {
         if (empty($params['angle'])) {
-            throw new TransformationException('Missing required parameter: angle', 400);
+            throw new TransformationException('Missing required parameter: angle', Response::HTTP_BAD_REQUEST);
         }
 
         // If the angle of the rotation is dividable by 90, we can calculate the input

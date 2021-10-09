@@ -1,19 +1,20 @@
 <?php declare(strict_types=1);
 namespace Imbo\Resource;
 
+use Imbo\Database\DatabaseInterface;
+use Imbo\EventManager\EventInterface;
+use Imbo\EventManager\EventManager;
 use Imbo\Exception\ResourceException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
-use Imbo\Database\DatabaseInterface;
-use Imbo\EventManager\EventManager;
-use Imbo\EventManager\EventInterface;
 use Imbo\Router\Route;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
  * @coversDefaultClass Imbo\Resource\GlobalShortUrl
  */
-class GlobalShortUrlTest extends ResourceTests {
+class GlobalShortUrlTest extends ResourceTests
+{
     private $resource;
     private $request;
     private $response;
@@ -21,11 +22,13 @@ class GlobalShortUrlTest extends ResourceTests {
     private $manager;
     private $event;
 
-    protected function getNewResource() : GlobalShortUrl {
+    protected function getNewResource(): GlobalShortUrl
+    {
         return new GlobalShortUrl();
     }
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);
@@ -44,14 +47,15 @@ class GlobalShortUrlTest extends ResourceTests {
     /**
      * @covers ::getImage
      */
-    public function testCanTriggerAnImageGetEventWhenRequestedWithAValidShortUrl() : void {
+    public function testCanTriggerAnImageGetEventWhenRequestedWithAValidShortUrl(): void
+    {
         $id = 'aaaaaaa';
         $user = 'christer';
         $imageIdentifier = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
         $extension = 'png';
         $query = [
             't' => [
-                'thumbnail:width=40'
+                'thumbnail:width=40',
             ],
             'accessToken' => 'some token',
         ];
@@ -110,7 +114,8 @@ class GlobalShortUrlTest extends ResourceTests {
     /**
      * @covers ::getImage
      */
-    public function testRespondsWith404WhenShortUrlDoesNotExist() : void {
+    public function testRespondsWith404WhenShortUrlDoesNotExist(): void
+    {
         $route = $this->createMock(Route::class);
         $route
             ->expects($this->once())
@@ -129,7 +134,7 @@ class GlobalShortUrlTest extends ResourceTests {
             ->with('aaaaaaa')
             ->willReturn(null);
 
-        $this->expectExceptionObject(new ResourceException('Image not found', 404));
+        $this->expectExceptionObject(new ResourceException('Image not found', Response::HTTP_NOT_FOUND));
 
         $this->resource->getImage($this->event);
     }

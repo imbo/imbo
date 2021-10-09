@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
-use Imbo\Exception\StorageException;
 use DateTime;
 use Imbo\Database\DatabaseInterface;
 use Imbo\EventManager\EventInterface;
 use Imbo\EventManager\EventManager;
+use Imbo\Exception\StorageException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
@@ -14,7 +14,8 @@ use Imbo\Storage\StorageInterface;
 /**
  * @coversDefaultClass Imbo\EventListener\StorageOperations
  */
-class StorageOperationsTest extends ListenerTests {
+class StorageOperationsTest extends ListenerTests
+{
     private $listener;
     private $event;
     private $request;
@@ -23,7 +24,8 @@ class StorageOperationsTest extends ListenerTests {
     private $imageIdentifier = 'id';
     private $storage;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->response = $this->createMock(Response::class);
         $this->request = $this->createConfiguredMock(Request::class, [
             'getUser' => $this->user,
@@ -39,14 +41,16 @@ class StorageOperationsTest extends ListenerTests {
         $this->listener = new StorageOperations();
     }
 
-    protected function getListener() : StorageOperations {
+    protected function getListener(): StorageOperations
+    {
         return $this->listener;
     }
 
     /**
      * @covers ::deleteImage
      */
-    public function testCanDeleteAnImage() : void {
+    public function testCanDeleteAnImage(): void
+    {
         $this->storage
             ->expects($this->once())
             ->method('delete')
@@ -58,7 +62,8 @@ class StorageOperationsTest extends ListenerTests {
     /**
      * @covers ::loadImage
      */
-    public function testCanLoadImage() : void {
+    public function testCanLoadImage(): void
+    {
         $date = new DateTime();
         $this->storage
             ->expects($this->once())
@@ -105,13 +110,14 @@ class StorageOperationsTest extends ListenerTests {
     /**
      * @covers ::loadImage
      */
-    public function testExceptionIfLoadImageFails() : void {
+    public function testExceptionIfLoadImageFails(): void
+    {
         $this->storage
             ->expects($this->once())
             ->method('getImage')
             ->with($this->user, $this->imageIdentifier)
             ->willReturn(null);
-        $this->expectExceptionObject(new StorageException('Failed reading file from storage backend', 503));
+        $this->expectExceptionObject(new StorageException('Failed reading file from storage backend', Response::HTTP_SERVICE_UNAVAILABLE));
 
         $this->listener->loadImage($this->event);
     }
@@ -119,7 +125,8 @@ class StorageOperationsTest extends ListenerTests {
     /**
      * @covers ::insertImage
      */
-    public function testCanInsertImage() : void {
+    public function testCanInsertImage(): void
+    {
         $image = $this->createConfiguredMock(Image::class, [
             'getBlob' => 'image data',
             'getImageIdentifier' => 'imageId',
@@ -133,7 +140,7 @@ class StorageOperationsTest extends ListenerTests {
         $this->response
             ->expects($this->once())
             ->method('setStatusCode')
-            ->with(201);
+            ->with(Response::HTTP_CREATED);
 
         $this->storage
             ->expects($this->once())
@@ -151,7 +158,8 @@ class StorageOperationsTest extends ListenerTests {
     /**
      * @covers ::insertImage
      */
-    public function testCanInsertImageThatAlreadyExists() : void {
+    public function testCanInsertImageThatAlreadyExists(): void
+    {
         $image = $this->createConfiguredMock(Image::class, [
             'getBlob' => 'image data',
             'getImageIdentifier' => 'imageId',
@@ -165,7 +173,7 @@ class StorageOperationsTest extends ListenerTests {
         $this->response
             ->expects($this->once())
             ->method('setStatusCode')
-            ->with(200);
+            ->with(Response::HTTP_OK);
 
         $this->storage
             ->expects($this->once())
@@ -183,7 +191,8 @@ class StorageOperationsTest extends ListenerTests {
     /**
      * @covers ::insertImage
      */
-    public function testWillDeleteImageFromDatabaseAndThrowExceptionWhenStoringFails() : void {
+    public function testWillDeleteImageFromDatabaseAndThrowExceptionWhenStoringFails(): void
+    {
         $image = $this->createConfiguredMock(Image::class, [
             'getBlob' => 'image data',
             'getImageIdentifier' => 'imageId',
@@ -199,7 +208,7 @@ class StorageOperationsTest extends ListenerTests {
             ->method('store')
             ->with($this->user, 'imageId', 'image data')
             ->willThrowException(
-                new StorageException('Could not store image', 500)
+                new StorageException('Could not store image', Response::HTTP_INTERNAL_SERVER_ERROR),
             );
 
         $database = $this->createMock(DatabaseInterface::class);
@@ -213,7 +222,7 @@ class StorageOperationsTest extends ListenerTests {
             ->method('getDatabase')
             ->willReturn($database);
 
-        $this->expectExceptionObject(new StorageException('Could not store image', 500));
+        $this->expectExceptionObject(new StorageException('Could not store image', Response::HTTP_INTERNAL_SERVER_ERROR));
 
         $this->listener->insertImage($this->event);
     }

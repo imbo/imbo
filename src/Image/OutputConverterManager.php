@@ -1,10 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image;
 
+use Imagick;
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Response\Response;
 use Imbo\Image\OutputConverter\OutputConverterInterface;
 use Imbo\Model\Image;
-use Imagick;
 
 /**
  * Output converter manager
@@ -14,7 +15,8 @@ use Imagick;
  * A plugin should update the given model to reflect the new state. By calling `setBlob`, the plugin
  * can update the actual binary data returned to the client.
  */
-class OutputConverterManager {
+class OutputConverterManager
+{
     /**
      * @var array Registered converters by their mime type
      */
@@ -46,7 +48,8 @@ class OutputConverterManager {
      * @param array $converters A list of objects or object names (strings) implementing `OutputConverterInterface`.
      * @return self
      */
-    public function addConverters(array $converters) {
+    public function addConverters(array $converters)
+    {
         foreach ($converters as $converter) {
             if (is_string($converter)) {
                 $converter = new $converter();
@@ -54,7 +57,7 @@ class OutputConverterManager {
 
             if (!$converter instanceof OutputConverterInterface) {
                 $name = is_object($converter) ? get_class($converter) : (string) $converter;
-                throw new InvalidArgumentException('Given converter (' . $name . ') does not implement OutputConverterInterface', 500);
+                throw new InvalidArgumentException('Given converter (' . $name . ') does not implement OutputConverterInterface', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
             $this->registerConverter($converter);
@@ -69,7 +72,8 @@ class OutputConverterManager {
      * @param OutputConverterInterface $converter The converter to register
      * @return self
      */
-    public function registerConverter(OutputConverterInterface $converter) {
+    public function registerConverter(OutputConverterInterface $converter)
+    {
         foreach ($converter->getSupportedMimeTypes() as $mimeType => $extensions) {
             if (!is_array($extensions)) {
                 $extensions = [$extensions];
@@ -109,7 +113,8 @@ class OutputConverterManager {
      * @param string $mime Mime type we should look up the converter from, if available
      * @return bool|null Returns true if it we were able to convert or null if we failed
      */
-    public function convert(Image $image, $extension, $mime = null) {
+    public function convert(Image $image, $extension, $mime = null)
+    {
         if ($this->supportsExtension($extension)) {
             foreach ($this->convertersByExtension[$extension] as $converter) {
                 $result = $converter->convert($this->imagick, $image, $extension, $mime);
@@ -140,7 +145,8 @@ class OutputConverterManager {
      *
      * @return array<string> A list of extensions registered with the converter manager
      */
-    public function getSupportedExtensions() {
+    public function getSupportedExtensions()
+    {
         return array_keys($this->convertersByExtension);
     }
 
@@ -149,7 +155,8 @@ class OutputConverterManager {
      *
      * @return array<string> A list of mime types registered with the converter manager
      */
-    public function getSupportedMimeTypes() {
+    public function getSupportedMimeTypes()
+    {
         return array_keys($this->convertersByMimeType);
     }
 
@@ -159,7 +166,8 @@ class OutputConverterManager {
      * @param string $extension The extension to look up the mime type for
      * @return string|null
      */
-    public function getMimeTypeFromExtension($extension) {
+    public function getMimeTypeFromExtension($extension)
+    {
         return isset($this->extensionToMimeType[$extension]) ? $this->extensionToMimeType[$extension] : null;
     }
 
@@ -169,7 +177,8 @@ class OutputConverterManager {
      * @param string $mimeType The mime type to look up the extension for.
      * @return string|null Returns the first registered mime type for a given extension
      */
-    public function getExtensionFromMimeType($mimeType) {
+    public function getExtensionFromMimeType($mimeType)
+    {
         return isset($this->mimeTypeToExtension[$mimeType]) ? $this->mimeTypeToExtension[$mimeType] : null;
     }
 
@@ -178,7 +187,8 @@ class OutputConverterManager {
      *
      * @return array A map of string => string entries with mime type => extension mapping
      */
-    public function getMimeTypeToExtensionMap() {
+    public function getMimeTypeToExtensionMap()
+    {
         return $this->mimeTypeToExtension;
     }
 
@@ -187,7 +197,8 @@ class OutputConverterManager {
      *
      * @return array A map of string => string entries with extension => mime type mapping
      */
-    public function getExtensionToMimeTypeMap() {
+    public function getExtensionToMimeTypeMap()
+    {
         return $this->extensionToMimeType;
     }
 
@@ -197,7 +208,8 @@ class OutputConverterManager {
      * @param string $extension The extension to check if we support
      * @return bool Whether the extension is supported
      */
-    public function supportsExtension($extension) {
+    public function supportsExtension($extension)
+    {
         return !empty($this->convertersByExtension[$extension]);
     }
 
@@ -207,7 +219,8 @@ class OutputConverterManager {
      * @param Imagick $imagick
      * @return self
      */
-    public function setImagick(Imagick $imagick) {
+    public function setImagick(Imagick $imagick)
+    {
         $this->imagick = $imagick;
 
         return $this;

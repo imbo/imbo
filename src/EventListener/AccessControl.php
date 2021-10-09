@@ -1,9 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
+use Imbo\Auth\AccessControl\GroupQuery;
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception\RuntimeException;
-use Imbo\Auth\AccessControl\GroupQuery;
+use Imbo\Http\Response\Response;
 use Imbo\Model\Groups as GroupsModel;
 use Imbo\Resource;
 
@@ -15,7 +16,8 @@ use Imbo\Resource;
  * the listener will throw an exception resulting in a HTTP response with 400 Bad Request.
  * It will also handle loading of ACL-related resources such as resource groups.
  */
-class AccessControl implements ListenerInterface {
+class AccessControl implements ListenerInterface
+{
     /**
      * Parameters for the listener
      *
@@ -48,7 +50,7 @@ class AccessControl implements ListenerInterface {
     private $groupLookupResources = [
         Resource::GROUP_GET,
         Resource::GROUP_HEAD,
-        Resource::GROUP_OPTIONS
+        Resource::GROUP_OPTIONS,
     ];
 
     /**
@@ -56,7 +58,8 @@ class AccessControl implements ListenerInterface {
      *
      * @param array $params Parameters for the listener
      */
-    public function __construct(array $params = null) {
+    public function __construct(array $params = null)
+    {
         if ($params) {
             $this->params = array_replace_recursive($this->params, $params);
         }
@@ -65,7 +68,8 @@ class AccessControl implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             'route.match' => 'subscribe',
             'acl.groups.load' => 'loadGroups',
@@ -77,7 +81,8 @@ class AccessControl implements ListenerInterface {
      *
      * @param EventInterface $event
      */
-    public function subscribe(EventInterface $event) {
+    public function subscribe(EventInterface $event)
+    {
         $resources = Resource::getAllResources();
 
         if ($this->params['additionalResources']) {
@@ -99,7 +104,8 @@ class AccessControl implements ListenerInterface {
      * @param EventInterface $event
      * @throws RuntimeException If public key does not have access to the resource
      */
-    public function checkAccess(EventInterface $event) {
+    public function checkAccess(EventInterface $event)
+    {
         if ($event->hasArgument('skipAccessControl') &&
             $event->getArgument('skipAccessControl') === true) {
             return;
@@ -111,7 +117,7 @@ class AccessControl implements ListenerInterface {
         $publicKey = (string) $request->getPublicKey();
 
         if ('' === $publicKey) {
-            throw new RuntimeException('Missing public key', 400);
+            throw new RuntimeException('Missing public key', Response::HTTP_BAD_REQUEST);
         }
 
         $user = $request->getUser();
@@ -145,7 +151,7 @@ class AccessControl implements ListenerInterface {
             }
         }
 
-        throw new RuntimeException('Permission denied (public key)', 400);
+        throw new RuntimeException('Permission denied (public key)', Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -153,16 +159,17 @@ class AccessControl implements ListenerInterface {
      *
      * @param EventInterface $event An event instance
      */
-    public function loadGroups(EventInterface $event) {
+    public function loadGroups(EventInterface $event)
+    {
         $query = new GroupQuery();
         $params = $event->getRequest()->query;
 
         if ($params->has('page')) {
-            $query->setPage($params->get('page'));
+            $query->setPage((int) $params->get('page'));
         }
 
         if ($params->has('limit')) {
-            $query->setLimit($params->get('limit'));
+            $query->setLimit((int) $params->get('limit'));
         }
 
         $response = $event->getResponse();

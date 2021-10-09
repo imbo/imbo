@@ -1,7 +1,8 @@
 <?php declare(strict_types=1);
 namespace Imbo\Http\Response;
 
-use Imbo\Model;
+use Imbo\Model\Error;
+use Imbo\Model\ModelInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
@@ -9,54 +10,27 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
  */
 class Response extends SymfonyResponse
 {
-    /**
-     * Model instance
-     *
-     * @var Model\ModelInterface
-     */
-    private $model;
+    private ?ModelInterface $model = null;
 
-    /**
-     * Get the model instance
-     *
-     * @return null|Model\ModelInterface
-     */
-    public function getModel()
+    public function getModel(): ?ModelInterface
     {
         return $this->model;
     }
 
-    /**
-     * Set the model instance
-     *
-     * @param Model\ModelInterface $model A model instance
-     * @return Response
-     */
-    public function setModel(Model\ModelInterface $model = null)
+    public function setModel(ModelInterface $model = null): self
     {
         $this->model = $model;
-
         return $this;
     }
 
-    /**
-     * Marks the response as not modified as per the Symfony
-     */
-    public function setNotModified(): object
+    public function setNotModified(): self
     {
         parent::setNotModified();
         $this->setModel(null);
-
         return $this;
     }
 
-    /**
-     * Set an error model and update some parts of the response object
-     *
-     * @param Model\Error $error An error model instance
-     * @return Response
-     */
-    public function setError(Model\Error $error)
+    public function setError(Error $error): self
     {
         $errorMessage = $error->getErrorMessage();
 

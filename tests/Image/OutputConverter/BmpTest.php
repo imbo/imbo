@@ -4,6 +4,7 @@ namespace Imbo\Image\OutputConverter;
 use Imagick;
 use ImagickException;
 use Imbo\Exception\OutputConverterException;
+use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use PHPUnit\Framework\TestCase;
 
@@ -67,7 +68,7 @@ class BmpTest extends TestCase
             ->with($extension)
             ->willThrowException(new ImagickException('some error'));
 
-        $this->expectExceptionObject(new OutputConverterException('some error', 400));
+        $this->expectExceptionObject(new OutputConverterException('some error', Response::HTTP_BAD_REQUEST));
         $this->converter->convert(
             $imagick,
             $this->createMock(Image::class),

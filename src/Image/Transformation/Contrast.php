@@ -1,17 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException;
 use ImagickException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
 
 /**
  * Contrast transformation
  */
-class Contrast extends Transformation {
-    /**
-     * {@inheritdoc}
-     */
-    public function transform(array $params) {
+class Contrast extends Transformation
+{
+    public function transform(array $params)
+    {
         $alpha = isset($params['sharpen']) ? (float) $params['sharpen'] : 1;
         $alpha = isset($params['alpha']) ? (float) $params['alpha'] : $alpha;
         $beta = isset($params['beta']) ? (float) $params['beta'] : 0.5;
@@ -26,7 +26,7 @@ class Contrast extends Transformation {
         try {
             $this->imagick->sigmoidalContrastImage($sharpen, abs($alpha), $beta);
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         $this->image->setHasBeenTransformed(true);

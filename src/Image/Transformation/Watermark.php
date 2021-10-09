@@ -1,37 +1,33 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
+use Imagick;
+use ImagickException;
 use Imbo\Exception\StorageException;
 use Imbo\Exception\TransformationException;
 use Imbo\Helpers\Imagick as ImagickHelper;
+use Imbo\Http\Response\Response;
 use Imbo\Image\InputSizeConstraint;
-use Imagick;
-use ImagickException;
 
 /**
  * Watermark transformation
  */
-class Watermark extends Transformation implements InputSizeConstraint {
+class Watermark extends Transformation implements InputSizeConstraint
+{
     /**
      * Default image identifier to use for watermarks
-     *
-     * @var string
      */
-    private $defaultImage;
+    private ?string $defaultImage = null;
 
     /**
      * X coordinate of watermark relative to position parameters
-     *
-     * @var int
      */
-    private $x = 0;
+    private int $x = 0;
 
     /**
      * Y coordinate of watermark relative to position parameters
-     *
-     * @var int
      */
-    private $y = 0;
+    private int $y = 0;
 
     /**
      * Position of watermark within original image
@@ -47,24 +43,19 @@ class Watermark extends Transformation implements InputSizeConstraint {
      * - "right": Places the watermark in the right center
      * - "left": Places the watermark in the left center
      * - "center": Places the watermark in the center of the image
-     *
-     * @var string
      */
-    private $position = 'top-left';
+    private string $position = 'top-left';
 
     /**
      * Set default image identifier to use if no identifier has been specified
-     *
-     * @param string $imageIdentifier Image identifier for the default image
      */
-    public function setDefaultImage($imageIdentifier) {
+    public function setDefaultImage(string $imageIdentifier)
+    {
         $this->defaultImage = $imageIdentifier;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function transform(array $params) {
+    public function transform(array $params)
+    {
         $width = !empty($params['width']) ? (int) $params['width'] : 0;
         $height = !empty($params['height']) ? (int) $params['height'] : 0;
         $imageIdentifier = !empty($params['img']) ? $params['img'] : $this->defaultImage;
@@ -77,7 +68,7 @@ class Watermark extends Transformation implements InputSizeConstraint {
         if (empty($imageIdentifier)) {
             throw new TransformationException(
                 'You must specify an image identifier to use for the watermark',
-                400
+                Response::HTTP_BAD_REQUEST,
             );
         }
 
@@ -85,12 +76,11 @@ class Watermark extends Transformation implements InputSizeConstraint {
         try {
             $watermarkData = $this->event->getStorage()->getImage(
                 $this->event->getRequest()->getUser(),
-                $imageIdentifier
+                $imageIdentifier,
             );
-
         } catch (StorageException $e) {
-            if ($e->getCode() == 404) {
-                throw new TransformationException('Watermark image not found', 400);
+            if ($e->getCode() == Response::HTTP_NOT_FOUND) {
+                throw new TransformationException('Watermark image not found', Response::HTTP_BAD_REQUEST);
             }
 
             throw $e;
@@ -128,7 +118,7 @@ class Watermark extends Transformation implements InputSizeConstraint {
             // Calculate width or height if not both have been specified
             if (!$height) {
                 $height = ($watermarkSize['height'] / $watermarkSize['width']) * $width;
-            } else if (!$width) {
+            } elseif (!$width) {
                 $width = ($watermarkSize['width'] / $watermarkSize['height']) * $height;
             }
 
@@ -141,47 +131,43 @@ class Watermark extends Transformation implements InputSizeConstraint {
         // Determine placement of the watermark
         if ($position === 'top-right') {
             $x = $image->getWidth() - $width + $x;
-        } else if ($position === 'bottom-left') {
+        } elseif ($position === 'bottom-left') {
             $y = $image->getHeight() - $height + $y;
-        } else if ($position === 'bottom-right') {
+        } elseif ($position === 'bottom-right') {
             $x = $image->getWidth() - $width + $x;
             $y = $image->getHeight() - $height + $y;
-        } else if ($position === 'center') {
+        } elseif ($position === 'center') {
             $x = ($image->getWidth() / 2) - ($width / 2) + $x;
             $y = ($image->getHeight() / 2) - ($height / 2) + $y;
-        } else if ($position === 'bottom') {
+        } elseif ($position === 'bottom') {
             $x = ($image->getWidth() / 2) - ($width / 2) + $x;
             $y = $image->getHeight() - $height + $y;
-        } else if ($position === 'top') {
+        } elseif ($position === 'top') {
             $x = ($image->getWidth() / 2) - ($width / 2) + $x;
-        } else if ($position === 'left') {
+        } elseif ($position === 'left') {
             $y = ($image->getHeight() / 2) - ($height / 2) + $y;
-        } else if ($position === 'right') {
+        } elseif ($position === 'right') {
             $x = $image->getWidth() - $width + $x;
             $y = ($image->getHeight() / 2) - ($height / 2) + $y;
         }
 
         // Now make a composite
         try {
-            $this->imagick->compositeImage($watermark, Imagick::COMPOSITE_OVER, $x, $y);
+            $this->imagick->compositeImage($watermark, Imagick::COMPOSITE_OVER, (int) $x, (int) $y);
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         $image->setHasBeenTransformed(true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getMinimumInputSize(array $params, array $imageSize) {
+    public function getMinimumInputSize(array $params, array $imageSize): int
+    {
         return InputSizeConstraint::NO_TRANSFORMATION;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function adjustParameters($ratio, array $parameters) {
+    public function adjustParameters(float $ratio, array $parameters): array
+    {
         foreach (['x', 'y', 'width', 'height'] as $param) {
             if (isset($parameters[$param])) {
                 $parameters[$param] = round($parameters[$param] / $ratio);

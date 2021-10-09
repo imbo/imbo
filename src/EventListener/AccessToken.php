@@ -1,14 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
-use Imbo\EventListener\AccessToken\AccessTokenInterface;
-use Imbo\EventManager\EventInterface;
-use Imbo\Http\Request\Request;
-use Imbo\Exception\RuntimeException;
-use Imbo\Exception\ConfigurationException;
-use Imbo\Helpers\Urls;
-use Imbo\EventListener\AccessToken\SHA256;
 use GuzzleHttp\Psr7\Query;
+use Imbo\EventListener\AccessToken\AccessTokenInterface;
+use Imbo\EventListener\AccessToken\SHA256;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception\ConfigurationException;
+use Imbo\Exception\RuntimeException;
+use Imbo\Helpers\Urls;
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
 use Imbo\Resource;
 
 /**
@@ -19,7 +20,8 @@ use Imbo\Resource;
  * appends this token to all such requests by default. If the access token is missing or invalid
  * the event listener will throw an exception resulting in a HTTP response with 400 Bad Request.
  */
-class AccessToken implements ListenerInterface {
+class AccessToken implements ListenerInterface
+{
     /**
      * Parameters for the listener
      *
@@ -68,7 +70,8 @@ class AccessToken implements ListenerInterface {
      *
      * @param array $params Parameters for the listener
      */
-    public function __construct(array $params = null) {
+    public function __construct(array $params = null)
+    {
         if ($params) {
             $this->params = array_replace_recursive($this->params, $params);
         }
@@ -79,14 +82,18 @@ class AccessToken implements ListenerInterface {
         }
 
         if (!$this->params['accessTokenGenerator'] instanceof AccessTokenInterface) {
-            throw new ConfigurationException('Invalid accessTokenGenerator defined (does not implement the AccessTokenInterface).', 500);
+            throw new ConfigurationException(
+                'Invalid accessTokenGenerator defined (does not implement the AccessTokenInterface).',
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+            );
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         $callbacks = [];
         $events = [
             Resource::GROUPS_GET,
@@ -111,7 +118,7 @@ class AccessToken implements ListenerInterface {
             Resource::SHORTURL_GET,
             Resource::SHORTURL_HEAD,
 
-            'auth.accesstoken'
+            'auth.accesstoken',
         ];
 
         foreach ($events as $event) {
@@ -128,7 +135,8 @@ class AccessToken implements ListenerInterface {
      * @throws RuntimeException
      * @return null|true Returns true on a successful access token comparion, null otherwise
      */
-    public function checkAccessToken(EventInterface $event) {
+    public function checkAccessToken(EventInterface $event)
+    {
         $request = $event->getRequest();
         $response = $event->getResponse();
         $query = $request->query;
@@ -156,7 +164,7 @@ class AccessToken implements ListenerInterface {
         }
 
         if (!$presentAccessTokenArgumentKeys) {
-            throw new RuntimeException('Missing access token', 400);
+            throw new RuntimeException('Missing access token', Response::HTTP_BAD_REQUEST);
         }
 
         // First the the raw un-encoded URI, then the URI as is
@@ -170,14 +178,14 @@ class AccessToken implements ListenerInterface {
         // See if we should modify the protocol for the incoming request
         $protocol = $config['authentication']['protocol'];
         if ($protocol === 'both') {
-            $uris = array_reduce($uris, function($dest, $uri) {
+            $uris = array_reduce($uris, function ($dest, $uri) {
                 $baseUrl = preg_replace('#^https?#', '', $uri);
                 $dest[] = 'http' . $baseUrl;
                 $dest[] = 'https' . $baseUrl;
                 return $dest;
             }, []);
-        } else if (in_array($protocol, ['http', 'https'])) {
-            $uris = array_map(function($uri) use ($protocol) {
+        } elseif (in_array($protocol, ['http', 'https'])) {
+            $uris = array_map(function ($uri) use ($protocol) {
                 return preg_replace('#^https?#', $protocol, $uri);
             }, $uris);
         }
@@ -194,7 +202,7 @@ class AccessToken implements ListenerInterface {
             }
         }
 
-        throw new RuntimeException('Incorrect access token', 400);
+        throw new RuntimeException('Incorrect access token', Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -213,7 +221,8 @@ class AccessToken implements ListenerInterface {
      * @param int $encoding The encoding to use - from GuzzleHttp\Psr7
      * @return string
      */
-    protected function getAlternativeURL($url, $encoding = PHP_QUERY_RFC3986) {
+    protected function getAlternativeURL($url, $encoding = PHP_QUERY_RFC3986)
+    {
         $urlParts = parse_url($url);
 
         if (!isset($urlParts['query'])) {
@@ -224,7 +233,7 @@ class AccessToken implements ListenerInterface {
         $fixKeyPattern = '#\[[0-9]+\]$#';
 
         $parsed = Query::parse($queryString);
-        $newArguments = array();
+        $newArguments = [];
 
         foreach ($parsed as $key => $value) {
             $fixedKey = preg_replace($fixKeyPattern, '', $key);
@@ -235,11 +244,11 @@ class AccessToken implements ListenerInterface {
                 $fixedKey .= '[]';
 
                 if (!isset($newArguments[$fixedKey])) {
-                    $newArguments[$fixedKey] = array();
+                    $newArguments[$fixedKey] = [];
                 }
 
                 $newArguments[$fixedKey][] = $value;
-            } else if (is_array($value) && substr($key, -2) == '[]') {
+            } elseif (is_array($value) && substr($key, -2) == '[]') {
                 // if the value is an array, and we have the [] format already, we expand the keys
                 foreach ($value as $innerKey => $innerValue) {
                     // remove [] from the key and append the inner array key
@@ -264,7 +273,8 @@ class AccessToken implements ListenerInterface {
      * @param $url string The URL to generate the alternative version of
      * @return string
      */
-    protected function getUnescapedAlternativeURL($url) {
+    protected function getUnescapedAlternativeURL($url)
+    {
         return $this->getAlternativeURL($url, false);
     }
 
@@ -275,7 +285,8 @@ class AccessToken implements ListenerInterface {
      * @param $url string The URL to generate the alternative version of
      * @return string
      */
-    protected function getEscapedAlternativeURL($url) {
+    protected function getEscapedAlternativeURL($url)
+    {
         return $this->getAlternativeURL($url, PHP_QUERY_RFC3986);
     }
 
@@ -290,7 +301,8 @@ class AccessToken implements ListenerInterface {
      * @param Request $request The request instance
      * @return boolean
      */
-    private function isWhitelisted(Request $request) {
+    private function isWhitelisted(Request $request)
+    {
         $filter = $this->params['transformations'];
 
         if (empty($filter['whitelist']) && empty($filter['blacklist'])) {

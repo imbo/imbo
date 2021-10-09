@@ -1,39 +1,44 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Model\Image;
-use Imbo\Storage\StorageInterface;
+use Imagick;
 use Imbo\EventManager\Event;
-use Imbo\Http\Request\Request;
 use Imbo\Exception\StorageException;
 use Imbo\Exception\TransformationException;
-use Imagick;
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+use Imbo\Model\Image;
+use Imbo\Storage\StorageInterface;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Watermark
  */
-class WatermarkTest extends TransformationTests {
+class WatermarkTest extends TransformationTests
+{
     private $transformation;
     private $width = 500;
     private $height = 500;
     private $watermarkImg = 'f5f7851c40e2b76a01af9482f67bbf3f';
 
-    protected function getTransformation() : Watermark {
+    protected function getTransformation(): Watermark
+    {
         return new Watermark();
     }
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->transformation = new Watermark();
     }
 
     /**
      * @covers ::transform
      */
-    public function testTransformThrowsExceptionIfNoImageSpecified() : void {
+    public function testTransformThrowsExceptionIfNoImageSpecified(): void
+    {
         $image = $this->createMock(Image::class);
         $this->expectExceptionObject(new TransformationException(
             'You must specify an image identifier to use for the watermark',
-            400
+            Response::HTTP_BAD_REQUEST,
         ));
         $this->transformation->setImage($image)->transform([]);
     }
@@ -41,8 +46,9 @@ class WatermarkTest extends TransformationTests {
     /**
      * @covers ::transform
      */
-    public function testThrowsExceptionIfSpecifiedImageIsNotFound() : void {
-        $e = new StorageException('File not found', 404);
+    public function testThrowsExceptionIfSpecifiedImageIsNotFound(): void
+    {
+        $e = new StorageException('File not found', Response::HTTP_NOT_FOUND);
 
         $storage = $this->createMock(StorageInterface::class);
         $storage
@@ -52,7 +58,7 @@ class WatermarkTest extends TransformationTests {
             ->willThrowException($e);
 
         $request = $this->createConfiguredMock(Request::class, [
-            'getUser' => 'someuser'
+            'getUser' => 'someuser',
         ]);
 
         $event = $this->createConfiguredMock(Event::class, [
@@ -66,13 +72,14 @@ class WatermarkTest extends TransformationTests {
 
         $this->expectExceptionObject(new TransformationException(
             'Watermark image not found',
-            400
+            Response::HTTP_BAD_REQUEST,
         ));
 
         $this->transformation->transform(['img' => 'foobar']);
     }
 
-    public function getParamsForWatermarks() : array {
+    public function getParamsForWatermarks(): array
+    {
         $black = [0, 0, 0];
         $white = [255, 255, 255];
 
@@ -320,12 +327,12 @@ class WatermarkTest extends TransformationTests {
 
             'opacity' => [
                 [
-                    'opacity' => 40
+                    'opacity' => 40,
                 ],
                 [
                     'top left corner'  => ['x' => 0,   'y' => 0, 'color' => [153, 153, 153]], // 255 * 0.6 = 153
                     'top right corner' => ['x' => 499, 'y' => 0, 'color' => $white],
-                ]
+                ],
             ],
             'alpha' => [
                 [
@@ -364,7 +371,8 @@ class WatermarkTest extends TransformationTests {
      * @covers ::transform
      * @covers ::setDefaultImage
      */
-    public function testApplyToImageTopLeftWithOnlyWidthAndDefaultWatermark(array $params, array $colors) : void {
+    public function testApplyToImageTopLeftWithOnlyWidthAndDefaultWatermark(array $params, array $colors): void
+    {
         $blob = file_get_contents(FIXTURES_DIR . '/white.png');
 
         $image = new Image();
@@ -425,14 +433,15 @@ class WatermarkTest extends TransformationTests {
      * @param array $expectedRgb Expected color value, in RGB format, as array
      * @param string $key Name of the key from the colors array
      */
-    protected function verifyColor(Imagick $imagick, int $x, int $y, array $expectedRgb, string $key) : void {
+    protected function verifyColor(Imagick $imagick, int $x, int $y, array $expectedRgb, string $key): void
+    {
         // Do assertion comparison on the color values
         $pixelValue = $imagick->getImagePixelColor($x, $y)->getColorAsString();
 
         $this->assertStringEndsWith(
             $expected = 'rgb(' . implode(',', $expectedRgb) . ')',
             $actual = $pixelValue,
-            sprintf('Color comparison for key "%s" failed. Expected "%s", got: "%s"', $key, $expected, $actual)
+            sprintf('Color comparison for key "%s" failed. Expected "%s", got: "%s"', $key, $expected, $actual),
         );
     }
 }

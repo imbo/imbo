@@ -1,21 +1,24 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Model\Image;
-use Imbo\Exception\TransformationException;
-use PHPUnit\Framework\TestCase;
 use Imagick;
 use ImagickException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
+use Imbo\Model\Image;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Modulate
  */
-class ModulateTest extends TransformationTests {
-    protected function getTransformation() : Modulate {
+class ModulateTest extends TransformationTests
+{
+    protected function getTransformation(): Modulate
+    {
         return new Modulate();
     }
 
-    public function getModulateParamsForTransformation() : array {
+    public function getModulateParamsForTransformation(): array
+    {
         return [
             'no params' => [
                 [],
@@ -33,7 +36,8 @@ class ModulateTest extends TransformationTests {
      * @dataProvider getModulateParamsForTransformation
      * @covers ::transform
      */
-    public function testCanModulateImages(array $params) : void {
+    public function testCanModulateImages(array $params): void
+    {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -50,7 +54,8 @@ class ModulateTest extends TransformationTests {
             ->transform($params);
     }
 
-    public function getModulateParams() : array {
+    public function getModulateParams(): array
+    {
         return [
             'no params' => [
                 [], 100, 100, 100,
@@ -68,7 +73,8 @@ class ModulateTest extends TransformationTests {
      * @dataProvider getModulateParams
      * @covers ::transform
      */
-    public function testUsesDefaultValuesWhenParametersAreNotSpecified(array $params, int $brightness, int $saturation, int $hue) : void {
+    public function testUsesDefaultValuesWhenParametersAreNotSpecified(array $params, int $brightness, int $saturation, int $hue): void
+    {
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
@@ -90,14 +96,15 @@ class ModulateTest extends TransformationTests {
     /**
      * @covers ::transform
      */
-    public function testThrowsException() : void {
+    public function testThrowsException(): void
+    {
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
             ->method('modulateImage')
             ->willThrowException($e = new ImagickException('some error'));
 
-        $this->expectExceptionObject(new TransformationException('some error', 400, $e));
+        $this->expectExceptionObject(new TransformationException('some error', Response::HTTP_BAD_REQUEST, $e));
 
         (new Modulate())
             ->setImagick($imagick)

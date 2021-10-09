@@ -1,146 +1,81 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Model;
 
-use Imbo\Exception\InvalidArgumentException;
 use ArrayAccess;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Response\Response;
 
-class Stats implements ModelInterface, ArrayAccess {
-    /**
-     * Custom stats that can be set
-     *
-     * @var array
-     */
-    private $customStats = [];
+class Stats implements ModelInterface, ArrayAccess
+{
+    private array $customStats = [];
+    private int $numUsers;
+    private int $numBytes;
+    private int $numImages;
 
-    /**
-     * Number of users in the system
-     *
-     * @var integer
-     */
-    private $numUsers;
-
-    /**
-     * Number of bytes in the system
-     *
-     * @var integer
-     */
-    private $numBytes;
-
-    /**
-     * Number of images in the system
-     *
-     * @var integer
-     */
-    private $numImages;
-
-    /**
-     * Set the number of users
-     *
-     * @param int $numUsers The number of users that has one or more images
-     * @return Stats
-     */
-    public function setNumUsers($numUsers) {
+    public function setNumUsers(int $numUsers): self
+    {
         $this->numUsers = $numUsers;
-
         return $this;
     }
 
-    /**
-     * Get the number of users
-     *
-     * @return integer
-     */
-    public function getNumUsers() {
+    public function getNumUsers(): int
+    {
         return $this->numUsers;
     }
 
-    /**
-     * Set the number of bytes stored in Imbo
-     *
-     * @param int $numBytes The number of bytes stored in Imbo
-     * @return Stats
-     */
-    public function setNumBytes($numBytes) {
+    public function setNumBytes(int $numBytes): self
+    {
         $this->numBytes = $numBytes;
-
         return $this;
     }
 
-    /**
-     * Get the total amount of bytes
-     *
-     * @return int
-     */
-    public function getNumBytes() {
+    public function getNumBytes(): int
+    {
         return $this->numBytes;
     }
 
-    /**
-     * Set the number of images stored in Imbo
-     *
-     * @param int $numImages The number of images stored in Imbo
-     * @return Stats
-     */
-    public function setNumImages($numImages) {
+    public function setNumImages(int $numImages): self
+    {
         $this->numImages = $numImages;
-
         return $this;
     }
 
-    /**
-     * Get the total amount of bytes
-     *
-     * @return int
-     */
-    public function getNumImages() {
+    public function getNumImages(): int
+    {
         return $this->numImages;
     }
 
-    /**
-     * Get custom stats
-     *
-     * @return array
-     */
-    public function getCustomStats() {
+    public function getCustomStats(): array
+    {
         return $this->customStats;
     }
 
-    /**
-     * @link http://www.php.net/manual/en/arrayaccess.offsetexists.php
-     */
-    public function offsetExists($offset) {
+    public function offsetExists($offset): bool
+    {
         return isset($this->customStats[$offset]);
     }
 
-    /**
-     * @link http://www.php.net/manual/en/arrayaccess.offsetget.php
-     */
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return $this->customStats[$offset];
     }
 
-    /**
-     * @link http://www.php.net/manual/en/arrayaccess.offsetset.php
-     */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value): void
+    {
         if ($offset === null) {
-            throw new InvalidArgumentException('Custom statistics requires a key to be set', 500);
+            throw new InvalidArgumentException('Custom statistics requires a key to be set', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         $this->customStats[$offset] = $value;
     }
 
-    /**
-     * @link http://www.php.net/manual/en/arrayaccess.offsetunset.php
-     */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset): void
+    {
         unset($this->customStats[$offset]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getData() {
+    public function getData(): array
+    {
         return [
             'numUsers' => $this->getNumUsers(),
             'numBytes' => $this->getNumBytes(),

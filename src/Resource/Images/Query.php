@@ -2,8 +2,10 @@
 namespace Imbo\Resource\Images;
 
 use Imbo\Exception\RuntimeException;
+use Imbo\Http\Response\Response;
 
-class Query {
+class Query
+{
     /**
      * The page to get
      */
@@ -63,7 +65,8 @@ class Query {
      * @param int $page
      * @return self
      */
-    public function setPage(int $page) : self {
+    public function setPage(int $page): self
+    {
         $this->page = $page;
 
         return $this;
@@ -74,7 +77,8 @@ class Query {
      *
      * @return int
      */
-    public function getPage() : int {
+    public function getPage(): int
+    {
         return $this->page;
     }
 
@@ -84,7 +88,8 @@ class Query {
      * @param int $limit
      * @return self
      */
-    public function setLimit(int $limit) : self {
+    public function setLimit(int $limit): self
+    {
         $this->limit = $limit;
 
         return $this;
@@ -95,7 +100,8 @@ class Query {
      *
      * @return int
      */
-    public function getLimit() : int {
+    public function getLimit(): int
+    {
         return $this->limit;
     }
 
@@ -105,7 +111,8 @@ class Query {
      * @param bool $returnMetadata
      * @return self
      */
-    public function setReturnMetadata($returnMetadata) : self {
+    public function setReturnMetadata($returnMetadata): self
+    {
         $this->returnMetadata = $returnMetadata;
 
         return $this;
@@ -116,7 +123,8 @@ class Query {
      *
      * @return bool
      */
-    public function getReturnMetadata() : bool {
+    public function getReturnMetadata(): bool
+    {
         return $this->returnMetadata;
     }
 
@@ -126,7 +134,8 @@ class Query {
      * @param int $from
      * @return self
      */
-    public function setFrom(int $from) : self {
+    public function setFrom(int $from): self
+    {
         $this->from = $from;
 
         return $this;
@@ -137,7 +146,8 @@ class Query {
      *
      * @return ?int
      */
-    public function getFrom() : ?int {
+    public function getFrom(): ?int
+    {
         return $this->from;
     }
 
@@ -147,7 +157,8 @@ class Query {
      * @param int $to
      * @return self
      */
-    public function setTo(int $to) : self {
+    public function setTo(int $to): self
+    {
         $this->to = $to;
 
         return $this;
@@ -158,7 +169,8 @@ class Query {
      *
      * @return ?int
      */
-    public function getTo() : ?int {
+    public function getTo(): ?int
+    {
         return $this->to;
     }
 
@@ -168,7 +180,8 @@ class Query {
      * @param string[] $imageIdentifiers
      * @return self
      */
-    public function setImageIdentifiers(array $imageIdentifiers) : self {
+    public function setImageIdentifiers(array $imageIdentifiers): self
+    {
         $this->imageIdentifiers = $imageIdentifiers;
 
         return $this;
@@ -179,7 +192,8 @@ class Query {
      *
      * @return string[]
      */
-    public function getImageIdentifiers() : array {
+    public function getImageIdentifiers(): array
+    {
         return $this->imageIdentifiers;
     }
 
@@ -189,7 +203,8 @@ class Query {
      * @param string[] $checksums
      * @return self
      */
-    public function setChecksums(array $checksums) : self {
+    public function setChecksums(array $checksums): self
+    {
         $this->checksums = $checksums;
 
         return $this;
@@ -200,7 +215,8 @@ class Query {
      *
      * @return string[]
      */
-    public function getChecksums() : array {
+    public function getChecksums(): array
+    {
         return $this->checksums;
     }
 
@@ -210,7 +226,8 @@ class Query {
      * @param string[] $originalChecksums
      * @return self
      */
-    public function setOriginalChecksums(array $originalChecksums) : self {
+    public function setOriginalChecksums(array $originalChecksums): self
+    {
         $this->originalChecksums = $originalChecksums;
 
         return $this;
@@ -221,7 +238,8 @@ class Query {
      *
      * @return string[]
      */
-    public function getOriginalChecksums() : array {
+    public function getOriginalChecksums(): array
+    {
         return $this->originalChecksums;
     }
 
@@ -231,7 +249,8 @@ class Query {
      * @param string[] $sort
      * @return self
      */
-    public function setSort(array $sort) : self {
+    public function setSort(array $sort): self
+    {
         $sortData = [];
 
         foreach ($sort as $field) {
@@ -239,14 +258,14 @@ class Query {
             $dir = 'asc';
 
             if (empty($field)) {
-                throw new RuntimeException('Badly formatted sort', 400);
+                throw new RuntimeException('Badly formatted sort', Response::HTTP_BAD_REQUEST);
             }
 
             if (strpos($field, ':') !== false) {
                 list($fieldName, $dir) = explode(':', $field);
 
                 if ($dir !== 'asc' && $dir !== 'desc') {
-                    throw new RuntimeException('Invalid sort value: ' . $field, 400);
+                    throw new RuntimeException('Invalid sort value: ' . $field, Response::HTTP_BAD_REQUEST);
                 }
 
                 $field = $fieldName;
@@ -268,7 +287,8 @@ class Query {
      *
      * @return array<int, array{field: string, sort: string}>
      */
-    public function getSort() : array {
+    public function getSort(): array
+    {
         return $this->sort;
     }
 }

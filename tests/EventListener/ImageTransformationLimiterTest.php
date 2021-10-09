@@ -1,21 +1,24 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
+use Imbo\EventManager\Event;
 use Imbo\Exception\ResourceException;
 use Imbo\Http\Request\Request;
-use Imbo\EventManager\Event;
+use Imbo\Http\Response\Response;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\EventListener\ImageTransformationLimiter
  */
-class ImageTransformationLimiterTest extends TestCase {
-    public function getLimitAndTransformations() : array {
+class ImageTransformationLimiterTest extends TestCase
+{
+    public function getLimitAndTransformations(): array
+    {
         return [
             [
                 'transformations' => [1, 2, 3, 4, 5],
                 'limit' => 2,
-                'exceptionMessage' => 'Too many transformations applied to resource. The limit is 2 transformations.'
+                'exceptionMessage' => 'Too many transformations applied to resource. The limit is 2 transformations.',
             ],
             [
                 'transformations' => [1, 2],
@@ -36,7 +39,8 @@ class ImageTransformationLimiterTest extends TestCase {
      * @covers ::checkTransformationCount
      * @covers ::setTransformationLimit
      */
-    public function testLimitsTransformationCount(array $transformations, int $limit, ?string $exceptionMessage) : void {
+    public function testLimitsTransformationCount(array $transformations, int $limit, ?string $exceptionMessage): void
+    {
         $listener = new ImageTransformationLimiter(['limit' => $limit]);
 
         $request = $this->createConfiguredMock(Request::class, [
@@ -50,17 +54,18 @@ class ImageTransformationLimiterTest extends TestCase {
         if ($exceptionMessage) {
             $this->expectExceptionObject(new ResourceException(
                 $exceptionMessage,
-                403
+                Response::HTTP_FORBIDDEN,
             ));
         }
 
         $this->assertNull(
             $listener->checkTransformationCount($event),
-            'Did not expect method to return anything'
+            'Did not expect method to return anything',
         );
     }
 
-    public function getLimits() : array {
+    public function getLimits(): array
+    {
         return [
             [42],
             [10],
@@ -73,11 +78,12 @@ class ImageTransformationLimiterTest extends TestCase {
      * @covers ::getTransformationLimit
      * @covers ::setTransformationLimit
      */
-    public function testGetSetLimitCountTransformationCount(int $limit) : void {
+    public function testGetSetLimitCountTransformationCount(int $limit): void
+    {
         $this->assertSame(
             $limit,
             $actual = (new ImageTransformationLimiter(['limit' => $limit]))->getTransformationLimit(),
-            sprintf('Expected limit to be %d, got: %d', $limit, $actual)
+            sprintf('Expected limit to be %d, got: %d', $limit, $actual),
         );
     }
 }

@@ -1,175 +1,127 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventManager;
 
+use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
+use Imbo\Database\DatabaseInterface;
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+use Imbo\Image\InputLoaderManager;
+use Imbo\Image\OutputConverterManager;
+use Imbo\Image\TransformationManager;
+use Imbo\Storage\StorageInterface;
 
-class Event implements EventInterface {
-    /**
-     * @var string
-     */
-    private $name;
+class Event implements EventInterface
+{
+    private ?string $name = null;
+    private bool $propagationStopped = false;
+    private array $arguments = [];
 
-    /**
-     * @var boolean
-     */
-    private $propagationStopped = false;
-
-    /**
-     * @var array
-     */
-    private $arguments = [];
-
-    /**
-     * Class constructor
-     *
-     * @param array $arguments
-     */
-    public function __construct(array $arguments = []) {
+    public function __construct(array $arguments = [])
+    {
         $this->arguments = $arguments;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName() {
+    public function getName(): ?string
+    {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setName($name) {
+    public function setName(string $name): self
+    {
         $this->name = $name;
-
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isPropagationStopped() {
+    public function isPropagationStopped(): bool
+    {
         return $this->propagationStopped;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function stopPropagation() {
+    public function stopPropagation(): self
+    {
         $this->propagationStopped = true;
-
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getArgument($key) {
+    public function getArgument(string $key)
+    {
         if ($this->hasArgument($key)) {
             return $this->arguments[$key];
         }
 
-        throw new InvalidArgumentException(sprintf('Argument "%s" does not exist', $key), 500);
+        throw new InvalidArgumentException(sprintf('Argument "%s" does not exist', $key), Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setArgument($key, $value) {
+    public function setArgument(string $key, $value): self
+    {
         $this->arguments[$key] = $value;
-
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setArguments(array $arguments = []) {
+    public function setArguments(array $arguments = []): self
+    {
         $this->arguments = $arguments;
-
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasArgument($key) {
+    public function hasArgument(string $key): bool
+    {
         return isset($this->arguments[$key]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getRequest() {
+    public function getRequest(): Request
+    {
         return $this->getArgument('request');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getResponse() {
+    public function getResponse(): Response
+    {
         return $this->getArgument('response');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDatabase() {
+    public function getDatabase(): DatabaseInterface
+    {
         return $this->getArgument('database');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getStorage() {
+    public function getStorage(): StorageInterface
+    {
         return $this->getArgument('storage');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAccessControl() {
+    public function getAccessControl(): AdapterInterface
+    {
         return $this->getArgument('accessControl');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getManager() {
+    public function getManager(): EventManager
+    {
         return $this->getArgument('manager');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTransformationManager() {
+    public function getTransformationManager(): TransformationManager
+    {
         return $this->getArgument('transformationManager');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getInputLoaderManager() {
+    public function getInputLoaderManager(): InputLoaderManager
+    {
         return $this->getArgument('inputLoaderManager');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getOutputConverterManager() {
+    public function getOutputConverterManager(): OutputConverterManager
+    {
         return $this->getArgument('outputConverterManager');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getConfig() {
+    public function getConfig(): array
+    {
         return $this->getArgument('config');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getHandler() {
+    public function getHandler(): string
+    {
         return $this->getArgument('handler');
     }
 }

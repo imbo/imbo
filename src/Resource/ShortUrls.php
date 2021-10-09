@@ -1,22 +1,26 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
 
-class ShortUrls implements ResourceInterface {
+class ShortUrls implements ResourceInterface
+{
     /**
      * {@inheritdoc}
      */
-    public function getAllowedMethods() {
+    public function getAllowedMethods()
+    {
         return ['POST', 'DELETE'];
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             // Add short URL
             'shorturls.post' => 'createShortUrl',
@@ -32,33 +36,34 @@ class ShortUrls implements ResourceInterface {
      *
      * @param EventInterface $event
      */
-    public function createShortUrl(EventInterface $event) {
+    public function createShortUrl(EventInterface $event)
+    {
         $request = $event->getRequest();
         $image = $request->getContent();
 
         if (empty($image)) {
-            throw new InvalidArgumentException('Missing JSON data', 400);
+            throw new InvalidArgumentException('Missing JSON data', Response::HTTP_BAD_REQUEST);
         } else {
             $image = json_decode($image, true);
 
             if ($image === null || json_last_error() !== JSON_ERROR_NONE) {
-                throw new InvalidArgumentException('Invalid JSON data', 400);
+                throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
             }
         }
 
         if (!isset($image['user']) || $image['user'] !== $request->getUser()) {
-            throw new InvalidArgumentException('Missing or invalid user', 400);
+            throw new InvalidArgumentException('Missing or invalid user', Response::HTTP_BAD_REQUEST);
         }
 
         if (!isset($image['imageIdentifier']) || $image['imageIdentifier'] !== $request->getImageIdentifier()) {
-            throw new InvalidArgumentException('Missing or invalid image identifier', 400);
+            throw new InvalidArgumentException('Missing or invalid image identifier', Response::HTTP_BAD_REQUEST);
         }
 
         $extension = isset($image['extension']) ? strtolower($image['extension']) : null;
         $outputConverterManager = $event->getOutputConverterManager();
 
         if ($extension !== null && !$outputConverterManager->supportsExtension($extension)) {
-            throw new InvalidArgumentException('Extension provided is not a recognized format', 400);
+            throw new InvalidArgumentException('Extension provided is not a recognized format', Response::HTTP_BAD_REQUEST);
         }
 
         $queryString = isset($image['query']) ? $image['query'] : null;
@@ -72,7 +77,7 @@ class ShortUrls implements ResourceInterface {
         $database = $event->getDatabase();
 
         if (!$database->imageExists($image['user'], $image['imageIdentifier'])) {
-            throw new InvalidArgumentException('Image does not exist', 404);
+            throw new InvalidArgumentException('Image does not exist', Response::HTTP_NOT_FOUND);
         }
 
         // See if a short URL ID already exists the for given parameters
@@ -86,7 +91,7 @@ class ShortUrls implements ResourceInterface {
                 // No short URL exists, generate an ID and insert. If the generated short URL ID
                 // already exists, insert again.
                 $shortUrlId = $this->getShortUrlId();
-            } while($database->getShortUrlParams($shortUrlId));
+            } while ($database->getShortUrlParams($shortUrlId));
 
             // We have an ID that does not already exist
             $database->insertShortUrl($shortUrlId, $image['user'], $image['imageIdentifier'], $extension, $query);
@@ -99,7 +104,7 @@ class ShortUrls implements ResourceInterface {
         ]);
 
         $event->getResponse()->setModel($model)
-                             ->setStatusCode($exists ? 200 : 201);
+                             ->setStatusCode($exists ? Response::HTTP_OK : Response::HTTP_CREATED);
     }
 
     /**
@@ -107,14 +112,15 @@ class ShortUrls implements ResourceInterface {
      *
      * @param EventInterface $event
      */
-    public function deleteImageShortUrls(EventInterface $event) {
+    public function deleteImageShortUrls(EventInterface $event)
+    {
         $request = $event->getRequest();
         $user = $request->getUser();
         $imageIdentifier = $request->getImageIdentifier();
 
         $event->getDatabase()->deleteShortUrls(
             $user,
-            $imageIdentifier
+            $imageIdentifier,
         );
 
         if ($event->getName() === 'shorturls.delete') {
@@ -135,7 +141,8 @@ class ShortUrls implements ResourceInterface {
      *
      * @return string
      */
-    private function getShortUrlId($len = 7) {
+    private function getShortUrlId($len = 7)
+    {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
         $charsLen = 62;
         $key = '';

@@ -1,28 +1,31 @@
 <?php declare(strict_types=1);
 namespace Imbo\Resource;
 
-use Imbo\Http\Response\Response;
 use Imbo\Database\DatabaseInterface;
-use Imbo\Storage\StorageInterface;
 use Imbo\EventManager\EventInterface;
+use Imbo\Http\Response\Response;
 use Imbo\Model\Status as StatusModel;
+use Imbo\Storage\StorageInterface;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
 /**
  * @coversDefaultClass Imbo\Resource\Status
  */
-class StatusTest extends ResourceTests {
+class StatusTest extends ResourceTests
+{
     private $resource;
     private $response;
     private $database;
     private $storage;
     private $event;
 
-    protected function getNewResource() : Status {
+    protected function getNewResource(): Status
+    {
         return new Status();
     }
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->response = $this->createMock(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);
         $this->storage = $this->createMock(StorageInterface::class);
@@ -35,28 +38,29 @@ class StatusTest extends ResourceTests {
         $this->resource = $this->getNewResource();
     }
 
-    public function getStatuses() : array {
+    public function getStatuses(): array
+    {
         return [
             'no error' => [
                 true,
-                true
+                true,
             ],
             'database down' => [
                 false,
                 true,
-                503,
+                Response::HTTP_SERVICE_UNAVAILABLE,
                 'Database error',
             ],
             'storage down' => [
                 true,
                 false,
-                503,
+                Response::HTTP_SERVICE_UNAVAILABLE,
                 'Storage error',
             ],
             'both down' => [
                 false,
                 false,
-                503,
+                Response::HTTP_SERVICE_UNAVAILABLE,
                 'Database and storage error',
             ],
         ];
@@ -66,7 +70,8 @@ class StatusTest extends ResourceTests {
      * @dataProvider getStatuses
      * @covers ::get
      */
-    public function testSetsCorrectStatusCodeAndErrorMessage(bool $databaseStatus, bool $storageStatus, ?int $statusCode = 0, ?string $reasonPhrase = '') : void {
+    public function testSetsCorrectStatusCodeAndErrorMessage(bool $databaseStatus, bool $storageStatus, ?int $statusCode = 0, ?string $reasonPhrase = ''): void
+    {
         $this->database
             ->expects($this->once())
             ->method('getStatus')

@@ -1,25 +1,28 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Model\Image;
-use Imbo\Exception\InvalidArgumentException;
-use Imbo\Exception\TransformationException;
-use Imbo\Exception\ConfigurationException;
-use PHPUnit\Framework\TestCase;
 use Imagick;
 use ImagickException;
+use Imbo\Exception\ConfigurationException;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
+use Imbo\Model\Image;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Icc
  */
-class IccTest extends TestCase {
+class IccTest extends TestCase
+{
     /**
      * @covers ::transform
      */
-    public function testExceptionWithoutProfiles() : void {
+    public function testExceptionWithoutProfiles(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException(
             'No profile name given for which ICC profile to use and no profile is assigned to the "default" name.',
-            400
+            Response::HTTP_BAD_REQUEST,
         ));
 
         (new Icc([]))->transform([]);
@@ -28,10 +31,11 @@ class IccTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testExceptionWithInvalidName() : void {
+    public function testExceptionWithInvalidName(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException(
             'The given ICC profile name ("foo") is unknown to the server.',
-            400
+            Response::HTTP_BAD_REQUEST,
         ));
 
         (new Icc([]))->transform(['profile' => 'foo']);
@@ -40,7 +44,8 @@ class IccTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testTransformationHappensWithMatchingName() : void {
+    public function testTransformationHappensWithMatchingName(): void
+    {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -67,7 +72,8 @@ class IccTest extends TestCase {
      * @covers ::__construct
      * @covers ::transform
      */
-    public function testTransformationHappensWithDefaultKey() : void {
+    public function testTransformationHappensWithDefaultKey(): void
+    {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -94,14 +100,15 @@ class IccTest extends TestCase {
      * @covers ::__construct
      * @covers ::transform
      */
-    public function testThrowsExceptionWhenImagickFailsWithAFatalError() : void {
+    public function testThrowsExceptionWhenImagickFailsWithAFatalError(): void
+    {
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
             ->method('profileImage')
             ->willThrowException($e = new ImagickException('Some error'));
 
-        $this->expectExceptionObject(new TransformationException('Some error', 400, $e));
+        $this->expectExceptionObject(new TransformationException('Some error', Response::HTTP_BAD_REQUEST, $e));
 
         (new Icc([
             'default' => DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc',
@@ -113,10 +120,11 @@ class IccTest extends TestCase {
     /**
      * @covers ::__construct
      */
-    public function testThrowsExceptionWhenConstructingWithWrongType() : void {
+    public function testThrowsExceptionWhenConstructingWithWrongType(): void
+    {
         $this->expectExceptionObject(new ConfigurationException(
             'Imbo\Image\Transformation\Icc requires an array with name => profile file (.icc) mappings when created.',
-            500
+            Response::HTTP_INTERNAL_SERVER_ERROR,
         ));
         new Icc('/some/path');
     }
@@ -124,15 +132,16 @@ class IccTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testThrowsExceptionWhenInvalidPathIsUsed() : void {
+    public function testThrowsExceptionWhenInvalidPathIsUsed(): void
+    {
         $path = DATA_DIR . '/foo/bar.icc';
 
         $this->expectExceptionObject(new ConfigurationException(
             sprintf(
                 'Could not load ICC profile referenced by "default": %s',
-                $path
+                $path,
             ),
-            500
+            Response::HTTP_INTERNAL_SERVER_ERROR,
         ));
 
         (new Icc([
@@ -144,7 +153,8 @@ class IccTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testStripProfileOnMismatch() : void {
+    public function testStripProfileOnMismatch(): void
+    {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -160,12 +170,12 @@ class IccTest extends TestCase {
             ->withConsecutive(
                 ['icc', $profile],
                 ['*', null],
-                ['icc', $profile]
+                ['icc', $profile],
             )
             ->willReturnOnConsecutiveCalls(
                 $this->throwException(new ImagickException('error #1', 465)),
                 true,
-                true
+                true,
             );
 
         (new Icc([
@@ -179,7 +189,8 @@ class IccTest extends TestCase {
     /**
      * @covers ::transform
      */
-    public function testThrowsExceptionWhenApplyingStrippedProfileFails() : void {
+    public function testThrowsExceptionWhenApplyingStrippedProfileFails(): void
+    {
         $profilePath = DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc';
         $profile = file_get_contents($profilePath);
 
@@ -189,15 +200,15 @@ class IccTest extends TestCase {
             ->withConsecutive(
                 ['icc', $profile],
                 ['*', ''],
-                ['icc', $profile]
+                ['icc', $profile],
             )
             ->willReturnOnConsecutiveCalls(
                 $this->throwException(new ImagickException('error #1', 465)),
                 true,
-                $this->throwException($e = new ImagickException('error #2'))
+                $this->throwException($e = new ImagickException('error #2')),
             );
 
-        $this->expectExceptionObject(new TransformationException('error #2', 400, $e));
+        $this->expectExceptionObject(new TransformationException('error #2', Response::HTTP_BAD_REQUEST, $e));
 
         (new Icc([
             'default' => DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc',

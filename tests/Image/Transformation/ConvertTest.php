@@ -1,25 +1,29 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Model\Image;
-use Imbo\EventManager\EventInterface;
-use Imbo\Image\OutputConverterManager;
-use Imbo\Exception\TransformationException;
 use Imagick;
 use ImagickException;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
+use Imbo\Image\OutputConverterManager;
+use Imbo\Model\Image;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Convert
  */
-class ConvertTest extends TransformationTests {
-    protected function getTransformation() : Convert {
+class ConvertTest extends TransformationTests
+{
+    protected function getTransformation(): Convert
+    {
         return new Convert();
     }
 
     /**
      * @covers ::transform
      */
-    public function testCanConvertAnImage() : void {
+    public function testCanConvertAnImage(): void
+    {
         $image = $this->createConfiguredMock(Image::class, [
             'getExtension' => 'png',
         ]);
@@ -66,7 +70,8 @@ class ConvertTest extends TransformationTests {
     /**
      * @covers ::transform
      */
-    public function testWillNotConvertImageIfNotNeeded() : void {
+    public function testWillNotConvertImageIfNotNeeded(): void
+    {
         $image = $this->createConfiguredMock(Image::class, [
             'getExtension' => 'png',
         ]);
@@ -80,12 +85,14 @@ class ConvertTest extends TransformationTests {
     /**
      * @covers ::transform
      */
-    public function testThrowsExceptionOnMissingType() : void {
-        $this->expectExceptionObject(new TransformationException('Missing required parameter: type', 400));
+    public function testThrowsExceptionOnMissingType(): void
+    {
+        $this->expectExceptionObject(new TransformationException('Missing required parameter: type', Response::HTTP_BAD_REQUEST));
         (new Convert())->transform([]);
     }
 
-    public function getConvertParams() : array {
+    public function getConvertParams(): array
+    {
         return [
             ['png', 'jpg', 'image/jpeg'],
             ['jpg', 'png', 'image/png'],
@@ -96,7 +103,8 @@ class ConvertTest extends TransformationTests {
      * @dataProvider getConvertParams
      * @covers ::transform
      */
-    public function testWillConvertImages(string $existingExtension, string $newType, string $newMimeType) : void {
+    public function testWillConvertImages(string $existingExtension, string $newType, string $newMimeType): void
+    {
         $image = $this->createConfiguredMock(Image::class, [
             'getExtension' => $existingExtension,
         ]);
@@ -143,7 +151,8 @@ class ConvertTest extends TransformationTests {
     /**
      * @covers ::transform
      */
-    public function testThrowsExceptionOnImagickError() : void {
+    public function testThrowsExceptionOnImagickError(): void
+    {
         $image = $this->createConfiguredMock(Image::class, [
             'getExtension' => 'png',
         ]);
@@ -154,7 +163,7 @@ class ConvertTest extends TransformationTests {
             ->method('setImageFormat')
             ->willThrowException($e = new ImagickException('some error'));
 
-        $this->expectExceptionObject(new TransformationException('some error', 400, $e));
+        $this->expectExceptionObject(new TransformationException('some error', Response::HTTP_BAD_REQUEST, $e));
 
         (new Convert())
             ->setImage($image)

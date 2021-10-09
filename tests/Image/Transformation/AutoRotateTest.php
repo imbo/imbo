@@ -5,6 +5,7 @@ use Imagick;
 use ImagickException;
 use ImagickPixelException;
 use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
 use Imbo\Image\InputSizeConstraint;
 use Imbo\Model\Image;
 
@@ -230,7 +231,7 @@ class AutoRotateTest extends TransformationTests
             ->method('getImageOrientation')
             ->willThrowException($imagickException);
 
-        $this->expectExceptionObject(new TransformationException('some error', 400, $imagickException));
+        $this->expectExceptionObject(new TransformationException('some error', Response::HTTP_BAD_REQUEST, $imagickException));
 
         (new AutoRotate())
             ->setImagick($imagick)
@@ -249,7 +250,7 @@ class AutoRotateTest extends TransformationTests
             ->method('getImageOrientation')
             ->willThrowException($pixelException);
 
-        $this->expectExceptionObject(new TransformationException('some error', 400, $pixelException));
+        $this->expectExceptionObject(new TransformationException('some error', Response::HTTP_BAD_REQUEST, $pixelException));
 
         (new AutoRotate())
             ->setImagick($imagick)

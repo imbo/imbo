@@ -6,6 +6,7 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\ResourceException;
 use Imbo\Exception\RuntimeException;
+use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
 
 class Key implements ResourceInterface
@@ -31,7 +32,7 @@ class Key implements ResourceInterface
         $publicKey = $event->getRequest()->getRoute()->get('publickey');
 
         if (!$acl->publicKeyExists($publicKey)) {
-            throw new RuntimeException('Public key not found', 404);
+            throw new RuntimeException('Public key not found', Response::HTTP_NOT_FOUND);
         }
 
         $event->getResponse()->setModel((new ArrayModel())->setData(['publicKey' => $publicKey]));
@@ -42,33 +43,33 @@ class Key implements ResourceInterface
         $acl = $event->getAccessControl();
 
         if (!($acl instanceof MutableAdapterInterface)) {
-            throw new ResourceException('Access control adapter is immutable', 405);
+            throw new ResourceException('Access control adapter is immutable', Response::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $request = $event->getRequest();
         $body    = $request->getContent();
 
         if (empty($body)) {
-            throw new InvalidArgumentException('Missing JSON data', 400);
+            throw new InvalidArgumentException('Missing JSON data', Response::HTTP_BAD_REQUEST);
         } else {
             $body = json_decode($body, true);
 
             if ($body === null || json_last_error() !== JSON_ERROR_NONE) {
-                throw new InvalidArgumentException('Invalid JSON data', 400);
+                throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
             }
         }
 
         $privateKey = $body['privateKey'] ?? null;
 
         if (null === $privateKey) {
-            throw new InvalidArgumentException('Missing private key', 400);
+            throw new InvalidArgumentException('Missing private key', Response::HTTP_BAD_REQUEST);
         }
 
         $publicKey = $request->getRoute()->get('publickey');
         $privateKey = $privateKey;
 
         if (!$acl->publicKeyExists($publicKey)) {
-            throw new InvalidArgumentException('Public key does not exist', 404);
+            throw new InvalidArgumentException('Public key does not exist', Response::HTTP_NOT_FOUND);
         }
 
         $acl->updatePrivateKey($publicKey, $privateKey);
@@ -80,14 +81,14 @@ class Key implements ResourceInterface
         $acl = $event->getAccessControl();
 
         if (!($acl instanceof MutableAdapterInterface)) {
-            throw new ResourceException('Access control adapter is immutable', 405);
+            throw new ResourceException('Access control adapter is immutable', Response::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $request = $event->getRequest();
         $publicKey = $request->getRoute()->get('publickey');
 
         if (!$acl->publicKeyExists($publicKey)) {
-            throw new RuntimeException('Public key does not exist', 404);
+            throw new RuntimeException('Public key does not exist', Response::HTTP_NOT_FOUND);
         }
 
         $acl->deletePublicKey($publicKey);

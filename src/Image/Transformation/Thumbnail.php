@@ -1,14 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException;
-use Imbo\Image\InputSizeConstraint;
 use ImagickException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
+use Imbo\Image\InputSizeConstraint;
 
 /**
  * Thumbnail transformation
  */
-class Thumbnail extends Transformation implements InputSizeConstraint {
+class Thumbnail extends Transformation implements InputSizeConstraint
+{
     /**
      * Width of the thumbnail
      *
@@ -35,7 +37,8 @@ class Thumbnail extends Transformation implements InputSizeConstraint {
     /**
      * {@inheritdoc}
      */
-    public function transform(array $params) {
+    public function transform(array $params)
+    {
         $width = !empty($params['width']) ? (int) $params['width'] : $this->width;
         $height = !empty($params['height']) ? (int) $params['height'] : $this->height;
         $fit = !empty($params['fit']) ? $params['fit'] : $this->fit;
@@ -47,7 +50,7 @@ class Thumbnail extends Transformation implements InputSizeConstraint {
                 $this->imagick->cropThumbnailImage($width, $height);
             }
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         $size = $this->imagick->getImageGeometry();
@@ -60,7 +63,8 @@ class Thumbnail extends Transformation implements InputSizeConstraint {
     /**
      * {@inheritdoc}
      */
-    public function getMinimumInputSize(array $params, array $imageSize) {
+    public function getMinimumInputSize(array $params, array $imageSize)
+    {
         $fit = isset($params['fit']) ? $params['fit'] : $this->fit;
         $width = !empty($params['width']) ? (int) $params['width'] : $this->width;
         $height = !empty($params['height']) ? (int) $params['height'] : $this->height;
@@ -78,7 +82,7 @@ class Thumbnail extends Transformation implements InputSizeConstraint {
 
         if ($ratioX === $ratioY) {
             return ['width' => $width, 'height' => $height];
-        } else if ($ratioX < $ratioY) {
+        } elseif ($ratioX < $ratioY) {
             return ['width' => $width, 'height' => (int) max(1, $ratioX * $sourceHeight)];
         }
 

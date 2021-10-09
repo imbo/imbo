@@ -1,23 +1,23 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException;
 use ImagickException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
 
 /**
  * Blur transformation
  */
-class Blur extends Transformation {
-    /**
-     * {@inheritdoc}
-     */
-    public function transform(array $params) {
+class Blur extends Transformation
+{
+    public function transform(array $params)
+    {
         $type = isset($params['type']) ? $params['type'] : 'gaussian';
 
         $blurTypes = ['gaussian', 'adaptive', 'motion', 'radial', 'rotational'];
 
         if (!in_array($type, $blurTypes)) {
-            throw new TransformationException('Unknown blur type: ' . $type, 400);
+            throw new TransformationException('Unknown blur type: ' . $type, Response::HTTP_BAD_REQUEST);
         }
 
         switch ($type) {
@@ -43,10 +43,11 @@ class Blur extends Transformation {
      * @param array $required Array with required parameters
      * @throws TransformationException
      */
-    private function checkRequiredParams(array $params, array $required) {
+    private function checkRequiredParams(array $params, array $required)
+    {
         foreach ($required as $param) {
             if (!isset($params[$param])) {
-                throw new TransformationException('Missing required parameter: ' . $param, 400);
+                throw new TransformationException('Missing required parameter: ' . $param, Response::HTTP_BAD_REQUEST);
             }
         }
     }
@@ -57,7 +58,8 @@ class Blur extends Transformation {
      * @param array $params The transformation parameters
      * @param bool $adaptive Perform adaptive blur or not
      */
-    private function blur(array $params, $adaptive = false) {
+    private function blur(array $params, $adaptive = false)
+    {
         $this->checkRequiredParams($params, ['radius', 'sigma']);
 
         $radius = (float) $params['radius'];
@@ -70,7 +72,7 @@ class Blur extends Transformation {
                 $this->imagick->gaussianBlurImage($radius, $sigma);
             }
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         $this->image->setHasBeenTransformed(true);
@@ -81,7 +83,8 @@ class Blur extends Transformation {
      *
      * @param array $params The transformation parameters
      */
-    private function motionBlur(array $params) {
+    private function motionBlur(array $params)
+    {
         $this->checkRequiredParams($params, ['radius', 'sigma', 'angle']);
 
         $radius = (float) $params['radius'];
@@ -91,7 +94,7 @@ class Blur extends Transformation {
         try {
             $this->imagick->motionBlurImage($radius, $sigma, $angle);
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         $this->image->setHasBeenTransformed(true);
@@ -102,7 +105,8 @@ class Blur extends Transformation {
      *
      * @param array $params The transformation parameters
      */
-    private function rotationalBlur(array $params) {
+    private function rotationalBlur(array $params)
+    {
         $this->checkRequiredParams($params, ['angle']);
 
         $angle = (float) $params['angle'];
@@ -110,7 +114,7 @@ class Blur extends Transformation {
         try {
             $this->imagick->rotationalBlurImage($angle);
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         $this->image->setHasBeenTransformed(true);

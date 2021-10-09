@@ -1,41 +1,45 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image;
 
-use Imbo\Model\Image;
-use Imbo\Image\OutputConverterManager;
+use Imagick;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Response\Response;
 use Imbo\Image\OutputConverter\Basic;
 use Imbo\Image\OutputConverter\Bmp;
-use Imbo\Image\OutputConverter\Webp;
 use Imbo\Image\OutputConverter\OutputConverterInterface;
-use Imbo\Exception\InvalidArgumentException;
+use Imbo\Image\OutputConverter\Webp;
+use Imbo\Model\Image;
 use PHPUnit\Framework\TestCase;
-use Imagick;
 use stdClass;
 
 /**
  * @coversDefaultClass Imbo\Image\OutputConverterManager
  */
-class OutputConverterManagerTest extends TestCase {
+class OutputConverterManagerTest extends TestCase
+{
     private $manager;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->manager = new OutputConverterManager();
     }
 
     /**
      * @covers ::setImagick
      */
-    public function testCanSetImagickInstance() : void {
+    public function testCanSetImagickInstance(): void
+    {
         $this->assertSame($this->manager, $this->manager->setImagick($this->createMock(Imagick::class)));
     }
 
     /**
      * @covers ::addConverters
      */
-    public function testThrowsExceptionWhenRegisteringWrongConverter() : void {
+    public function testThrowsExceptionWhenRegisteringWrongConverter(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException(
             'Given converter (stdClass) does not implement OutputConverterInterface',
-            500
+            Response::HTTP_INTERNAL_SERVER_ERROR,
         ));
         $this->manager->addConverters([new stdClass()]);
     }
@@ -44,11 +48,12 @@ class OutputConverterManagerTest extends TestCase {
     /**
      * @covers ::addConverters
      */
-    public function testCanAddConvertersAsStrings() : void {
+    public function testCanAddConvertersAsStrings(): void
+    {
         $this->assertSame($this->manager, $this->manager->addConverters([
             new Basic(),
             new Bmp(),
-            Webp::class
+            Webp::class,
         ]));
     }
 
@@ -62,35 +67,36 @@ class OutputConverterManagerTest extends TestCase {
      * @covers ::supportsExtension
      * @covers ::registerConverter
      */
-    public function testCanRegisterConverters() : void {
+    public function testCanRegisterConverters(): void
+    {
         // Assert that everything is empty from the start
         $this->assertEmpty(
             $this->manager->getSupportedExtensions(),
-            'Expected no supported extensions'
+            'Expected no supported extensions',
         );
         $this->assertEmpty(
             $this->manager->getSupportedMimeTypes(),
-            'Expected no supported mime types'
+            'Expected no supported mime types',
         );
         $this->assertNull(
             $this->manager->getMimeTypeFromExtension('png'),
-            'Did not expect to get mime type from extension'
+            'Did not expect to get mime type from extension',
         );
         $this->assertNull(
             $this->manager->getExtensionFromMimeType('image/png'),
-            'Did not expect to get extension from mime type'
+            'Did not expect to get extension from mime type',
         );
         $this->assertEmpty(
             $this->manager->getMimeTypeToExtensionMap(),
-            'Expected empty mime type to extension map'
+            'Expected empty mime type to extension map',
         );
         $this->assertEmpty(
             $this->manager->getExtensionToMimeTypeMap(),
-            'Expected empty extension to mime type map'
+            'Expected empty extension to mime type map',
         );
         $this->assertFalse(
             $this->manager->supportsExtension('png'),
-            'Did not expect to support given extension'
+            'Did not expect to support given extension',
         );
 
         $converter1 = $this->createConfiguredMock(OutputConverterInterface::class, [
@@ -113,7 +119,7 @@ class OutputConverterManagerTest extends TestCase {
         $this->assertCount(
             4,
             $supportedExtensions = $this->manager->getSupportedExtensions(),
-            sprintf('Expected to 4 supported extensions, got %d', count($supportedExtensions))
+            sprintf('Expected to 4 supported extensions, got %d', count($supportedExtensions)),
         );
 
         foreach (['jpg', 'jpeg', 'gif', 'png'] as $ext) {
@@ -123,7 +129,7 @@ class OutputConverterManagerTest extends TestCase {
         $this->assertCount(
             3,
             $supportedMimeTypes = $this->manager->getSupportedMimeTypes(),
-            sprintf('Expected to 3 supported mime types, got %d', count($supportedMimeTypes))
+            sprintf('Expected to 3 supported mime types, got %d', count($supportedMimeTypes)),
         );
 
         foreach (['image/jpeg', 'image/gif', 'image/png'] as $mime) {
@@ -155,7 +161,7 @@ class OutputConverterManagerTest extends TestCase {
         foreach (['jpg', 'jpeg', 'gif', 'png'] as $ext) {
             $this->assertTrue(
                 $this->manager->supportsExtension($ext),
-                sprintf('Expected to support "%s"', $ext)
+                sprintf('Expected to support "%s"', $ext),
             );
         }
     }
@@ -165,7 +171,8 @@ class OutputConverterManagerTest extends TestCase {
      * @covers ::supportsExtension
      * @covers ::getMimeTypeFromExtension
      */
-    public function testCanConvertImages() : void {
+    public function testCanConvertImages(): void
+    {
         $mime = 'image/png';
         $extension = 'png';
 
@@ -193,7 +200,7 @@ class OutputConverterManagerTest extends TestCase {
                 ->setImagick($imagick)
                 ->registerConverter($converter)
                 ->convert($image, $extension, $mime),
-            'Exected convert method to return true'
+            'Exected convert method to return true',
         );
     }
 
@@ -201,7 +208,8 @@ class OutputConverterManagerTest extends TestCase {
      * @covers ::convert
      * @covers ::supportsExtension
      */
-    public function testCanConvertImageUsingMimeType() : void {
+    public function testCanConvertImageUsingMimeType(): void
+    {
         $mime = 'image/jpeg';
         $extension = 'jpg';
 
@@ -229,14 +237,15 @@ class OutputConverterManagerTest extends TestCase {
                 ->setImagick($imagick)
                 ->registerConverter($converter)
                 ->convert($image, 'jpeg', $mime),
-            'Exected convert method to return true'
+            'Exected convert method to return true',
         );
     }
 
     /**
      * @covers ::convert
      */
-    public function testReturnsNullWhenImageCantBeConverted() : void {
+    public function testReturnsNullWhenImageCantBeConverted(): void
+    {
         $converter = $this->createConfiguredMock(OutputConverterInterface::class, [
             'getSupportedMimeTypes' => [
                 'image/png' => 'png',
@@ -250,7 +259,7 @@ class OutputConverterManagerTest extends TestCase {
             $this->manager
                 ->setImagick($this->createMock(Imagick::class))
                 ->registerConverter($converter)
-                ->convert($this->createMock(Image::class), 'png', 'image/png')
+                ->convert($this->createMock(Image::class), 'png', 'image/png'),
         );
     }
 }

@@ -1,26 +1,28 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Auth\AccessControl\Adapter;
 
-use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
 use Imbo\Auth\AccessControl\GroupQuery;
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Response\Response;
 use Imbo\Model\Groups as GroupsModel;
 
 /**
  * Abstract access control adapter
  */
-abstract class AbstractAdapter implements AdapterInterface {
+abstract class AbstractAdapter implements AdapterInterface
+{
     abstract public function getGroups(GroupQuery $query, GroupsModel $model): array;
     abstract public function groupExists(string $groupName): bool;
     abstract public function getGroup(string $groupName): ?array;
 
-    public function hasAccess(string $publicKey, string $resource, string $user = null): bool {
+    public function hasAccess(string $publicKey, string $resource, string $user = null): bool
+    {
         $accessList = $this->getAccessListForPublicKey($publicKey) ?: [];
 
         foreach ($accessList as $acl) {
             // If the group specified has not been defined, throw an exception to help the user
             if (!isset($acl['users'])) {
-                throw new InvalidArgumentException('Missing property "users" in access rule', 500);
+                throw new InvalidArgumentException('Missing property "users" in access rule', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
             // If a user is specified, ensure the public key has access to the user
@@ -41,7 +43,7 @@ abstract class AbstractAdapter implements AdapterInterface {
 
                 // If the group has not been defined, throw an exception to help debug the problem
                 if ($resources === null) {
-                    throw new InvalidArgumentException('Group "' . $group . '" is not defined', 500);
+                    throw new InvalidArgumentException('Group "' . $group . '" is not defined', Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
             }
 
@@ -53,9 +55,10 @@ abstract class AbstractAdapter implements AdapterInterface {
         return false;
     }
 
-    public function getUsersForResource(string $publicKey, string $resource): array {
+    public function getUsersForResource(string $publicKey, string $resource): array
+    {
         $accessList = $this->getAccessListForPublicKey($publicKey);
-        $userLists = array_filter(array_map(fn($acl) => $acl['users'] ?? false, $accessList));
+        $userLists = array_filter(array_map(fn ($acl) => $acl['users'] ?? false, $accessList));
         $users = array_merge(...$userLists);
 
         if ($this->hasAccess($publicKey, $resource, $publicKey)) {

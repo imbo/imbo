@@ -8,6 +8,7 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Exception\DatabaseException;
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 
 /**
@@ -187,7 +188,7 @@ class ExifMetadataTest extends ListenerTests
             'getRequest' => $request,
             'getDatabase' => $database,
         ]);
-        $this->expectExceptionObject(new RuntimeException('Could not store EXIF-metadata', 500));
+        $this->expectExceptionObject(new RuntimeException('Could not store EXIF-metadata', Response::HTTP_INTERNAL_SERVER_ERROR));
         $this->listener->save($event);
     }
 

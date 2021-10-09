@@ -1,25 +1,29 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception\ResourceException;
+use Imbo\Http\Response\Response;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * Global short URL resource
  */
-class GlobalShortUrl implements ResourceInterface {
+class GlobalShortUrl implements ResourceInterface
+{
     /**
      * {@inheritdoc}
      */
-    public function getAllowedMethods() {
+    public function getAllowedMethods()
+    {
         return ['GET', 'HEAD'];
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             // Fetch an image using the short URL
             'globalshorturl.get' => 'getImage',
@@ -32,14 +36,15 @@ class GlobalShortUrl implements ResourceInterface {
      *
      * @param EventInterface $event
      */
-    public function getImage(EventInterface $event) {
+    public function getImage(EventInterface $event)
+    {
         $request = $event->getRequest();
         $route = $request->getRoute();
 
         $params = $event->getDatabase()->getShortUrlParams($route->get('shortUrlId'));
 
         if (!$params) {
-            throw new ResourceException('Image not found', 404);
+            throw new ResourceException('Image not found', Response::HTTP_NOT_FOUND);
         }
 
         $route->set('user', $params['user']);

@@ -1,10 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
+use ImagickException;
 use Imbo\Exception\ConfigurationException;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\TransformationException;
-use ImagickException;
+use Imbo\Http\Response\Response;
 
 /**
  * Transformation for applying ICC profiles to an image.
@@ -25,7 +26,8 @@ use ImagickException;
  *          },
  *      ],
  */
-class Icc extends Transformation {
+class Icc extends Transformation
+{
     /**
      * @var array
      */
@@ -38,9 +40,13 @@ class Icc extends Transformation {
      *                        with the `profile` parameter for the transformation, and the values
      *                        are paths to the profiles themselves.
      */
-    public function __construct($profiles) {
+    public function __construct($profiles)
+    {
         if (!is_array($profiles)) {
-            throw new ConfigurationException(get_class() . ' requires an array with name => profile file (.icc) mappings when created.', 500);
+            throw new ConfigurationException(
+                get_class() . ' requires an array with name => profile file (.icc) mappings when created.',
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+            );
         }
 
         $this->profiles = $profiles;
@@ -49,17 +55,27 @@ class Icc extends Transformation {
     /**
      * {@inheritdoc}
      */
-    public function transform(array $params) {
+    public function transform(array $params)
+    {
         if (empty($params['profile']) && empty($this->profiles['default'])) {
-            throw new InvalidArgumentException('No profile name given for which ICC profile to use and no profile is assigned to the "default" name.', 400);
-        } else if (!empty($params['profile']) && empty($this->profiles[$params['profile']])) {
-            throw new InvalidArgumentException('The given ICC profile name ("' . $params['profile'] . '") is unknown to the server.', 400);
+            throw new InvalidArgumentException(
+                'No profile name given for which ICC profile to use and no profile is assigned to the "default" name.',
+                Response::HTTP_BAD_REQUEST,
+            );
+        } elseif (!empty($params['profile']) && empty($this->profiles[$params['profile']])) {
+            throw new InvalidArgumentException(
+                'The given ICC profile name ("' . $params['profile'] . '") is unknown to the server.',
+                Response::HTTP_BAD_REQUEST,
+            );
         }
 
         $file = empty($params['profile']) ? $this->profiles['default'] : $this->profiles[$params['profile']];
 
         if (!file_exists($file)) {
-            throw new ConfigurationException('Could not load ICC profile referenced by "' . (!empty($params['profile']) ? $params['profile'] : 'default') . '": ' . $file, 500);
+            throw new ConfigurationException(
+                'Could not load ICC profile referenced by "' . (!empty($params['profile']) ? $params['profile'] : 'default') . '": ' . $file,
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+            );
         }
 
         $iccProfile = file_get_contents($file);
@@ -76,10 +92,10 @@ class Icc extends Transformation {
                     // try to apply the profile again
                     $this->imagick->profileImage('icc', $iccProfile);
                 } catch (ImagickException $e) {
-                    throw new TransformationException($e->getMessage(), 400, $e);
+                    throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
                 }
             } else {
-                throw new TransformationException($e->getMessage(), 400, $e);
+                throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
             }
         }
 

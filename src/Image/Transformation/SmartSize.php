@@ -1,31 +1,29 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\RegionExtractor;
-use Imbo\Exception\TransformationException;
 use ImagickException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
 
 /**
  * SmartSize transformation
  */
-class SmartSize extends Transformation {
+class SmartSize extends Transformation
+{
     /**
      * Holds cached metadata for this image
-     *
-     * @var array
      */
-    private $metadata = null;
+    private ?array $metadata = null;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function transform(array $params) {
+    public function transform(array $params): void
+    {
         $params = $this->validateParameters($params);
 
         $this->event->getResponse()->headers->set('X-Imbo-POIs-Used', $params['poi'] ? 1 : 0);
 
         if (!$params['poi']) {
-            return $this->simpleCrop($params['width'], $params['height']);
+            $this->simpleCrop($params['width'], $params['height']);
+            return;
         }
 
         $crop = $this->calculateCrop($params, [
@@ -38,7 +36,7 @@ class SmartSize extends Transformation {
             $this->imagick->setImagePage(0, 0, 0, 0);
             $this->imagick->thumbnailImage($params['width'], $params['height']);
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         $this->image->setWidth($params['width'])
@@ -53,7 +51,8 @@ class SmartSize extends Transformation {
      * @param array $imageSize
      * @return array Crop data
      */
-    private function calculateCrop(array $parameters, array $imageSize) {
+    private function calculateCrop(array $parameters, array $imageSize)
+    {
         $focalX = $parameters['poi'][0];
         $focalY  = $parameters['poi'][1];
 
@@ -73,8 +72,8 @@ class SmartSize extends Transformation {
             $cropWidth = (int) ceil(
                 $targetRatio * max(
                     min($sourceHeight, $targetHeight * $growFactor),
-                    $sourceHeight * $sourcePortionThreshold
-                )
+                    $sourceHeight * $sourcePortionThreshold,
+                ),
             );
             $cropHeight = (int) floor($cropWidth / $targetRatio);
         } else {
@@ -82,8 +81,8 @@ class SmartSize extends Transformation {
             $cropHeight = (int) ceil(
                 max(
                     min($sourceWidth, $targetWidth * $growFactor),
-                    $sourceWidth * $sourcePortionThreshold
-                ) / $targetRatio
+                    $sourceWidth * $sourcePortionThreshold,
+                ) / $targetRatio,
             );
             $cropWidth = (int) floor($cropHeight * $targetRatio);
         }
@@ -94,14 +93,14 @@ class SmartSize extends Transformation {
         // Make sure that we're not cropping outside the image on the x axis
         if ($cropLeft < 0) {
             $cropLeft = 0;
-        } else if ($cropLeft + $cropWidth > $sourceWidth) {
+        } elseif ($cropLeft + $cropWidth > $sourceWidth) {
             $cropLeft = $sourceWidth - $cropWidth;
         }
 
         // Make sure that we're not cropping outside the image on the y axis
         if ($cropTop < 0) {
             $cropTop = 0;
-        } else if ($cropTop + $cropHeight > $sourceHeight) {
+        } elseif ($cropTop + $cropHeight > $sourceHeight) {
             $cropTop = $sourceHeight - $cropHeight;
         }
 
@@ -115,16 +114,13 @@ class SmartSize extends Transformation {
 
     /**
      * Fetch POI from metadata for the image
-     *
-     * @param EventInterface $event
-     * @param Image $image
-     * @return array|false Array with x and y coordinate, or false if no POI was found
      */
-    private function getPoiFromMetadata() {
+    private function getPoiFromMetadata(): ?array
+    {
         if ($this->metadata === null) {
             $metadata = $this->event->getDatabase()->getMetadata(
                 $this->image->getUser(),
-                $this->image->getImageIdentifier()
+                $this->image->getImageIdentifier(),
             );
 
             $poi = isset($metadata['poi'][0]) ? $metadata['poi'][0] : false;
@@ -133,19 +129,19 @@ class SmartSize extends Transformation {
             if ($poi && isset($poi['cx']) && isset($poi['cy'])) {
                 $this->metadata = [
                     (int) $poi['cx'],
-                    (int) $poi['cy']
+                    (int) $poi['cy'],
                 ];
-            } else if (
+            } elseif (
                 $poi &&
                 isset($poi['x']) && isset($poi['y']) &&
                 isset($poi['width']) && isset($poi['height'])
             ) {
                 $this->metadata = [
                     (int) $poi['x'] + ($poi['width']  / 2),
-                    (int) $poi['y'] + ($poi['height'] / 2)
+                    (int) $poi['y'] + ($poi['height'] / 2),
                 ];
             } else {
-                $this->metadata = false;
+                $this->metadata = null;
             }
         }
 
@@ -157,10 +153,9 @@ class SmartSize extends Transformation {
       * the crop area should never go below.
       *
       * This is important in order to avoid using a very small portion of a large image.
-      *
-      * @param $closeness Closeness of crop
      */
-    private function getSourcePercentageThreshold($closeness) {
+    private function getSourcePercentageThreshold(string $closeness): float
+    {
         switch ($closeness) {
             case 'close':
                 return 0.3;
@@ -179,10 +174,9 @@ class SmartSize extends Transformation {
     /**
       * Get the factor by which the crop area is grown in order to include stuff around
       * the POI. The larger the factor, the wider the crop.
-      *
-      * @param $closeness Closeness of crop
      */
-    private function getGrowFactor($closeness) {
+    private function getGrowFactor(string $closeness): float
+    {
         switch ($closeness) {
             case 'close':
                 return 1;
@@ -200,11 +194,9 @@ class SmartSize extends Transformation {
 
     /**
      * Perform a simple crop/resize operation on the image
-     *
-     * @param int $width
-     * @param int $height
      */
-    private function simpleCrop($width, $height) {
+    private function simpleCrop(int $width, int $height): void
+    {
         $sourceRatio = $this->image->getWidth() / $this->image->getHeight();
         $cropRatio = $width / $height;
 
@@ -225,21 +217,23 @@ class SmartSize extends Transformation {
         $crop->setImage($this->image)->transform([
             'width' => $width,
             'height' => $height,
-            'mode' => 'center'
+            'mode' => 'center',
         ]);
     }
 
     /**
      * Validate parameters and return a normalized parameter array
      *
-     * @param array $params
-     * @return array
      * @throws TransformationException Thrown on invalid or missing parameters
      */
-    private function validateParameters(array $params) {
+    private function validateParameters(array $params): array
+    {
         if (empty($params['width']) || empty($params['height'])) {
-            throw new TransformationException('Both width and height needs to be specified', 400);
+            throw new TransformationException('Both width and height needs to be specified', Response::HTTP_BAD_REQUEST);
         }
+
+        $params['width'] = (int) $params['width'];
+        $params['height'] = (int) $params['height'];
 
         // Get POI from transformation params
         $poi = empty($params['poi']) ? null : explode(',', $params['poi']);
@@ -248,18 +242,18 @@ class SmartSize extends Transformation {
         if (!$poi) {
             $metadataPoi = $this->getPoiFromMetadata();
 
-            if ($metadataPoi) {
+            if (null !== $metadataPoi) {
                 $poi = $metadataPoi;
             }
         }
 
         if ($poi) {
             if (!isset($poi[0]) || !isset($poi[1])) {
-                throw new TransformationException('Invalid POI format, expected format `<x>,<y>`', 400);
+                throw new TransformationException('Invalid POI format, expected format `<x>,<y>`', Response::HTTP_BAD_REQUEST);
             }
 
             if (!empty($params['crop']) && in_array($params['crop'], ['close', 'medium', 'wide', 'full']) === false) {
-                throw new TransformationException('Invalid crop value. Valid values are: close,medium,wide,full', 400);
+                throw new TransformationException('Invalid crop value. Valid values are: close,medium,wide,full', Response::HTTP_BAD_REQUEST);
             }
         }
 

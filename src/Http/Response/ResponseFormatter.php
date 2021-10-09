@@ -1,17 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Http\Response;
 
-use Imbo\EventManager\EventInterface;
 use Imbo\EventListener\ListenerInterface;
-use Imbo\Model;
+use Imbo\EventManager\EventInterface;
 use Imbo\Exception;
+use Imbo\Http\Request\Request;
+use Imbo\Model;
 use Symfony\Component\HttpFoundation\AcceptHeader;
 
 /**
  * This event listener will correctly format the response body based on the Accept headers in the
  * request
  */
-class ResponseFormatter implements ListenerInterface {
+class ResponseFormatter implements ListenerInterface
+{
     /**
      * Content formatters
      *
@@ -88,7 +90,8 @@ class ResponseFormatter implements ListenerInterface {
      *
      * @param array $param Parameters for the event listener
      */
-    public function __construct(array $params) {
+    public function __construct(array $params)
+    {
         $this->formatters = $params['formatters'];
         $this->contentNegotiation = $params['contentNegotiation'];
     }
@@ -96,7 +99,8 @@ class ResponseFormatter implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             'response.send' => ['format' => 20],
             'response.negotiate' => 'negotiate',
@@ -109,7 +113,8 @@ class ResponseFormatter implements ListenerInterface {
      * @param string $formatter The formatter to set
      * @return self
      */
-    public function setFormatter($formatter) {
+    public function setFormatter($formatter)
+    {
         $this->formatter = $formatter;
 
         return $this;
@@ -120,7 +125,8 @@ class ResponseFormatter implements ListenerInterface {
      *
      * @return string
      */
-    public function getFormatter() {
+    public function getFormatter()
+    {
         return $this->formatter;
     }
 
@@ -129,7 +135,8 @@ class ResponseFormatter implements ListenerInterface {
      *
      * @param EventInterface $event The event instance
      */
-    public function negotiate(EventInterface $event) {
+    public function negotiate(EventInterface $event)
+    {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
@@ -150,7 +157,7 @@ class ResponseFormatter implements ListenerInterface {
             // Configuration is telling us not to use content negotiation for images,
             // instead we want to use the original format of the image
             $formatter = $model->getExtension();
-        } else if ($extension && !($model instanceof Model\Error && ($routeName === 'image' || $routeName === 'globalshorturl'))) {
+        } elseif ($extension && !($model instanceof Model\Error && ($routeName === 'image' || $routeName === 'globalshorturl'))) {
             // The user agent wants a specific type. Skip content negotiation completely, but not
             // if the request is against the image resource (or the global short url resource), and
             // ended up as an error, because then Imbo would try to render the error as an image.
@@ -158,13 +165,13 @@ class ResponseFormatter implements ListenerInterface {
 
             if (isset($extensionsToMimeType[$extension])) {
                 $mime = $extensionsToMimeType[$extension];
-            } else if ($model instanceof Model\Image) {
+            } elseif ($model instanceof Model\Image) {
                 // If the request is for an image, but we don't support the extension - give a 404 like the old router did.
-                throw new Exception\RuntimeException('Not Found', 404);
+                throw new Exception\RuntimeException('Not Found', Response::HTTP_NOT_FOUND);
             }
 
             $formatter = $supportedTypes[$mime];
-        } else if (null !== $model) {
+        } elseif (null !== $model) {
             // Set Vary to Accept since we are doing content negotiation based on Accept
             $response->setVary('Accept', false);
 
@@ -197,7 +204,7 @@ class ResponseFormatter implements ListenerInterface {
                 $original = $model->getMimeType();
 
                 if ($types[0] !== $original) {
-                    $types = array_filter($types, function($type) use ($original) {
+                    $types = array_filter($types, function ($type) use ($original) {
                         return $type !== $original;
                     });
 
@@ -224,8 +231,8 @@ class ResponseFormatter implements ListenerInterface {
             if (!$match && !$event->hasArgument('noStrict')) {
                 // No types matched with strict mode enabled. The client does not want any of Imbo's
                 // supported types. Y U NO ACCEPT MY TYPES?! FFFFUUUUUUU!
-                throw new Exception\RuntimeException('Not acceptable', 406);
-            } else if (!$match) {
+                throw new Exception\RuntimeException('Not acceptable', Response::HTTP_NOT_ACCEPTABLE);
+            } elseif (!$match) {
                 // There was no match but we don't want to be an ass about it. Send a response
                 // anyway (allowed according to RFC2616, section 10.4.7)
                 $formatter = $supportedTypes[$this->defaultMimeType];
@@ -240,11 +247,12 @@ class ResponseFormatter implements ListenerInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function format(EventInterface $event) {
+    public function format(EventInterface $event)
+    {
         $response = $event->getResponse();
         $model = $response->getModel();
 
-        if ($response->getStatusCode() === 204 || !$model) {
+        if (Response::HTTP_NO_CONTENT === $response->getStatusCode() || !$model) {
             // No content to write
             return;
         }
@@ -265,7 +273,7 @@ class ResponseFormatter implements ListenerInterface {
                 $outputConverterManager->convert($model, $this->formatter);
             // for clarity - if we just have a requested compression / quality value, we still have to invoke the
             // conversion / writer for the existing format
-            } else if (
+            } elseif (
                 $model->getOutputQualityCompression() &&
                 $outputConverterManager->supportsExtension($this->formatter)
             ) {
@@ -299,7 +307,7 @@ class ResponseFormatter implements ListenerInterface {
             'Content-Length' => strlen($formattedData),
         ]);
 
-        if ($request->getMethod() !== 'HEAD') {
+        if (Request::METHOD_HEAD !== $request->getMethod()) {
             $response->setContent($formattedData);
         }
     }

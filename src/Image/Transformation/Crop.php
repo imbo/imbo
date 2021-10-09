@@ -1,33 +1,26 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException;
-use Imbo\Image\RegionExtractor;
-use Imbo\Image\InputSizeConstraint;
 use ImagickException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
+use Imbo\Image\InputSizeConstraint;
+use Imbo\Image\RegionExtractor;
 
-/**
- * Crop transformation
- */
-class Crop extends Transformation implements RegionExtractor, InputSizeConstraint {
+class Crop extends Transformation implements RegionExtractor, InputSizeConstraint
+{
     /**
      * X coordinate of the top left corner of the crop
-     *
-     * @var int
      */
-    private $x = 0;
+    private int $x = 0;
 
     /**
      * Y coordinate of the top left corner of the crop
-     *
-     * @var int
      */
-    private $y = 0;
+    private int $y = 0;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function transform(array $params) {
+    public function transform(array $params): void
+    {
         $region = $this->getExtractedRegion($params, [
             'width'  => $this->image->getWidth(),
             'height' => $this->image->getHeight(),
@@ -42,12 +35,12 @@ class Crop extends Transformation implements RegionExtractor, InputSizeConstrain
                 $region['width'],
                 $region['height'],
                 $region['x'],
-                $region['y']
+                $region['y'],
             );
 
             $this->imagick->setImagePage(0, 0, 0, 0);
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         $size = $this->imagick->getImageGeometry();
@@ -58,12 +51,14 @@ class Crop extends Transformation implements RegionExtractor, InputSizeConstrain
     }
 
     /**
-     * {@inheritdoc}
+     * @throws TransformationException
+     * @return array{x:int,y:int,width:int,height:int}|false
      */
-    public function getExtractedRegion(array $params, array $imageSize) {
+    public function getExtractedRegion(array $params, array $imageSize)
+    {
         foreach (['width', 'height'] as $param) {
             if (!isset($params[$param])) {
-                throw new TransformationException('Missing required parameter: ' . $param, 400);
+                throw new TransformationException('Missing required parameter: ' . $param, Response::HTTP_BAD_REQUEST);
             }
         }
 
@@ -77,23 +72,23 @@ class Crop extends Transformation implements RegionExtractor, InputSizeConstrain
 
         // Set correct x and/or y values based on the crop mode
         if ($mode === 'center' || $mode === 'center-x') {
-            $x = (int) ($imageSize['width'] - $width) / 2;
+            $x = (int) (($imageSize['width'] - $width) / 2);
         }
 
         if ($mode === 'center' || $mode === 'center-y') {
-            $y = (int) ($imageSize['height'] - $height) / 2;
+            $y = (int) (($imageSize['height'] - $height) / 2);
         }
 
         // Throw exception on X/Y values that are out of bounds
         if ($x + $width > $imageSize['width']) {
             throw new TransformationException(
                 'Crop area is out of bounds (`x` + `width` > image width)',
-                400
+                Response::HTTP_BAD_REQUEST,
             );
-        } else if ($y + $height > $imageSize['height']) {
+        } elseif ($y + $height > $imageSize['height']) {
             throw new TransformationException(
                 'Crop area is out of bounds (`y` + `height` > image height)',
-                400
+                Response::HTTP_BAD_REQUEST,
             );
         }
 
@@ -106,21 +101,17 @@ class Crop extends Transformation implements RegionExtractor, InputSizeConstrain
             'width' => $width,
             'height' => $height,
             'x' => $x,
-            'y' => $y
+            'y' => $y,
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getMinimumInputSize(array $params, array $imageSize) {
+    public function getMinimumInputSize(array $params, array $imageSize): int
+    {
         return InputSizeConstraint::NO_TRANSFORMATION;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function adjustParameters($ratio, array $parameters) {
+    public function adjustParameters(float $ratio, array $parameters): array
+    {
         foreach (['x', 'y', 'width', 'height'] as $param) {
             if (isset($parameters[$param])) {
                 $parameters[$param] = round($parameters[$param] / $ratio);

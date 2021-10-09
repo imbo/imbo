@@ -12,18 +12,21 @@ use Imbo\Model\ArrayModel;
 /**
  * @coversDefaultClass Imbo\Resource\ShortUrls
  */
-class ShortUrlsTest extends ResourceTests {
+class ShortUrlsTest extends ResourceTests
+{
     private $request;
     private $response;
     private $database;
     private $event;
     private $outputConverterManager;
 
-    protected function getNewResource() : ShortUrls {
+    protected function getNewResource(): ShortUrls
+    {
         return new ShortUrls();
     }
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->resource = $this->getNewResource();
         $this->request = $this->createConfiguredMock(Request::class, [
             'getUser' => 'user',
@@ -32,7 +35,9 @@ class ShortUrlsTest extends ResourceTests {
         $this->response = $this->createMock(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);
         $this->outputConverterManager = $this->createConfiguredMock(OutputConverterManager::class, [
-            'supportsExtension' => $this->returnCallback(function ($ext) { return $ext === 'gif'; }),
+            'supportsExtension' => $this->returnCallback(function ($ext) {
+                return $ext === 'gif';
+            }),
         ]);
 
         $this->event = $this->createConfiguredMock(EventInterface::class, [
@@ -46,79 +51,86 @@ class ShortUrlsTest extends ResourceTests {
     /**
      * @covers ::createShortUrl
      */
-    public function testWillThrowAnExceptionWhenRequestBodyIsEmpty() : void {
+    public function testWillThrowAnExceptionWhenRequestBodyIsEmpty(): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getContent')
             ->willReturn(null);
-        $this->expectExceptionObject(new InvalidArgumentException('Missing JSON data', 400));
+        $this->expectExceptionObject(new InvalidArgumentException('Missing JSON data', Response::HTTP_BAD_REQUEST));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
     /**
      * @covers ::createShortUrl
      */
-    public function testWillThrowAnExceptionWhenRequestBodyIsInvalid() : void {
+    public function testWillThrowAnExceptionWhenRequestBodyIsInvalid(): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getContent')
             ->willReturn('some string');
-        $this->expectExceptionObject(new InvalidArgumentException('Invalid JSON data', 400));
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
     /**
      * @covers ::createShortUrl
      */
-    public function testWillThrowAnExceptionWhenUserMissing() : void {
+    public function testWillThrowAnExceptionWhenUserMissing(): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getContent')
             ->willReturn('{}');
-        $this->expectExceptionObject(new InvalidArgumentException('Missing or invalid user', 400));
+        $this->expectExceptionObject(new InvalidArgumentException('Missing or invalid user', Response::HTTP_BAD_REQUEST));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
     /**
      * @covers ::createShortUrl
      */
-    public function testWillThrowAnExceptionWhenUserDoesNotMatch() : void {
+    public function testWillThrowAnExceptionWhenUserDoesNotMatch(): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getContent')
             ->willReturn('{"user": "otheruser"}');
-        $this->expectExceptionObject(new InvalidArgumentException('Missing or invalid user', 400));
+        $this->expectExceptionObject(new InvalidArgumentException('Missing or invalid user', Response::HTTP_BAD_REQUEST));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
     /**
      * @covers ::createShortUrl
      */
-    public function testWillThrowAnExceptionWhenImageIdentifierIsMissing() : void {
+    public function testWillThrowAnExceptionWhenImageIdentifierIsMissing(): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getContent')
             ->willReturn('{"user": "user"}');
-        $this->expectExceptionObject(new InvalidArgumentException('Missing or invalid image identifier', 400));
+        $this->expectExceptionObject(new InvalidArgumentException('Missing or invalid image identifier', Response::HTTP_BAD_REQUEST));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
     /**
      * @covers ::createShortUrl
      */
-    public function testWillThrowAnExceptionWhenImageIdentifierDoesNotMatch() : void {
+    public function testWillThrowAnExceptionWhenImageIdentifierDoesNotMatch(): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getContent')
             ->willReturn('{"user": "user", "imageIdentifier": "other id"}');
-        $this->expectExceptionObject(new InvalidArgumentException('Missing or invalid image identifier', 400));
+        $this->expectExceptionObject(new InvalidArgumentException('Missing or invalid image identifier', Response::HTTP_BAD_REQUEST));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
     /**
      * @covers ::createShortUrl
      */
-    public function testWillThrowAnExceptionWhenExtensionIsNotRecognized() : void {
+    public function testWillThrowAnExceptionWhenExtensionIsNotRecognized(): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getContent')
@@ -127,11 +139,12 @@ class ShortUrlsTest extends ResourceTests {
             ->expects($this->any())
             ->method('supportsExtension')
             ->willReturn(false);
-        $this->expectExceptionObject(new InvalidArgumentException('Extension provided is not a recognized format', 400));
+        $this->expectExceptionObject(new InvalidArgumentException('Extension provided is not a recognized format', Response::HTTP_BAD_REQUEST));
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    public function createShortUrlParams() : array {
+    public function createShortUrlParams(): array
+    {
         return [
             'no extension, no query' => [
                 null, null, [],
@@ -163,7 +176,8 @@ class ShortUrlsTest extends ResourceTests {
      * @covers ::createShortUrl
      * @covers ::getShortUrlId
      */
-    public function testCanCreateShortUrls(?string $extension = null, ?string $queryString = null, array $query = []) : void {
+    public function testCanCreateShortUrls(?string $extension = null, ?string $queryString = null, array $query = []): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getContent')
@@ -202,7 +216,7 @@ class ShortUrlsTest extends ResourceTests {
         $this->response
             ->expects($this->once())
             ->method('setStatusCode')
-            ->with(201);
+            ->with(Response::HTTP_CREATED);
 
         $this->getNewResource()->createShortUrl($this->event);
     }
@@ -210,7 +224,8 @@ class ShortUrlsTest extends ResourceTests {
     /**
      * @covers ::createShortUrl
      */
-    public function testWillReturn200OKIfTheShortUrlAlreadyExists() : void {
+    public function testWillReturn200OKIfTheShortUrlAlreadyExists(): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getContent')
@@ -243,7 +258,7 @@ class ShortUrlsTest extends ResourceTests {
         $this->response
             ->expects($this->once())
             ->method('setStatusCode')
-            ->with(200);
+            ->with(Response::HTTP_OK);
 
         $this->getNewResource()->createShortUrl($this->event);
     }
@@ -251,7 +266,8 @@ class ShortUrlsTest extends ResourceTests {
     /**
      * @covers ::createShortUrl
      */
-    public function testWillGenerateANewIdIfTheGeneratedOneExists() : void {
+    public function testWillGenerateANewIdIfTheGeneratedOneExists(): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getContent')
@@ -289,7 +305,7 @@ class ShortUrlsTest extends ResourceTests {
         $this->response
             ->expects($this->once())
             ->method('setStatusCode')
-            ->with(201);
+            ->with(Response::HTTP_CREATED);
 
         $this->getNewResource()->createShortUrl($this->event);
     }
@@ -297,7 +313,8 @@ class ShortUrlsTest extends ResourceTests {
     /**
      * @covers ::deleteImageShortUrls
      */
-    public function testWillNotAddAModelIfTheEventIsNotAShortUrlsEvent() : void {
+    public function testWillNotAddAModelIfTheEventIsNotAShortUrlsEvent(): void
+    {
         $this->database
             ->expects($this->once())
             ->method('deleteShortUrls')
@@ -316,7 +333,8 @@ class ShortUrlsTest extends ResourceTests {
     /**
      * @covers ::deleteImageShortUrls
      */
-    public function testWillAddAModelIfTheEventIsAShortUrlsEvent() : void {
+    public function testWillAddAModelIfTheEventIsAShortUrlsEvent(): void
+    {
         $this->database
             ->expects($this->once())
             ->method('deleteShortUrls')
@@ -336,7 +354,8 @@ class ShortUrlsTest extends ResourceTests {
     /**
      * @covers ::createShortUrl
      */
-    public function testCanNotAddShortUrlWhenImageDoesNotExist() : void {
+    public function testCanNotAddShortUrlWhenImageDoesNotExist(): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getContent')
@@ -353,7 +372,7 @@ class ShortUrlsTest extends ResourceTests {
             ->method('imageExists')
             ->with('user', 'id')
             ->willReturn(false);
-        $this->expectExceptionObject(new InvalidArgumentException('Image does not exist', 404));
+        $this->expectExceptionObject(new InvalidArgumentException('Image does not exist', Response::HTTP_NOT_FOUND));
         $this->getNewResource()->createShortUrl($this->event);
     }
 }

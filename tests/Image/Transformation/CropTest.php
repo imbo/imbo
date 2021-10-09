@@ -1,20 +1,24 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Model\Image;
-use Imbo\Exception\TransformationException;
 use Imagick;
 use Imbo\EventManager\EventInterface;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
+use Imbo\Model\Image;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Crop
  */
-class CropTest extends TransformationTests {
-    protected function getTransformation() : Crop {
+class CropTest extends TransformationTests
+{
+    protected function getTransformation(): Crop
+    {
         return new Crop();
     }
 
-    public function getCropParams() : array {
+    public function getCropParams(): array
+    {
         return [
             'cropped area smaller than the image' => [['width' => 100, 'height' => 50], 100, 50, true],
             'cropped area smaller than the image with x and y offset' => [['width' => 100, 'height' => 63, 'x' => 565, 'y' => 400], 100, 63, true],
@@ -28,7 +32,8 @@ class CropTest extends TransformationTests {
      * @dataProvider getCropParams
      * @covers ::transform
      */
-    public function testCanCropImages(array $params, int $endWidth, int $endHeight, bool $transformed) : void {
+    public function testCanCropImages(array $params, int $endWidth, int $endHeight, bool $transformed): void
+    {
         $image = $this->createConfiguredMock(Image::class, [
             'getWidth' => 665,
             'getHeight' => 463,
@@ -68,12 +73,13 @@ class CropTest extends TransformationTests {
     /**
      * @covers ::transform
      */
-    public function testThrowsExceptionWhenWidthIsMissing() : void {
+    public function testThrowsExceptionWhenWidthIsMissing(): void
+    {
         $transformation = new Crop();
         $transformation->setImage($this->createMock(Image::class));
         $this->expectExceptionObject(new TransformationException(
             'Missing required parameter: width',
-            400
+            Response::HTTP_BAD_REQUEST,
         ));
         $transformation->transform(['height' => 123]);
     }
@@ -81,17 +87,19 @@ class CropTest extends TransformationTests {
     /**
      * @covers ::transform
      */
-    public function testThrowsExceptionWhenHeightIsMissing() : void {
+    public function testThrowsExceptionWhenHeightIsMissing(): void
+    {
         $transformation = new Crop();
         $transformation->setImage($this->createMock(Image::class));
         $this->expectExceptionObject(new TransformationException(
             'Missing required parameter: height',
-            400
+            Response::HTTP_BAD_REQUEST,
         ));
         $transformation->transform(['width' => 123]);
     }
 
-    public function getImageParams() : array {
+    public function getImageParams(): array
+    {
         return [
             'Do not perform work when cropping same sized images' => [
                 ['width' => 123, 'height' => 234],
@@ -128,7 +136,8 @@ class CropTest extends TransformationTests {
      * @dataProvider getImageParams
      * @covers ::transform
      */
-    public function testUsesAllParams(array $params, int $originalWidth, int $originalHeight, int $width, int $height, int $x, int $y, ?bool $shouldCrop = true) : void {
+    public function testUsesAllParams(array $params, int $originalWidth, int $originalHeight, int $width, int $height, int $x, int $y, ?bool $shouldCrop = true): void
+    {
         $imagick = $this->createMock(Imagick::class);
         $image = $this->createConfiguredMock(Image::class, [
             'getWidth'  => $originalWidth,
@@ -167,7 +176,8 @@ class CropTest extends TransformationTests {
             ->transform($params);
     }
 
-    public function getInvalidImageParams() : array {
+    public function getInvalidImageParams(): array
+    {
         return [
             'Dont throw if width/height are within bounds (no coords)' => [
                 ['width' => 100, 'height' => 100],
@@ -222,7 +232,8 @@ class CropTest extends TransformationTests {
      * @dataProvider getInvalidImageParams
      * @covers ::transform
      */
-    public function testThrowsOnInvalidCropParams(array $params, int $originalWidth, int $originalHeight, ?string $errRegex = null) : void {
+    public function testThrowsOnInvalidCropParams(array $params, int $originalWidth, int $originalHeight, ?string $errRegex = null): void
+    {
         $imagick = $this->createMock(Imagick::class);
         $image = $this->createConfiguredMock(Image::class, [
             'getWidth'  => $originalWidth,
@@ -231,7 +242,7 @@ class CropTest extends TransformationTests {
 
         if (null !== $errRegex) {
             $this->expectException(TransformationException::class);
-            $this->expectExceptionCode(400);
+            $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
             $this->expectExceptionMessageMatches($errRegex);
             $imagick
                 ->expects($this->never())

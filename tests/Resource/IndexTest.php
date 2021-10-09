@@ -1,26 +1,29 @@
 <?php declare(strict_types=1);
 namespace Imbo\Resource;
 
+use Imbo\EventManager\EventInterface;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
-use Imbo\EventManager\EventInterface;
 use Imbo\Model\ArrayModel;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
  * @coversDefaultClass Imbo\Resource\Index
  */
-class IndexTest extends ResourceTests {
+class IndexTest extends ResourceTests
+{
     private $resource;
     private $request;
     private $response;
     private $event;
 
-    protected function getNewResource() : Index {
+    protected function getNewResource(): Index
+    {
         return new Index();
     }
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
         $this->responseHeaders = $this->createMock(ResponseHeaderBag::class);
@@ -35,7 +38,8 @@ class IndexTest extends ResourceTests {
     /**
      * @covers ::get
      */
-    public function testSupportsHttpGet() : void {
+    public function testSupportsHttpGet(): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getSchemeAndHttpHost')
@@ -75,7 +79,8 @@ class IndexTest extends ResourceTests {
     /**
      * @covers ::get
      */
-    public function testRedirectsIfConfigurationOptionHasBeenSet() : void {
+    public function testRedirectsIfConfigurationOptionHasBeenSet(): void
+    {
         $url = 'http://imbo.io';
         $this->event
             ->expects($this->any())
@@ -92,7 +97,7 @@ class IndexTest extends ResourceTests {
         $this->response
             ->expects($this->once())
             ->method('setStatusCode')
-            ->with(307);
+            ->with(Response::HTTP_TEMPORARY_REDIRECT);
         $this->response
             ->expects($this->never())
             ->method('setModel');

@@ -14,7 +14,8 @@ use Imbo\Storage\StorageInterface;
 /**
  * @coversDefaultClass Imbo\Resource\Metadata
  */
-class MetadataTest extends ResourceTests {
+class MetadataTest extends ResourceTests
+{
     private $resource;
     private $request;
     private $response;
@@ -23,11 +24,13 @@ class MetadataTest extends ResourceTests {
     private $manager;
     private $event;
 
-    protected function getNewResource() : Metadata {
+    protected function getNewResource(): Metadata
+    {
         return new Metadata();
     }
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);
@@ -47,7 +50,8 @@ class MetadataTest extends ResourceTests {
     /**
      * @covers ::delete
      */
-    public function testSupportsHttpDelete() : void {
+    public function testSupportsHttpDelete(): void
+    {
         $this->manager
             ->expects($this->once())
             ->method('trigger')
@@ -63,7 +67,8 @@ class MetadataTest extends ResourceTests {
     /**
      * @covers ::put
      */
-    public function testSupportsHttpPut() : void {
+    public function testSupportsHttpPut(): void
+    {
         $metadata = ['foo' => 'bar'];
         $this->request
             ->expects($this->once())
@@ -87,7 +92,8 @@ class MetadataTest extends ResourceTests {
     /**
      * @covers ::post
      */
-    public function testSupportsHttpPost() : void {
+    public function testSupportsHttpPost(): void
+    {
         $metadata = ['foo' => 'bar'];
         $this->request
             ->expects($this->once())
@@ -121,7 +127,8 @@ class MetadataTest extends ResourceTests {
     /**
      * @covers ::get
      */
-    public function testSupportsHttpGet() : void {
+    public function testSupportsHttpGet(): void
+    {
         $this->manager
             ->expects($this->once())
             ->method('trigger')
@@ -132,31 +139,34 @@ class MetadataTest extends ResourceTests {
     /**
      * @covers ::validateMetadata
      */
-    public function testThrowsExceptionWhenValidatingMissingJsonData() : void {
+    public function testThrowsExceptionWhenValidatingMissingJsonData(): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getContent')
             ->willReturn(null);
-        $this->expectExceptionObject(new InvalidArgumentException('Missing JSON data', 400));
+        $this->expectExceptionObject(new InvalidArgumentException('Missing JSON data', Response::HTTP_BAD_REQUEST));
         $this->resource->validateMetadata($this->event);
     }
 
     /**
      * @covers ::validateMetadata
      */
-    public function testThrowsExceptionWhenValidatingInvalidJsonData() : void {
+    public function testThrowsExceptionWhenValidatingInvalidJsonData(): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getContent')
             ->willReturn('some string');
-        $this->expectExceptionObject(new InvalidArgumentException('Invalid JSON data', 400));
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST));
         $this->resource->validateMetadata($this->event);
     }
 
     /**
      * @covers ::validateMetadata
      */
-    public function testAllowsValidJsonData() : void {
+    public function testAllowsValidJsonData(): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getContent')
@@ -167,12 +177,13 @@ class MetadataTest extends ResourceTests {
     /**
      * @covers ::validateMetadata
      */
-    public function testThrowsExceptionOnInvalidKeys() {
+    public function testThrowsExceptionOnInvalidKeys()
+    {
         $this->request
             ->expects($this->once())
             ->method('getContent')
             ->willReturn('{"foo.bar":"bar"}');
-        $this->expectExceptionObject(new InvalidArgumentException('Invalid metadata. Dot characters (\'.\') are not allowed in metadata keys', 400));
+        $this->expectExceptionObject(new InvalidArgumentException('Invalid metadata. Dot characters (\'.\') are not allowed in metadata keys', Response::HTTP_BAD_REQUEST));
         $this->resource->validateMetadata($this->event);
     }
 }

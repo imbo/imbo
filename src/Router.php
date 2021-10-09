@@ -3,6 +3,7 @@ namespace Imbo;
 
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
 use Imbo\Router\Route;
 
 /**
@@ -72,11 +73,11 @@ class Router
         $httpMethod = $request->getMethod();
 
         if ($httpMethod === 'BREW') {
-            throw new RuntimeException('I\'m a teapot!', 418);
+            throw new RuntimeException('I\'m a teapot!', Response::HTTP_I_AM_A_TEAPOT);
         }
 
         if (!isset(self::$supportedHttpMethods[$httpMethod])) {
-            throw new RuntimeException('Unsupported HTTP method: ' . $httpMethod, 501);
+            throw new RuntimeException('Unsupported HTTP method: ' . $httpMethod, Response::HTTP_NOT_IMPLEMENTED);
         }
 
         $path = $request->getPathInfo();
@@ -89,7 +90,7 @@ class Router
         }
 
         if ([] === $matches) {
-            throw new RuntimeException('Not Found', 404);
+            throw new RuntimeException('Not Found', Response::HTTP_NOT_FOUND);
         }
 
         $route = new Route();

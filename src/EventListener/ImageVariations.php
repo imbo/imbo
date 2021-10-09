@@ -1,34 +1,27 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
-use Imbo\EventManager\EventInterface;
 use Imbo\EventListener\ImageVariations\Database\DatabaseInterface;
 use Imbo\EventListener\ImageVariations\Storage\StorageInterface;
-use Imbo\Exception\InvalidArgumentException;
-use Imbo\Exception\TransformationException;
-use Imbo\Exception\StorageException;
+use Imbo\EventManager\EventInterface;
 use Imbo\Exception\DatabaseException;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Exception\StorageException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
 
 /**
  * Image variations generator
  */
-class ImageVariations implements ListenerInterface {
-    /**
-     * @var DatabaseInterface
-     */
-    private $database;
-
-    /**
-     * @var StorageInterface
-     */
-    private $storage;
+class ImageVariations implements ListenerInterface
+{
+    private DatabaseInterface $database;
+    private StorageInterface $storage;
 
     /**
      * Parameters for the event listener
-     *
-     * @var array
      */
-    private $params = [
+    private array $params = [
         // Flip to true to converts variations to a lossless format (PNG) before saving
         'lossless' => false,
 
@@ -57,22 +50,21 @@ class ImageVariations implements ListenerInterface {
      * @param array $params Parameters for the event listener
      * @throws InvalidArgumentException
      */
-    public function __construct(array $params = []) {
+    public function __construct(array $params = [])
+    {
         $this->params = array_replace($this->params, $params);
 
         // Make sure the scale factor is a negative number if it exists
         if (isset($this->params['scaleFactor']) && $this->params['scaleFactor'] >= 1) {
-            throw new InvalidArgumentException('Scale factor must be below 1', 503);
+            throw new InvalidArgumentException('Scale factor must be below 1', Response::HTTP_SERVICE_UNAVAILABLE);
         }
 
         $this->configureDatabase($this->params);
         $this->configureStorage($this->params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents(): array
+    {
         return [
             // Generate image variations that can be used in resize operations later on
             'images.post' => ['generateVariations' => -10],
@@ -87,10 +79,9 @@ class ImageVariations implements ListenerInterface {
 
     /**
      * Choose an image variation based on the transformations and the original size of the image
-     *
-     * @param EventInterface $event The current event
      */
-    public function chooseVariation(EventInterface $event) {
+    public function chooseVariation(EventInterface $event): void
+    {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
@@ -177,10 +168,9 @@ class ImageVariations implements ListenerInterface {
      * Generate multiple variations based on the configuration
      *
      * If any of the operations fail Imbo will trigger errors
-     *
-     * @param EventInterface $event
      */
-    public function generateVariations(EventInterface $event) {
+    public function generateVariations(EventInterface $event): void
+    {
         $eventManager = $event->getManager();
         $transformationManager = $event->getTransformationManager();
 
@@ -198,7 +188,7 @@ class ImageVariations implements ListenerInterface {
         $scaleFactor = $this->params['scaleFactor'];
 
         // Remove widths which are larger than the original image
-        $widths = array_filter($this->params['widths'], function($value) use ($originalWidth) {
+        $widths = array_filter($this->params['widths'], function ($value) use ($originalWidth) {
             return $value < $originalWidth;
         });
 
@@ -225,6 +215,8 @@ class ImageVariations implements ListenerInterface {
                 $widths[] = $variationWidth;
             }
         }
+
+        $widths = array_map('intval', $widths);
 
         foreach ($widths as $width) {
             // Clone the image so that the resize operation will happen on the original every time
@@ -276,7 +268,7 @@ class ImageVariations implements ListenerInterface {
 
                 try {
                     $this->storage->deleteImageVariations($user, $imageIdentifier, $width);
-                // @codeCoverageIgnoreStart
+                    // @codeCoverageIgnoreStart
                 } catch (StorageException $e) {
                     trigger_error('Could not remove the stored variation', E_USER_WARNING);
                 }
@@ -289,10 +281,9 @@ class ImageVariations implements ListenerInterface {
      * Delete all image variations attached to an image
      *
      * If any of the delete operations fail Imbo will trigger an error
-     *
-     * @param EventInterface $event The current event
      */
-    public function deleteVariations(EventInterface $event) {
+    public function deleteVariations(EventInterface $event): void
+    {
         $request = $event->getRequest();
         $user = $request->getUser();
         $imageIdentifier = $request->getImageIdentifier();
@@ -316,23 +307,24 @@ class ImageVariations implements ListenerInterface {
      * @param array $config The event listener configuration
      * @throws InvalidArgumentException
      */
-    private function configureDatabase(array $config) {
+    private function configureDatabase(array $config): void
+    {
         if (!isset($config['database']) || !isset($config['database']['adapter'])) {
-            throw new InvalidArgumentException('Missing database adapter configuration for the image variations event listener', 500);
+            throw new InvalidArgumentException('Missing database adapter configuration for the image variations event listener', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         $config = $config['database'];
 
         if (is_callable($config['adapter'])) {
             $databaseAdapter = $config['adapter']();
-        } else if (is_string($config['adapter'])) {
+        } elseif (is_string($config['adapter'])) {
             $databaseAdapter = new $config['adapter'](isset($config['params']) ? $config['params'] : null);
         } else {
             $databaseAdapter = $config['adapter'];
         }
 
         if (!($databaseAdapter instanceof DatabaseInterface)) {
-            throw new InvalidArgumentException('Invalid database adapter for the image variations event listener', 500);
+            throw new InvalidArgumentException('Invalid database adapter for the image variations event listener', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         $this->database = $databaseAdapter;
@@ -344,23 +336,24 @@ class ImageVariations implements ListenerInterface {
      * @param array $config The event listener configuration
      * @throws InvalidArgumentException
      */
-    private function configureStorage(array $config) {
+    private function configureStorage(array $config): void
+    {
         if (!isset($config['storage']) || !isset($config['storage']['adapter'])) {
-            throw new InvalidArgumentException('Missing storage adapter configuration for the image variations event listener', 500);
+            throw new InvalidArgumentException('Missing storage adapter configuration for the image variations event listener', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         $config = $config['storage'];
 
         if (is_callable($config['adapter'])) {
             $storageAdapter = $config['adapter']();
-        } else if (is_string($config['adapter'])) {
+        } elseif (is_string($config['adapter'])) {
             $storageAdapter = new $config['adapter'](isset($config['params']) ? $config['params'] : null);
         } else {
             $storageAdapter = $config['adapter'];
         }
 
         if (!($storageAdapter instanceof StorageInterface)) {
-            throw new InvalidArgumentException('Invalid storage adapter for the image variations event listener', 500);
+            throw new InvalidArgumentException('Invalid storage adapter for the image variations event listener', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         $this->storage = $storageAdapter;

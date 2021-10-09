@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image;
 
 /**
@@ -8,9 +8,10 @@ namespace Imbo\Image;
  * provided to this transformation needs to be adjusted if the input size has changed,
  * for instance when the ImageVariations-listener is used.
  */
-interface InputSizeConstraint {
-    const NO_TRANSFORMATION = 0;
-    const STOP_RESOLVING = 1;
+interface InputSizeConstraint
+{
+    public const NO_TRANSFORMATION = 0;
+    public const STOP_RESOLVING = 1;
 
     /**
      * Get the minimum input size that this transformation can accept as input, given the
@@ -39,5 +40,5 @@ interface InputSizeConstraint {
      * @param array $parameters Transformation parameters
      * @return array Adjusted parameters
      */
-    public function adjustParameters($ratio, array $parameters);
+    public function adjustParameters(float $ratio, array $parameters): array;
 }

@@ -1,22 +1,21 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Model\Image;
-use Imbo\Exception\TransformationException;
 use ImagickException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
 
 /**
  * Convert transformation
  *
  * This transformation can be used to convert the image from one type to another.
  */
-class Convert extends Transformation {
-    /**
-     * {@inheritdoc}
-     */
-    public function transform(array $params) {
+class Convert extends Transformation
+{
+    public function transform(array $params)
+    {
         if (empty($params['type'])) {
-            throw new TransformationException('Missing required parameter: type', 400);
+            throw new TransformationException('Missing required parameter: type', Response::HTTP_BAD_REQUEST);
         }
 
         $type = $params['type'];
@@ -29,7 +28,7 @@ class Convert extends Transformation {
         try {
             $this->imagick->setImageFormat($type);
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         $outputConverterManager = $this->event->getOutputConverterManager();

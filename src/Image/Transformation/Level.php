@@ -1,26 +1,29 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException;
-use ImagickException;
 use Imagick;
+use ImagickException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
 
 /**
  * Level transformation
  *
  * This transformation can be used to adjust the level of RGB/CMYK in an image.
  */
-class Level extends Transformation {
+class Level extends Transformation
+{
     /**
      * {@inheritdoc}
      */
-    public function transform(array $params) {
+    public function transform(array $params)
+    {
         $channel = isset($params['channel']) ? $params['channel'] : 'all';
         $amount = isset($params['amount']) ? $params['amount'] : 1;
 
         if ($amount < -100) {
             $amount = -100;
-        } else if ($amount > 100) {
+        } elseif ($amount > 100) {
             $amount = 100;
         }
 
@@ -58,7 +61,7 @@ class Level extends Transformation {
         try {
             $this->imagick->levelImage(0, (float) $gamma, $this->getQuantumRange(), $channel);
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         $this->image->setHasBeenTransformed(true);

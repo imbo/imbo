@@ -12,13 +12,14 @@ use Imbo\Image\Identifier\Generator\GeneratorInterface;
 use Imbo\Model\ArrayModel;
 use Imbo\Model\Image;
 use Imbo\Storage\StorageInterface;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use PHPUnit\Framework\MockObject\Stub\Exception as ExceptionStub;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
  * @coversDefaultClass Imbo\Resource\Images
  */
-class ImagesTest extends ResourceTests {
+class ImagesTest extends ResourceTests
+{
     private $resource;
     private $request;
     private $response;
@@ -29,11 +30,13 @@ class ImagesTest extends ResourceTests {
     private $imageIdentifierGenerator;
     private $config;
 
-    protected function getNewResource() : Images {
+    protected function getNewResource(): Images
+    {
         return new Images();
     }
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);
@@ -57,7 +60,8 @@ class ImagesTest extends ResourceTests {
     /**
      * @covers ::addImage
      */
-    public function testSupportsHttpPost() : void {
+    public function testSupportsHttpPost(): void
+    {
         $this->imageIdentifierGenerator
             ->expects($this->any())
             ->method('isDeterministic')
@@ -95,7 +99,8 @@ class ImagesTest extends ResourceTests {
     /**
      * @covers ::addImage
      */
-    public function testThrowsExceptionWhenItFailsToGenerateUniqueImageIdentifier() : void {
+    public function testThrowsExceptionWhenItFailsToGenerateUniqueImageIdentifier(): void
+    {
         $this->manager
             ->expects($this->any())
             ->method('trigger')
@@ -126,14 +131,15 @@ class ImagesTest extends ResourceTests {
             ->method('getImage')
             ->willReturn($image);
 
-        $this->expectExceptionObject(new ImageException('Failed to generate unique image identifier', 503));
+        $this->expectExceptionObject(new ImageException('Failed to generate unique image identifier', Response::HTTP_SERVICE_UNAVAILABLE));
         $this->resource->addImage($this->event);
     }
 
     /**
      * @covers ::getImages
      */
-    public function testSupportsHttpGet() : void {
+    public function testSupportsHttpGet(): void
+    {
         $this->manager
             ->expects($this->once())
             ->method('trigger')
@@ -144,7 +150,8 @@ class ImagesTest extends ResourceTests {
     /**
      * @covers ::addImage
      */
-    public function testAddImageWithCallableImageIdentifierGenerator() : void {
+    public function testAddImageWithCallableImageIdentifierGenerator(): void
+    {
         $this->manager
             ->method('trigger')
             ->withConsecutive(
@@ -155,9 +162,9 @@ class ImagesTest extends ResourceTests {
             )
             ->willReturnOnConsecutiveCalls(
                 new ExceptionStub(new DuplicateImageIdentifierException()),
-                null,
-                null,
-                null,
+                $this->manager,
+                $this->manager,
+                $this->manager,
             );
 
         $image = $this->createConfiguredMock(Image::class, [
@@ -177,7 +184,7 @@ class ImagesTest extends ResourceTests {
             ->method('setModel')
             ->with($this->isInstanceOf(ArrayModel::class));
 
-        $imageIdentifierGenerator = function() : IdGenerator {
+        $imageIdentifierGenerator = function (): IdGenerator {
             return new IdGenerator();
         };
 
@@ -194,12 +201,15 @@ class ImagesTest extends ResourceTests {
     }
 }
 
-class IdGenerator {
-    public function generate(Image $image) : string {
+class IdGenerator
+{
+    public function generate(Image $image): string
+    {
         return 'some id';
     }
 
-    public function isDeterministic() : bool {
+    public function isDeterministic(): bool
+    {
         return true;
     }
 }

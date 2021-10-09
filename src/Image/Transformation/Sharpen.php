@@ -1,17 +1,20 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException;
 use ImagickException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
 
 /**
  * Sharpen transformation
  */
-class Sharpen extends Transformation {
+class Sharpen extends Transformation
+{
     /**
      * {@inheritdoc}
      */
-    public function transform(array $params) {
+    public function transform(array $params)
+    {
         $preset = isset($params['preset']) ? $params['preset'] : null;
         $radius = 2;
         $sigma = 1;
@@ -58,7 +61,7 @@ class Sharpen extends Transformation {
         try {
             $this->imagick->unsharpMaskImage($radius, $sigma, $gain, $threshold);
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         $this->image->setHasBeenTransformed(true);

@@ -1,18 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException;
-use Imbo\Image\InputSizeConstraint;
 use ImagickException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
+use Imbo\Image\InputSizeConstraint;
 
 /**
  * Resize transformation
  */
-class Resize extends Transformation implements InputSizeConstraint {
-    /**
-     * {@inheritdoc}
-     */
-    public function transform(array $params) {
+class Resize extends Transformation implements InputSizeConstraint
+{
+    public function transform(array $params)
+    {
         $size = $this->calculateSize($params, [
             'width'  => $this->image->getWidth(),
             'height' => $this->image->getHeight(),
@@ -26,7 +26,7 @@ class Resize extends Transformation implements InputSizeConstraint {
         try {
             $this->imagick->thumbnailImage($size['width'], $size['height']);
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         $newSize = $this->imagick->getImageGeometry();
@@ -36,10 +36,8 @@ class Resize extends Transformation implements InputSizeConstraint {
                     ->setHasBeenTransformed(true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getMinimumInputSize(array $params, array $imageSize) {
+    public function getMinimumInputSize(array $params, array $imageSize)
+    {
         return $this->calculateSize($params, $imageSize) ?: InputSizeConstraint::NO_TRANSFORMATION;
     }
 
@@ -48,13 +46,14 @@ class Resize extends Transformation implements InputSizeConstraint {
      *
      * @param array $params
      * @param array $imageSize
-     * @return array
+     * @return ?array{width:int,height:int}
      */
-    protected function calculateSize(array $params, array $imageSize) {
+    protected function calculateSize(array $params, array $imageSize): ?array
+    {
         if (empty($params['width']) && empty($params['height'])) {
             throw new TransformationException(
                 'Missing both width and height. You need to specify at least one of them',
-                400
+                Response::HTTP_BAD_REQUEST,
             );
         }
 
@@ -66,16 +65,16 @@ class Resize extends Transformation implements InputSizeConstraint {
 
         if ($width === $originalWidth && $height === $originalHeight) {
             // Resize params match the current image size, no need for any resizing
-            return;
+            return null;
         }
 
         // Calculate width or height if not both have been specified
         if (!$height) {
             $height = ceil(($originalHeight / $originalWidth) * $width);
-        } else if (!$width) {
+        } elseif (!$width) {
             $width = ceil(($originalWidth / $originalHeight) * $height);
         }
 
-        return ['width' => $width, 'height' => $height];
+        return ['width' => (int) $width, 'height' => (int) $height];
     }
 }

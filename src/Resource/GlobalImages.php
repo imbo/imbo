@@ -1,8 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception\RuntimeException;
+use Imbo\Http\Response\Response;
 
 /**
  * Global images resource
@@ -16,18 +17,21 @@ use Imbo\Exception\RuntimeException;
  * from     => Unix timestamp to fetch from
  * to       => Unit timestamp to fetch to
  */
-class GlobalImages implements ResourceInterface {
+class GlobalImages implements ResourceInterface
+{
     /**
      * {@inheritdoc}
      */
-    public function getAllowedMethods() {
+    public function getAllowedMethods()
+    {
         return ['GET', 'HEAD'];
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             'globalimages.get'    => 'getImages',
             'globalimages.head'   => 'getImages',
@@ -39,7 +43,8 @@ class GlobalImages implements ResourceInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function getImages(EventInterface $event) {
+    public function getImages(EventInterface $event)
+    {
         $acl = $event->getAccessControl();
 
         $missingAccess = [];
@@ -49,7 +54,7 @@ class GlobalImages implements ResourceInterface {
             $hasAccess = $acl->hasAccess(
                 $event->getRequest()->getPublicKey(),
                 'images.get',
-                $user
+                $user,
             );
 
             if (!$hasAccess) {
@@ -62,12 +67,12 @@ class GlobalImages implements ResourceInterface {
                 'Public key does not have access to the users: [' .
                 implode(', ', $missingAccess) .
                 ']',
-                400
+                Response::HTTP_BAD_REQUEST,
             );
         }
 
         $event->getManager()->trigger('db.images.load', [
-            'users' => $users
+            'users' => $users,
         ]);
     }
 }

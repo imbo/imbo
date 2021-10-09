@@ -1,29 +1,31 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventManager;
 
+use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
+use Imbo\Database\DatabaseInterface;
+use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
-use Imbo\Database\DatabaseInterface;
-use Imbo\Storage\StorageInterface;
-use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
-use Imbo\EventManager\EventManager;
-use Imbo\Exception\InvalidArgumentException;
 use Imbo\Image\InputLoaderManager;
-use Imbo\Image\OutputConverter\OutputConverterInterface;
+use Imbo\Image\OutputConverterManager;
 use Imbo\Image\TransformationManager;
+use Imbo\Storage\StorageInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\EventManager\Event
  */
-class EventTest extends TestCase {
+class EventTest extends TestCase
+{
     private $event;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->event = new Event();
     }
 
-    public function getArguments() : array {
+    public function getArguments(): array
+    {
         return [
             'request' => [
                 'getRequest', 'request', $this->createMock(Request::class),
@@ -50,7 +52,7 @@ class EventTest extends TestCase {
                 'getInputLoaderManager', 'inputLoaderManager', $this->createMock(InputLoaderManager::class),
             ],
             'outputConverterManager' => [
-                'getOutputConverterManager', 'outputConverterManager', $this->createMock(OutputConverterInterface::class),
+                'getOutputConverterManager', 'outputConverterManager', $this->createMock(OutputConverterManager::class),
             ],
             'config' => [
                 'getConfig', 'config', ['some' => 'config'],
@@ -76,7 +78,8 @@ class EventTest extends TestCase {
      * @covers ::getInputLoaderManager
      * @covers ::getOutputConverterManager
      */
-    public function testCanSetAndGetRequest(string $method, string $argument, $value) : void {
+    public function testCanSetAndGetRequest(string $method, string $argument, $value): void
+    {
         $this->event->setArgument($argument, $value);
         $this->assertSame($value, $this->event->$method());
     }
@@ -85,7 +88,8 @@ class EventTest extends TestCase {
      * @covers ::setName
      * @covers ::getName
      */
-    public function testCanSetAndGetName() : void {
+    public function testCanSetAndGetName(): void
+    {
         $this->assertNull($this->event->getName());
         $this->assertSame($this->event, $this->event->setName('name'));
         $this->assertSame('name', $this->event->getName());
@@ -95,7 +99,8 @@ class EventTest extends TestCase {
      * @covers ::stopPropagation
      * @covers ::isPropagationStopped
      */
-    public function testCanStopPropagation() : void {
+    public function testCanStopPropagation(): void
+    {
         $this->assertFalse($this->event->isPropagationStopped());
         $this->assertSame($this->event, $this->event->stopPropagation());
         $this->assertTrue($this->event->isPropagationStopped());
@@ -104,10 +109,11 @@ class EventTest extends TestCase {
     /**
      * @covers ::getArgument
      */
-    public function testThrowsExceptionWhenGettingArgumentThatDoesNotExist() : void {
+    public function testThrowsExceptionWhenGettingArgumentThatDoesNotExist(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException(
             'Argument "foobar" does not exist',
-            500
+            Response::HTTP_INTERNAL_SERVER_ERROR,
         ));
         $this->event->getArgument('foobar');
     }
@@ -116,10 +122,11 @@ class EventTest extends TestCase {
      * @covers ::__construct
      * @covers ::setArguments
      */
-    public function testCanSetArgumentsThroughConstructor() : void {
+    public function testCanSetArgumentsThroughConstructor(): void
+    {
         $this->assertSame(
             'bar',
-            (new Event(['foo' => 'bar']))->getArgument('foo')
+            (new Event(['foo' => 'bar']))->getArgument('foo'),
         );
     }
 
@@ -128,7 +135,8 @@ class EventTest extends TestCase {
      * @covers ::getArgument
      * @covers ::hasArgument
      */
-    public function testSetArgumentsOverridesAllArguments() : void {
+    public function testSetArgumentsOverridesAllArguments(): void
+    {
         $this->assertFalse($this->event->hasArgument('foo'));
 
         $this->assertSame($this->event, $this->event->setArguments(['foo' => 'bar']));

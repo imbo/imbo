@@ -1,20 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
-use Imbo\EventListener\ListenerInterface;
+use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\ResourceException;
+use Imbo\Http\Response\Response;
 
 /**
  * Limit the number of transformations that can be applied in a request.
  */
-class ImageTransformationLimiter implements ListenerInterface {
-    /**
-     * Number of transformations to allow
-     *
-     * @var int
-     */
-    private $transformationLimit;
+class ImageTransformationLimiter implements ListenerInterface
+{
+    private int $transformationLimit;
 
     /**
      * Class constructor
@@ -24,21 +21,20 @@ class ImageTransformationLimiter implements ListenerInterface {
      *                      active.
      * @throws InvalidArgumentException Throws an exception if the "limit" element is missing in params
      */
-    public function __construct(array $params) {
+    public function __construct(array $params)
+    {
         if (!isset($params['limit'])) {
             throw new InvalidArgumentException(
                 'The image transformation limiter needs the "limit" argument to be configured.',
-                500
+                Response::HTTP_INTERNAL_SERVER_ERROR,
             );
         }
 
         $this->setTransformationLimit($params['limit']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents(): array
+    {
         return [
             'image.get' => ['checkTransformationCount' => 20],
         ];
@@ -48,33 +44,27 @@ class ImageTransformationLimiter implements ListenerInterface {
      * Check the number of transformations in a request and generate a 403 if there's an excessive number of
      * transformations.
      *
-     * @param EventInterface $event The triggered event
      * @throws ResourceException Throws an exception if the transformation count exceeds the allowed value.
      */
-    public function checkTransformationCount(EventInterface $event) {
+    public function checkTransformationCount(EventInterface $event): void
+    {
         $transformations = $event->getRequest()->getTransformations();
 
         if ($this->transformationLimit && (count($transformations) > $this->transformationLimit)) {
-            throw new ResourceException('Too many transformations applied to resource. The limit is ' .
-                                        $this->transformationLimit . ' transformations.', 403);
+            throw new ResourceException(
+                'Too many transformations applied to resource. The limit is ' . $this->transformationLimit . ' transformations.',
+                Response::HTTP_FORBIDDEN,
+            );
         }
     }
 
-    /**
-     * Get the current transformation limit applied
-     *
-     * @return int
-     */
-    public function getTransformationLimit() {
+    public function getTransformationLimit(): int
+    {
         return $this->transformationLimit;
     }
 
-    /**
-     * Set the current transformation limit. Set value to 0 to disable the check without removing the listener.
-     *
-     * @param int $transformationLimit
-     */
-    public function setTransformationLimit($transformationLimit) {
-        $this->transformationLimit = (int) $transformationLimit;
+    public function setTransformationLimit(int $transformationLimit): void
+    {
+        $this->transformationLimit = $transformationLimit;
     }
 }

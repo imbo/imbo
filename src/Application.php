@@ -63,7 +63,7 @@ class Application
         }
 
         if (!$database instanceof DatabaseInterface) {
-            throw new InvalidArgumentException('Invalid database adapter', 500);
+            throw new InvalidArgumentException('Invalid database adapter', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         $storage = $this->config['storage'];
@@ -73,7 +73,7 @@ class Application
         }
 
         if (!$storage instanceof StorageInterface) {
-            throw new InvalidArgumentException('Invalid storage adapter', 500);
+            throw new InvalidArgumentException('Invalid storage adapter', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         // Access control adapter
@@ -84,7 +84,7 @@ class Application
         }
 
         if (!$accessControl instanceof AccessControlInterface) {
-            throw new InvalidArgumentException('Invalid access control adapter', 500);
+            throw new InvalidArgumentException('Invalid access control adapter', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         // Create a router based on the routes in the configuration and internal routes
@@ -94,7 +94,7 @@ class Application
         $transformationManager = new TransformationManager();
 
         if (isset($this->config['transformations']) && !is_array($this->config['transformations'])) {
-            throw new InvalidArgumentException('The "transformations" configuration key must be specified as an array', 500);
+            throw new InvalidArgumentException('The "transformations" configuration key must be specified as an array', Response::HTTP_INTERNAL_SERVER_ERROR);
         } elseif (isset($this->config['transformations']) && is_array($this->config['transformations'])) {
             $transformationManager->addTransformations($this->config['transformations']);
         }
@@ -103,7 +103,7 @@ class Application
         $inputLoaderManager = new InputLoaderManager();
 
         if (isset($this->config['inputLoaders']) && !is_array($this->config['inputLoaders'])) {
-            throw new InvalidArgumentException('The "inputLoaders" configuration key must be specified as an array', 500);
+            throw new InvalidArgumentException('The "inputLoaders" configuration key must be specified as an array', Response::HTTP_INTERNAL_SERVER_ERROR);
         } elseif (isset($this->config['inputLoaders']) && is_array($this->config['inputLoaders'])) {
             $inputLoaderManager->addLoaders($this->config['inputLoaders']);
         }
@@ -112,7 +112,7 @@ class Application
         $outputConverterManager = new OutputConverterManager();
 
         if (isset($this->config['outputConverters']) && !is_array($this->config['outputConverters'])) {
-            throw new InvalidArgumentException('The "outputConverters" configuration key must be specified as an array', 500);
+            throw new InvalidArgumentException('The "outputConverters" configuration key must be specified as an array', Response::HTTP_INTERNAL_SERVER_ERROR);
         } elseif (isset($this->config['outputConverters']) && is_array($this->config['outputConverters'])) {
             $outputConverterManager->addConverters($this->config['outputConverters']);
         }
@@ -206,7 +206,7 @@ class Application
             }
 
             if (!($initializer instanceof InitializerInterface)) {
-                throw new InvalidArgumentException('Invalid event listener initializer: ' . $name, 500);
+                throw new InvalidArgumentException('Invalid event listener initializer: ' . $name, Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
             $eventManager->addInitializer($initializer);
@@ -248,7 +248,7 @@ class Application
                 }
 
                 if (!is_string($listener) && !($listener instanceof ListenerInterface)) {
-                    throw new InvalidArgumentException('Invalid event listener definition', 500);
+                    throw new InvalidArgumentException('Invalid event listener definition', Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
 
                 $eventManager->addEventHandler($name, $listener, $params)
@@ -278,7 +278,7 @@ class Application
                 $eventManager->addEventHandler($name, $definition['callback'])
                              ->addCallbacks($name, $events, $users);
             } else {
-                throw new InvalidArgumentException('Invalid event listener definition', 500);
+                throw new InvalidArgumentException('Invalid event listener definition', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         }
 
@@ -315,7 +315,7 @@ class Application
                 }
 
                 if (!$resource instanceof ResourceInterface) {
-                    throw new InvalidArgumentException('Invalid resource class for route: ' . $routeName, 500);
+                    throw new InvalidArgumentException('Invalid resource class for route: ' . $routeName, Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
             } else {
                 $className = 'Imbo\Resource\\' . ucfirst($routeName);
@@ -331,7 +331,7 @@ class Application
             $eventName = $routeName . '.' . $methodName;
 
             if (!$eventManager->hasListenersForEvent($eventName)) {
-                throw new RuntimeException('Method not allowed', 405);
+                throw new RuntimeException('Method not allowed', Response::HTTP_METHOD_NOT_ALLOWED);
             }
 
             $eventManager->trigger($eventName)
@@ -343,7 +343,7 @@ class Application
 
             // If the error is not from the previous attempt at doing content negotiation, force
             // another round since the model has changed into an error model.
-            if ($exception->getCode() !== 406) {
+            if (Response::HTTP_NOT_ACCEPTABLE !== $exception->getCode()) {
                 try {
                     $eventManager->trigger('response.negotiate');
                     $negotiated = true;

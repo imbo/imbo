@@ -1,17 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException;
 use Imagick;
 use ImagickDraw;
-use ImagickPixel;
 use ImagickException;
+use ImagickPixel;
 use ImagickPixelException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
 
 /**
  * Histogram transformation
  */
-class Histogram extends Transformation {
+class Histogram extends Transformation
+{
     /**
      * Generated histogram scale factor.
      *
@@ -21,45 +23,33 @@ class Histogram extends Transformation {
      * anti-aliased on resize.
      *
      * Only unsigned, positive integers are allowed.
-     *
-     * @var integer
      */
-    private $scale = 1;
+    private int $scale = 1;
 
     /**
      * Color to use when drawing the graph for the red channel.
-     *
-     * @var string
      */
-    private $red = '#D93333';
+    private string $red = '#D93333';
 
     /**
      * Color to use when drawing the graph for the green channel.
-     *
-     * @var string
      */
-    private $green = '#58C458';
+    private string $green = '#58C458';
 
     /**
      * Color to use when drawing the graph for the blue channel.
-     *
-     * @var string
      */
-    private $blue = '#3767BF';
+    private string $blue = '#3767BF';
 
     /**
      * Ratio between width / height. Defaults to the golden ratio.
-     *
-     * @var double
      */
-    private $ratio = 1.618;
+    private float $ratio = 1.618;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function transform(array $params) {
+    public function transform(array $params): void
+    {
         $scale = !empty($params['scale']) ? max(1, min(8, (int) $params['scale'])) : $this->scale;
-        $ratio = !empty($params['ratio']) ? max(0.1, min(8, (double) $params['ratio'])) : $this->ratio;
+        $ratio = !empty($params['ratio']) ? max(0.1, min(8, (float) $params['ratio'])) : $this->ratio;
 
         // colors to use for each channel when drawing the histogram
         $colors = [
@@ -92,8 +82,8 @@ class Histogram extends Transformation {
 
             // let's draw a histogram
             $origwidth = 256;
-            $width = $origwidth * $scale;
-            $height = floor($width / $ratio);
+            $width = (int) ($origwidth * $scale);
+            $height = (int) floor($width / $ratio);
 
             // drawing surface for the histogram
             $this->imagick->clear();
@@ -144,9 +134,9 @@ class Histogram extends Transformation {
             $this->imagick->transparentPaintImage('black', 0, 0, false);
             $this->imagick->setImageFormat('png');
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         } catch (ImagickPixelException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         // Store the new image

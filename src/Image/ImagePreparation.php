@@ -1,23 +1,26 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image;
 
-use Imbo\EventManager\EventInterface;
+use finfo;
+use ImagickException;
 use Imbo\EventListener\ListenerInterface;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception;
 use Imbo\Exception\ImageException;
 use Imbo\Exception\LoaderException;
-use Imbo\Exception;
+use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
-use ImagickException;
-use finfo;
 
 /**
  * Image preparation
  */
-class ImagePreparation implements ListenerInterface {
+class ImagePreparation implements ListenerInterface
+{
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             'images.post' => ['prepareImage' => 50],
         ];
@@ -32,14 +35,15 @@ class ImagePreparation implements ListenerInterface {
      * @param EventInterface $event The current event
      * @throws ImageException
      */
-    public function prepareImage(EventInterface $event) {
+    public function prepareImage(EventInterface $event)
+    {
         $request = $event->getRequest();
 
         // Fetch image data from input
         $imageBlob = $request->getContent();
 
         if (empty($imageBlob)) {
-            $e = new ImageException('No image attached', 400);
+            $e = new ImageException('No image attached', Response::HTTP_BAD_REQUEST);
             $e->setImboErrorCode(Exception::IMAGE_NO_IMAGE_ATTACHED);
 
             throw $e;
@@ -54,7 +58,7 @@ class ImagePreparation implements ListenerInterface {
 
         // The loader for the format determined that the image was borked. We set up the image
         // exception here since we're catching multiple exceptions below
-        $invalidImageException = new ImageException('Invalid image', 415);
+        $invalidImageException = new ImageException('Invalid image', Response::HTTP_UNSUPPORTED_MEDIA_TYPE);
         $invalidImageException->setImboErrorCode(Exception::IMAGE_INVALID_IMAGE);
 
         // Attempt to load the image through one of the registered loaders
@@ -72,7 +76,7 @@ class ImagePreparation implements ListenerInterface {
 
         // Unsupported image type
         if (!$imagick) {
-            $e = new ImageException('Unsupported image type: ' . $mime, 415);
+            $e = new ImageException('Unsupported image type: ' . $mime, Response::HTTP_UNSUPPORTED_MEDIA_TYPE);
             $e->setImboErrorCode(Exception::IMAGE_UNSUPPORTED_MIMETYPE);
 
             throw $e;

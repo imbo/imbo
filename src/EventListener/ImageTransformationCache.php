@@ -1,14 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
-use Imbo\Http\Request\Request;
-use Imbo\Model\Image;
-use Imbo\Exception\StorageException;
 use Imbo\Exception\InvalidArgumentException;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Imbo\Exception\StorageException;
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+use Imbo\Model\Image;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
  * Image transformation cache
@@ -25,7 +26,8 @@ use RecursiveIteratorIterator;
  * - image extension (can be null)
  * - image transformations (can be null)
  */
-class ImageTransformationCache implements ListenerInterface {
+class ImageTransformationCache implements ListenerInterface
+{
     /**
      * Root path where the cached images can be stored
      *
@@ -46,11 +48,12 @@ class ImageTransformationCache implements ListenerInterface {
      * @param array $params Parameters for the cache
      * @throws InvalidArgumentException Throws an exception if the specified path is not writable
      */
-    public function __construct(array $params) {
+    public function __construct(array $params)
+    {
         if (!isset($params['path'])) {
             throw new InvalidArgumentException(
                 'The image transformation cache path is missing from the configuration',
-                500
+                Response::HTTP_INTERNAL_SERVER_ERROR,
             );
         }
 
@@ -59,7 +62,7 @@ class ImageTransformationCache implements ListenerInterface {
         if (!$this->isWritable($path)) {
             throw new InvalidArgumentException(
                 'Image transformation cache path is not writable by the webserver: ' . $path,
-                500
+                Response::HTTP_INTERNAL_SERVER_ERROR,
             );
         }
 
@@ -69,7 +72,8 @@ class ImageTransformationCache implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             // Look for images in the cache before transformations occur
             'image.get' => ['loadFromCache' => 20],
@@ -87,7 +91,8 @@ class ImageTransformationCache implements ListenerInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function loadFromCache(EventInterface $event) {
+    public function loadFromCache(EventInterface $event)
+    {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
@@ -135,7 +140,8 @@ class ImageTransformationCache implements ListenerInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function storeInCache(EventInterface $event) {
+    public function storeInCache(EventInterface $event)
+    {
         $request = $event->getRequest();
         $response = $event->getResponse();
         $model = $response->getModel();
@@ -177,7 +183,7 @@ class ImageTransformationCache implements ListenerInterface {
                 // in which case it'll give a warning (we'd use try/catch here in case of PHP7)
                 if (@rename($path. '.tmp', $path) === false && !file_exists($path)) {
                     throw new StorageException(
-                        'An error occured while moving transformed image to cache'
+                        'An error occured while moving transformed image to cache',
                     );
                 }
             }
@@ -189,7 +195,8 @@ class ImageTransformationCache implements ListenerInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function deleteFromCache(EventInterface $event) {
+    public function deleteFromCache(EventInterface $event)
+    {
         $request = $event->getRequest();
         $cacheDir = $this->getCacheDir($request->getUser(), $request->getImageIdentifier());
 
@@ -203,8 +210,9 @@ class ImageTransformationCache implements ListenerInterface {
      *
      * @param boolean $cacheHit Whether the request has already triggered a cache hit
      */
-    protected function setCacheHit($cacheHit) {
-        $this->cacheHit = (boolean) $cacheHit;
+    protected function setCacheHit($cacheHit)
+    {
+        $this->cacheHit = (bool) $cacheHit;
     }
 
     /**
@@ -212,7 +220,8 @@ class ImageTransformationCache implements ListenerInterface {
      *
      * @return boolean
      */
-    protected function isCacheHit() {
+    protected function isCacheHit()
+    {
         return $this->cacheHit;
     }
 
@@ -221,7 +230,8 @@ class ImageTransformationCache implements ListenerInterface {
      *
      * @return string
      */
-    protected function getPath() {
+    protected function getPath()
+    {
         return $this->path;
     }
 
@@ -230,7 +240,8 @@ class ImageTransformationCache implements ListenerInterface {
      *
      * @param string $path
      */
-    protected function setPath($path) {
+    protected function setPath($path)
+    {
         $this->path = $path;
     }
 
@@ -241,7 +252,8 @@ class ImageTransformationCache implements ListenerInterface {
      * @param string $imageIdentifier The image identifier
      * @return string Returns the absolute path to the image cache dir
      */
-    protected function getCacheDir($user, $imageIdentifier) {
+    protected function getCacheDir($user, $imageIdentifier)
+    {
         $userPath = str_pad($user, 3, '0', STR_PAD_LEFT);
         return sprintf(
             '%s/%s/%s/%s/%s/%s/%s/%s/%s',
@@ -253,7 +265,7 @@ class ImageTransformationCache implements ListenerInterface {
             $imageIdentifier[0],
             $imageIdentifier[1],
             $imageIdentifier[2],
-            $imageIdentifier
+            $imageIdentifier,
         );
     }
 
@@ -263,7 +275,8 @@ class ImageTransformationCache implements ListenerInterface {
      * @param Request $request The current request instance
      * @return string Returns the absolute path to the cache file
      */
-    protected function getCacheFilePath(Request $request) {
+    protected function getCacheFilePath(Request $request)
+    {
         $hash = $this->getCacheKey($request);
         $dir = $this->getCacheDir($request->getUser(), $request->getImageIdentifier());
 
@@ -273,7 +286,7 @@ class ImageTransformationCache implements ListenerInterface {
             $hash[0],
             $hash[1],
             $hash[2],
-            $hash
+            $hash,
         );
     }
 
@@ -283,12 +296,13 @@ class ImageTransformationCache implements ListenerInterface {
      * @param Request $request The current request instance
      * @return string Returns a string that can be used as a cache key for the current image
      */
-    protected function getCacheKey(Request $request) {
+    protected function getCacheKey(Request $request)
+    {
         $user = $request->getUser();
         $imageIdentifier = $request->getImageIdentifier();
         $accept = explode(',', $request->headers->get('Accept', '*/*'));
 
-        $accept = array_filter(array_map(function($value) {
+        $accept = array_filter(array_map(function ($value) {
             // Trim whitespace
             $value = trim($value);
 
@@ -300,7 +314,7 @@ class ImageTransformationCache implements ListenerInterface {
             }
 
             return $value;
-        }, $accept), function($value) {
+        }, $accept), function ($value) {
             // Keep values starting with "*/" or "image/"
             return ($value[0] === '*' && $value[1] === '/') || substr($value, 0, 6) === 'image/';
         });
@@ -325,10 +339,11 @@ class ImageTransformationCache implements ListenerInterface {
      *
      * @param string $dir Name of a directory
      */
-    protected function rmdir($dir) {
+    protected function rmdir($dir)
+    {
         $iterator = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($dir),
-            RecursiveIteratorIterator::CHILD_FIRST
+            RecursiveIteratorIterator::CHILD_FIRST,
         );
 
         foreach ($iterator as $file) {
@@ -357,7 +372,8 @@ class ImageTransformationCache implements ListenerInterface {
      * @param string $path The path to check
      * @return boolean
      */
-    protected function isWritable($path) {
+    protected function isWritable($path)
+    {
         if (!is_dir($path)) {
             // Path does not exist, check parent
             return $this->isWritable(dirname($path));

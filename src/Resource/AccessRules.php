@@ -1,30 +1,34 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Resource;
 
+use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception\InvalidArgumentException;
-use Imbo\Exception\RuntimeException;
 use Imbo\Exception\ResourceException;
-use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
+use Imbo\Exception\RuntimeException;
+use Imbo\Http\Response\Response;
 use Imbo\Model\AccessRules as AccessRulesModel;
 use Imbo\Model\ArrayModel;
 
-class AccessRules implements ResourceInterface {
+class AccessRules implements ResourceInterface
+{
     /**
      * {@inheritdoc}
      */
-    public function getAllowedMethods() {
+    public function getAllowedMethods()
+    {
         return ['GET', 'HEAD', 'POST'];
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             'accessrules.get' => 'getRules',
             'accessrules.head' => 'getRules',
-            'accessrules.post' => 'addRules'
+            'accessrules.post' => 'addRules',
         ];
     }
 
@@ -33,7 +37,8 @@ class AccessRules implements ResourceInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function getRules(EventInterface $event) {
+    public function getRules(EventInterface $event)
+    {
         $request = $event->getRequest();
         $publicKey = $request->getRoute()->get('publickey');
 
@@ -41,7 +46,7 @@ class AccessRules implements ResourceInterface {
         $keyExists = $accessControl->publicKeyExists($publicKey);
 
         if (!$keyExists) {
-            throw new RuntimeException('Public key not found', 404);
+            throw new RuntimeException('Public key not found', Response::HTTP_NOT_FOUND);
         }
 
         $accessList = $accessControl->getAccessListForPublicKey($publicKey);
@@ -67,11 +72,12 @@ class AccessRules implements ResourceInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function addRules(EventInterface $event) {
+    public function addRules(EventInterface $event)
+    {
         $accessControl = $event->getAccessControl();
 
         if (!($accessControl instanceof MutableAdapterInterface)) {
-            throw new ResourceException('Access control adapter is immutable', 405);
+            throw new ResourceException('Access control adapter is immutable', Response::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $request = $event->getRequest();
@@ -79,7 +85,7 @@ class AccessRules implements ResourceInterface {
         $data = json_decode($request->getContent(), true);
 
         if (!is_array($data)) {
-            throw new InvalidArgumentException('No access rule data provided', 400);
+            throw new InvalidArgumentException('No access rule data provided', Response::HTTP_BAD_REQUEST);
         }
 
         // If a single rule was provided, wrap it in an array
@@ -111,12 +117,13 @@ class AccessRules implements ResourceInterface {
      * @param Mixed Values to test
      * @return boolean True if all values are strings
      */
-    private function isStringArray($values) {
+    private function isStringArray($values)
+    {
         if (!is_array($values)) {
             return false;
         }
 
-        return array_reduce($values, function($res, $value) {
+        return array_reduce($values, function ($res, $value) {
             return $res && is_string($value);
         }, true);
     }
@@ -127,44 +134,45 @@ class AccessRules implements ResourceInterface {
      * @param array $rule Access rule to check
      * @throws RuntimeException
      */
-    private function validateRule(EventInterface $event, array $rule) {
+    private function validateRule(EventInterface $event, array $rule)
+    {
         $acl = $event->getAccessControl();
 
         $allowedProperties = ['resources', 'group', 'users'];
         $unknownProperties = array_diff(array_keys($rule), $allowedProperties);
 
         if (!empty($unknownProperties)) {
-            throw new RuntimeException('Found unknown properties in rule: [' . implode(', ', $unknownProperties) . ']', 400);
+            throw new RuntimeException('Found unknown properties in rule: [' . implode(', ', $unknownProperties) . ']', Response::HTTP_BAD_REQUEST);
         }
 
         if (isset($rule['resources']) && isset($rule['group'])) {
-            throw new RuntimeException('Both resources and group found in rule', 400);
+            throw new RuntimeException('Both resources and group found in rule', Response::HTTP_BAD_REQUEST);
         }
 
         if (!isset($rule['resources']) && !isset($rule['group'])) {
-            throw new RuntimeException('Neither group nor resources found in rule', 400);
+            throw new RuntimeException('Neither group nor resources found in rule', Response::HTTP_BAD_REQUEST);
         }
 
         if (isset($rule['resources']) && !$this->isStringArray($rule['resources'])) {
-            throw new RuntimeException('Illegal value in resources array. String array expected', 400);
+            throw new RuntimeException('Illegal value in resources array. String array expected', Response::HTTP_BAD_REQUEST);
         }
 
         if (isset($rule['group'])) {
             if (!is_string($rule['group'])) {
-                throw new RuntimeException('Group must be specified as a string value', 400);
+                throw new RuntimeException('Group must be specified as a string value', Response::HTTP_BAD_REQUEST);
             }
 
             if (!$acl->getGroup($rule['group'])) {
-                throw new RuntimeException('Group \'' . $rule['group'] . '\' does not exist', 400);
+                throw new RuntimeException('Group \'' . $rule['group'] . '\' does not exist', Response::HTTP_BAD_REQUEST);
             }
         }
 
         if (!isset($rule['users'])) {
-            throw new RuntimeException('Users not specified in rule', 400);
+            throw new RuntimeException('Users not specified in rule', Response::HTTP_BAD_REQUEST);
         }
 
         if ($rule['users'] !== '*' && !$this->isStringArray($rule['users'])) {
-            throw new RuntimeException('Illegal value for users property. Allowed: \'*\' or array with users', 400);
+            throw new RuntimeException('Illegal value for users property. Allowed: \'*\' or array with users', Response::HTTP_BAD_REQUEST);
         }
     }
 }

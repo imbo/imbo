@@ -1,18 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException;
-use Imbo\Image\InputSizeConstraint;
 use ImagickException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
+use Imbo\Image\InputSizeConstraint;
 
-/**
- * MaxSize transformation
- */
-class MaxSize extends Transformation implements InputSizeConstraint {
-    /**
-     * {@inheritdoc}
-     */
-    public function transform(array $params) {
+class MaxSize extends Transformation implements InputSizeConstraint
+{
+    public function transform(array $params): void
+    {
         $newSize = $this->calculateSize($params, [
             'width'  => $this->image->getWidth(),
             'height' => $this->image->getHeight(),
@@ -26,7 +23,7 @@ class MaxSize extends Transformation implements InputSizeConstraint {
         try {
             $this->imagick->thumbnailImage($newSize['width'], $newSize['height']);
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
 
         $size = $this->imagick->getImageGeometry();
@@ -36,10 +33,8 @@ class MaxSize extends Transformation implements InputSizeConstraint {
                     ->setHasBeenTransformed(true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getMinimumInputSize(array $params, array $imageSize) {
+    public function getMinimumInputSize(array $params, array $imageSize)
+    {
         return $this->calculateSize($params, $imageSize) ?: InputSizeConstraint::NO_TRANSFORMATION;
     }
 
@@ -48,16 +43,17 @@ class MaxSize extends Transformation implements InputSizeConstraint {
      *
      * @param array $params
      * @param array $imageSize
-     * @return array|boolean
+     * @return ?array{width:int,height:int}
      */
-    protected function calculateSize(array $params, array $imageSize) {
+    protected function calculateSize(array $params, array $imageSize): ?array
+    {
         $maxWidth = !empty($params['width']) ? (int) $params['width'] : 0;
         $maxHeight = !empty($params['height']) ? (int) $params['height'] : 0;
 
         $sourceWidth  = $imageSize['width'];
         $sourceHeight = $imageSize['height'];
 
-        $width  = $maxWidth  ?: $sourceWidth;
+        $width  = $maxWidth ?: $sourceWidth;
         $height = $maxHeight ?: $sourceHeight;
 
         // Figure out original ratio
@@ -72,9 +68,9 @@ class MaxSize extends Transformation implements InputSizeConstraint {
         // Is the original image smaller than the specified parameters?
         if ($sourceWidth <= $width && $sourceHeight <= $height) {
             // Original image is smaller than the max-parameters, don't transform
-            return;
+            return null;
         }
 
-        return ['width' => $width, 'height' => $height];
+        return ['width' => (int) $width, 'height' => (int) $height];
     }
 }

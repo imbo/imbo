@@ -1,17 +1,20 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception\StorageException;
+use Imbo\Http\Response\Response;
 
 /**
  * Storage operations event listener
  */
-class StorageOperations implements ListenerInterface {
+class StorageOperations implements ListenerInterface
+{
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             'storage.image.delete' => 'deleteImage',
             'storage.image.load' => 'loadImage',
@@ -24,7 +27,8 @@ class StorageOperations implements ListenerInterface {
      *
      * @param EventInterface $event An event instance
      */
-    public function deleteImage(EventInterface $event) {
+    public function deleteImage(EventInterface $event)
+    {
         $request = $event->getRequest();
         $event->getStorage()->delete($request->getUser(), $request->getImageIdentifier());
     }
@@ -34,7 +38,8 @@ class StorageOperations implements ListenerInterface {
      *
      * @param EventInterface $event An event instance
      */
-    public function loadImage(EventInterface $event) {
+    public function loadImage(EventInterface $event)
+    {
         $storage = $event->getStorage();
         $request = $event->getRequest();
         $response = $event->getResponse();
@@ -48,7 +53,7 @@ class StorageOperations implements ListenerInterface {
         // that's down, web-backed storage being unavailable or something
         // similar.
         if (null === $imageData) {
-            throw new StorageException('Failed reading file from storage backend for user ' . $user . ', id: ' . $imageIdentifier, 503);
+            throw new StorageException('Failed reading file from storage backend for user ' . $user . ', id: ' . $imageIdentifier, Response::HTTP_SERVICE_UNAVAILABLE);
         }
 
         $lastModified = $storage->getLastModified($user, $imageIdentifier);
@@ -64,7 +69,8 @@ class StorageOperations implements ListenerInterface {
      *
      * @param EventInterface $event An event instance
      */
-    public function insertImage(EventInterface $event) {
+    public function insertImage(EventInterface $event)
+    {
         $request = $event->getRequest();
         $user = $request->getUser();
         $image = $request->getImage();
@@ -76,17 +82,17 @@ class StorageOperations implements ListenerInterface {
             $event->getStorage()->store(
                 $user,
                 $imageIdentifier,
-                $blob
+                $blob,
             );
         } catch (StorageException $e) {
             $event->getDatabase()->deleteImage(
                 $user,
-                $imageIdentifier
+                $imageIdentifier,
             );
 
             throw $e;
         }
 
-        $event->getResponse()->setStatusCode($exists ? 200 : 201);
+        $event->getResponse()->setStatusCode($exists ? Response::HTTP_OK : Response::HTTP_CREATED);
     }
 }

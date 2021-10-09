@@ -1,9 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image;
 
-use Imbo\Image\InputLoader\InputLoaderInterface;
-use Imbo\Exception\InvalidArgumentException;
 use Imagick;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Response\Response;
+use Imbo\Image\InputLoader\InputLoaderInterface;
 
 /**
  * Loader manager
@@ -15,7 +16,8 @@ use Imagick;
  * support the image for any reason, or throw a LoaderException if the image is determined to be
  * invalid or damaged.
  */
-class InputLoaderManager {
+class InputLoaderManager
+{
     /**
      * @var array Registered loaders for a given mime type
      */
@@ -37,7 +39,8 @@ class InputLoaderManager {
      * @param Imagick $imagick
      * @return self
      */
-    public function setImagick(Imagick $imagick) {
+    public function setImagick(Imagick $imagick)
+    {
         $this->imagick = $imagick;
 
         return $this;
@@ -49,7 +52,8 @@ class InputLoaderManager {
      * @param array<InputLoaderInterface|string> $loaders A list of loaders to add to the manager.
      * @return self
      */
-    public function addLoaders(array $loaders) {
+    public function addLoaders(array $loaders)
+    {
         foreach ($loaders as $loader) {
             if (is_string($loader)) {
                 $loader = new $loader();
@@ -57,7 +61,7 @@ class InputLoaderManager {
 
             if (!$loader instanceof InputLoaderInterface) {
                 $name = is_object($loader) ? get_class($loader) : (string) $loader;
-                throw new InvalidArgumentException('Given loader (' . $name . ') does not implement LoaderInterface', 500);
+                throw new InvalidArgumentException('Given loader (' . $name . ') does not implement LoaderInterface', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
             $this->registerLoader($loader);
@@ -72,7 +76,8 @@ class InputLoaderManager {
      * @param InputLoaderInterface $loader InputLoader to register
      * @return self
      */
-    public function registerLoader(InputLoaderInterface $loader) {
+    public function registerLoader(InputLoaderInterface $loader)
+    {
         foreach ($loader->getSupportedMimeTypes() as $mime => $extensions) {
             if (!isset($this->loaders[$mime])) {
                 $this->loaders[$mime] = [];
@@ -105,7 +110,8 @@ class InputLoaderManager {
      *                              the blob. If any of the loaders ends up with a result other than
      *                              false, the imagick instance will be returned.
      */
-    public function load($mime, $blob) {
+    public function load($mime, $blob)
+    {
         if (!isset($this->loaders[$mime])) {
             return null;
         }
@@ -143,7 +149,8 @@ class InputLoaderManager {
      * @param string $mimeType
      * @return string|null The extension used for the mime type or null if the mime type is unknown
      */
-    public function getExtensionFromMimeType($mimeType) {
+    public function getExtensionFromMimeType($mimeType)
+    {
         return isset($this->mimeTypeToExtension[$mimeType]) ? $this->mimeTypeToExtension[$mimeType][0] : null;
     }
 }

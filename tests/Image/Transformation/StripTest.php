@@ -1,23 +1,27 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException;
-use Imbo\Model\Image;
 use Imagick;
 use ImagickException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
+use Imbo\Model\Image;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Strip
  */
-class StripTest extends TransformationTests {
-    protected function getTransformation() : Strip {
+class StripTest extends TransformationTests
+{
+    protected function getTransformation(): Strip
+    {
         return new Strip();
     }
 
     /**
      * @covers ::transform
      */
-    public function testStripMetadata() : void {
+    public function testStripMetadata(): void
+    {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -54,14 +58,15 @@ class StripTest extends TransformationTests {
     /**
      * @covers ::transform
      */
-    public function testThrowsCorrectExceptionWhenAnErrorOccurs() : void {
+    public function testThrowsCorrectExceptionWhenAnErrorOccurs(): void
+    {
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
             ->method('stripImage')
             ->willThrowException($e = new ImagickException('error'));
 
-        $this->expectExceptionObject(new TransformationException('error', 400, $e));
+        $this->expectExceptionObject(new TransformationException('error', Response::HTTP_BAD_REQUEST, $e));
         (new Strip())
             ->setImagick($imagick)
             ->transform([]);
@@ -70,7 +75,8 @@ class StripTest extends TransformationTests {
     /**
      * @covers ::transform
      */
-    public function testReloadsImage() : void {
+    public function testReloadsImage(): void
+    {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())

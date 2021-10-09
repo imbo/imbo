@@ -1,15 +1,18 @@
 <?php declare(strict_types=1);
 namespace Imbo\Auth\AccessControl\Adapter;
 
-use Imbo\Resource;
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Response\Response;
+use Imbo\Resource;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter
  */
-class SimpleArrayAdapterTest extends TestCase {
-    public function getAuthConfig() : array {
+class SimpleArrayAdapterTest extends TestCase
+{
+    public function getAuthConfig(): array
+    {
         $users = [
             'publicKey1' => 'key1',
             'publicKey2' => 'key2',
@@ -26,13 +29,14 @@ class SimpleArrayAdapterTest extends TestCase {
      * @covers ::__construct
      * @covers ::getExpandedAclList
      */
-    public function testThrowsOnMultiplePrivateKeysPerPublicKey() : void {
+    public function testThrowsOnMultiplePrivateKeysPerPublicKey(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException(
             'A public key can only have a single private key (as of 2.0.0)',
-            500
+            Response::HTTP_INTERNAL_SERVER_ERROR,
         ));
         new SimpleArrayAdapter([
-            'publicKey' => ['key1', 'key2']
+            'publicKey' => ['key1', 'key2'],
         ]);
     }
 
@@ -40,7 +44,8 @@ class SimpleArrayAdapterTest extends TestCase {
      * @covers ::__construct
      * @covers ::getExpandedAclList
      */
-    public function testLegacyConfigKeysHaveWriteAccess() : void {
+    public function testLegacyConfigKeysHaveWriteAccess(): void
+    {
         $accessControl = new SimpleArrayAdapter([
             'publicKey' => 'privateKey',
         ]);
@@ -49,8 +54,8 @@ class SimpleArrayAdapterTest extends TestCase {
             $accessControl->hasAccess(
                 'publicKey',
                 Resource::IMAGES_POST,
-                'publicKey'
-            )
+                'publicKey',
+            ),
         );
     }
 }

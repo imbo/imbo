@@ -1,22 +1,22 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image;
 
+use Imagick;
 use Imbo\Database\DatabaseInterface;
-use Imbo\Image\ImagePreparation;
+use Imbo\EventManager\EventInterface;
 use Imbo\Exception\ImageException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
-use Imbo\EventManager\EventInterface;
 use Imbo\Image\Identifier\Generator\GeneratorInterface;
+use Imbo\Model\Image;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Imbo\Model\Image;
-use Imagick;
 
 /**
  * @coversDefaultClass Imbo\Image\ImagePreparation
  */
-class ImagePreparationTest extends TestCase {
+class ImagePreparationTest extends TestCase
+{
     private $prepare;
     private $request;
     private $response;
@@ -29,14 +29,15 @@ class ImagePreparationTest extends TestCase {
     private $outputConverterManager;
     private $imagickLoader;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->request = $this->createMock(Request::class);
         $this->database = $this->createMock(DatabaseInterface::class);
         $this->headers = $this->createMock(ResponseHeaderBag::class);
         $this->response = $this->createMock(Response::class);
         $this->response->headers = $this->headers;
         $this->inputLoaderManager = $this->createMock(InputLoaderManager::class);
-        $this->imagickLoader = function (string $mime, string $data) : Imagick {
+        $this->imagickLoader = function (string $mime, string $data): Imagick {
             $imagick = new Imagick();
             $imagick->readImageBlob($data);
 
@@ -60,7 +61,8 @@ class ImagePreparationTest extends TestCase {
     /**
      * @covers ::getSubscribedEvents
      */
-    public function testReturnsACorrectDefinition() : void {
+    public function testReturnsACorrectDefinition(): void
+    {
         $class = get_class($this->prepare);
         $this->assertIsArray($class::getSubscribedEvents());
     }
@@ -68,20 +70,22 @@ class ImagePreparationTest extends TestCase {
     /**
      * @covers ::prepareImage
      */
-    public function testThrowsExceptionWhenNoImageIsAttached() : void {
+    public function testThrowsExceptionWhenNoImageIsAttached(): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getContent')
             ->willReturn('');
 
-        $this->expectExceptionObject(new ImageException('No image attached', 400));
+        $this->expectExceptionObject(new ImageException('No image attached', Response::HTTP_BAD_REQUEST));
         $this->prepare->prepareImage($this->event);
     }
 
     /**
      * @covers ::prepareImage
      */
-    public function testThrowsExceptionWhenImageTypeIsNotSupported() : void {
+    public function testThrowsExceptionWhenImageTypeIsNotSupported(): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getContent')
@@ -92,14 +96,15 @@ class ImagePreparationTest extends TestCase {
             ->method('load')
             ->willReturn(null);
 
-        $this->expectExceptionObject(new ImageException('Unsupported image type: text/x-php', 415));
+        $this->expectExceptionObject(new ImageException('Unsupported image type: text/x-php', Response::HTTP_UNSUPPORTED_MEDIA_TYPE));
         $this->prepare->prepareImage($this->event);
     }
 
     /**
      * @covers ::prepareImage
      */
-    public function testThrowsExceptionWhenImageIsBroken() : void {
+    public function testThrowsExceptionWhenImageIsBroken(): void
+    {
         $filePath = FIXTURES_DIR . '/broken-image.jpg';
 
         $this->inputLoaderManager
@@ -112,14 +117,15 @@ class ImagePreparationTest extends TestCase {
             ->method('getContent')
             ->willReturn(file_get_contents($filePath));
 
-        $this->expectExceptionObject(new ImageException('Invalid image', 415));
+        $this->expectExceptionObject(new ImageException('Invalid image', Response::HTTP_UNSUPPORTED_MEDIA_TYPE));
         $this->prepare->prepareImage($this->event);
     }
 
     /**
      * @covers ::prepareImage
      */
-    public function testThrowsExceptionWhenImageIsSlightlyBroken() : void {
+    public function testThrowsExceptionWhenImageIsSlightlyBroken(): void
+    {
         $filePath = FIXTURES_DIR . '/slightly-broken-image.png';
 
         $this->inputLoaderManager
@@ -132,14 +138,15 @@ class ImagePreparationTest extends TestCase {
             ->method('getContent')
             ->willReturn(file_get_contents($filePath));
 
-        $this->expectExceptionObject(new ImageException('Invalid image', 415));
+        $this->expectExceptionObject(new ImageException('Invalid image', Response::HTTP_UNSUPPORTED_MEDIA_TYPE));
         $this->prepare->prepareImage($this->event);
     }
 
     /**
      * @covers ::prepareImage
      */
-    public function testPopulatesRequestWhenImageIsValid() : void {
+    public function testPopulatesRequestWhenImageIsValid(): void
+    {
         $imagePath = FIXTURES_DIR . '/image.png';
         $imageData = file_get_contents($imagePath);
 

@@ -1,21 +1,25 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
+use Imbo\Http\Response\Response;
 use Imbo\Model;
 
-class Index implements ResourceInterface {
+class Index implements ResourceInterface
+{
     /**
      * {@inheritdoc}
      */
-    public function getAllowedMethods() {
+    public function getAllowedMethods()
+    {
         return ['GET', 'HEAD'];
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             'index.get' => 'get',
             'index.head' => 'get',
@@ -27,19 +31,20 @@ class Index implements ResourceInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function get(EventInterface $event) {
+    public function get(EventInterface $event)
+    {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
         $redirectUrl = $event->getConfig()['indexRedirect'];
 
         if ($redirectUrl) {
-            $response->setStatusCode(307);
+            $response->setStatusCode(Response::HTTP_TEMPORARY_REDIRECT);
             $response->headers->set('Location', $redirectUrl);
             return;
         }
 
-        $response->setStatusCode(200, 'Hell Yeah');
+        $response->setStatusCode(Response::HTTP_OK, 'Hell Yeah');
 
         $baseUrl = $request->getSchemeAndHttpHost() . $request->getBaseUrl();
 

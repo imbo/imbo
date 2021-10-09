@@ -5,6 +5,7 @@ use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\ResourceException;
+use Imbo\Http\Response\Response;
 use Imbo\Model\Group;
 
 class Groups implements ResourceInterface
@@ -38,28 +39,28 @@ class Groups implements ResourceInterface
     {
         $accessControl = $event->getAccessControl();
         if (!($accessControl instanceof MutableAdapterInterface)) {
-            throw new ResourceException('Access control adapter is immutable', 405);
+            throw new ResourceException('Access control adapter is immutable', Response::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $request = $event->getRequest();
         $body    = $request->getContent();
 
         if (empty($body)) {
-            throw new InvalidArgumentException('Missing JSON data', 400);
+            throw new InvalidArgumentException('Missing JSON data', Response::HTTP_BAD_REQUEST);
         } else {
             $body = json_decode($body, true);
 
             if ($body === null || json_last_error() !== JSON_ERROR_NONE) {
-                throw new InvalidArgumentException('Invalid JSON data', 400);
+                throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
             }
         }
 
         if (!array_key_exists('name', $body) || '' === trim((string) $body['name'])) {
-            throw new InvalidArgumentException('Group name missing', 400);
+            throw new InvalidArgumentException('Group name missing', Response::HTTP_BAD_REQUEST);
         } elseif (!array_key_exists('resources', $body) || !is_array($body['resources'])) {
-            throw new InvalidArgumentException('Resource list missing', 400);
-        } else if (!preg_match('/^[a-z0-9_-]{1,}$/', $body['name'])) {
-            throw new InvalidArgumentException('Invalid group name', 400);
+            throw new InvalidArgumentException('Resource list missing', Response::HTTP_BAD_REQUEST);
+        } elseif (!preg_match('/^[a-z0-9_-]{1,}$/', $body['name'])) {
+            throw new InvalidArgumentException('Invalid group name', Response::HTTP_BAD_REQUEST);
         }
 
         $name      = $body['name'];
@@ -68,12 +69,12 @@ class Groups implements ResourceInterface
         $group = $accessControl->getGroup($name);
 
         if (null !== $group) {
-            throw new InvalidArgumentException('Group already exists', 400);
+            throw new InvalidArgumentException('Group already exists', Response::HTTP_BAD_REQUEST);
         }
 
         foreach ($resources as $resource) {
             if (!is_string($resource)) {
-                throw new ResourceException('Resources must be specified as strings', 400);
+                throw new ResourceException('Resources must be specified as strings', Response::HTTP_BAD_REQUEST);
             }
         }
 
@@ -86,6 +87,6 @@ class Groups implements ResourceInterface
 
         $event->getResponse()
             ->setModel($model)
-            ->setStatusCode(201);
+            ->setStatusCode(Response::HTTP_CREATED);
     }
 }

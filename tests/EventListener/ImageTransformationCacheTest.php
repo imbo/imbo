@@ -1,22 +1,22 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
-use Imbo\EventListener\ImageTransformationCache;
-use Imbo\Exception\InvalidArgumentException;
-use Imbo\Http\Response\Response;
-use Imbo\Http\Request\Request;
 use Imbo\EventManager\Event;
-use Imbo\Model\Image;
+use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
 use Imbo\Model\Error;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Imbo\Model\Image;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use TestFs\StreamWrapper as TestFs;
 
 /**
  * @coversDefaultClass Imbo\EventListener\ImageTransformationCache
  */
-class ImageTransformationCacheTest extends ListenerTests {
+class ImageTransformationCacheTest extends ListenerTests
+{
     private $listener;
     private $event;
     private $request;
@@ -27,7 +27,8 @@ class ImageTransformationCacheTest extends ListenerTests {
     private $responseHeaders;
     private $requestHeaders;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $this->requestHeaders = $this->createMock(HeaderBag::class);
         $this->query = $this->createMock(ParameterBag::class);
@@ -53,11 +54,13 @@ class ImageTransformationCacheTest extends ListenerTests {
         $this->listener = new ImageTransformationCache(['path' => TestFs::url('cacheDir')]);
     }
 
-    public function tearDown() : void {
+    public function tearDown(): void
+    {
         TestFs::unregister();
     }
 
-    protected function getListener() : ImageTransformationCache {
+    protected function getListener(): ImageTransformationCache
+    {
         return $this->listener;
     }
 
@@ -67,7 +70,8 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers ::getCacheKey
      * @covers ::getCacheFilePath
      */
-    public function testChangesTheImageInstanceOnCacheHit() : void {
+    public function testChangesTheImageInstanceOnCacheHit(): void
+    {
         $imageFromCache = $this->createMock(Image::class);
         $cachedData = serialize([
             'image' => $imageFromCache,
@@ -116,7 +120,8 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers ::getCacheKey
      * @covers ::getCacheFilePath
      */
-    public function testRemovesCorruptCachedDataOnCacheHit() : void {
+    public function testRemovesCorruptCachedDataOnCacheHit(): void
+    {
         $this->request
             ->method('getExtension')
             ->willReturn('png');
@@ -152,7 +157,8 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers ::getCacheKey
      * @covers ::getCacheFilePath
      */
-    public function testAddsCorrectResponseHeaderOnCacheMiss() : void {
+    public function testAddsCorrectResponseHeaderOnCacheMiss(): void
+    {
         $this->requestHeaders
             ->expects($this->once())
             ->method('get')
@@ -170,7 +176,8 @@ class ImageTransformationCacheTest extends ListenerTests {
     /**
      * @covers ::storeInCache
      */
-    public function testDoesNotStoreNonImageModelsInTheCache() : void {
+    public function testDoesNotStoreNonImageModelsInTheCache(): void
+    {
         $this->response
             ->expects($this->once())
             ->method('getModel')
@@ -189,7 +196,8 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers ::getCacheKey
      * @covers ::getCacheFilePath
      */
-    public function testStoresImageInCache() : void {
+    public function testStoresImageInCache(): void
+    {
         $image = $this->createMock(Image::class);
 
         $this->response
@@ -221,7 +229,8 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers ::getCacheKey
      * @covers ::getCacheFilePath
      */
-    public function testDoesNotStoreIfCachedVersionAlreadyExists() : void {
+    public function testDoesNotStoreIfCachedVersionAlreadyExists(): void
+    {
         $imageFromCache = $this->createMock(Image::class);
         $cachedData = serialize([
             'image' => $imageFromCache,
@@ -282,7 +291,8 @@ class ImageTransformationCacheTest extends ListenerTests {
      * @covers ::getCacheDir
      * @covers ::rmdir
      */
-    public function testCanDeleteAllImageVariationsFromCache() : void {
+    public function testCanDeleteAllImageVariationsFromCache(): void
+    {
         $cachedFiles = [
             TestFs::url('cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/f/30f0763c8422360d10fd84573dd58293'),
             TestFs::url('cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/3/0/e/30e0763c8422360d10fd84573dd58293'),
@@ -308,10 +318,11 @@ class ImageTransformationCacheTest extends ListenerTests {
     /**
      * @covers ::__construct
      */
-    public function testThrowsAnExceptionWhenPathIsMissingFromTheParameters() : void {
+    public function testThrowsAnExceptionWhenPathIsMissingFromTheParameters(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException(
             'The image transformation cache path is missing from the configuration',
-            500
+            Response::HTTP_INTERNAL_SERVER_ERROR,
         ));
         new ImageTransformationCache([]);
     }
@@ -319,13 +330,14 @@ class ImageTransformationCacheTest extends ListenerTests {
     /**
      * @covers ::__construct
      */
-    public function testThrowsExceptionWhenCacheDirIsNotWritable() : void {
+    public function testThrowsExceptionWhenCacheDirIsNotWritable(): void
+    {
         $dir = TestFs::url('unwritableDir');
         mkdir($dir, 0000);
 
         $this->expectExceptionObject(new InvalidArgumentException(
             'Image transformation cache path is not writable by the webserver: tfs://unwritableDir',
-            500
+            Response::HTTP_INTERNAL_SERVER_ERROR,
         ));
         new ImageTransformationCache(['path' => $dir]);
     }
@@ -333,9 +345,10 @@ class ImageTransformationCacheTest extends ListenerTests {
     /**
      * @covers ::__construct
      */
-    public function testDoesNotTriggerWarningIfCachePathDoesNotExistAndParentIsWritable() : void {
+    public function testDoesNotTriggerWarningIfCachePathDoesNotExistAndParentIsWritable(): void
+    {
         $this->assertNotNull(
-            new ImageTransformationCache(['path' => TestFs::url('cacheDir/some/dir/that/does/not/exist')])
+            new ImageTransformationCache(['path' => TestFs::url('cacheDir/some/dir/that/does/not/exist')]),
         );
     }
 }

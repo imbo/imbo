@@ -1,48 +1,29 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventManager;
 
-use Imbo\EventListener\ListenerInterface;
 use Imbo\EventListener\Initializer\InitializerInterface;
+use Imbo\EventListener\ListenerInterface;
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Response\Response;
 
-class EventManager {
-    /**
-     * The event handlers
-     *
-     * @var array
-     */
-    private $eventHandlers = [];
-
-    /**
-     * Event template
-     *
-     * @var EventInterface
-     */
-    private $event;
+class EventManager
+{
+    private array $eventHandlers = [];
+    private EventInterface $event;
+    private array $callbacks = [];
 
     /**
-     * Map of events and callbacks
-     *
-     * @var array
-     */
-    private $callbacks = [];
-
-    /**
-     * Event listener initializers
-     *
-     * @var InitializerInterface[]
+     * @var array<InitializerInterface>
      */
     private $initializers = [];
 
     /**
      * Register an event handler
      *
-     * @param string $name The name of the handler
      * @param mixed $handler The handler itself
-     * @param array $params Parameters for the handler if $handler is a string
-     * @return self
      */
-    public function addEventHandler($name, $handler, array $params = []) {
+    public function addEventHandler($name, $handler, array $params = []): self
+    {
         if (is_string($handler)) {
             $this->eventHandlers[$name] = [
                 'handler' => $handler,
@@ -57,14 +38,9 @@ class EventManager {
 
     /**
      * Add one or more callbacks
-     *
-     * @param string $name The name of the handler that owns the callback
-     * @param array $events Which events the callback will trigger for
-     * @param array $users User filter for the events
-     * @return self
      */
-    public function addCallbacks($name, array $events, array $users = []) {
-        // Default priority
+    public function addCallbacks($name, array $events, array $users = []): self
+    {
         $defaultPriority = 0;
 
         foreach ($events as $event => $callback) {
@@ -80,7 +56,7 @@ class EventManager {
                     'method' => $callback,
                     'users' => $users,
                 ], $defaultPriority);
-            } else if (is_array($callback)) {
+            } elseif (is_array($callback)) {
                 // 'eventName' => [ ... ]
                 foreach ($callback as $method => $priority) {
                     if (is_int($method)) {
@@ -95,27 +71,25 @@ class EventManager {
                         'users' => $users,
                     ], $priority);
                 }
-            } else if (is_int($callback)) {
+            } elseif (is_int($callback)) {
                 // We have a closure as a callback, so $callback is the actual priority
                 $this->callbacks[$event]->insert([
                     'handler' => $name,
                     'users' => $users,
                 ], $callback);
             } else {
-                throw new InvalidArgumentException('Invalid event definition for listener: ' . $name, 500);
+                throw new InvalidArgumentException(
+                    'Invalid event definition for listener: ' . $name,
+                    Response::HTTP_INTERNAL_SERVER_ERROR,
+                );
             }
         }
 
         return $this;
     }
 
-    /**
-     * Get a handler instance
-     *
-     * @param string $name The name of the handler
-     * @return ListenerInterface
-     */
-    public function getHandlerInstance($name) {
+    public function getHandlerInstance($name)
+    {
         if (is_array($this->eventHandlers[$name])) {
             // The listener has not been initialized
             $className = $this->eventHandlers[$name]['handler'];
@@ -133,35 +107,23 @@ class EventManager {
         return $this->eventHandlers[$name];
     }
 
-    /**
-     * Add an event listener initializer
-     *
-     * @param InitializerInterface $initializer An initializer instance
-     * @return self
-     */
-    public function addInitializer(InitializerInterface $initializer) {
+    public function addInitializer(InitializerInterface $initializer): self
+    {
         $this->initializers[] = $initializer;
 
         return $this;
     }
 
     /**
-     * Get the registered initializers
-     *
-     * @return InitializerInterface[]
+     * @return array<InitializerInterface>
      */
-    public function getInitializers() {
+    public function getInitializers(): array
+    {
         return $this->initializers;
     }
 
-    /**
-     * Trigger a given event
-     *
-     * @param string $eventName The name of the event to trigger
-     * @param array $params Extra parameters for the event
-     * @return EventManager
-     */
-    public function trigger($eventName, array $params = []) {
+    public function trigger(string $eventName, array $params = []): EventManager
+    {
         $event = clone $this->event;
         $event->setName($eventName);
 
@@ -201,10 +163,10 @@ class EventManager {
     /**
      * Get all listeners that listens for an event, including wildcard listeners
      *
-     * @param string $event Name of the event
-     * @return PriorityQueue[]
+     * @return array<PriorityQueue>
      */
-    private function getListenersForEvent($event) {
+    private function getListenersForEvent(string $event): array
+    {
         $listeners = [];
 
         foreach ($this->getEventNameParts($event) as $name) {
@@ -221,10 +183,10 @@ class EventManager {
     /**
      * Get all parts of an event name
      *
-     * @param string $event
-     * @param string[]
+     * @param array<string>
      */
-    private function getEventNameParts($event) {
+    private function getEventNameParts(string $event): array
+    {
         $parts = ['*'];
         $offset = 0;
 
@@ -237,43 +199,24 @@ class EventManager {
         return $parts;
     }
 
-    /**
-     * Whether or not the manager has event listeners that subscribes to a specific event
-     *
-     * @param string $eventName The name of the event to check
-     * @return boolean
-     */
-    public function hasListenersForEvent($eventName) {
+    public function hasListenersForEvent(string $eventName): bool
+    {
         return !empty($this->callbacks[$eventName]);
     }
 
-    /**
-     * Set the event template
-     *
-     * This event instance will be cloned for each use of the trigger method
-     *
-     * @param EventInterface $event A configured event instance
-     * @return self
-     */
-    public function setEventTemplate(EventInterface $event) {
+    public function setEventTemplate(EventInterface $event): self
+    {
         $this->event = $event;
-
         return $this;
     }
 
-    /**
-     * Check if a listener will trigger for a given user
-     *
-     * @param string $user The user to check for, can be null
-     * @param array $filter The array from the listener with "whitelist" and "blacklist"
-     * @return boolean
-     */
-    private function triggersFor($user = null, array $filter = []) {
+    private function triggersFor(string $user = null, array $filter = []): bool
+    {
         if (empty($user) || empty($filter)) {
             return true;
         }
 
-        $filter = array_merge(['whitelist' => [], 'blacklist' => []],  $filter);
+        $filter = array_merge(['whitelist' => [], 'blacklist' => []], $filter);
 
         $whitelist = array_flip($filter['whitelist']);
         $blacklist = array_flip($filter['blacklist']);

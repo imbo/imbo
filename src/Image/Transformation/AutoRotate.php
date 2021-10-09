@@ -1,21 +1,24 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Exception\TransformationException;
-use Imbo\Image\InputSizeConstraint;
 use Imagick;
 use ImagickException;
 use ImagickPixelException;
+use Imbo\Exception\TransformationException;
+use Imbo\Http\Response\Response;
+use Imbo\Image\InputSizeConstraint;
 
 /**
  * Automatic rotate transformation. Rotates and flips the image
  * based on the EXIF orientation tag.
  */
-class AutoRotate extends Transformation implements InputSizeConstraint {
+class AutoRotate extends Transformation implements InputSizeConstraint
+{
     /**
      * {@inheritdoc}
      */
-    public function transform(array $params) {
+    public function transform(array $params)
+    {
         try {
             // Get orientation from exif data
             $orientation = $this->imagick->getImageOrientation();
@@ -85,16 +88,17 @@ class AutoRotate extends Transformation implements InputSizeConstraint {
                 }
             }
         } catch (ImagickException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         } catch (ImagickPixelException $e) {
-            throw new TransformationException($e->getMessage(), 400, $e);
+            throw new TransformationException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getMinimumInputSize(array $params, array $imageSize) {
+    public function getMinimumInputSize(array $params, array $imageSize)
+    {
         // We don't have an imagick instance at this point in the flow, so we don't have any way to
         // determine if the image should be rotated. Return false to signal that we can't make any
         // assumptions on the input size from this point on.

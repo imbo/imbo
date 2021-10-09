@@ -3,6 +3,7 @@ namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception\ResourceException;
+use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
 
 class ShortUrl implements ResourceInterface
@@ -34,11 +35,11 @@ class ShortUrl implements ResourceInterface
         $shortUrlId = $request->getRoute()->get('shortUrlId');
 
         if (!$params = $database->getShortUrlParams($shortUrlId)) {
-            throw new ResourceException('ShortURL not found', 404);
+            throw new ResourceException('ShortURL not found', Response::HTTP_NOT_FOUND);
         }
 
         if ($params['user'] !== $user || $params['imageIdentifier'] !== $imageIdentifier) {
-            throw new ResourceException('ShortURL not found', 404);
+            throw new ResourceException('ShortURL not found', Response::HTTP_NOT_FOUND);
         }
 
         $model = new ArrayModel();
@@ -55,11 +56,11 @@ class ShortUrl implements ResourceInterface
         $shortUrlId = $request->getRoute()->get('shortUrlId');
 
         if (!$params = $database->getShortUrlParams($shortUrlId)) {
-            throw new ResourceException('ShortURL not found', 404);
+            throw new ResourceException('ShortURL not found', Response::HTTP_NOT_FOUND);
         }
 
         if ($params['user'] !== $user || $params['imageIdentifier'] !== $imageIdentifier) {
-            throw new ResourceException('ShortURL not found', 404);
+            throw new ResourceException('ShortURL not found', Response::HTTP_NOT_FOUND);
         }
 
         $database->deleteShortUrls(

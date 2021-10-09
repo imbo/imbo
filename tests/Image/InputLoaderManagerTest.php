@@ -3,6 +3,7 @@ namespace Imbo\Image;
 
 use Imagick;
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Response\Response;
 use Imbo\Image\InputLoader\Basic;
 use Imbo\Image\InputLoader\InputLoaderInterface;
 use PHPUnit\Framework\TestCase;
@@ -38,7 +39,7 @@ class InputLoaderManagerTest extends TestCase
     {
         $this->expectExceptionObject(new InvalidArgumentException(
             'Given loader (stdClass) does not implement LoaderInterface',
-            500,
+            Response::HTTP_INTERNAL_SERVER_ERROR,
         ));
         $this->manager->addLoaders([new stdClass()]);
     }

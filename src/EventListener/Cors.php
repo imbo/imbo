@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
+use Imbo\Http\Response\Response;
 
 /**
  * Cross-Origin Resource Sharing (CORS) event listener
@@ -10,7 +11,8 @@ use Imbo\EventManager\EventInterface;
  * and adds the correct headers required for CORS to function properly -
  * all configured on a per-user/resource base.
  */
-class Cors implements ListenerInterface {
+class Cors implements ListenerInterface
+{
     /**
      * Parameters for the listener
      *
@@ -46,12 +48,13 @@ class Cors implements ListenerInterface {
      *
      * @param array $params Parameters for the listener
      */
-    public function __construct(array $params = []) {
+    public function __construct(array $params = [])
+    {
         if ($params) {
             $this->params = array_replace($this->params, $params);
 
             // Clean up all origins for easier matching
-            array_walk($this->params['allowedOrigins'], function(&$origin) {
+            array_walk($this->params['allowedOrigins'], function (&$origin) {
                 $origin = strtolower($origin);
                 $origin = rtrim($origin, '/');
             });
@@ -61,7 +64,8 @@ class Cors implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             'route.match' => 'subscribe',
             'response.send' => ['setExposedHeaders' => 5],
@@ -73,7 +77,8 @@ class Cors implements ListenerInterface {
      *
      * @param EventInterface $event The event instance
      */
-    public function subscribe(EventInterface $event) {
+    public function subscribe(EventInterface $event)
+    {
         $events = [];
 
         // Enable the event listener only for resources and methods specified
@@ -101,7 +106,8 @@ class Cors implements ListenerInterface {
      *
      * @param EventInterface $event The event instance
      */
-    public function setExposedHeaders(EventInterface $event) {
+    public function setExposedHeaders(EventInterface $event)
+    {
         // If this request was disallowed, don't expose any headers
         if (!$this->requestAllowed) {
             return;
@@ -110,17 +116,18 @@ class Cors implements ListenerInterface {
         $headers = [
             // The ResponseSender-listener will add this header and send the response,
             // so we have no way to pick it up - instead we'll always whitelist it
-            'X-Imbo-ImageIdentifier'
+            'X-Imbo-ImageIdentifier',
         ];
 
         foreach ($event->getResponse()->headers as $header => $value) {
             if (strpos($header, 'x-imbo') === 0) {
-                $headers[] = implode('-', array_map('ucfirst', explode('-', $header)));;
+                $headers[] = implode('-', array_map('ucfirst', explode('-', $header)));
+                ;
             }
         }
 
         $event->getResponse()->headers->add([
-            'Access-Control-Expose-Headers' => implode(', ', $headers)
+            'Access-Control-Expose-Headers' => implode(', ', $headers),
         ]);
     }
 
@@ -129,13 +136,14 @@ class Cors implements ListenerInterface {
      *
      * @param EventInterface $event The event instance
      */
-    public function options(EventInterface $event) {
+    public function options(EventInterface $event)
+    {
         $request = $event->getRequest();
         $response = $event->getResponse();
         $origin = $request->headers->get('Origin');
 
         // This is an OPTIONS request, send 204 since no more content will follow
-        $response->setStatusCode(204);
+        $response->setStatusCode(Response::HTTP_NO_CONTENT);
 
         // Vary on Origin to prevent caching allowed/disallowed requests
         $event->getResponse()->setVary('Origin', false);
@@ -160,7 +168,8 @@ class Cors implements ListenerInterface {
 
         foreach ($requestHeaders as $header) {
             if (strpos($header, 'x-imbo') === 0) {
-                $allowedHeaders[] = implode('-', array_map('ucfirst', explode('-', $header)));;
+                $allowedHeaders[] = implode('-', array_map('ucfirst', explode('-', $header)));
+                ;
             }
         }
 
@@ -180,7 +189,8 @@ class Cors implements ListenerInterface {
      *
      * @param EventInterface $event The event instance
      */
-    public function invoke(EventInterface $event) {
+    public function invoke(EventInterface $event)
+    {
         $request = $event->getRequest();
         $resource = (string) $request->getRoute();
         $method = $request->getMethod();
@@ -214,7 +224,8 @@ class Cors implements ListenerInterface {
      *
      * @return array The defined allowed origins
      */
-    public function getAllowedOrigins() {
+    public function getAllowedOrigins()
+    {
         return $this->params['allowedOrigins'];
     }
 
@@ -224,7 +235,8 @@ class Cors implements ListenerInterface {
      * @param string $origin Origin to validate
      * @return boolean True if allowed, false otherwise
      */
-    private function originIsAllowed($origin) {
+    private function originIsAllowed($origin)
+    {
         // Global wildcard defined?
         if (in_array('*', $this->params['allowedOrigins'])) {
             return true;

@@ -1,9 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
-use Imbo\Exception\RuntimeException;
 use Imbo\Exception;
+use Imbo\Exception\RuntimeException;
+use Imbo\Http\Response\Response;
 use Imbo\Resource;
 
 /**
@@ -12,7 +13,8 @@ use Imbo\Resource;
  * This listener enforces the usage of the signature and timestamp parameters when the user agent
  * wants to perform write operations (PUT/POST/DELETE).
  */
-class Authenticate implements ListenerInterface {
+class Authenticate implements ListenerInterface
+{
     /**
      * Max. diff to tolerate in the timestamp in seconds
      *
@@ -30,7 +32,8 @@ class Authenticate implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         $callbacks = [];
         $events = [
             Resource::GROUPS_POST,        // Create resource group
@@ -63,7 +66,8 @@ class Authenticate implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function authenticate(EventInterface $event) {
+    public function authenticate(EventInterface $event)
+    {
         $response = $event->getResponse();
         $request = $event->getRequest();
         $config = $event->getConfig();
@@ -75,17 +79,17 @@ class Authenticate implements ListenerInterface {
         // Fetch timestamp header, fallback to query param
         $timestamp = $request->headers->get(
             'x-imbo-authenticate-timestamp',
-            $request->query->get('timestamp')
+            $request->query->get('timestamp'),
         );
 
         if (!$timestamp) {
-            $exception = new RuntimeException('Missing authentication timestamp', 400);
+            $exception = new RuntimeException('Missing authentication timestamp', Response::HTTP_BAD_REQUEST);
             $exception->setImboErrorCode(Exception::AUTH_MISSING_PARAM);
-        } else if (!$this->timestampIsValid($timestamp)) {
-            $exception = new RuntimeException('Invalid timestamp: ' . $timestamp, 400);
+        } elseif (!$this->timestampIsValid($timestamp)) {
+            $exception = new RuntimeException('Invalid timestamp: ' . $timestamp, Response::HTTP_BAD_REQUEST);
             $exception->setImboErrorCode(Exception::AUTH_INVALID_TIMESTAMP);
-        } else if ($this->timestampHasExpired($timestamp)) {
-            $exception = new RuntimeException('Timestamp has expired: ' . $timestamp, 400);
+        } elseif ($this->timestampHasExpired($timestamp)) {
+            $exception = new RuntimeException('Timestamp has expired: ' . $timestamp, Response::HTTP_BAD_REQUEST);
             $exception->setImboErrorCode(Exception::AUTH_TIMESTAMP_EXPIRED);
         }
 
@@ -96,11 +100,11 @@ class Authenticate implements ListenerInterface {
         // Fetch signature header, fallback to query param
         $signature = $request->headers->get(
             'x-imbo-authenticate-signature',
-            $request->query->get('signature')
+            $request->query->get('signature'),
         );
 
         if (!$signature) {
-            $exception = new RuntimeException('Missing authentication signature', 400);
+            $exception = new RuntimeException('Missing authentication signature', Response::HTTP_BAD_REQUEST);
             $exception->setImboErrorCode(Exception::AUTH_MISSING_PARAM);
         }
 
@@ -111,7 +115,7 @@ class Authenticate implements ListenerInterface {
         $publicKey = $request->getPublicKey();
 
         if (null === $publicKey) {
-            throw new RuntimeException('Missing public key', 400);
+            throw new RuntimeException('Missing public key', Response::HTTP_BAD_REQUEST);
         }
 
         $privateKey = $event->getAccessControl()->getPrivateKey($publicKey);
@@ -129,10 +133,10 @@ class Authenticate implements ListenerInterface {
         $protocol = $config['authentication']['protocol'];
         if ($protocol === 'both') {
             $uris = [
-                preg_replace('#^https?#', 'http',  $url),
+                preg_replace('#^https?#', 'http', $url),
                 preg_replace('#^https?#', 'https', $url),
             ];
-        } else if (in_array($protocol, ['http', 'https'])) {
+        } elseif (in_array($protocol, ['http', 'https'])) {
             $uris = [preg_replace('#^https?#', $protocol, $url)];
         }
 
@@ -145,7 +149,7 @@ class Authenticate implements ListenerInterface {
             }
         }
 
-        $exception = new RuntimeException('Signature mismatch', 400);
+        $exception = new RuntimeException('Signature mismatch', Response::HTTP_BAD_REQUEST);
         $exception->setImboErrorCode(Exception::AUTH_SIGNATURE_MISMATCH);
 
         throw $exception;
@@ -162,7 +166,8 @@ class Authenticate implements ListenerInterface {
      * @param string $signature The signature to compare with
      * @return boolean
      */
-    private function signatureIsValid($httpMethod, $url, $publicKey, $privateKey, $timestamp, $signature) {
+    private function signatureIsValid($httpMethod, $url, $publicKey, $privateKey, $timestamp, $signature)
+    {
         // Generate data for the HMAC
         $data = $httpMethod . '|' . $url . '|' . $publicKey . '|' . $timestamp;
 
@@ -180,7 +185,8 @@ class Authenticate implements ListenerInterface {
      * @param string $timestamp A string with a timestamp
      * @return boolean
      */
-    private function timestampIsValid($timestamp) {
+    private function timestampIsValid($timestamp)
+    {
         if (!preg_match('/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}(?:\.\d+)?Z$/', $timestamp)) {
             return false;
         }
@@ -194,7 +200,8 @@ class Authenticate implements ListenerInterface {
      * @param string $timestamp A valid timestamp
      * @return boolean
      */
-    private function timestampHasExpired($timestamp) {
+    private function timestampHasExpired($timestamp)
+    {
         $year   = (int) substr($timestamp, 0, 4);
         $month  = (int) substr($timestamp, 5, 2);
         $day    = (int) substr($timestamp, 8, 2);

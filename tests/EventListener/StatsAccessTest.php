@@ -2,20 +2,23 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
-use Imbo\Resource\Stats as StatsResource;
 use Imbo\EventManager\EventManager;
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+use Imbo\Resource\Stats as StatsResource;
 
 /**
  * @coversDefaultClass Imbo\EventListener\StatsAccess
  */
-class StatsAccessTest extends ListenerTests {
+class StatsAccessTest extends ListenerTests
+{
     private $listener;
     private $event;
     private $request;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->request = $this->createMock(Request::class);
 
         $this->event = $this->createConfiguredMock(EventInterface::class, [
@@ -25,15 +28,17 @@ class StatsAccessTest extends ListenerTests {
         $this->listener = new StatsAccess();
     }
 
-    protected function getListener() : StatsAccess {
+    protected function getListener(): StatsAccess
+    {
         return $this->listener;
     }
 
     /**
      * @covers ::checkAccess
      */
-    public function testDoesNotAllowAnyIpAddressPerDefault() : void {
-        $this->expectExceptionObject(new RuntimeException('Access denied', 403));
+    public function testDoesNotAllowAnyIpAddressPerDefault(): void
+    {
+        $this->expectExceptionObject(new RuntimeException('Access denied', Response::HTTP_FORBIDDEN));
         $this->request
             ->expects($this->once())
             ->method('getClientIp')
@@ -42,82 +47,83 @@ class StatsAccessTest extends ListenerTests {
         $this->listener->checkAccess($this->event);
     }
 
-    public function getFilterData() : array {
+    public function getFilterData(): array
+    {
         return [
             'IPv4 in whitelist' => [
                 '127.0.0.1',
                 ['127.0.0.1'],
-                true
+                true,
             ],
             'IPv4 not in whitelist' => [
                 '127.0.0.2',
                 ['127.0.0.1'],
-                false
+                false,
             ],
             'IPv4 in whitelist range' => [
                 '192.168.1.10',
                 ['192.168.1.0/24'],
-                true
+                true,
             ],
             'IPv4 outside of whitelist range' => [
                 '192.168.1.64',
                 ['192.168.1.32/27'],
-                false
+                false,
             ],
             'IPv6 in whitelist (in short format)' => [
                 '2a00:1b60:1011:0000:0000:0000:0000:1338',
                 ['2a00:1b60:1011::1338'],
-                true
+                true,
             ],
             'IPv6 in whitelist (in full format)' => [
                 '2a00:1b60:1011:0000:0000:0000:0000:1338',
                 ['2a00:1b60:1011:0000:0000:0000:0000:1338'],
-                true
+                true,
             ],
             'IPv6 in whitelist range' => [
                 '2001:0db8:0000:0000:0000:0000:0000:0000',
                 ['2001:db8::/48'],
-                true
+                true,
             ],
             'IPv6 in whitelist range (3)' => [
                 '2001:0db8:0000:0000:0000:0000:0000:0000',
                 ['2001:db8::/47'],
-                true
+                true,
             ],
             'IPv6 in whitelist range (2)' => [
                 '2001:0db8:0000:0000:0000:0000:0000:0000',
                 ['2001:db8::/46'],
-                true
+                true,
             ],
             'IPv6 in whitelist range (1)' => [
                 '2001:0db8:0000:0000:0000:0000:0000:0000',
                 ['2001:db8::/45'],
-                true
+                true,
             ],
             'IPv6 outside of whitelist range' => [
                 '2001:0db9:0000:0000:0000:0000:0000:0000',
                 ['2001:db8::/48'],
-                false
+                false,
             ],
             'IPv6 in whitelist (in short format in both fields)' => [
                 '2a00:1b60:1011::1338',
                 ['2a00:1b60:1011::1338'],
-                true
+                true,
             ],
             'Blaclisted IPv4 client and both types in allow' => [
                 '1.2.3.4',
                 ['127.0.0.1', '::1'],
-                false
+                false,
             ],
             'Whitelitsed IPv6 client and both types in allow' => [
                 '::1',
                 ['127.0.0.1', '::1'],
-                true
+                true,
             ],
             'Wildcard allows all clients' => [
                 '::1',
                 ['*'],
-                true
+                true,
             ],
         ];
     }
@@ -136,7 +142,8 @@ class StatsAccessTest extends ListenerTests {
      * @covers ::__construct
      * @covers ::expandIPv6InFilters
      */
-    public function testCanUseDifferentFilters(string $clientIp, array $allow, bool $hasAccess) : void {
+    public function testCanUseDifferentFilters(string $clientIp, array $allow, bool $hasAccess): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getClientIp')
@@ -157,11 +164,12 @@ class StatsAccessTest extends ListenerTests {
      * @see https://github.com/imbo/imbo/issues/249
      * @covers ::getSubscribedEvents
      */
-    public function testListensToTheSameEventsAsTheStatsResource() : void {
+    public function testListensToTheSameEventsAsTheStatsResource(): void
+    {
         $this->assertSame(
             array_keys(StatsAccess::getSubscribedEvents()),
             array_keys(StatsResource::getSubscribedEvents()),
-            'The stats access event listener does not listen to the same events as the stats resource, which it should'
+            'The stats access event listener does not listen to the same events as the stats resource, which it should',
         );
     }
 
@@ -169,14 +177,19 @@ class StatsAccessTest extends ListenerTests {
      * @see https://github.com/imbo/imbo/issues/251
      * @covers ::getSubscribedEvents
      */
-    public function testHasHigherPriorityThanTheStatsResource() : void {
+    public function testHasHigherPriorityThanTheStatsResource(): void
+    {
         $eventManager = (new EventManager())
             ->setEventTemplate($this->createConfiguredMock(EventInterface::class, [
-                'getRequest' => $this->createMock(Request::class)
+                'getRequest' => $this->createMock(Request::class),
             ]))
-            ->addEventHandler('statsAccess', function () { echo 'stats access'; })
+            ->addEventHandler('statsAccess', function () {
+                echo 'stats access';
+            })
             ->addCallbacks('statsAccess', StatsAccess::getSubscribedEvents())
-            ->addEventHandler('statsResource', function () { echo 'stats resource'; })
+            ->addEventHandler('statsResource', function () {
+                echo 'stats resource';
+            })
             ->addCallbacks('statsResource', StatsResource::getSubscribedEvents());
 
         $this->expectOutputString('stats accessstats resource');

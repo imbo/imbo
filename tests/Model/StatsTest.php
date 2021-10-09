@@ -2,19 +2,23 @@
 namespace Imbo\Model;
 
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Http\Response\Response;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Model\Stats
  */
-class StatsTest extends TestCase {
+class StatsTest extends TestCase
+{
     private $model;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->model = new Stats();
     }
 
-    public function getNumUsers() : array {
+    public function getNumUsers(): array
+    {
         return [
             [0],
             [1],
@@ -23,7 +27,8 @@ class StatsTest extends TestCase {
         ];
     }
 
-    public function getNumImages() : array {
+    public function getNumImages(): array
+    {
         return [
             [0],
             [2],
@@ -32,7 +37,8 @@ class StatsTest extends TestCase {
         ];
     }
 
-    public function getNumBytes() : array {
+    public function getNumBytes(): array
+    {
         return [
             [0],
             [1349],
@@ -46,7 +52,8 @@ class StatsTest extends TestCase {
      * @covers ::setNumUsers
      * @covers ::getNumUsers
      */
-    public function testCanSetAndGetNumberOfUsers(int $users) : void {
+    public function testCanSetAndGetNumberOfUsers(int $users): void
+    {
         $this->model->setNumUsers($users);
         $this->assertSame($users, $this->model->getNumUsers());
     }
@@ -56,7 +63,8 @@ class StatsTest extends TestCase {
      * @covers ::setNumImages
      * @covers ::getNumImages
      */
-    public function testCanSetAndGetAmountOfImages(int $images) : void {
+    public function testCanSetAndGetAmountOfImages(int $images): void
+    {
         $this->model->setNumImages($images);
         $this->assertSame($images, $this->model->getNumImages());
     }
@@ -66,7 +74,8 @@ class StatsTest extends TestCase {
      * @covers ::setNumBytes
      * @covers ::getNumBytes
      */
-    public function testCanSetAndGetAmountOfBytes(int $bytes) : void {
+    public function testCanSetAndGetAmountOfBytes(int $bytes): void
+    {
         $this->model->setNumBytes($bytes);
         $this->assertSame($bytes, $this->model->getNumBytes());
     }
@@ -78,7 +87,8 @@ class StatsTest extends TestCase {
      * @covers ::offsetGet
      * @covers ::offsetUnset
      */
-    public function testSupportsCustomStats() : void {
+    public function testSupportsCustomStats(): void
+    {
         $this->assertSame([], $this->model->getCustomStats());
 
         $this->model['foo'] = 'bar';
@@ -97,10 +107,11 @@ class StatsTest extends TestCase {
     /**
      * @covers ::offsetSet
      */
-    public function testThrowsExceptionWhenUsedAsArrayWithoutAKey() : void {
+    public function testThrowsExceptionWhenUsedAsArrayWithoutAKey(): void
+    {
         $this->expectExceptionObject(new InvalidArgumentException(
             'Custom statistics requires a key to be set',
-            500
+            Response::HTTP_INTERNAL_SERVER_ERROR,
         ));
         $this->model[] = 'foobar';
     }
@@ -108,7 +119,8 @@ class StatsTest extends TestCase {
     /**
      * @covers ::getData
      */
-    public function testGetData() : void {
+    public function testGetData(): void
+    {
         $this->model
             ->setNumUsers(100)
             ->setNumBytes(1000)

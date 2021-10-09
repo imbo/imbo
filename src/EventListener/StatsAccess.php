@@ -1,8 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception\RuntimeException;
+use Imbo\Http\Response\Response;
 
 /**
  * Stats access listener
@@ -11,7 +12,8 @@ use Imbo\Exception\RuntimeException;
  * addresses or subnets (using CIDR notation). If you disable the listener from the configuration
  * it will be open to anyone (and it does not require an access token by default).
  */
-class StatsAccess implements ListenerInterface {
+class StatsAccess implements ListenerInterface
+{
     /**
      * Parameters for the listener
      *
@@ -29,7 +31,8 @@ class StatsAccess implements ListenerInterface {
      *
      * @param array $params Parameters for the listener
      */
-    public function __construct(array $params = []) {
+    public function __construct(array $params = [])
+    {
         if (isset($params['allow'])) {
             $this->params = array_replace_recursive($this->params, $params);
 
@@ -41,7 +44,8 @@ class StatsAccess implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             'stats.get' => ['checkAccess' => 1],
             'stats.head' => ['checkAccess' => 1],
@@ -51,7 +55,8 @@ class StatsAccess implements ListenerInterface {
     /**
      * {@inheritdoc}
      */
-    public function checkAccess(EventInterface $event) {
+    public function checkAccess(EventInterface $event)
+    {
         $request = $event->getRequest();
         $ip = $request->getClientIp();
 
@@ -62,7 +67,7 @@ class StatsAccess implements ListenerInterface {
         $access = $this->isAllowed($ip);
 
         if (!$access) {
-            throw new RuntimeException('Access denied', 403);
+            throw new RuntimeException('Access denied', Response::HTTP_FORBIDDEN);
         }
     }
 
@@ -72,7 +77,8 @@ class StatsAccess implements ListenerInterface {
      * @param string $ip An IP address
      * @return boolean
      */
-    private function isAllowed($ip) {
+    private function isAllowed($ip)
+    {
         // Look for a wildcard
         if (in_array('*', $this->params['allow'])) {
             // There is a wildcard in the list, all IP's are allowed
@@ -102,7 +108,8 @@ class StatsAccess implements ListenerInterface {
      * @param string $range A CIDR notated IP address and routing prefix
      * @return boolean
      */
-    private function cidrMatch($ip, $range) {
+    private function cidrMatch($ip, $range)
+    {
         if ($this->isIPv6($ip)) {
             return $this->cidr6Match($ip, $range);
         } else {
@@ -117,7 +124,8 @@ class StatsAccess implements ListenerInterface {
      * @param string $range A CIDR notated IP address and routing prefix (for instance 192.168.1.0/24)
      * @return boolean
      */
-    private function cidr4Match($ip, $range) {
+    private function cidr4Match($ip, $range)
+    {
         // Split CIDR on /
         list($subnet, $bits) = explode('/', $range);
 
@@ -140,7 +148,8 @@ class StatsAccess implements ListenerInterface {
      * @param string $range A CIDR notated IP address and routing prefix (for instance 2001:db8::/48)
      * @return boolean
      */
-    private function cidr6Match($ip, $range) {
+    private function cidr6Match($ip, $range)
+    {
         // Split CIDR on /
         list($subnet, $mask) = explode('/', $range);
 
@@ -160,7 +169,8 @@ class StatsAccess implements ListenerInterface {
      * @param int $mask A mask from a CIDR
      * @return string
      */
-    private function getBinaryMask($mask) {
+    private function getBinaryMask($mask)
+    {
         // Prefix the string
         $hexMask = str_repeat('f', (int) ($mask / 4));
 
@@ -190,7 +200,8 @@ class StatsAccess implements ListenerInterface {
      * @param string $ip The address to check
      * @return boolean True if the ip address looks like an IPv6 address
      */
-    private function isIPv6($ip) {
+    private function isIPv6($ip)
+    {
         return strpos($ip, ':') !== false;
     }
 
@@ -200,7 +211,8 @@ class StatsAccess implements ListenerInterface {
      * @param string $ip The address to check
      * @return boolean True if the ip address looks like an IPv4 address
      */
-    private function isIPv4($ip) {
+    private function isIPv4($ip)
+    {
         return !$this->isIPv6($ip);
     }
 
@@ -210,7 +222,8 @@ class StatsAccess implements ListenerInterface {
      * @param string $ip For instance 2a00:1b60:1011::1338
      * @return string 2a00:1b60:1011:0000:0000:0000:0000:1338
      */
-    private function expandIPv6($ip) {
+    private function expandIPv6($ip)
+    {
         // Convert to in_addr an unpack as hex
         $hex = strtolower(bin2hex(inet_pton($ip)));
 
@@ -223,7 +236,8 @@ class StatsAccess implements ListenerInterface {
      *
      * @param string $ip An IP address that might be expanded
      */
-    private function expandIPv6InFilters(&$ip) {
+    private function expandIPv6InFilters(&$ip)
+    {
         if ($this->isIPv6($ip)) {
             if (($pos = strpos($ip, '/')) !== false) {
                 // The IPv6 has a routing prefix attached to it

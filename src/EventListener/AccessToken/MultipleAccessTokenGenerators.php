@@ -1,11 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener\AccessToken;
 
-use Imbo\EventListener\AccessToken\AccessTokenGenerator;
-use Imbo\EventListener\AccessToken\SHA256;
 use Imbo\Exception\RuntimeException;
 
-class MultipleAccessTokenGenerators extends AccessTokenGenerator {
+class MultipleAccessTokenGenerators extends AccessTokenGenerator
+{
     /**
      * The params array for this generator allows you to define a set of access token signature generators to be used
      * for different url parameters if present. Each will be tried in the sequence defined.
@@ -21,7 +20,8 @@ class MultipleAccessTokenGenerators extends AccessTokenGenerator {
      *
      * @param array $params Parameters to the MultipleAccessTokenGenerators.
      */
-    public function __construct(array $params = []) {
+    public function __construct(array $params = [])
+    {
         if (!isset($params['generators']) || !is_array($params['generators'])) {
             $params['generators'] = [];
         } else {
@@ -35,11 +35,13 @@ class MultipleAccessTokenGenerators extends AccessTokenGenerator {
         parent::__construct($params);
     }
 
-    public function generateSignature($argumentKey, $data, $privateKey) {
+    public function generateSignature($argumentKey, $data, $privateKey)
+    {
         return $this->params['generators'][$argumentKey]->generateSignature($argumentKey, $data, $privateKey);
     }
 
-    public function getArgumentKeys() {
+    public function getArgumentKeys()
+    {
         return array_keys($this->params['generators']);
     }
 }

@@ -1,32 +1,36 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Resource;
 
-use Imbo\EventManager\EventInterface;
-use Imbo\Exception\RuntimeException;
-use Imbo\Exception\ResourceException;
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
+use Imbo\EventManager\EventInterface;
+use Imbo\Exception\ResourceException;
+use Imbo\Exception\RuntimeException;
+use Imbo\Http\Response\Response;
 use Imbo\Model\AccessRule as AccessRuleModel;
 use Imbo\Model\ArrayModel;
 
 /**
  * Access rule resource
  */
-class AccessRule implements ResourceInterface {
+class AccessRule implements ResourceInterface
+{
     /**
      * {@inheritdoc}
      */
-    public function getAllowedMethods() {
+    public function getAllowedMethods()
+    {
         return ['GET', 'HEAD', 'DELETE'];
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             'accessrule.get' => 'getRule',
             'accessrule.head' => 'getRule',
-            'accessrule.delete' => 'deleteRule'
+            'accessrule.delete' => 'deleteRule',
         ];
     }
 
@@ -35,7 +39,8 @@ class AccessRule implements ResourceInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function getRule(EventInterface $event) {
+    public function getRule(EventInterface $event)
+    {
         $acl = $event->getAccessControl();
 
         $request = $event->getRequest();
@@ -45,13 +50,13 @@ class AccessRule implements ResourceInterface {
         $keyExists = $acl->publicKeyExists($publicKey);
 
         if (!$keyExists) {
-            throw new RuntimeException('Public key not found', 404);
+            throw new RuntimeException('Public key not found', Response::HTTP_NOT_FOUND);
         }
 
         $accessRule = $acl->getAccessRule($publicKey, $accessRuleId);
 
         if (!$accessRule) {
-            throw new RuntimeException('Access rule not found', 404);
+            throw new RuntimeException('Access rule not found', Response::HTTP_NOT_FOUND);
         }
 
         $model = new AccessRuleModel();
@@ -74,11 +79,12 @@ class AccessRule implements ResourceInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function deleteRule(EventInterface $event) {
+    public function deleteRule(EventInterface $event)
+    {
         $acl = $event->getAccessControl();
 
         if (!($acl instanceof MutableAdapterInterface)) {
-            throw new ResourceException('Access control adapter is immutable', 405);
+            throw new ResourceException('Access control adapter is immutable', Response::HTTP_METHOD_NOT_ALLOWED);
         }
 
         $request = $event->getRequest();
@@ -88,13 +94,13 @@ class AccessRule implements ResourceInterface {
         $keyExists = $acl->publicKeyExists($publicKey);
 
         if (!$keyExists) {
-            throw new RuntimeException('Public key not found', 404);
+            throw new RuntimeException('Public key not found', Response::HTTP_NOT_FOUND);
         }
 
         $accessRule = $acl->getAccessRule($publicKey, $accessRuleId);
 
         if (!$accessRule) {
-            throw new RuntimeException('Access rule not found', 404);
+            throw new RuntimeException('Access rule not found', Response::HTTP_NOT_FOUND);
         }
 
         $acl->deleteAccessRule($publicKey, $accessRuleId);
