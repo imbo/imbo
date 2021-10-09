@@ -190,7 +190,7 @@ class AccessToken implements ListenerInterface
             }, $uris);
         }
 
-        foreach ($uris as $uri) {
+        foreach (array_filter($uris) as $uri) {
             foreach ($presentAccessTokenArgumentKeys as $argumentKey => $token) {
                 // Remove the access token from the query string as it's not used to generate the signature
                 $uriWithoutAccessToken = rtrim(preg_replace('/(?<=(\?|&))' . $argumentKey . '=[^&]+&?/', '', $uri), '&?');
