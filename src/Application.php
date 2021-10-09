@@ -1,33 +1,44 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo;
 
-use Imbo\Http\Request\Request;
-use Imbo\Http\Response\Response;
+use Imbo\Auth\AccessControl\Adapter\AdapterInterface as AccessControlInterface;
+use Imbo\Database\DatabaseInterface;
+use Imbo\EventListener\DatabaseOperations;
+use Imbo\EventListener\HttpCache;
+use Imbo\EventListener\Initializer\InitializerInterface;
 use Imbo\EventListener\ListenerInterface;
+use Imbo\EventListener\ResponseETag;
+use Imbo\EventListener\ResponseSender;
+use Imbo\EventListener\StorageOperations;
 use Imbo\EventManager\Event;
 use Imbo\EventManager\EventManager;
-use Imbo\Model\Error;
-use Imbo\Auth\AccessControl\Adapter\AdapterInterface as AccessControlInterface;
-use Imbo\Exception\RuntimeException;
 use Imbo\Exception\InvalidArgumentException;
-use Imbo\Database\DatabaseInterface;
-use Imbo\Storage\StorageInterface;
+use Imbo\Exception\RuntimeException;
+use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Formatter;
-use Imbo\Resource\ResourceInterface;
-use Imbo\Image\TransformationManager;
-use Imbo\EventListener\Initializer\InitializerInterface;
+use Imbo\Http\Response\Response;
+use Imbo\Http\Response\ResponseFormatter;
+use Imbo\Image\ImagePreparation;
 use Imbo\Image\InputLoaderManager;
 use Imbo\Image\OutputConverterManager;
+use Imbo\Image\TransformationManager;
+use Imbo\Model\Error;
+use Imbo\Resource\ResourceInterface;
+use Imbo\Storage\StorageInterface;
 
-/**
- * Imbo application
- */
-class Application {
+class Application
+{
     private array $config;
     private Request $request;
     private Response $response;
 
-    public function __construct(array $config) {
+    /**
+     * Class constructor
+     *
+     * @param array $config
+     */
+    public function __construct(array $config)
+    {
         $this->config = $config;
 
         $this->request = Request::createFromGlobals();
@@ -43,7 +54,8 @@ class Application {
         $this->response->headers->set('X-Imbo-Version', Version::VERSION);
     }
 
-    public function run(): void {
+    public function run(): void
+    {
         $database = $this->config['database'];
 
         if (is_callable($database) && !($database instanceof DatabaseInterface)) {
@@ -83,7 +95,7 @@ class Application {
 
         if (isset($this->config['transformations']) && !is_array($this->config['transformations'])) {
             throw new InvalidArgumentException('The "transformations" configuration key must be specified as an array', 500);
-        } else if (isset($this->config['transformations']) && is_array($this->config['transformations'])) {
+        } elseif (isset($this->config['transformations']) && is_array($this->config['transformations'])) {
             $transformationManager->addTransformations($this->config['transformations']);
         }
 
@@ -92,7 +104,7 @@ class Application {
 
         if (isset($this->config['inputLoaders']) && !is_array($this->config['inputLoaders'])) {
             throw new InvalidArgumentException('The "inputLoaders" configuration key must be specified as an array', 500);
-        } else if (isset($this->config['inputLoaders']) && is_array($this->config['inputLoaders'])) {
+        } elseif (isset($this->config['inputLoaders']) && is_array($this->config['inputLoaders'])) {
             $inputLoaderManager->addLoaders($this->config['inputLoaders']);
         }
 
@@ -101,7 +113,7 @@ class Application {
 
         if (isset($this->config['outputConverters']) && !is_array($this->config['outputConverters'])) {
             throw new InvalidArgumentException('The "outputConverters" configuration key must be specified as an array', 500);
-        } else if (isset($this->config['outputConverters']) && is_array($this->config['outputConverters'])) {
+        } elseif (isset($this->config['outputConverters']) && is_array($this->config['outputConverters'])) {
             $outputConverterManager->addConverters($this->config['outputConverters']);
         }
 
@@ -133,35 +145,35 @@ class Application {
 
         // Collect event listener data
         $eventListeners = [
-            // Resources
-            'Imbo\Resource\Index',
-            'Imbo\Resource\Status',
-            'Imbo\Resource\Stats',
-            'Imbo\Resource\GlobalShortUrl',
-            'Imbo\Resource\ShortUrls',
-            'Imbo\Resource\ShortUrl',
-            'Imbo\Resource\User',
-            'Imbo\Resource\GlobalImages',
-            'Imbo\Resource\Images',
-            'Imbo\Resource\Image',
-            'Imbo\Resource\Metadata',
-            'Imbo\Resource\Groups',
-            'Imbo\Resource\Group',
-            'Imbo\Resource\Keys',
-            'Imbo\Resource\Key',
-            'Imbo\Resource\AccessRules',
-            'Imbo\Resource\AccessRule',
-            'Imbo\Http\Response\ResponseFormatter' => [
+            Resource\Index::class,
+            Resource\Status::class,
+            Resource\Stats::class,
+            Resource\GlobalShortUrl::class,
+            Resource\ShortUrls::class,
+            Resource\ShortUrl::class,
+            Resource\User::class,
+            Resource\GlobalImages::class,
+            Resource\Images::class,
+            Resource\Image::class,
+            Resource\Metadata::class,
+            Resource\Groups::class,
+            Resource\Group::class,
+            Resource\Keys::class,
+            Resource\Key::class,
+            Resource\AccessRules::class,
+            Resource\AccessRule::class,
+
+            ResponseFormatter::class => [
                 'formatters' => $formatters,
                 'contentNegotiation' => $contentNegotiation,
             ],
-            'Imbo\EventListener\DatabaseOperations',
-            'Imbo\EventListener\StorageOperations',
-            'Imbo\Image\ImagePreparation',
-            'Imbo\EventListener\ResponseSender',
-            'Imbo\EventListener\ResponseETag',
-            'Imbo\EventListener\HttpCache',
-            'Imbo\Image\TransformationManager' => $transformationManager
+            DatabaseOperations::class,
+            StorageOperations::class,
+            ImagePreparation::class,
+            ResponseSender::class,
+            ResponseETag::class,
+            HttpCache::class,
+            TransformationManager::class => $transformationManager,
         ];
 
         foreach ($eventListeners as $listener => $params) {
@@ -170,7 +182,7 @@ class Application {
                 $listener = $params;
                 $params = [];
                 $name = $listener;
-            } else if ($params instanceof ListenerInterface) {
+            } elseif ($params instanceof ListenerInterface) {
                 $listener = $params;
                 $params = [];
                 $name = get_class($listener);
@@ -241,7 +253,7 @@ class Application {
 
                 $eventManager->addEventHandler($name, $listener, $params)
                              ->addCallbacks($name, $listener::getSubscribedEvents(), $users);
-            } else if (is_array($definition) && !empty($definition['callback']) && !empty($definition['events'])) {
+            } elseif (is_array($definition) && !empty($definition['callback']) && !empty($definition['events'])) {
                 $priority = 0;
                 $events = [];
                 $users = [];
