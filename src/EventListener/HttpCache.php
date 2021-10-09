@@ -1,48 +1,32 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
+use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Http cache listener
- *
- * This event listener will listen to all outgoing responses and check if any HTTP cache headers
- * have explicitly been set. If not, it will apply the configured defaults.
- */
-class HttpCache implements ListenerInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+class HttpCache implements ListenerInterface
+{
+    public static function getSubscribedEvents(): array
+    {
         return [
             'response.send' => ['setHeaders' => 1],
         ];
     }
 
-    /**
-     * Right before the response is sent to the client, check if any HTTP cache control headers
-     * have explicity been set for this response. If not, apply the configured defaults.
-     *
-     * @param EventInterface $event The event instance
-     */
-    public function setHeaders(EventInterface $event) {
+    public function setHeaders(EventInterface $event): void
+    {
         $method = $event->getRequest()->getMethod();
 
-        // Obviously we shouldn't bother doing any HTTP caching logic for non-GET/HEAD requests
-        if ($method !== 'GET' && $method !== 'HEAD') {
+        if (Request::METHOD_GET !== $method && Request::METHOD_HEAD !== $method) {
             return;
         }
 
         $response = $event->getResponse();
-        $headers = $event->getResponse()->headers;
 
-        // Imbo defaults to 'public' as cache-control value - if it has changed from this value,
-        // assume the resource requested has explicitly defined its own caching rules and fall back
-        if ($headers->get('Cache-Control') !== 'public') {
+        if ($response->headers->get('Cache-Control') !== 'public') {
             return;
         }
 
-        // Get configured HTTP cache defaults from configuration, then apply them
         $config = $event->getConfig()['httpCacheHeaders'];
 
         if (isset($config['maxAge'])) {
@@ -55,12 +39,12 @@ class HttpCache implements ListenerInterface {
 
         if (isset($config['public']) && $config['public']) {
             $response->setPublic();
-        } else if (isset($config['public'])) {
+        } elseif (isset($config['public'])) {
             $response->setPrivate();
         }
 
         if (isset($config['mustRevalidate']) && $config['mustRevalidate']) {
-            $headers->addCacheControlDirective('must-revalidate');
+            $response->headers->addCacheControlDirective('must-revalidate');
         }
     }
 }
