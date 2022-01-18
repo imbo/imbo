@@ -44,7 +44,7 @@ class Border extends Transformation implements InputSizeConstraint
         try {
             if ($mode === 'outbound') {
                 // Paint the border outside of the image, increasing the width/height
-                if ($this->imagick->getImageAlphaChannel() !== 0) {
+                if ($this->imagick->getImageAlphaChannel()) {
                     // If we have an alpha channel and call `borderImage()`, Imagick will remove
                     // the alpha channel - if we have an alpha channel, use an alternative approach
                     $this->expandImage($color, $width, $height);

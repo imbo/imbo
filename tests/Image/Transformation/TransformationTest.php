@@ -44,7 +44,7 @@ class TransformationTest extends TestCase {
                 'width'  => 100,
                 'height' => 100,
             ],
-            'getImageAlphaChannel' => 0,
+            'getImageAlphaChannel' => false,
         ]);
 
         $imagick
