@@ -54,7 +54,7 @@ jobs:
     strategy:
       matrix:
         operating-system: ['ubuntu-20.04']
-        php-versions: ['7.4', '8.0']
+        php-versions: ['7.4', '8.0', '8.1']
         mongodb-versions: ['5.0.2']
 
     runs-on: ${{ matrix.operating-system }}
@@ -113,7 +113,7 @@ jobs:
     strategy:
       matrix:
         operating-system: ['ubuntu-20.04']
-        php-versions: ['7.4', '8.0']
+        php-versions: ['7.4', '8.0', '8.1']
         mongodb-versions: ['5.0.2']
 
     runs-on: ${{ matrix.operating-system }}
@@ -172,7 +172,7 @@ jobs:
     strategy:
       matrix:
         operating-system: ['ubuntu-20.04']
-        php-versions: ['7.4', '8.0']
+        php-versions: ['7.4', '8.0', '8.1']
         mongodb-versions: ['5.0.2']
 
     runs-on: ${{ matrix.operating-system }}
@@ -235,7 +235,7 @@ jobs:
     strategy:
       matrix:
         operating-system: ['ubuntu-20.04']
-        php-versions: ['7.4', '8.0']
+        php-versions: ['7.4', '8.0', '8.1']
         mongodb-versions: ['5.0.2']
         mysql-versions: ['8.0.20']
 
@@ -310,7 +310,7 @@ jobs:
     strategy:
       matrix:
         operating-system: ['ubuntu-20.04']
-        php-versions: ['7.4', '8.0']
+        php-versions: ['7.4', '8.0', '8.1']
         mongodb-versions: ['5.0.2']
 
     runs-on: ${{ matrix.operating-system }}
