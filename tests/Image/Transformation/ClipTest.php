@@ -150,7 +150,7 @@ class ClipTest extends TestCase
     public function testThrowsExceptionWhenImagickFailsWithAFatalError(): void
     {
         $imagick = $this->createConfiguredMock(Imagick::class, [
-            'getImageAlphaChannel' => Imagick::ALPHACHANNEL_COPY,
+            'getImageAlphaChannel' => true,
         ]);
         $imagick
             ->expects($this->once())
