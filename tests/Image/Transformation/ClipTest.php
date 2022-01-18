@@ -123,7 +123,7 @@ class ClipTest extends TestCase
     public function testWillResetAlphaChannelWhenTheImageDoesNotHaveAClippingPath(): void
     {
         $imagick = $this->createConfiguredMock(Imagick::class, [
-            'getImageAlphaChannel' => Imagick::ALPHACHANNEL_COPY,
+            'getImageAlphaChannel' => true,
         ]);
 
         $imagick
@@ -131,7 +131,7 @@ class ClipTest extends TestCase
             ->method('setImageAlphaChannel')
             ->withConsecutive(
                 [Imagick::ALPHACHANNEL_TRANSPARENT],
-                [Imagick::ALPHACHANNEL_COPY], // Reset to the one fetched above
+                [Imagick::ALPHACHANNEL_ACTIVATE], // activate because the first causes a failure
             );
 
         $imagick

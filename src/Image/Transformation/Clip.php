@@ -56,7 +56,7 @@ class Clip extends Transformation
             if ($e->getCode() == 410) {
                 // but we need to reset the alpha channel mode in case someone else is doing something with it
                 if ($currentAlphaChannelMode) {
-                    $this->imagick->setImageAlphaChannel($currentAlphaChannelMode);
+                    $this->imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_ACTIVATE);
                 }
 
                 return;
