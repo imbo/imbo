@@ -9,6 +9,3 @@ End-user docs can be found [here](http://docs.imbo-project.org/en/latest/).
 
 ## License
 Licensed under the MIT License.
-
-## Community
-If you have any questions feel free to join `#imbo` on the Freenode IRC network (`chat.freenode.net`), or ask them on the [forum](https://groups.google.com/forum/#!forum/imbo-project).
