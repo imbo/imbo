@@ -23,9 +23,8 @@
   ],
   "support": {
     "issues": "https://github.com/imbo/imbo/issues",
-    "irc": "irc://irc.freenode.net/imbo",
     "source": "https://github.com/imbo/imbo",
-    "docs": "http://docs.imbo.io"
+    "docs": "https://docs.imbo.io"
   },
   "require": {
     "php": ">=7.4",
@@ -77,13 +76,6 @@
     "bin/imbo"
   ],
   "scripts": {
-    "clear-build": [
-      "rm -rf build",
-      "mkdir build",
-      "mkdir build/coverage",
-      "mkdir build/logs",
-      "mkdir build/docs"
-    ],
     "test:phpunit": "vendor/bin/phpunit --verbose",
     "test:phpunit:coverage": [
       "rm -rf build/coverage",
@@ -116,6 +108,21 @@
       "mkdir -p build/logs",
       "php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &"
     ]
+  },
+  "scripts-descriptions": {
+    "test:phpunit": "Run unit tests using PHPUnit",
+    "test:phpunit:coverage": "Run unit tests using PHPUnit with code coverage enabled (requires Xdebug)",
+    "test:behat": "Run all Behat test suites",
+    "test:behat:mongodb-gridfs": "Run the MongoDB / GridFS Behat test suite",
+    "test:behat:mongodb-filesystem": "Run the MongoDB / Filesystem Behat test suite",
+    "test:behat:sqlite-filesystem": "Run the SQLite / Filesystem Behat test suite",
+    "test:behat:mysql-filesystem": "Run the MySQL / Filesystem Behat test suite",
+    "test:behat:postgresql-filesystem": "Run the PostgreSQL / Filesystem Behat test suite",
+    "test": "Run unit tests and all Behat test suites",
+    "docs": "Generate docs",
+    "cs": "Check coding standard against the official Imbo coding standard",
+    "sa": "Run static analysis using Psalm",
+    "dev": "Start development server"
   },
   "config": {
     "sort-packages": true
