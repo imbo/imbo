@@ -7,18 +7,12 @@ use Imbo\Model;
 
 class Index implements ResourceInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedMethods()
+    public function getAllowedMethods(): array
     {
         return ['GET', 'HEAD'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'index.get' => 'get',
@@ -31,7 +25,7 @@ class Index implements ResourceInterface
      *
      * @param EventInterface $event The current event
      */
-    public function get(EventInterface $event)
+    public function get(EventInterface $event): void
     {
         $request = $event->getRequest();
         $response = $event->getResponse();
@@ -45,8 +39,6 @@ class Index implements ResourceInterface
         }
 
         $response->setStatusCode(Response::HTTP_OK, 'Hell Yeah');
-
-        $baseUrl = $request->getSchemeAndHttpHost() . $request->getBaseUrl();
 
         $model = new Model\ArrayModel();
         $model->setData([

@@ -23,18 +23,12 @@ use Imbo\Model;
  */
 class Images implements ResourceInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedMethods()
+    public function getAllowedMethods(): array
     {
         return ['GET', 'HEAD', 'POST'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'images.get' => 'getImages',
@@ -48,7 +42,7 @@ class Images implements ResourceInterface
      *
      * @param EventInterface $event The current event
      */
-    public function getImages(EventInterface $event)
+    public function getImages(EventInterface $event): void
     {
         $event->getManager()->trigger('db.images.load');
     }
@@ -58,7 +52,7 @@ class Images implements ResourceInterface
      *
      * @param EventInterface $event
      */
-    public function addImage(EventInterface $event)
+    public function addImage(EventInterface $event): void
     {
         $request = $event->getRequest();
         $response = $event->getResponse();

@@ -16,10 +16,7 @@ use Imbo\Model\Image;
  */
 class ImagePreparation implements ListenerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'images.post' => ['prepareImage' => 50],
@@ -35,7 +32,7 @@ class ImagePreparation implements ListenerInterface
      * @param EventInterface $event The current event
      * @throws ImageException
      */
-    public function prepareImage(EventInterface $event)
+    public function prepareImage(EventInterface $event): void
     {
         $request = $event->getRequest();
 

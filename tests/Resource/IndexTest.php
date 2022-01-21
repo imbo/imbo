@@ -40,14 +40,6 @@ class IndexTest extends ResourceTests
      */
     public function testSupportsHttpGet(): void
     {
-        $this->request
-            ->expects($this->once())
-            ->method('getSchemeAndHttpHost')
-            ->willReturn('http://imbo');
-        $this->request
-            ->expects($this->once())
-            ->method('getBaseUrl')
-            ->willReturn('');
         $this->response
             ->expects($this->once())
             ->method('setModel')

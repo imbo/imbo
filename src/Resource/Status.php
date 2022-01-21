@@ -15,18 +15,12 @@ use Imbo\Model;
  */
 class Status implements ResourceInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedMethods()
+    public function getAllowedMethods(): array
     {
         return ['GET', 'HEAD'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'status.get' => 'get',
@@ -39,7 +33,7 @@ class Status implements ResourceInterface
      *
      * @param EventInterface $event The current event
      */
-    public function get(EventInterface $event)
+    public function get(EventInterface $event): void
     {
         $response = $event->getResponse();
         $database = $event->getDatabase();

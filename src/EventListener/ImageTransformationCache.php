@@ -69,10 +69,7 @@ class ImageTransformationCache implements ListenerInterface
         $this->setPath($path);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             // Look for images in the cache before transformations occur

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
@@ -10,7 +10,8 @@ use Imbo\EventManager\EventInterface;
  *
  * @link https://www.varnish-software.com/blog/advanced-cache-invalidation-strategies
  */
-class VarnishHashTwo implements ListenerInterface {
+class VarnishHashTwo implements ListenerInterface
+{
     /**
      * The response header to use
      *
@@ -23,16 +24,15 @@ class VarnishHashTwo implements ListenerInterface {
      *
      * @param array $params Parameters for the event listener
      */
-    public function __construct(array $params = null) {
+    public function __construct(array $params = null)
+    {
         if ($params && isset($params['headerName'])) {
             $this->header = $params['headerName'];
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents(): array
+    {
         return [
             'image.get' => ['addHeader' => -1],
             'image.head' => ['addHeader' => -1],
@@ -44,7 +44,8 @@ class VarnishHashTwo implements ListenerInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function addHeader(EventInterface $event) {
+    public function addHeader(EventInterface $event)
+    {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
@@ -56,7 +57,7 @@ class VarnishHashTwo implements ListenerInterface {
             [
                 'imbo;image;' . $user . ';' . $imageIdentifier,
                 'imbo;user;' . $user,
-            ]
+            ],
         );
     }
 }

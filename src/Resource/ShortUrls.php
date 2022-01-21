@@ -8,18 +8,12 @@ use Imbo\Model\ArrayModel;
 
 class ShortUrls implements ResourceInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedMethods()
+    public function getAllowedMethods(): array
     {
         return ['POST', 'DELETE'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             // Add short URL
@@ -36,7 +30,7 @@ class ShortUrls implements ResourceInterface
      *
      * @param EventInterface $event
      */
-    public function createShortUrl(EventInterface $event)
+    public function createShortUrl(EventInterface $event): void
     {
         $request = $event->getRequest();
         $image = $request->getContent();
@@ -112,7 +106,7 @@ class ShortUrls implements ResourceInterface
      *
      * @param EventInterface $event
      */
-    public function deleteImageShortUrls(EventInterface $event)
+    public function deleteImageShortUrls(EventInterface $event): void
     {
         $request = $event->getRequest();
         $user = $request->getUser();
@@ -138,10 +132,8 @@ class ShortUrls implements ResourceInterface
 
     /**
      * Method for generating short URL keys
-     *
-     * @return string
      */
-    private function getShortUrlId($len = 7)
+    private function getShortUrlId(int $len = 7): string
     {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
         $charsLen = 62;

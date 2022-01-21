@@ -12,18 +12,12 @@ use Imbo\Model\ArrayModel;
 
 class AccessRules implements ResourceInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedMethods()
+    public function getAllowedMethods(): array
     {
         return ['GET', 'HEAD', 'POST'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'accessrules.get' => 'getRules',
@@ -37,7 +31,7 @@ class AccessRules implements ResourceInterface
      *
      * @param EventInterface $event The current event
      */
-    public function getRules(EventInterface $event)
+    public function getRules(EventInterface $event): void
     {
         $request = $event->getRequest();
         $publicKey = $request->getRoute()->get('publickey');
@@ -72,7 +66,7 @@ class AccessRules implements ResourceInterface
      *
      * @param EventInterface $event The current event
      */
-    public function addRules(EventInterface $event)
+    public function addRules(EventInterface $event): void
     {
         $accessControl = $event->getAccessControl();
 
@@ -114,27 +108,26 @@ class AccessRules implements ResourceInterface
     /**
      * Checks if this is an array containing only strings
      *
-     * @param Mixed Values to test
-     * @return boolean True if all values are strings
+     * @param mixed Values to test
+     * @return bool True if all values are strings
      */
-    private function isStringArray($values)
+    private function isStringArray($values): bool
     {
         if (!is_array($values)) {
             return false;
         }
 
-        return array_reduce($values, function ($res, $value) {
-            return $res && is_string($value);
-        }, true);
+        return array_reduce($values, fn (bool $res, $value): bool => $res && is_string($value), true);
     }
 
     /**
      * Validate the contents of an access rule.
      *
+     * @param EventInterface $event
      * @param array $rule Access rule to check
      * @throws RuntimeException
      */
-    private function validateRule(EventInterface $event, array $rule)
+    private function validateRule(EventInterface $event, array $rule): void
     {
         $acl = $event->getAccessControl();
 

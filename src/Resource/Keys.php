@@ -10,12 +10,12 @@ use Imbo\Model\ArrayModel;
 
 class Keys implements ResourceInterface
 {
-    public function getAllowedMethods()
+    public function getAllowedMethods(): array
     {
         return ['POST'];
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'keys.post' => 'createKey',

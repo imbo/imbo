@@ -1,17 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
-use Imbo\EventListener\ListenerInterface;
 
 /**
  * Auto rotate event listener
  */
-class AutoRotateImage implements ListenerInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+class AutoRotateImage implements ListenerInterface
+{
+    public static function getSubscribedEvents(): array
+    {
         return [
             'images.post' => ['autoRotate' => 25],
         ];
@@ -22,7 +20,8 @@ class AutoRotateImage implements ListenerInterface {
      *
      * @param EventInterface $event The triggered event
      */
-    public function autoRotate(EventInterface $event) {
+    public function autoRotate(EventInterface $event)
+    {
         $event->getTransformationManager()
             ->getTransformation('autoRotate')
             ->setImage($event->getRequest()->getImage())

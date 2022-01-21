@@ -1,25 +1,22 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
-use Imbo\Resource\Images\Query as ImagesQuery;
 use Imbo\Model;
+use Imbo\Resource\Images\Query as ImagesQuery;
 
 /**
  * Database operations event listener
  */
-class DatabaseOperations implements ListenerInterface {
+class DatabaseOperations implements ListenerInterface
+{
     /**
      * An images query object
-     *
-     * @var ImagesQuery
      */
-    private $imagesQuery;
+    private ?ImagesQuery $imagesQuery = null;
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents(): array
+    {
         return [
             'db.image.insert'    => 'insertImage',
             'db.image.delete'    => 'deleteImage',
@@ -39,7 +36,8 @@ class DatabaseOperations implements ListenerInterface {
      * @param ImagesQuery $query The query object
      * @return self
      */
-    public function setImagesQuery(ImagesQuery $query) {
+    public function setImagesQuery(ImagesQuery $query): self
+    {
         $this->imagesQuery = $query;
 
         return $this;
@@ -50,7 +48,8 @@ class DatabaseOperations implements ListenerInterface {
      *
      * @return ImagesQuery
      */
-    public function getImagesQuery() {
+    public function getImagesQuery(): ImagesQuery
+    {
         if (!$this->imagesQuery) {
             $this->imagesQuery = new ImagesQuery();
         }
@@ -65,7 +64,8 @@ class DatabaseOperations implements ListenerInterface {
      * @param array $params Optional arguments to the insert method
      *                      - `updateIfDuplicate` controls whether an update will happen if the imageid already exists
      */
-    public function insertImage(EventInterface $event, $params = []) {
+    public function insertImage(EventInterface $event, array $params = []): void
+    {
         $request = $event->getRequest();
 
         $updateIfDuplicate = !isset($params['updateIfDuplicate']) || !empty($params['updateIfDuplicate']);
@@ -74,7 +74,7 @@ class DatabaseOperations implements ListenerInterface {
             $request->getUser(),
             $request->getImage()->getImageIdentifier(),
             $request->getImage(),
-            $updateIfDuplicate
+            $updateIfDuplicate,
         );
     }
 
@@ -83,12 +83,13 @@ class DatabaseOperations implements ListenerInterface {
      *
      * @param EventInterface $event An event instance
      */
-    public function deleteImage(EventInterface $event) {
+    public function deleteImage(EventInterface $event): void
+    {
         $request = $event->getRequest();
 
         $event->getDatabase()->deleteImage(
             $request->getUser(),
-            $request->getImageIdentifier()
+            $request->getImageIdentifier(),
         );
     }
 
@@ -97,14 +98,15 @@ class DatabaseOperations implements ListenerInterface {
      *
      * @param EventInterface $event An event instance
      */
-    public function loadImage(EventInterface $event) {
+    public function loadImage(EventInterface $event): void
+    {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
         $event->getDatabase()->load(
             $request->getUser(),
             $request->getImageIdentifier(),
-            $response->getModel()
+            $response->getModel(),
         );
     }
 
@@ -113,17 +115,18 @@ class DatabaseOperations implements ListenerInterface {
      *
      * @param EventInterface $event An event instance
      */
-    public function deleteMetadata(EventInterface $event) {
+    public function deleteMetadata(EventInterface $event): void
+    {
         $request = $event->getRequest();
 
         $event->getDatabase()->deleteMetadata(
             $request->getUser(),
-            $request->getImageIdentifier()
+            $request->getImageIdentifier(),
         );
 
         $event->getDatabase()->setLastModifiedNow(
             $request->getUser(),
-            $request->getImageIdentifier()
+            $request->getImageIdentifier(),
         );
     }
 
@@ -132,18 +135,19 @@ class DatabaseOperations implements ListenerInterface {
      *
      * @param EventInterface $event An event instance
      */
-    public function updateMetadata(EventInterface $event) {
+    public function updateMetadata(EventInterface $event): void
+    {
         $request = $event->getRequest();
 
         $event->getDatabase()->updateMetadata(
             $request->getUser(),
             $request->getImageIdentifier(),
-            $event->getArgument('metadata')
+            $event->getArgument('metadata'),
         );
 
         $event->getDatabase()->setLastModifiedNow(
             $request->getUser(),
-            $request->getImageIdentifier()
+            $request->getImageIdentifier(),
         );
     }
 
@@ -152,7 +156,8 @@ class DatabaseOperations implements ListenerInterface {
      *
      * @param EventInterface $event An event instance
      */
-    public function loadMetadata(EventInterface $event) {
+    public function loadMetadata(EventInterface $event): void
+    {
         $request = $event->getRequest();
         $response = $event->getResponse();
         $user = $request->getUser();
@@ -171,7 +176,8 @@ class DatabaseOperations implements ListenerInterface {
      *
      * @param EventInterface $event An event instance
      */
-    public function loadImages(EventInterface $event) {
+    public function loadImages(EventInterface $event): void
+    {
         $query = $this->getImagesQuery();
         $params = $event->getRequest()->query;
         $returnMetadata = false;
@@ -289,7 +295,8 @@ class DatabaseOperations implements ListenerInterface {
      *
      * @param EventInterface $event An event instance
      */
-    public function loadUser(EventInterface $event) {
+    public function loadUser(EventInterface $event): void
+    {
         $request = $event->getRequest();
         $response = $event->getResponse();
         $user = $request->getUser();
@@ -312,7 +319,8 @@ class DatabaseOperations implements ListenerInterface {
      *
      * @param EventInterface $event An event instance
      */
-    public function loadStats(EventInterface $event) {
+    public function loadStats(EventInterface $event): void
+    {
         $response = $event->getResponse();
         $database = $event->getDatabase();
 

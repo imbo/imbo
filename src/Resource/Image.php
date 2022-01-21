@@ -1,21 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
 use Imbo\Model;
 
-class Image implements ResourceInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedMethods() {
+class Image implements ResourceInterface
+{
+    public function getAllowedMethods(): array
+    {
         return ['GET', 'HEAD', 'DELETE'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents(): array
+    {
         return [
             'image.get' => 'getImage',
             'image.head' => 'getImage',
@@ -28,7 +25,8 @@ class Image implements ResourceInterface {
      *
      * @param EventInterface
      */
-    public function deleteImage(EventInterface $event) {
+    public function deleteImage(EventInterface $event): void
+    {
         $event->getManager()->trigger('db.image.delete');
         $event->getManager()->trigger('storage.image.delete');
 
@@ -45,7 +43,8 @@ class Image implements ResourceInterface {
      *
      * @param EventInterface
      */
-    public function getImage(EventInterface $event) {
+    public function getImage(EventInterface $event): void
+    {
         $request = $event->getRequest();
         $response = $event->getResponse();
         $eventManager = $event->getManager();

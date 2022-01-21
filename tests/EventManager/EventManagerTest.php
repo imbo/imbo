@@ -341,7 +341,7 @@ class Listener implements ListenerInterface
         $this->params = $params;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'event' => 'method',

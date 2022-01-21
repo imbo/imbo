@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
@@ -10,7 +10,8 @@ use Imbo\EventManager\EventInterface;
  * before sending back transformed images to the client, or when storing transformed images in the
  * storage.
  */
-class Imagick implements ListenerInterface, ImagickAware {
+class Imagick implements ListenerInterface, ImagickAware
+{
     /**
      * Imagick instance that is injected by an initializer
      *
@@ -18,19 +19,15 @@ class Imagick implements ListenerInterface, ImagickAware {
      */
     private $imagick;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setImagick(\Imagick $imagick) {
+    public function setImagick(\Imagick $imagick): self
+    {
         $this->imagick = $imagick;
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents(): array
+    {
         return [
             // Update the model after all transformations have been applied
             'image.transformed' => 'updateModel',
@@ -55,7 +52,8 @@ class Imagick implements ListenerInterface, ImagickAware {
      *
      * @param EventInterface $event The event instance
      */
-    public function readImageBlob(EventInterface $event) {
+    public function readImageBlob(EventInterface $event): void
+    {
         $eventName = $event->getName();
         $config = $event->getConfig();
         $jpegSizeHintEnabled = $config['optimizations']['jpegSizeHint'];
@@ -63,7 +61,7 @@ class Imagick implements ListenerInterface, ImagickAware {
         if ($event->hasArgument('image')) {
             // The image has been specified as an argument to the event
             $image = $event->getArgument('image');
-        } else if ($eventName === 'images.post') {
+        } elseif ($eventName === 'images.post') {
             // The image is found in the request
             $image = $event->getRequest()->getImage();
         } else {
@@ -102,7 +100,8 @@ class Imagick implements ListenerInterface, ImagickAware {
      *
      * @param EventInterface $event The event instance
      */
-    public function updateModelBeforeStoring(EventInterface $event) {
+    public function updateModelBeforeStoring(EventInterface $event): void
+    {
         $image = $event->getRequest()->getImage();
 
         if ($image->getHasBeenTransformed()) {
@@ -115,7 +114,8 @@ class Imagick implements ListenerInterface, ImagickAware {
      *
      * @param EventInterface $event The event instance
      */
-    public function updateModel(EventInterface $event) {
+    public function updateModel(EventInterface $event): void
+    {
         $image = $event->getArgument('image');
 
         if ($image->getHasBeenTransformed()) {

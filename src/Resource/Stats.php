@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
@@ -9,18 +9,15 @@ use Imbo\EventManager\EventInterface;
  * This resource can be used to monitor the imbo installation to see if it has access to the
  * current database and storage.
  */
-class Stats implements ResourceInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedMethods() {
+class Stats implements ResourceInterface
+{
+    public function getAllowedMethods(): array
+    {
         return ['GET', 'HEAD'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents(): array
+    {
         return [
             'stats.get' => 'get',
             'stats.head' => 'get',
@@ -32,7 +29,8 @@ class Stats implements ResourceInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function get(EventInterface $event) {
+    public function get(EventInterface $event): void
+    {
         $response = $event->getResponse();
         $response->setMaxAge(0)
                  ->setPrivate();

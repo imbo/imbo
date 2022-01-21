@@ -96,10 +96,7 @@ class ResponseFormatter implements ListenerInterface
         $this->contentNegotiation = $params['contentNegotiation'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'response.send' => ['format' => 20],

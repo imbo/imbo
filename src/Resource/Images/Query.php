@@ -34,28 +34,28 @@ class Query
     /**
      * Image identifiers filter
      *
-     * @var string[]
+     * @var array<string>
      */
     private array $imageIdentifiers = [];
 
     /**
      * Checksums filter
      *
-     * @var string[]
+     * @var array<string>
      */
     private array $checksums = [];
 
     /**
      * Original checksums filter
      *
-     * @var string[]
+     * @var array<string>
      */
     private array $originalChecksums = [];
 
     /**
      * Sort
      *
-     * @var array<int, array{field: string, sort: string}>
+     * @var array<int,array{field:string,sort:string}>
      */
     private $sort = [];
 
@@ -177,7 +177,7 @@ class Query
     /**
      * Set the imageIdentifiers filter
      *
-     * @param string[] $imageIdentifiers
+     * @param array<string> $imageIdentifiers
      * @return self
      */
     public function setImageIdentifiers(array $imageIdentifiers): self
@@ -190,7 +190,7 @@ class Query
     /**
      * Get the imageIdentifiers filter
      *
-     * @return string[]
+     * @return array<string>
      */
     public function getImageIdentifiers(): array
     {
@@ -200,7 +200,7 @@ class Query
     /**
      * Set the checksums filter
      *
-     * @param string[] $checksums
+     * @param array<string> $checksums
      * @return self
      */
     public function setChecksums(array $checksums): self
@@ -213,7 +213,7 @@ class Query
     /**
      * Get the checksums filter
      *
-     * @return string[]
+     * @return array<string>
      */
     public function getChecksums(): array
     {
@@ -223,7 +223,7 @@ class Query
     /**
      * Set the original checksums filter
      *
-     * @param string[] $originalChecksums
+     * @param array<string> $originalChecksums
      * @return self
      */
     public function setOriginalChecksums(array $originalChecksums): self
@@ -236,7 +236,7 @@ class Query
     /**
      * Get the original checksums filter
      *
-     * @return string[]
+     * @return array<string>
      */
     public function getOriginalChecksums(): array
     {
@@ -246,7 +246,7 @@ class Query
     /**
      * Set the sort data
      *
-     * @param string[] $sort
+     * @param array<string> $sort
      * @return self
      */
     public function setSort(array $sort): self
@@ -285,7 +285,7 @@ class Query
     /**
      * Get the sort data
      *
-     * @return array<int, array{field: string, sort: string}>
+     * @return array<int,array{field:string,sort:string}>
      */
     public function getSort(): array
     {

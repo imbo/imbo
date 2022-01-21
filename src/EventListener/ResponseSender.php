@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
@@ -6,11 +6,10 @@ use Imbo\EventManager\EventInterface;
 /**
  * Response sender listener
  */
-class ResponseSender implements ListenerInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+class ResponseSender implements ListenerInterface
+{
+    public static function getSubscribedEvents(): array
+    {
         return [
             'response.send' => 'send',
         ];
@@ -21,7 +20,8 @@ class ResponseSender implements ListenerInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function send(EventInterface $event) {
+    public function send(EventInterface $event): void
+    {
         $request = $event->getRequest();
         $response = $event->getResponse();
 
@@ -39,7 +39,7 @@ class ResponseSender implements ListenerInterface {
             // The request has an image. This means that an image was just added.
             // Get the image identifier from the image model
             $imageIdentifier = $image->getImageIdentifier();
-        } else if ($identifier = $request->getImageIdentifier()) {
+        } elseif ($identifier = $request->getImageIdentifier()) {
             // An image identifier exists in the request URI, use that
             $imageIdentifier = $identifier;
         }

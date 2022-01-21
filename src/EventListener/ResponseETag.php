@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
@@ -6,11 +6,10 @@ use Imbo\EventManager\EventInterface;
 /**
  * Generate an ETag for the response
  */
-class ResponseETag implements ListenerInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+class ResponseETag implements ListenerInterface
+{
+    public static function getSubscribedEvents(): array
+    {
         return [
             'response.send' => [
                 'setETag' => 5,
@@ -27,9 +26,10 @@ class ResponseETag implements ListenerInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function fixIfNoneMatchHeader(EventInterface $event) {
+    public function fixIfNoneMatchHeader(EventInterface $event): void
+    {
         $request = $event->getRequest();
-        $ifNoneMatch = $request->headers->get('if-none-match', false);
+        $ifNoneMatch = $request->headers->get('if-none-match');
 
         if ($ifNoneMatch && strlen($ifNoneMatch) > 34) {
             // Remote quotes
@@ -46,7 +46,8 @@ class ResponseETag implements ListenerInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function setETag(EventInterface $event) {
+    public function setETag(EventInterface $event): void
+    {
         $response = $event->getResponse();
         $request = $event->getRequest();
 

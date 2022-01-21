@@ -10,10 +10,7 @@ use Imbo\Http\Response\Response;
  */
 class StorageOperations implements ListenerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'storage.image.delete' => 'deleteImage',
@@ -27,7 +24,7 @@ class StorageOperations implements ListenerInterface
      *
      * @param EventInterface $event An event instance
      */
-    public function deleteImage(EventInterface $event)
+    public function deleteImage(EventInterface $event): void
     {
         $request = $event->getRequest();
         $event->getStorage()->delete($request->getUser(), $request->getImageIdentifier());
@@ -38,7 +35,7 @@ class StorageOperations implements ListenerInterface
      *
      * @param EventInterface $event An event instance
      */
-    public function loadImage(EventInterface $event)
+    public function loadImage(EventInterface $event): void
     {
         $storage = $event->getStorage();
         $request = $event->getRequest();
@@ -69,7 +66,7 @@ class StorageOperations implements ListenerInterface
      *
      * @param EventInterface $event An event instance
      */
-    public function insertImage(EventInterface $event)
+    public function insertImage(EventInterface $event): void
     {
         $request = $event->getRequest();
         $user = $request->getUser();

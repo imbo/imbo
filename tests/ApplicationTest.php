@@ -187,7 +187,7 @@ class ApplicationTest extends TestCase
 
 class TestListener implements ListenerInterface
 {
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [];
     }
@@ -195,12 +195,12 @@ class TestListener implements ListenerInterface
 
 class TestResource implements ListenerInterface, ResourceInterface
 {
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [];
     }
 
-    public function getAllowedMethods()
+    public function getAllowedMethods(): array
     {
         return [];
     }

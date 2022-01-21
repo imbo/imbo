@@ -89,10 +89,7 @@ class AccessToken implements ListenerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         $callbacks = [];
         $events = [

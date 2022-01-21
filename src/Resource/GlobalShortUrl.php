@@ -11,18 +11,12 @@ use Symfony\Component\HttpFoundation\ParameterBag;
  */
 class GlobalShortUrl implements ResourceInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedMethods()
+    public function getAllowedMethods(): array
     {
         return ['GET', 'HEAD'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             // Fetch an image using the short URL
@@ -36,7 +30,7 @@ class GlobalShortUrl implements ResourceInterface
      *
      * @param EventInterface $event
      */
-    public function getImage(EventInterface $event)
+    public function getImage(EventInterface $event): void
     {
         $request = $event->getRequest();
         $route = $request->getRoute();

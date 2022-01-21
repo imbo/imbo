@@ -17,22 +17,15 @@ class Authenticate implements ListenerInterface
 {
     /**
      * Max. diff to tolerate in the timestamp in seconds
-     *
-     * @var int
      */
-    private $maxDiff = 120;
+    private int $maxDiff = 120;
 
     /**
      * The algorithm to use when generating the HMAC
-     *
-     * @var string
      */
-    private $algorithm = 'sha256';
+    private string $algorithm = 'sha256';
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         $callbacks = [];
         $events = [

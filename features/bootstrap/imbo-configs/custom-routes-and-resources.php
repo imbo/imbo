@@ -5,18 +5,22 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Model\ArrayModel;
 use Imbo\Resource\ResourceInterface;
 
-class CustomResource implements ResourceInterface {
-    public function getAllowedMethods() {
+class CustomResource implements ResourceInterface
+{
+    public function getAllowedMethods(): array
+    {
         return ['GET'];
     }
 
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents(): array
+    {
         return [
             'custom1.get' => 'get',
         ];
     }
 
-    public function get(EventInterface $event) {
+    public function get(EventInterface $event): void
+    {
         $model = new ArrayModel();
         $model->setData([
             'event' => $event->getName(),
@@ -29,19 +33,23 @@ class CustomResource implements ResourceInterface {
 /**
  * Attach a couple of custom resources
  */
-class CustomResource2 implements ResourceInterface {
-    public function getAllowedMethods() {
+class CustomResource2 implements ResourceInterface
+{
+    public function getAllowedMethods(): array
+    {
         return ['GET', 'PUT'];
     }
 
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents(): array
+    {
         return [
             'custom2.get' => 'get',
             'custom2.put' => 'put',
         ];
     }
 
-    public function get(EventInterface $event) {
+    public function get(EventInterface $event): void
+    {
         $model = new ArrayModel();
         $model->setData([
             'event' => $event->getName(),
@@ -49,7 +57,8 @@ class CustomResource2 implements ResourceInterface {
         $event->getResponse()->setModel($model);
     }
 
-    public function put(EventInterface $event) {
+    public function put(EventInterface $event): void
+    {
         $model = new ArrayModel();
         $model->setData([
             'event' => $event->getName(),
@@ -65,8 +74,6 @@ return [
     ],
     'resources' => [
         'custom1' => CustomResource::class,
-        'custom2' => function() {
-            return new CustomResource2();
-        }
+        'custom2' => fn () => new CustomResource2(),
     ],
 ];

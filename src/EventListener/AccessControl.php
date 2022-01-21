@@ -65,10 +65,7 @@ class AccessControl implements ListenerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'route.match' => 'subscribe',
@@ -81,7 +78,7 @@ class AccessControl implements ListenerInterface
      *
      * @param EventInterface $event
      */
-    public function subscribe(EventInterface $event)
+    public function subscribe(EventInterface $event): void
     {
         $resources = Resource::getAllResources();
 
@@ -104,7 +101,7 @@ class AccessControl implements ListenerInterface
      * @param EventInterface $event
      * @throws RuntimeException If public key does not have access to the resource
      */
-    public function checkAccess(EventInterface $event)
+    public function checkAccess(EventInterface $event): void
     {
         if ($event->hasArgument('skipAccessControl') &&
             $event->getArgument('skipAccessControl') === true) {
@@ -159,7 +156,7 @@ class AccessControl implements ListenerInterface
      *
      * @param EventInterface $event An event instance
      */
-    public function loadGroups(EventInterface $event)
+    public function loadGroups(EventInterface $event): void
     {
         $query = new GroupQuery();
         $params = $event->getRequest()->query;

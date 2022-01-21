@@ -42,10 +42,7 @@ class TransformationManager implements ListenerInterface
      */
     protected $transformationsApplied = false;
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'image.transform' => 'applyTransformations',

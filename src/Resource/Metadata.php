@@ -11,18 +11,12 @@ use Imbo\Model;
  */
 class Metadata implements ResourceInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedMethods()
+    public function getAllowedMethods(): array
     {
         return ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'metadata.head' => 'get',
@@ -44,7 +38,7 @@ class Metadata implements ResourceInterface
      *
      * @param EventInterface $event The current event
      */
-    public function delete(EventInterface $event)
+    public function delete(EventInterface $event): void
     {
         $event->getManager()->trigger('db.metadata.delete');
         $event->getResponse()->setModel(new Model\Metadata());
@@ -55,7 +49,7 @@ class Metadata implements ResourceInterface
      *
      * @param EventInterface $event The current event
      */
-    public function put(EventInterface $event)
+    public function put(EventInterface $event): void
     {
         $request = $event->getRequest();
         $metadata = json_decode($request->getContent(), true);
@@ -77,7 +71,7 @@ class Metadata implements ResourceInterface
      *
      * @param EventInterface $event The current event
      */
-    public function post(EventInterface $event)
+    public function post(EventInterface $event): void
     {
         $request = $event->getRequest();
 
@@ -96,7 +90,7 @@ class Metadata implements ResourceInterface
      *
      * @param EventInterface $event The current event
      */
-    public function get(EventInterface $event)
+    public function get(EventInterface $event): void
     {
         $event->getManager()->trigger('db.metadata.load');
     }
@@ -107,7 +101,7 @@ class Metadata implements ResourceInterface
      * @param EventInterface $event The event instance
      * @throws InvalidArgumentException
      */
-    public function validateMetadata(EventInterface $event)
+    public function validateMetadata(EventInterface $event): void
     {
         $request = $event->getRequest();
         $metadata = $request->getContent();

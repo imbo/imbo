@@ -19,18 +19,12 @@ use Imbo\Http\Response\Response;
  */
 class GlobalImages implements ResourceInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedMethods()
+    public function getAllowedMethods(): array
     {
         return ['GET', 'HEAD'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'globalimages.get'    => 'getImages',
@@ -43,7 +37,7 @@ class GlobalImages implements ResourceInterface
      *
      * @param EventInterface $event The current event
      */
-    public function getImages(EventInterface $event)
+    public function getImages(EventInterface $event): void
     {
         $acl = $event->getAccessControl();
 

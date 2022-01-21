@@ -1,20 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
 
-class User implements ResourceInterface {
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedMethods() {
+class User implements ResourceInterface
+{
+    public function getAllowedMethods(): array
+    {
         return ['GET', 'HEAD'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents(): array
+    {
         return [
             'user.get' => 'get',
             'user.head' => 'get',
@@ -26,7 +23,8 @@ class User implements ResourceInterface {
      *
      * @param EventInterface $event The current event
      */
-    public function get(EventInterface $event) {
+    public function get(EventInterface $event): void
+    {
         $event->getManager()->trigger('db.user.load');
     }
 }

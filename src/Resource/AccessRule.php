@@ -14,18 +14,12 @@ use Imbo\Model\ArrayModel;
  */
 class AccessRule implements ResourceInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedMethods()
+    public function getAllowedMethods(): array
     {
         return ['GET', 'HEAD', 'DELETE'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'accessrule.get' => 'getRule',
@@ -39,7 +33,7 @@ class AccessRule implements ResourceInterface
      *
      * @param EventInterface $event The current event
      */
-    public function getRule(EventInterface $event)
+    public function getRule(EventInterface $event): void
     {
         $acl = $event->getAccessControl();
 
@@ -79,7 +73,7 @@ class AccessRule implements ResourceInterface
      *
      * @param EventInterface $event The current event
      */
-    public function deleteRule(EventInterface $event)
+    public function deleteRule(EventInterface $event): void
     {
         $acl = $event->getAccessControl();
 

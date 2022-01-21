@@ -61,10 +61,7 @@ class Cors implements ListenerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             'route.match' => 'subscribe',

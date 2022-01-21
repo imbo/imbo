@@ -1,30 +1,28 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
+use Imagick;
 use Imbo\EventManager\EventInterface;
 
 /**
  * Add the current Imagick instance to the active LoaderManager and OutputConverterManager
  */
-class LoaderOutputConverterImagick implements ListenerInterface, ImagickAware {
+class LoaderOutputConverterImagick implements ListenerInterface, ImagickAware
+{
     /**
-     * @var \Imagick
+     * @var Imagick
      */
     protected $imagick;
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents(): array
+    {
         return [
             'imbo.initialized' => ['populateImagickInstance'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setImagick(\Imagick $imagick) {
+    public function setImagick(Imagick $imagick): self
+    {
         $this->imagick = $imagick;
 
         return $this;
@@ -35,7 +33,8 @@ class LoaderOutputConverterImagick implements ListenerInterface, ImagickAware {
      *
      * @param EventInterface $event
      */
-    public function populateImagickInstance(EventInterface $event) {
+    public function populateImagickInstance(EventInterface $event): void
+    {
         $event->getInputLoaderManager()->setImagick($this->imagick);
         $event->getOutputConverterManager()->setImagick($this->imagick);
     }

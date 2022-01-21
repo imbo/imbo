@@ -1,10 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
 /**
  * Event listener interface
  */
-interface ListenerInterface {
+interface ListenerInterface
+{
     /**
      * Return an array with events to subscribe to
      *
@@ -26,7 +27,7 @@ interface ListenerInterface {
      *     'event2' => 'someOtherMethod',
      * ];
      *
-     * @return array
+     * @return array<string,string|array<int|string,int|string>>
      */
-    static function getSubscribedEvents();
+    public static function getSubscribedEvents(): array;
 }
