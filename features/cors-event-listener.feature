@@ -10,7 +10,6 @@ Feature: Imbo provides an event listener for CORS
         Then the response status line is "200 Hell Yeah"
         And the "Access-Control-Allow-Origin" response header is "http://allowedhost"
         And the "Access-Control-Expose-Headers" response header matches "/X-Imbo-ImageIdentifier/"
-        And the "Access-Control-Expose-Headers" response header matches "/X-Imbo-Version/"
         And the "Vary" response header matches "/Origin/"
         And the "Allow" response header matches "/GET/"
         And the "Allow" response header matches "/HEAD/"

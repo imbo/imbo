@@ -51,7 +51,6 @@ class Application
         );
 
         $this->response = (new Response())->setPublic();
-        $this->response->headers->set('X-Imbo-Version', Version::VERSION);
     }
 
     public function run(): void
