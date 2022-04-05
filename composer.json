@@ -46,6 +46,7 @@
     "imbo/imbo-sqlite-adapters": "dev-main",
     "phpunit/phpunit": "^9.2",
     "psalm/plugin-phpunit": "^0.16.1",
+    "symfony/var-dumper": "^5.4",
     "vimeo/psalm": "^4.10"
   },
   "suggest": {
