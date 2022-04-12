@@ -73,6 +73,11 @@ class AccessTokenTest extends ListenerTests
             ->method('getPublicKey')
             ->willReturn('some-key');
 
+        $this->accessControl
+            ->expects($this->once())
+            ->method('getPrivateKey')
+            ->willReturn('private-key');
+
         $this->expectExceptionObject(new RuntimeException('Incorrect access token', Response::HTTP_BAD_REQUEST));
         $this->listener->checkAccessToken($this->event);
     }
