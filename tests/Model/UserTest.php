@@ -1,16 +1,18 @@
 <?php declare(strict_types=1);
 namespace Imbo\Model;
 
-use PHPUnit\Framework\TestCase;
 use DateTime;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Model\User
  */
-class UserTest extends TestCase {
+class UserTest extends TestCase
+{
     private $model;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->model = new User();
     }
 
@@ -18,7 +20,8 @@ class UserTest extends TestCase {
      * @covers ::getUserId
      * @covers ::setUserId
      */
-    public function testCanSetAndGetUserId() : void {
+    public function testCanSetAndGetUserId(): void
+    {
         $this->assertNull($this->model->getUserId());
         $this->assertSame($this->model, $this->model->setUserId('key'));
         $this->assertSame('key', $this->model->getUserId());
@@ -28,7 +31,8 @@ class UserTest extends TestCase {
      * @covers ::getNumImages
      * @covers ::setNumImages
      */
-    public function testCanSetAndGetNumImages() : void {
+    public function testCanSetAndGetNumImages(): void
+    {
         $this->assertNull($this->model->getNumImages());
         $this->assertSame($this->model, $this->model->setNumImages(10));
         $this->assertSame(10, $this->model->getNumImages());
@@ -38,7 +42,8 @@ class UserTest extends TestCase {
      * @covers ::getLastModified
      * @covers ::setLastModified
      */
-    public function testCanSetAndGetLastModified() : void {
+    public function testCanSetAndGetLastModified(): void
+    {
         $date = new DateTime();
 
         $this->assertNull($this->model->getLastModified());
@@ -49,7 +54,8 @@ class UserTest extends TestCase {
     /**
      * @covers ::getData
      */
-    public function testGetData() : void {
+    public function testGetData(): void
+    {
         $date = new DateTime();
 
         $this->model

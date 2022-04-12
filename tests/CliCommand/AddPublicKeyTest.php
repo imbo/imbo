@@ -1,48 +1,53 @@
 <?php declare(strict_types=1);
 namespace Imbo\CliCommand;
 
+use Exception;
+use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
-use Imbo\Resource;
 use Imbo\Exception\RuntimeException;
+use Imbo\Resource;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
-use PHPUnit\Framework\TestCase;
-use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
-use Exception;
 
 /**
  * @coversDefaultClass Imbo\CliCommand\AddPublicKey
  */
-class AddPublicKeyTest extends TestCase {
+class AddPublicKeyTest extends TestCase
+{
     private $application;
     private $command;
     private $adapter;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->adapter = $this->createMock(MutableAdapterInterface::class);
 
         $this->command = new AddPublicKey();
         $this->command->setConfig([
-            'accessControl' => $this->adapter
+            'accessControl' => $this->adapter,
         ]);
 
         $this->application = new Application();
         $this->application->add($this->command);
     }
 
-    public function getInvalidAccessControlConfig() : array {
+    public function getInvalidAccessControlConfig(): array
+    {
         return [
             [
                 ['accessControl' => new Exception()],
-                'Invalid access control adapter'
+                'Invalid access control adapter',
             ],
             [
-                ['accessControl' => function() : Exception { return new Exception(); }],
-                'Invalid access control adapter'
+                ['accessControl' => function (): Exception {
+                    return new Exception();
+                }],
+                'Invalid access control adapter',
             ],
             [
                 ['accessControl' => $this->createMock(AdapterInterface::class)],
-                'The configured access control adapter is not mutable'
+                'The configured access control adapter is not mutable',
             ],
         ];
     }
@@ -51,7 +56,8 @@ class AddPublicKeyTest extends TestCase {
      * @dataProvider getInvalidAccessControlConfig
      * @covers ::getAclAdapter
      */
-    public function testThrowsWhenAccessControlIsNotValid(array $config, string $errorMessage) : void {
+    public function testThrowsWhenAccessControlIsNotValid(array $config, string $errorMessage): void
+    {
         $command = new AddPublicKey();
         $command->setConfig($config);
 
@@ -64,7 +70,8 @@ class AddPublicKeyTest extends TestCase {
      * @covers ::execute
      * @covers ::getAclAdapter
      */
-    public function testThrowsOnDuplicatePublicKeyName() : void {
+    public function testThrowsOnDuplicatePublicKeyName(): void
+    {
         $this->adapter
             ->expects($this->once())
             ->method('publicKeyExists')
@@ -80,7 +87,8 @@ class AddPublicKeyTest extends TestCase {
      * @covers ::execute
      * @covers ::askForPrivateKey
      */
-    public function testWillAskForPrivateKeyIfNotSpecified() : void {
+    public function testWillAskForPrivateKeyIfNotSpecified(): void
+    {
         $this->adapter
             ->expects($this->once())
             ->method('addKeyPair')
@@ -91,7 +99,7 @@ class AddPublicKeyTest extends TestCase {
             'ZiePublicKey',
             '0',
             'rexxars',
-            'n'
+            'n',
         ]);
         $commandTester->execute(['publicKey' => 'foo']);
     }
@@ -99,7 +107,8 @@ class AddPublicKeyTest extends TestCase {
     /**
      * @covers ::askForUsers
      */
-    public function testWillNotAcceptEmptyUserSpecification() : void {
+    public function testWillNotAcceptEmptyUserSpecification(): void
+    {
         $commandTester = new CommandTester($this->command);
         $commandTester->setInputs([
             '0',
@@ -115,7 +124,8 @@ class AddPublicKeyTest extends TestCase {
      * @covers ::askForResources
      * @covers ::askForCustomResources
      */
-    public function testWillNotAcceptEmptyCustomResourceSpecification() : void {
+    public function testWillNotAcceptEmptyCustomResourceSpecification(): void
+    {
         $commandTester = new CommandTester($this->command);
         $commandTester->setInputs([
             '4',
@@ -132,12 +142,13 @@ class AddPublicKeyTest extends TestCase {
      * @covers ::askForResources
      * @covers ::askForUsers
      */
-    public function testContinuesAskingForAclRulesIfUserSaysThereAreMoreRulesToAdd() : void {
+    public function testContinuesAskingForAclRulesIfUserSaysThereAreMoreRulesToAdd(): void
+    {
         $this->adapter
             ->expects($this->exactly(3))
             ->method('addAccessRule')
             ->withConsecutive(
-                [$this->equalTo('foo'), $this->callback(function($rule) {
+                [$this->equalTo('foo'), $this->callback(function ($rule) {
                     $diff = array_diff($rule['resources'], Resource::getReadOnlyResources());
                     return (
                         count($rule['users']) === 2 &&
@@ -146,7 +157,7 @@ class AddPublicKeyTest extends TestCase {
                         empty($diff)
                     );
                 })],
-                [$this->equalTo('foo'), $this->callback(function($rule) {
+                [$this->equalTo('foo'), $this->callback(function ($rule) {
                     $diff = array_diff($rule['resources'], Resource::getReadWriteResources());
                     return (
                         count($rule['users']) === 2 &&
@@ -155,13 +166,13 @@ class AddPublicKeyTest extends TestCase {
                         empty($diff)
                     );
                 })],
-                [$this->equalTo('foo'), $this->callback(function($rule) {
+                [$this->equalTo('foo'), $this->callback(function ($rule) {
                     $diff = array_diff($rule['resources'], Resource::getAllResources());
                     return (
                         $rule['users'] === '*' &&
                         empty($diff)
                     );
-                })]
+                })],
             );
 
         $commandTester = new CommandTester($this->command);
@@ -176,8 +187,8 @@ class AddPublicKeyTest extends TestCase {
             3,
             substr_count(
                 $commandTester->getDisplay(true),
-                'Create more ACL-rules for this public key?'
-            )
+                'Create more ACL-rules for this public key?',
+            ),
         );
     }
 
@@ -188,14 +199,15 @@ class AddPublicKeyTest extends TestCase {
      * @covers ::askForUsers
      * @covers ::askForSpecificResources
      */
-    public function testPromptsForListOfSpecificResourcesIfOptionIsSelected() : void {
+    public function testPromptsForListOfSpecificResourcesIfOptionIsSelected(): void
+    {
         $allResources = Resource::getAllResources();
         sort($allResources);
 
         $this->adapter
             ->expects($this->once())
             ->method('addAccessRule')
-            ->with('foo', $this->callback(function($rule) use ($allResources) {
+            ->with('foo', $this->callback(function ($rule) use ($allResources) {
                 return (
                     $rule['users'] === '*' &&
                     $rule['resources'][0] === $allResources[0] &&
@@ -218,7 +230,8 @@ class AddPublicKeyTest extends TestCase {
      * @covers ::askForAnotherAclRule
      * @covers ::askForCustomResources
      */
-    public function testPromtpsForListOfCustomResourcesIfOptionIsSelected() : void {
+    public function testPromtpsForListOfCustomResourcesIfOptionIsSelected(): void
+    {
         $allResources = Resource::getAllResources();
         sort($allResources);
 
@@ -228,9 +241,9 @@ class AddPublicKeyTest extends TestCase {
             ->with('foo', [
                 'resources' => [
                     'foo.read',
-                    'bar.write'
+                    'bar.write',
                 ],
-                'users' => '*'
+                'users' => '*',
             ]);
 
         $this->adapter
@@ -243,7 +256,7 @@ class AddPublicKeyTest extends TestCase {
             '4',
             'foo.read,bar.write',
             '*',
-            'n'
+            'n',
         ]);
         $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
     }
@@ -251,7 +264,8 @@ class AddPublicKeyTest extends TestCase {
     /**
      * @covers ::__construct
      */
-    public function testConfiguresCommand() : void {
+    public function testConfiguresCommand(): void
+    {
         $this->assertSame('Add a public key', $this->command->getDescription());
         $this->assertSame('add-public-key', $this->command->getName());
         $this->assertSame('Add a public key to the configured access control adapter', $this->command->getHelp());

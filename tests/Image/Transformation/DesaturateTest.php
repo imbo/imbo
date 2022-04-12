@@ -1,22 +1,24 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Image\Transformation\Desaturate;
-use Imbo\Model\Image;
 use Imagick;
+use Imbo\Model\Image;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Desaturate
  */
-class DesaturateTest extends TransformationTests {
-    protected function getTransformation() : Desaturate {
+class DesaturateTest extends TransformationTests
+{
+    protected function getTransformation(): Desaturate
+    {
         return new Desaturate();
     }
 
     /**
      * @covers ::transform
      */
-    public function testCanDesaturateImages() : void {
+    public function testCanDesaturateImages(): void
+    {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())

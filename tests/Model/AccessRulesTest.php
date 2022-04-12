@@ -6,10 +6,12 @@ use PHPUnit\Framework\TestCase;
 /**
  * @coversDefaultClass Imbo\Model\AccessRules
  */
-class AccessRulesTest extends TestCase {
+class AccessRulesTest extends TestCase
+{
     private $model;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->model = new AccessRules();
     }
 
@@ -18,7 +20,8 @@ class AccessRulesTest extends TestCase {
      * @covers ::setRules
      * @covers ::getData
      */
-    public function testSetAndGetId() : void {
+    public function testSetAndGetId(): void
+    {
         $rules = [
             ['id' => 1, 'group' => 'group', 'users' => ['user']],
             ['id' => 2, 'resources' => ['image.get', 'image.head'], 'users' => ['user']],

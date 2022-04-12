@@ -1,21 +1,24 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
+use Imagick;
 use Imbo\Model\Image;
 use PHPUnit\Framework\TestCase;
-use Imagick;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Transformation
  */
-class TransformationTest extends TestCase {
+class TransformationTest extends TestCase
+{
     private $transformation;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->transformation = new Border();
     }
 
-    public function getColors() : array {
+    public function getColors(): array
+    {
         return [
             ['red', 'red'],
             ['000', '#000'],
@@ -34,7 +37,8 @@ class TransformationTest extends TestCase {
      * @covers ::setImage
      * @covers ::setImagick
      */
-    public function testCanFormatColors(string $color, string $expected) : void {
+    public function testCanFormatColors(string $color, string $expected): void
+    {
         $image = $this->createMock(Image::class);
         $image->expects($this->once())->method('setWidth')->willReturnSelf();
         $image->expects($this->once())->method('setHeight')->willReturnSelf();

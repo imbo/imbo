@@ -6,10 +6,12 @@ use PHPUnit\Framework\TestCase;
 /**
  * @coversDefaultClass Imbo\CliCommand\CliCommand
  */
-class CliCommandTest extends TestCase {
+class CliCommandTest extends TestCase
+{
     private $command;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->command = $this
             ->getMockBuilder(CliCommand::class)
             ->disableOriginalConstructor()
@@ -19,7 +21,8 @@ class CliCommandTest extends TestCase {
     /**
      * @covers ::getConfig
      */
-    public function testCanSetAndGetConfiguration() : void {
+    public function testCanSetAndGetConfiguration(): void
+    {
         $config = ['some' => 'config'];
         $this->command->setConfig($config);
         $this->assertSame($config, $this->command->getConfig());
@@ -28,7 +31,8 @@ class CliCommandTest extends TestCase {
     /**
      * @covers ::getConfig
      */
-    public function testFetchesTheDefaultConfigurationIfNoneHasBeenSet() : void {
+    public function testFetchesTheDefaultConfigurationIfNoneHasBeenSet(): void
+    {
         $this->assertEquals(require __DIR__ . '/../../config/config.default.php', $this->command->getConfig());
     }
 
@@ -36,7 +40,8 @@ class CliCommandTest extends TestCase {
      * @covers ::getConfig
      * @covers ::setConfig
      */
-    public function testCanSetConfig() : void {
+    public function testCanSetConfig(): void
+    {
         $this->command->setConfig(['some' => 'config']);
         $this->assertSame(['some' => 'config'], $this->command->getConfig());
     }

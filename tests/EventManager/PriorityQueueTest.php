@@ -6,11 +6,13 @@ use PHPUnit\Framework\TestCase;
 /**
  * @coversDefaultClass Imbo\EventManager\PriorityQueue
  */
-class PriorityQueueTest extends TestCase {
+class PriorityQueueTest extends TestCase
+{
     /**
      * @covers ::insert
      */
-    public function testUsesAPredictableOrder() : void {
+    public function testUsesAPredictableOrder(): void
+    {
         $queue = new PriorityQueue();
 
         for ($i = 0; $i < 10; $i++) {

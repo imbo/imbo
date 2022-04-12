@@ -6,10 +6,12 @@ use PHPUnit\Framework\TestCase;
 /**
  * @coversDefaultClass Imbo\Model\Group
  */
-class GroupTest extends TestCase {
+class GroupTest extends TestCase
+{
     private $model;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->model = new Group();
     }
 
@@ -17,7 +19,8 @@ class GroupTest extends TestCase {
      * @covers ::getName
      * @covers ::setName
      */
-    public function testSetAndGetName() : void {
+    public function testSetAndGetName(): void
+    {
         $this->assertNull($this->model->getName());
         $this->assertSame($this->model, $this->model->setName('name'));
         $this->assertSame('name', $this->model->getName());
@@ -27,7 +30,8 @@ class GroupTest extends TestCase {
      * @covers ::getResources
      * @covers ::setResources
      */
-    public function testSetAndGetResources() : void {
+    public function testSetAndGetResources(): void
+    {
         $this->assertSame([], $this->model->getResources());
         $this->assertSame($this->model, $this->model->setResources(['image.get', 'image.head']));
         $this->assertSame(['image.get', 'image.head'], $this->model->getResources());
@@ -36,7 +40,8 @@ class GroupTest extends TestCase {
     /**
      * @covers ::getData
      */
-    public function testGetData() : void {
+    public function testGetData(): void
+    {
         $this->model
             ->setName('name')
             ->setResources(['image.get', 'image.head']);

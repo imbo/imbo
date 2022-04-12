@@ -6,10 +6,12 @@ use PHPUnit\Framework\TestCase;
 /**
  * @coversDefaultClass Imbo\Model\AccessRule
  */
-class AccessRuleTest extends TestCase {
+class AccessRuleTest extends TestCase
+{
     private $model;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->model = new AccessRule();
     }
 
@@ -17,7 +19,8 @@ class AccessRuleTest extends TestCase {
      * @covers ::getId
      * @covers ::setId
      */
-    public function testSetAndGetId() : void {
+    public function testSetAndGetId(): void
+    {
         $this->assertNull($this->model->getId());
         $this->assertSame($this->model, $this->model->setId(1));
         $this->assertSame(1, $this->model->getId());
@@ -27,7 +30,8 @@ class AccessRuleTest extends TestCase {
      * @covers ::getGroup
      * @covers ::setGroup
      */
-    public function testSetAndGetGroup() : void {
+    public function testSetAndGetGroup(): void
+    {
         $this->assertNull($this->model->getGroup());
         $this->assertSame($this->model, $this->model->setGroup('name'));
         $this->assertSame('name', $this->model->getGroup());
@@ -37,7 +41,8 @@ class AccessRuleTest extends TestCase {
      * @covers ::getResources
      * @covers ::setResources
      */
-    public function testSetAndGetResources() : void {
+    public function testSetAndGetResources(): void
+    {
         $this->assertSame([], $this->model->getResources());
         $this->assertSame($this->model, $this->model->setResources(['r1', 'r2']));
         $this->assertSame(['r1', 'r2'], $this->model->getResources());
@@ -47,7 +52,8 @@ class AccessRuleTest extends TestCase {
      * @covers ::getUsers
      * @covers ::setUsers
      */
-    public function testSetAndGetUsers() : void {
+    public function testSetAndGetUsers(): void
+    {
         $this->assertSame([], $this->model->getUsers());
         $this->assertSame($this->model, $this->model->setUsers(['u1', 'u2']));
         $this->assertSame(['u1', 'u2'], $this->model->getUsers());
@@ -56,7 +62,8 @@ class AccessRuleTest extends TestCase {
     /**
      * @covers ::getData
      */
-    public function testGetData() : void {
+    public function testGetData(): void
+    {
         $this->model
             ->setId(1)
             ->setGroup('name')

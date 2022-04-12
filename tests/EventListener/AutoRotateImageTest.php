@@ -11,28 +11,31 @@ use PHPUnit\Framework\TestCase;
 /**
  * @coversDefaultClass Imbo\EventListener\AutoRotateImage
  */
-class AutoRotateImageTest extends TestCase {
+class AutoRotateImageTest extends TestCase
+{
     private $listener;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->listener = new AutoRotateImage();
     }
 
     /**
      * @covers ::getSubscribedEvents
      */
-    public function testReturnsCorrectSubscriptionData() : void {
+    public function testReturnsCorrectSubscriptionData(): void
+    {
         $className = get_class($this->listener);
         $events = $className::getSubscribedEvents();
 
         $this->assertTrue(isset($events['images.post']['autoRotate']));
-
     }
 
     /**
      * @covers ::autoRotate
      */
-    public function testTriggersTransformationForRotating() : void {
+    public function testTriggersTransformationForRotating(): void
+    {
         $image = $this->createMock(Image::class);
 
         $request = $this->createConfiguredMock(Request::class, [

@@ -1,18 +1,21 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Model\Image;
 use Imagick;
+use Imbo\Model\Image;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Resize
  */
-class ResizeTest extends TransformationTests {
-    protected function getTransformation() : Resize {
+class ResizeTest extends TransformationTests
+{
+    protected function getTransformation(): Resize
+    {
         return new Resize();
     }
 
-    public function getResizeParams() : array {
+    public function getResizeParams(): array
+    {
         return [
             'only width' => [
                 'params'         => ['width' => 100],
@@ -34,7 +37,7 @@ class ResizeTest extends TransformationTests {
             ],
             'params match image size' => [
                 'params'         => ['width' => 665, 'height' => 463],
-                'transformation' => false
+                'transformation' => false,
             ],
         ];
     }
@@ -43,7 +46,8 @@ class ResizeTest extends TransformationTests {
      * @dataProvider getResizeParams
      * @covers ::transform
      */
-    public function testCanTransformImage(array $params, bool $transformation, int $resizedWidth = null, int $resizedHeight = null) : void {
+    public function testCanTransformImage(array $params, bool $transformation, int $resizedWidth = null, int $resizedHeight = null): void
+    {
         $image = $this->createConfiguredMock(Image::class, [
             'getWidth' => 665,
             'getHeight' => 463,

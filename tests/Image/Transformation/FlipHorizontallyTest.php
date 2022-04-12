@@ -1,21 +1,24 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Model\Image;
 use Imagick;
+use Imbo\Model\Image;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\FlipHorizontally
  */
-class FlipHorizontallyTest extends TransformationTests {
-    protected function getTransformation() : FlipHorizontally {
+class FlipHorizontallyTest extends TransformationTests
+{
+    protected function getTransformation(): FlipHorizontally
+    {
         return new FlipHorizontally();
     }
 
     /**
      * @covers ::transform
      */
-    public function testCanFlipTheImage() : void {
+    public function testCanFlipTheImage(): void
+    {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())

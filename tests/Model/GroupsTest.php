@@ -6,10 +6,12 @@ use PHPUnit\Framework\TestCase;
 /**
  * @coversDefaultClass Imbo\Model\Groups
  */
-class GroupsTest extends TestCase {
+class GroupsTest extends TestCase
+{
     private $model;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->model = new Groups();
     }
 
@@ -17,7 +19,8 @@ class GroupsTest extends TestCase {
      * @covers ::getGroups
      * @covers ::setGroups
      */
-    public function testSetAndGetGroups() : void {
+    public function testSetAndGetGroups(): void
+    {
         $this->assertSame([], $this->model->getGroups());
         $this->assertSame($this->model, $this->model->setGroups(['group' => [], 'group2' => []]));
         $this->assertSame(['group' => [], 'group2' => []], $this->model->getGroups());
@@ -27,7 +30,8 @@ class GroupsTest extends TestCase {
      * @covers ::setHits
      * @covers ::getHits
      */
-    public function testCanSetAndGetHits() : void {
+    public function testCanSetAndGetHits(): void
+    {
         $this->assertNull($this->model->getHits());
         $this->assertSame($this->model, $this->model->setHits(10));
         $this->assertSame(10, $this->model->getHits());
@@ -37,7 +41,8 @@ class GroupsTest extends TestCase {
      * @covers ::setPage
      * @covers ::getPage
      */
-    public function testCanSetAndGetPage() : void {
+    public function testCanSetAndGetPage(): void
+    {
         $this->assertNull($this->model->getPage());
         $this->assertSame($this->model, $this->model->setPage(10));
         $this->assertSame(10, $this->model->getPage());
@@ -47,7 +52,8 @@ class GroupsTest extends TestCase {
      * @covers ::setLimit
      * @covers ::getLimit
      */
-    public function testCanSetAndGetLimit() : void {
+    public function testCanSetAndGetLimit(): void
+    {
         $this->assertNull($this->model->getLimit());
         $this->assertSame($this->model, $this->model->setLimit(10));
         $this->assertSame(10, $this->model->getLimit());
@@ -56,7 +62,8 @@ class GroupsTest extends TestCase {
     /**
      * @covers ::getCount
      */
-    public function testCanCountImages() : void {
+    public function testCanCountImages(): void
+    {
         $this->assertSame(0, $this->model->getCount());
         $this->assertSame($this->model, $this->model->setGroups(['group1' => [], 'group2' => []]));
         $this->assertSame(2, $this->model->getCount());
@@ -65,7 +72,8 @@ class GroupsTest extends TestCase {
     /**
      * @covers ::getData
      */
-    public function testGetData() : void {
+    public function testGetData(): void
+    {
         $this->model
             ->setGroups(['group' => [], 'group2' => []])
             ->setHits(10)

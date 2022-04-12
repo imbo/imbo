@@ -1,18 +1,21 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image\Transformation;
 
-use Imbo\Model\Image;
 use Imagick;
+use Imbo\Model\Image;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\MaxSize
  */
-class MaxSizeTest extends TransformationTests {
-    protected function getTransformation() : MaxSize {
+class MaxSizeTest extends TransformationTests
+{
+    protected function getTransformation(): MaxSize
+    {
         return new MaxSize();
     }
 
-    public function getMaxSizeParams() : array {
+    public function getMaxSizeParams(): array
+    {
         return [
             'landscape image with only width in params' => [
                 'file' => FIXTURES_DIR . '/image.png',
@@ -87,7 +90,8 @@ class MaxSizeTest extends TransformationTests {
      * @dataProvider getMaxSizeParams
      * @covers ::transform
      */
-    public function testCanTransformImages(string $file, array $params, int $width, int $height, ?int $transformedWidth, ?int $transformedHeight, ?bool $transformation = true) : void {
+    public function testCanTransformImages(string $file, array $params, int $width, int $height, ?int $transformedWidth, ?int $transformedHeight, ?bool $transformation = true): void
+    {
         $image = $this->createConfiguredMock(Image::class, [
             'getWidth' => $width,
             'getHeight' => $height,

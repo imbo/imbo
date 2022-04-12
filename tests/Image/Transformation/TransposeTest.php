@@ -7,15 +7,18 @@ use Imbo\Model\Image;
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Transpose
  */
-class TransposeTest extends TransformationTests {
-    protected function getTransformation() : Transpose {
+class TransposeTest extends TransformationTests
+{
+    protected function getTransformation(): Transpose
+    {
         return new Transpose();
     }
 
     /**
      * @covers ::transform
      */
-    public function testCanTransformImage() : void {
+    public function testCanTransformImage(): void
+    {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())

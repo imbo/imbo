@@ -10,14 +10,16 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 /**
  * @coversDefaultClass Imbo\EventListener\VarnishHashTwo
  */
-class VarnishHashTwoTest extends ListenerTests {
+class VarnishHashTwoTest extends ListenerTests
+{
     private $listener;
     private $event;
     private $request;
     private $response;
     private $responseHeaders;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->request = $this->createMock(Request::class);
 
         $this->responseHeaders = $this->createMock(ResponseHeaderBag::class);
@@ -32,14 +34,16 @@ class VarnishHashTwoTest extends ListenerTests {
         $this->listener = new VarnishHashTwo();
     }
 
-    protected function getListener() : VarnishHashTwo {
+    protected function getListener(): VarnishHashTwo
+    {
         return $this->listener;
     }
 
     /**
      * @covers ::addHeader
      */
-    public function testCanSendAHashTwoHeader() : void {
+    public function testCanSendAHashTwoHeader(): void
+    {
         $this->request
             ->expects($this->once())
             ->method('getUser')
@@ -69,7 +73,8 @@ class VarnishHashTwoTest extends ListenerTests {
      * @covers ::__construct
      * @covers ::addHeader
      */
-    public function testCanSpecifyACustomHeaderName() : void {
+    public function testCanSpecifyACustomHeaderName(): void
+    {
         $listener = new VarnishHashTwo(['headerName' => 'X-CustomHeader']);
 
         $this->request

@@ -1,18 +1,19 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
+use Imagick as I;
 use Imbo\EventManager\EventInterface;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Image\InputLoaderManager;
 use Imbo\Image\TransformationManager;
 use Imbo\Model\Image;
-use Imagick as I;
 
 /**
  * @coversDefaultClass Imbo\EventListener\Imagick
  */
-class ImagickTest extends ListenerTests {
+class ImagickTest extends ListenerTests
+{
     private $listener;
     private $request;
     private $response;
@@ -20,7 +21,8 @@ class ImagickTest extends ListenerTests {
     private $transformationManager;
     private $inputLoaderManager;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
         $this->transformationManager = $this->createMock(TransformationManager::class);
@@ -35,7 +37,8 @@ class ImagickTest extends ListenerTests {
         $this->listener = new Imagick();
     }
 
-    protected function getListener() : Imagick {
+    protected function getListener(): Imagick
+    {
         return $this->listener;
     }
 
@@ -43,10 +46,11 @@ class ImagickTest extends ListenerTests {
      * @covers ::readImageBlob
      * @covers ::setImagick
      */
-    public function testFetchesImageFromRequest() : void {
+    public function testFetchesImageFromRequest(): void
+    {
         $image = $this->createConfiguredMock(Image::class, [
             'getBlob' => 'image',
-            'getMimeType' => 'image/jpeg'
+            'getMimeType' => 'image/jpeg',
         ]);
 
         $this->request
@@ -70,7 +74,7 @@ class ImagickTest extends ListenerTests {
             ->willReturn([
                 'optimizations' => [
                     'jpegSizeHint' => false,
-                ]
+                ],
             ]);
 
         $this->listener->readImageBlob($this->event);
@@ -80,7 +84,8 @@ class ImagickTest extends ListenerTests {
      * @covers ::readImageBlob
      * @covers ::setImagick
      */
-    public function testFetchesImageFromResponse() : void {
+    public function testFetchesImageFromResponse(): void
+    {
         $image = $this->createConfiguredMock(Image::class, [
             'getBlob' => 'image',
             'getMimeType' => 'image/jpeg',
@@ -107,7 +112,7 @@ class ImagickTest extends ListenerTests {
             ->willReturn([
                 'optimizations' => [
                     'jpegSizeHint' => false,
-                ]
+                ],
             ]);
 
         $this->listener->readImageBlob($this->event);
@@ -117,10 +122,11 @@ class ImagickTest extends ListenerTests {
      * @covers ::readImageBlob
      * @covers ::setImagick
      */
-    public function testFetchesImageFromEvent() : void {
+    public function testFetchesImageFromEvent(): void
+    {
         $image = $this->createConfiguredMock(Image::class, [
             'getBlob' => 'image',
-            'getMimeType' => 'image/png'
+            'getMimeType' => 'image/png',
         ]);
 
         $this->event
@@ -150,13 +156,14 @@ class ImagickTest extends ListenerTests {
             ->willReturn([
                 'optimizations' => [
                     'jpegSizeHint' => false,
-                ]
+                ],
             ]);
 
         $this->listener->readImageBlob($this->event);
     }
 
-    public function hasImageBeenTransformed() : array {
+    public function hasImageBeenTransformed(): array
+    {
         return [
             'has been transformed' => [true],
             'has not been transformed' => [false],
@@ -168,9 +175,10 @@ class ImagickTest extends ListenerTests {
      * @covers ::updateModelBeforeStoring
      * @covers ::setImagick
      */
-    public function testUpdatesModelBeforeStoring(bool $hasBeenTransformed) : void {
+    public function testUpdatesModelBeforeStoring(bool $hasBeenTransformed): void
+    {
         $image = $this->createConfiguredMock(Image::class, [
-            'getHasBeenTransformed' => $hasBeenTransformed
+            'getHasBeenTransformed' => $hasBeenTransformed,
         ]);
 
         $imagick = $this->createMock(I::class);
@@ -208,7 +216,8 @@ class ImagickTest extends ListenerTests {
      * @covers ::updateModel
      * @covers ::setImagick
      */
-    public function testUpdatesModelBeforeSendingResponse(bool $hasBeenTransformed) : void {
+    public function testUpdatesModelBeforeSendingResponse(bool $hasBeenTransformed): void
+    {
         $image = $this->createConfiguredMock(Image::class, [
             'getHasBeenTransformed' => $hasBeenTransformed,
         ]);
@@ -247,7 +256,8 @@ class ImagickTest extends ListenerTests {
     /**
      * @covers ::readImageBlob
      */
-    public function testCanOptimizeImage() : void {
+    public function testCanOptimizeImage(): void
+    {
         $this->event
             ->expects($this->once())
             ->method('getName')
@@ -260,7 +270,7 @@ class ImagickTest extends ListenerTests {
             ->method('setArgument')
             ->withConsecutive(
                 ['ratio', 4],
-                ['transformationIndex', 0]
+                ['transformationIndex', 0],
             );
 
         $this->transformationManager

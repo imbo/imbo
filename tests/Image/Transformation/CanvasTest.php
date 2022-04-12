@@ -7,12 +7,15 @@ use Imbo\Model\Image;
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Canvas
  */
-class CanvasTest extends TransformationTests {
-    protected function getTransformation() : Canvas {
+class CanvasTest extends TransformationTests
+{
+    protected function getTransformation(): Canvas
+    {
         return new Canvas();
     }
 
-    public function getCanvasParameters() : array {
+    public function getCanvasParameters(): array
+    {
         return [
             // free mode with only width
             [1000, null, 'free', 1000, 463],
@@ -52,7 +55,8 @@ class CanvasTest extends TransformationTests {
      * @dataProvider getCanvasParameters
      * @covers ::transform
      */
-    public function testTransformWithDifferentParameters(?int $width, ?int $height, string $mode, int $resultingWidth, int $resultingHeight) : void {
+    public function testTransformWithDifferentParameters(?int $width, ?int $height, string $mode, int $resultingWidth, int $resultingHeight): void
+    {
         $blob = file_get_contents(FIXTURES_DIR . '/image.png');
 
         $image = $this->createConfiguredMock(Image::class, [

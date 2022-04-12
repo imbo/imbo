@@ -6,10 +6,12 @@ use PHPUnit\Framework\TestCase;
 /**
  * @coversDefaultClass Imbo\Model\ArrayModel
  */
-class ArrayModelTest extends TestCase {
+class ArrayModelTest extends TestCase
+{
     private $model;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->model = new ArrayModel();
     }
 
@@ -17,7 +19,8 @@ class ArrayModelTest extends TestCase {
      * @covers ::getData
      * @covers ::setData
      */
-    public function testCanSetAndGetData() : void {
+    public function testCanSetAndGetData(): void
+    {
         $this->assertSame([], $this->model->getData());
         $this->assertSame($this->model, $this->model->setData(['key' => 'value']));
         $this->assertSame(['key' => 'value'], $this->model->getData());
@@ -27,7 +30,8 @@ class ArrayModelTest extends TestCase {
      * @covers ::setTitle
      * @covers ::getTitle
      */
-    public function testCanSetAndGetTitle() : void {
+    public function testCanSetAndGetTitle(): void
+    {
         $this->assertNull($this->model->getTitle());
         $this->assertSame($this->model, $this->model->setTitle('title'));
         $this->assertSame('title', $this->model->getTitle());

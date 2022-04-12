@@ -1,17 +1,18 @@
 <?php declare(strict_types=1);
 namespace Imbo\Resource;
 
-use Imbo\Http\Request\Request;
-use Imbo\Http\Response\Response;
 use Imbo\Database\DatabaseInterface;
-use Imbo\Storage\StorageInterface;
 use Imbo\EventManager\EventInterface;
 use Imbo\EventManager\EventManager;
+use Imbo\Http\Request\Request;
+use Imbo\Http\Response\Response;
+use Imbo\Storage\StorageInterface;
 
 /**
  * @coversDefaultClass Imbo\Resource\User
  */
-class UserTest extends ResourceTests {
+class UserTest extends ResourceTests
+{
     private $resource;
     private $request;
     private $response;
@@ -19,11 +20,13 @@ class UserTest extends ResourceTests {
     private $storage;
     private $event;
 
-    protected function getNewResource() : User {
+    protected function getNewResource(): User
+    {
         return new User();
     }
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);
@@ -41,14 +44,15 @@ class UserTest extends ResourceTests {
     /**
      * @covers ::get
      */
-    public function testSupportsHttpGet() : void {
+    public function testSupportsHttpGet(): void
+    {
         $manager = $this->createMock(EventManager::class);
         $manager
             ->expects($this->once())
             ->method('trigger')
             ->with('db.user.load');
 
-            $this->event
+        $this->event
             ->expects($this->once())
             ->method('getManager')
             ->willReturn($manager);

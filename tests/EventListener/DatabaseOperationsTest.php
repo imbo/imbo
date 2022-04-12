@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
-use Imbo\EventListener\DatabaseOperations;
 use DateTime;
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
 use Imbo\Database\DatabaseInterface;
@@ -19,7 +18,8 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 /**
  * @coversDefaultClass Imbo\EventListener\DatabaseOperations
  */
-class DatabaseOperationsTest extends ListenerTests {
+class DatabaseOperationsTest extends ListenerTests
+{
     private $listener;
     private $event;
     private $request;
@@ -30,7 +30,8 @@ class DatabaseOperationsTest extends ListenerTests {
     private $image;
     private $accessControl;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->response = $this->createMock(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);
         $this->accessControl = $this->createMock(AdapterInterface::class);
@@ -50,14 +51,16 @@ class DatabaseOperationsTest extends ListenerTests {
         $this->listener = new DatabaseOperations();
     }
 
-    protected function getListener() : DatabaseOperations {
+    protected function getListener(): DatabaseOperations
+    {
         return $this->listener;
     }
 
     /**
      * @covers ::insertImage
      */
-    public function testCanInsertImage() : void {
+    public function testCanInsertImage(): void
+    {
         $this->image
             ->expects($this->once())
             ->method('getImageIdentifier')
@@ -78,7 +81,8 @@ class DatabaseOperationsTest extends ListenerTests {
     /**
      * @covers ::deleteImage
      */
-    public function testCanDeleteImage() : void {
+    public function testCanDeleteImage(): void
+    {
         $this->database
             ->expects($this->once())
             ->method('deleteImage')
@@ -90,13 +94,14 @@ class DatabaseOperationsTest extends ListenerTests {
     /**
      * @covers ::loadImage
      */
-    public function testCanLoadImage() : void {
+    public function testCanLoadImage(): void
+    {
         $this->response
             ->expects($this->any())
             ->method('getModel')
             ->willReturn($this->image);
 
-            $this->database
+        $this->database
             ->expects($this->once())
             ->method('load')
             ->with($this->user, $this->imageIdentifier, $this->image);
@@ -107,7 +112,8 @@ class DatabaseOperationsTest extends ListenerTests {
     /**
      * @covers ::deleteMetadata
      */
-    public function testCanDeleteMetadata() : void {
+    public function testCanDeleteMetadata(): void
+    {
         $this->database
             ->expects($this->once())
             ->method('deleteMetadata')
@@ -124,7 +130,8 @@ class DatabaseOperationsTest extends ListenerTests {
     /**
      * @covers ::updateMetadata
      */
-    public function testCanUpdateMetadata() : void {
+    public function testCanUpdateMetadata(): void
+    {
         $this->event
             ->expects($this->once())
             ->method('getArgument')
@@ -147,7 +154,8 @@ class DatabaseOperationsTest extends ListenerTests {
     /**
      * @covers ::loadMetadata
      */
-    public function testCanLoadMetadata() : void {
+    public function testCanLoadMetadata(): void
+    {
         $date = new DateTime();
         $this->database
             ->expects($this->once())
@@ -178,7 +186,8 @@ class DatabaseOperationsTest extends ListenerTests {
     /**
      * @covers ::loadImages
      */
-    public function testCanLoadImages() : void {
+    public function testCanLoadImages(): void
+    {
         $images = [
             [
                 'added' => new DateTime(),
@@ -299,7 +308,8 @@ class DatabaseOperationsTest extends ListenerTests {
     /**
      * @covers ::loadUser
      */
-    public function testCanLoadUser() : void {
+    public function testCanLoadUser(): void
+    {
         $date = new DateTime();
         $this->database
             ->expects($this->once())
@@ -330,7 +340,8 @@ class DatabaseOperationsTest extends ListenerTests {
     /**
      * @covers ::loadStats
      */
-    public function testCanLoadStats() : void {
+    public function testCanLoadStats(): void
+    {
         $this->database
             ->method('getNumImages')
             ->willReturnOnConsecutiveCalls(1, 2);
@@ -352,7 +363,8 @@ class DatabaseOperationsTest extends ListenerTests {
      * @covers ::getImagesQuery
      * @covers ::setImagesQuery
      */
-    public function testCanCreateItsOwnImagesQuery() : void {
+    public function testCanCreateItsOwnImagesQuery(): void
+    {
         $this->assertInstanceOf(Query::class, $this->listener->getImagesQuery());
 
         $query = $this->createMock(Query::class);

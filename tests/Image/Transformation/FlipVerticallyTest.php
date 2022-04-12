@@ -7,15 +7,18 @@ use Imbo\Model\Image;
 /**
  * @coversDefaultClass Imbo\Image\Transformation\FlipVertically
  */
-class FlipVerticallyTest extends TransformationTests {
-    protected function getTransformation() : FlipVertically {
+class FlipVerticallyTest extends TransformationTests
+{
+    protected function getTransformation(): FlipVertically
+    {
         return new FlipVertically();
     }
 
     /**
      * @covers ::transform
      */
-    public function testCanFlipTheImage() : void {
+    public function testCanFlipTheImage(): void
+    {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())

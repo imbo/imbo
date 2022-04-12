@@ -7,15 +7,18 @@ use Imbo\Model\Image;
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Vignette
  */
-class VignetteTest extends TransformationTests {
-    protected function getTransformation() : Vignette {
+class VignetteTest extends TransformationTests
+{
+    protected function getTransformation(): Vignette
+    {
         return new Vignette();
     }
 
     /**
      * @covers ::transform
      */
-    public function testCanVignetteImages() : void {
+    public function testCanVignetteImages(): void
+    {
         $image = $this->createConfiguredMock(Image::class, [
             'getWidth' => 640,
             'getHeight' => 480,

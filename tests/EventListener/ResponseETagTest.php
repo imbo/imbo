@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
-use Imbo\EventListener\ResponseETag;
 use Imbo\EventManager\EventInterface;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
@@ -10,18 +9,22 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 /**
  * @coversDefaultClass Imbo\EventListener\ResponseETag
  */
-class ResponseETagTest extends ListenerTests {
+class ResponseETagTest extends ListenerTests
+{
     private $listener;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->listener = new ResponseETag();
     }
 
-    protected function getListener() : ResponseETag {
+    protected function getListener(): ResponseETag
+    {
         return $this->listener;
     }
 
-    public function getTaintedHeaders() : array {
+    public function getTaintedHeaders(): array
+    {
         return [
             'non-tainted' => ['"be7d5bb2f29494c0a1c95c81e8ae8b99"', '"be7d5bb2f29494c0a1c95c81e8ae8b99"', false],
             'tainted' => ['"be7d5bb2f29494c0a1c95c81e8ae8b99-gzip"', '"be7d5bb2f29494c0a1c95c81e8ae8b99"', true],
@@ -32,7 +35,8 @@ class ResponseETagTest extends ListenerTests {
      * @dataProvider getTaintedHeaders
      * @covers ::fixIfNoneMatchHeader
      */
-    public function testCanFixATaintedInNoneMatchHeader(string $incoming, string $real, bool $willFix) : void {
+    public function testCanFixATaintedInNoneMatchHeader(string $incoming, string $real, bool $willFix): void
+    {
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
             ->expects($this->once())
@@ -63,7 +67,8 @@ class ResponseETagTest extends ListenerTests {
         $this->listener->fixIfNoneMatchHeader($event);
     }
 
-    public function getRoutesForETags() : array {
+    public function getRoutesForETags(): array
+    {
         return [
             'index route has no ETag' => ['index', false],
             'stats route has no ETag' => ['stats', false],
@@ -81,7 +86,8 @@ class ResponseETagTest extends ListenerTests {
      * @dataProvider getRoutesForETags
      * @covers ::setETag
      */
-    public function testWillSetETagForSomeRoutes(string $route, bool $hasETag, bool $isOk = false, string $content = null) : void {
+    public function testWillSetETagForSomeRoutes(string $route, bool $hasETag, bool $isOk = false, string $content = null): void
+    {
         $request = $this->createMock(Request::class);
         $request
             ->expects($this->once())

@@ -1,20 +1,22 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventListener\Initializer;
 
-use Imbo\EventListener\Initializer\Imagick as ImagickInitializer;
+use Imagick;
 use Imbo\EventListener\Imagick as ImagickEventListener;
+use Imbo\EventListener\Initializer\Imagick as ImagickInitializer;
 use Imbo\Image\Transformation\Border;
 use PHPUnit\Framework\TestCase;
-use Imagick;
 
 /**
  * @coversDefaultClass Imbo\EventListener\Initializer\Imagick
  */
-class ImagickTest extends TestCase {
+class ImagickTest extends TestCase
+{
     /**
      * @covers ::initialize
      */
-    public function testInjectsImagickIntoEventListeners() : void {
+    public function testInjectsImagickIntoEventListeners(): void
+    {
         $imagick = $this->createMock(Imagick::class);
 
         $listener = $this->createMock(ImagickEventListener::class);
@@ -30,7 +32,8 @@ class ImagickTest extends TestCase {
      * @covers ::__construct
      * @covers ::initialize
      */
-    public function testCanCreateAnImagickInstanceByItself() : void {
+    public function testCanCreateAnImagickInstanceByItself(): void
+    {
         $listener = $this->createMock(Border::class);
         $listener
             ->expects($this->once())

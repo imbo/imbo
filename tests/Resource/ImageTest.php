@@ -14,7 +14,8 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 /**
  * @coversDefaultClass Imbo\Resource\Image
  */
-class ImageTest extends ResourceTests {
+class ImageTest extends ResourceTests
+{
     private $resource;
     private $request;
     private $response;
@@ -23,11 +24,13 @@ class ImageTest extends ResourceTests {
     private $manager;
     private $event;
 
-    protected function getNewResource() : Image {
+    protected function getNewResource(): Image
+    {
         return new Image();
     }
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);
@@ -47,7 +50,8 @@ class ImageTest extends ResourceTests {
     /**
      * @covers ::deleteImage
      */
-    public function testSupportsHttpDelete() : void {
+    public function testSupportsHttpDelete(): void
+    {
         $this->manager
             ->method('trigger')
             ->withConsecutive(
@@ -71,7 +75,8 @@ class ImageTest extends ResourceTests {
     /**
      * @covers ::getImage
      */
-    public function testSupportsHttpGet() : void {
+    public function testSupportsHttpGet(): void
+    {
         $user = 'christer';
         $imageIdentifier = 'imageIdentifier';
 
@@ -109,14 +114,14 @@ class ImageTest extends ResourceTests {
         $responseHeaders
             ->expects($this->once())
             ->method('add')
-            ->with($this->callback(function(array $headers) : bool {
+            ->with($this->callback(function (array $headers): bool {
                 return
                     array_key_exists('X-Imbo-OriginalMimeType', $headers)
                     && array_key_exists('X-Imbo-OriginalWidth', $headers)
                     && array_key_exists('X-Imbo-OriginalHeight', $headers)
                     && array_key_exists('X-Imbo-OriginalFileSize', $headers)
                     && array_key_exists('X-Imbo-OriginalExtension', $headers);
-        }));
+            }));
 
         $this->resource->getImage($this->event);
     }

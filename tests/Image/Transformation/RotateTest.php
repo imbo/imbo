@@ -7,12 +7,15 @@ use Imbo\Model\Image;
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Rotate
  */
-class RotateTest extends TransformationTests {
-    protected function getTransformation() : Rotate {
+class RotateTest extends TransformationTests
+{
+    protected function getTransformation(): Rotate
+    {
         return new Rotate();
     }
 
-    public function getRotateParams() : array {
+    public function getRotateParams(): array
+    {
         return [
             '90 angle' => [90, 463, 665],
             '180 angle' => [180, 665, 463],
@@ -23,7 +26,8 @@ class RotateTest extends TransformationTests {
      * @dataProvider getRotateParams
      * @covers ::transform
      */
-    public function testCanTransformImage(int $angle, int $width, int $height) : void {
+    public function testCanTransformImage(int $angle, int $width, int $height): void
+    {
         $image = $this->createMock(Image::class);
 
         $image

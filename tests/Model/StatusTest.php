@@ -1,16 +1,18 @@
 <?php declare(strict_types=1);
 namespace Imbo\Model;
 
-use PHPUnit\Framework\TestCase;
 use DateTime;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\Model\Status
  */
-class StatusTest extends TestCase {
+class StatusTest extends TestCase
+{
     private $model;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->model = new Status();
     }
 
@@ -18,7 +20,8 @@ class StatusTest extends TestCase {
      * @covers ::getDate
      * @covers ::setDate
      */
-    public function testCanSetAndGetDate() : void {
+    public function testCanSetAndGetDate(): void
+    {
         $date = new DateTime();
 
         $this->assertNull($this->model->getDate());
@@ -30,7 +33,8 @@ class StatusTest extends TestCase {
      * @covers ::getDatabaseStatus
      * @covers ::setDatabaseStatus
      */
-    public function testCanSetAndGetDatabaseStatus() : void {
+    public function testCanSetAndGetDatabaseStatus(): void
+    {
         $this->assertNull($this->model->getDatabaseStatus());
         $this->assertSame($this->model, $this->model->setDatabaseStatus(true));
         $this->assertTrue($this->model->getDatabaseStatus());
@@ -40,7 +44,8 @@ class StatusTest extends TestCase {
      * @covers ::getStorageStatus
      * @covers ::setStorageStatus
      */
-    public function testCanSetAndGetStorageStatus() : void {
+    public function testCanSetAndGetStorageStatus(): void
+    {
         $this->assertNull($this->model->getStorageStatus());
         $this->assertSame($this->model, $this->model->setStorageStatus(true));
         $this->assertTrue($this->model->getStorageStatus());
@@ -49,7 +54,8 @@ class StatusTest extends TestCase {
     /**
      * @covers ::getData
      */
-    public function testGetData() : void {
+    public function testGetData(): void
+    {
         $date = new DateTime();
 
         $this->model

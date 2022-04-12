@@ -3,7 +3,8 @@ namespace Imbo\Resource;
 
 use PHPUnit\Framework\TestCase;
 
-abstract class ResourceTests extends TestCase {
+abstract class ResourceTests extends TestCase
+{
     /**
      * Return a resource that can be tested
      *
@@ -14,7 +15,8 @@ abstract class ResourceTests extends TestCase {
     /**
      * @covers ::getSubscribedEvents
      */
-    public function testReturnsCorrectEventSubscriptions() : void {
+    public function testReturnsCorrectEventSubscriptions(): void
+    {
         $this->assertIsArray($this->getNewResource()::getSubscribedEvents());
     }
 
@@ -22,7 +24,8 @@ abstract class ResourceTests extends TestCase {
      * @covers ::getSubscribedEvents
      * @covers ::getAllowedMethods
      */
-    public function testReturnsTheCorrectAllowedMethods() : void {
+    public function testReturnsTheCorrectAllowedMethods(): void
+    {
         $resource = $this->getNewResource();
 
         // Translate the class name to an event name: Imbo\Resource\GlobalShortUrl => globalshorturl
@@ -45,7 +48,7 @@ abstract class ResourceTests extends TestCase {
             $this->fail(sprintf(
                 'Resource allows %s, but no listener definition subscribes to %s',
                 $method,
-                $expectedEventName
+                $expectedEventName,
             ));
         }
 
@@ -65,7 +68,7 @@ abstract class ResourceTests extends TestCase {
             $this->fail(sprintf(
                 'Resource subscribes to %s but does not allow %s',
                 $event,
-                $expectedMethod
+                $expectedMethod,
             ));
         }
     }

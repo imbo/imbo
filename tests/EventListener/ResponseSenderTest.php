@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
-use Imbo\EventListener\ResponseSender;
 use Imbo\EventManager\EventInterface;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
@@ -11,21 +10,25 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 /**
  * @coversDefaultClass Imbo\EventListener\ResponseSender
  */
-class ResponseSenderTest extends ListenerTests {
+class ResponseSenderTest extends ListenerTests
+{
     private $listener;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->listener = new ResponseSender();
     }
 
-    protected function getListener() : ResponseSender {
+    protected function getListener(): ResponseSender
+    {
         return $this->listener;
     }
 
     /**
      * @covers ::send
      */
-    public function testCanSendTheResponse() : void {
+    public function testCanSendTheResponse(): void
+    {
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -65,7 +68,8 @@ class ResponseSenderTest extends ListenerTests {
     /**
      * @covers ::send
      */
-    public function testCanSendTheResponseAndInjectTheCorrectImageIdentifier() : void {
+    public function testCanSendTheResponseAndInjectTheCorrectImageIdentifier(): void
+    {
         $request = $this->createMock(Request::class);
         $request
             ->expects($this->once())

@@ -2,17 +2,19 @@
 namespace Imbo\CliCommand;
 
 use Imbo\Exception\RuntimeException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass Imbo\CliCommand\GeneratePrivateKey
  */
-class GeneratePrivateKeyTest extends TestCase {
+class GeneratePrivateKeyTest extends TestCase
+{
     private $command;
 
-    public function setUp() : void {
+    public function setUp(): void
+    {
         $this->command = new GeneratePrivateKey();
 
         $application = new Application();
@@ -24,7 +26,8 @@ class GeneratePrivateKeyTest extends TestCase {
      * @covers ::generate
      * @covers ::__construct
      */
-    public function testCanGenerateAPrivateKey() : void {
+    public function testCanGenerateAPrivateKey(): void
+    {
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(['command' => $this->command->getName()]);
 
@@ -36,7 +39,8 @@ class GeneratePrivateKeyTest extends TestCase {
      * @covers ::generate
      * @covers ::__construct
      */
-    public function testFailsWhenItCantGenerateAPrivateKey() : void {
+    public function testFailsWhenItCantGenerateAPrivateKey(): void
+    {
         $this->command->maxTries = 0;
         $commandTester = new CommandTester($this->command);
         $this->expectExceptionObject(new RuntimeException('Could not generate private key'));
