@@ -5,6 +5,7 @@ use Imagick;
 use Imbo\EventListener\ImagickAware;
 use Imbo\EventListener\ListenerInterface;
 use Imbo\EventManager\EventInterface;
+use Imbo\Exception\TransformationException;
 use Imbo\Model\Image;
 
 /**

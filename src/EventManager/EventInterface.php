@@ -3,6 +3,7 @@ namespace Imbo\EventManager;
 
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
 use Imbo\Database\DatabaseInterface;
+use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Image\InputLoaderManager;
