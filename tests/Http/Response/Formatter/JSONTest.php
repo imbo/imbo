@@ -12,7 +12,6 @@ use Imbo\Model\Group;
 use Imbo\Model\Groups;
 use Imbo\Model\Image;
 use Imbo\Model\Images;
-use Imbo\Model\ListModel;
 use Imbo\Model\Metadata;
 use Imbo\Model\Stats;
 use Imbo\Model\Status;
@@ -411,38 +410,6 @@ class JSONTest extends TestCase
 
         $data = json_decode($json, true);
         $this->assertSame([], $data);
-    }
-
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatListModel
-     */
-    public function testCanFormatAListModel(): void
-    {
-        $list = [1, 2, 3];
-        $container = 'foo';
-        $model = $this->createConfiguredMock(ListModel::class, [
-            'getList' => $list,
-            'getContainer' => $container,
-        ]);
-
-        $this->assertSame('{"foo":[1,2,3]}', $this->formatter->format($model));
-    }
-
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatListModel
-     */
-    public function testCanFormatAnEmptyListModel(): void
-    {
-        $list = [];
-        $container = 'foo';
-        $model = $this->createConfiguredMock(ListModel::class, [
-            'getList' => $list,
-            'getContainer' => $container,
-        ]);
-
-        $this->assertSame('{"foo":[]}', $this->formatter->format($model));
     }
 
     /**

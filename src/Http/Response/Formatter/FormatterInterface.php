@@ -90,14 +90,6 @@ interface FormatterInterface {
     function formatArrayModel(Model\ArrayModel $model);
 
     /**
-     * Format a list model
-     *
-     * @param Model\ListModel $model The model to format
-     * @return string Formatted data
-     */
-    function formatListModel(Model\ListModel $model);
-
-    /**
      * Format a stats model
      *
      * @param Model\Stats $model The model to format

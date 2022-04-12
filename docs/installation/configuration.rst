@@ -1052,7 +1052,7 @@ Below is an example implementation of the ``ImboUsers`` resource used in the abo
     <?php
     use Imbo\Resource\ResourceInterface,
         Imbo\EventManager\EventInterface,
-        Imbo\Model\ListModel;
+        Imbo\Model\ArrayModel;
 
     class ImboUsers implements ResourceInterface {
         public function getAllowedMethods() {
@@ -1066,9 +1066,9 @@ Below is an example implementation of the ``ImboUsers`` resource used in the abo
         }
 
         public function get(EventInterface $event) {
-            $event->getResponse()->setModel(
-                new ListModel('users', ['someuser', 'someotheruser']
-            );
+            $model = new ArrayModel();
+            $model->setData(['users' => ['someuser', 'someotheruser']]);
+            $event->getResponse()->setModel($model);
         }
     }
 

@@ -41,8 +41,6 @@ abstract class Formatter implements FormatterInterface
             return $this->formatAccessRules($model);
         } elseif ($model instanceof Model\ArrayModel) {
             return $this->formatArrayModel($model);
-        } elseif ($model instanceof Model\ListModel) {
-            return $this->formatListModel($model);
         } elseif ($model instanceof Model\Stats) {
             return $this->formatStats($model);
         }

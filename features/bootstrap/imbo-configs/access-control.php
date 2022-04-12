@@ -4,7 +4,7 @@ namespace Imbo\Behat;
 use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
 use Imbo\EventListener\AccessControl;
 use Imbo\EventManager\EventInterface;
-use Imbo\Model\ListModel;
+use Imbo\Model\ArrayModel;
 use Imbo\Resource;
 use Imbo\Resource\ResourceInterface;
 
@@ -24,7 +24,7 @@ class Foobar implements ResourceInterface
 
     public function get(EventInterface $event): void
     {
-        $event->getResponse()->setModel(new ListModel('foo', [1, 2, 3]));
+        $event->getResponse()->setModel((new ArrayModel())->setData(['foo' => [1, 2, 3]]));
     }
 }
 
