@@ -149,9 +149,9 @@ class FeatureContext extends ApiContext
         if (!class_exists($database)) {
             throw new InvalidArgumentException(
                 sprintf(
-                'Database test class "%s" does not exist.',
-                $database,
-            ),
+                    'Database test class "%s" does not exist.',
+                    $database,
+                ),
             );
         } elseif (!class_exists($storage)) {
             throw new InvalidArgumentException(sprintf(
@@ -1685,10 +1685,10 @@ class FeatureContext extends ApiContext
         if (count($this->history) < $num) {
             throw new RuntimeException(
                 sprintf(
-                'Not enough transactions in the history. Needs at least %d, actual: %d.',
-                $num,
-                count($this->history),
-            ),
+                    'Not enough transactions in the history. Needs at least %d, actual: %d.',
+                    $num,
+                    count($this->history),
+                ),
             );
         }
 
