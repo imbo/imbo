@@ -2,7 +2,7 @@ name: CI build
 on: push
 jobs:
   unit-tests:
-    name: Unit tests
+    name: Unit tests and QA
     strategy:
       matrix:
         operating-system: ['ubuntu-20.04']
@@ -25,6 +25,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
+          tools: php-cs-fixer
           extensions: imagick
 
       - uses: actions/checkout@v2
@@ -45,6 +46,9 @@ jobs:
 
       - name: Install dependencies
         run: composer install
+
+      - name: Check coding standard
+        run: php-cs-fixer fix --dry-run --diff
 
       - name: Run unit tests using PHPUnit
         run: vendor/bin/phpunit --verbose
