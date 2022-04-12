@@ -3,13 +3,14 @@ namespace Imbo\Model;
 
 use DateTime;
 
-class Image implements ModelInterface {
+class Image implements ModelInterface
+{
     /**
      * Mapping for some mime types
      *
-     * @var array<string, string>
+     * @var array<string,string>
      */
-    static public array $mimeTypeMapping = [
+    public static array $mimeTypeMapping = [
         'image/x-png'  => 'image/png',
         'image/x-jpeg' => 'image/jpeg',
         'image/x-gif'  => 'image/gif',
@@ -97,7 +98,8 @@ class Image implements ModelInterface {
      *
      * @return ?int
      */
-    public function getFilesize() : ?int {
+    public function getFilesize(): ?int
+    {
         return $this->filesize ?? null;
     }
 
@@ -107,7 +109,8 @@ class Image implements ModelInterface {
      * @param int $size The size of the image
      * @return self
      */
-    public function setFilesize(int $size) : self {
+    public function setFilesize(int $size): self
+    {
         $this->filesize = $size;
 
         return $this;
@@ -118,7 +121,8 @@ class Image implements ModelInterface {
      *
      * @return ?string
      */
-    public function getMimeType() : ?string {
+    public function getMimeType(): ?string
+    {
         return $this->mimeType ?? null;
     }
 
@@ -128,7 +132,8 @@ class Image implements ModelInterface {
      * @param string $mimeType The mime type, for instance "image/png"
      * @return self
      */
-    public function setMimeType(string $mimeType) : self {
+    public function setMimeType(string $mimeType): self
+    {
         if (isset(self::$mimeTypeMapping[$mimeType])) {
             // The mime type has a mapping, use that instead
             $mimeType = self::$mimeTypeMapping[$mimeType];
@@ -144,7 +149,8 @@ class Image implements ModelInterface {
      *
      * @return ?string
      */
-    public function getExtension() : ?string {
+    public function getExtension(): ?string
+    {
         return $this->extension ?? null;
     }
 
@@ -154,7 +160,8 @@ class Image implements ModelInterface {
      * @param string $extension The file extension
      * @return self
      */
-    public function setExtension(string $extension) : self {
+    public function setExtension(string $extension): self
+    {
         $this->extension = $extension;
 
         return $this;
@@ -165,7 +172,8 @@ class Image implements ModelInterface {
      *
      * @return ?string
      */
-    public function getBlob() : ?string {
+    public function getBlob(): ?string
+    {
         return $this->blob ?? null;
     }
 
@@ -175,7 +183,8 @@ class Image implements ModelInterface {
      * @param string $blob The binary data to set
      * @return self
      */
-    public function setBlob(string $blob) : self {
+    public function setBlob(string $blob): self
+    {
         $this->blob = $blob;
         $this->setFilesize(strlen($blob));
         $this->setChecksum(md5($blob));
@@ -188,7 +197,8 @@ class Image implements ModelInterface {
      *
      * @return array
      */
-    public function getMetadata() : array {
+    public function getMetadata(): array
+    {
         return $this->metadata;
     }
 
@@ -198,7 +208,8 @@ class Image implements ModelInterface {
      * @param array $metadata An array with metadata
      * @return self
      */
-    public function setMetadata(array $metadata) : self {
+    public function setMetadata(array $metadata): self
+    {
         $this->metadata = $metadata;
 
         return $this;
@@ -209,7 +220,8 @@ class Image implements ModelInterface {
      *
      * @return ?int
      */
-    public function getWidth() : ?int {
+    public function getWidth(): ?int
+    {
         return $this->width ?? null;
     }
 
@@ -219,7 +231,8 @@ class Image implements ModelInterface {
      * @param int $width Width in pixels
      * @return Image
      */
-    public function setWidth(int $width) : Image {
+    public function setWidth(int $width): Image
+    {
         $this->width = $width;
 
         return $this;
@@ -230,7 +243,8 @@ class Image implements ModelInterface {
      *
      * @return ?int
      */
-    public function getHeight() : ?int {
+    public function getHeight(): ?int
+    {
         return $this->height ?? null;
     }
 
@@ -240,7 +254,8 @@ class Image implements ModelInterface {
      * @param int $height Height in pixels
      * @return self
      */
-    public function setHeight(int $height) : self {
+    public function setHeight(int $height): self
+    {
         $this->height = $height;
 
         return $this;
@@ -251,7 +266,8 @@ class Image implements ModelInterface {
      *
      * @return ?DateTime
      */
-    public function getAddedDate() : ?DateTime {
+    public function getAddedDate(): ?DateTime
+    {
         return $this->added ?? null;
     }
 
@@ -261,7 +277,8 @@ class Image implements ModelInterface {
      * @param DateTime $added When the image was added
      * @return self
      */
-    public function setAddedDate(DateTime $added) : self {
+    public function setAddedDate(DateTime $added): self
+    {
         $this->added = $added;
 
         return $this;
@@ -272,7 +289,8 @@ class Image implements ModelInterface {
      *
      * @return ?DateTime
      */
-    public function getUpdatedDate() : ?DateTime {
+    public function getUpdatedDate(): ?DateTime
+    {
         return $this->updated ?? null;
     }
 
@@ -282,7 +300,8 @@ class Image implements ModelInterface {
      * @param DateTime $updated When the image was updated
      * @return self
      */
-    public function setUpdatedDate(DateTime $updated) : self {
+    public function setUpdatedDate(DateTime $updated): self
+    {
         $this->updated = $updated;
 
         return $this;
@@ -293,7 +312,8 @@ class Image implements ModelInterface {
      *
      * @return ?string
      */
-    public function getUser() : ?string {
+    public function getUser(): ?string
+    {
         return $this->user ?? null;
     }
 
@@ -303,7 +323,8 @@ class Image implements ModelInterface {
      * @param string $user The user
      * @return self
      */
-    public function setUser(string $user) : self {
+    public function setUser(string $user): self
+    {
         $this->user = $user;
 
         return $this;
@@ -314,7 +335,8 @@ class Image implements ModelInterface {
      *
      * @return ?string
      */
-    public function getImageIdentifier() : ?string {
+    public function getImageIdentifier(): ?string
+    {
         return $this->imageIdentifier ?? null;
     }
 
@@ -324,7 +346,8 @@ class Image implements ModelInterface {
      * @param string $imageIdentifier The image identifier
      * @return self
      */
-    public function setImageIdentifier(string $imageIdentifier) : self {
+    public function setImageIdentifier(string $imageIdentifier): self
+    {
         $this->imageIdentifier = $imageIdentifier;
 
         return $this;
@@ -335,7 +358,8 @@ class Image implements ModelInterface {
      *
      * @return ?string
      */
-    public function getChecksum() : ?string {
+    public function getChecksum(): ?string
+    {
         return $this->checksum ?? null;
     }
 
@@ -345,7 +369,8 @@ class Image implements ModelInterface {
      * @param string $checksum The checksum to set
      * @return self
      */
-    public function setChecksum(string $checksum) : self {
+    public function setChecksum(string $checksum): self
+    {
         $this->checksum = $checksum;
 
         return $this;
@@ -356,7 +381,8 @@ class Image implements ModelInterface {
      *
      * @return ?string
      */
-    public function getOriginalChecksum() : ?string {
+    public function getOriginalChecksum(): ?string
+    {
         return $this->originalChecksum ?? null;
     }
 
@@ -366,7 +392,8 @@ class Image implements ModelInterface {
      * @param string $originalChecksum The original checksum to set
      * @return self
      */
-    public function setOriginalChecksum(string $checksum) : self {
+    public function setOriginalChecksum(string $checksum): self
+    {
         $this->originalChecksum = $checksum;
 
         return $this;
@@ -378,7 +405,8 @@ class Image implements ModelInterface {
      * @param bool $flag
      * @return self
      */
-    public function setHasBeenTransformed(bool $flag) : self {
+    public function setHasBeenTransformed(bool $flag): self
+    {
         $this->hasBeenTransformed = $flag;
 
         return $this;
@@ -389,7 +417,8 @@ class Image implements ModelInterface {
      *
      * @return bool
      */
-    public function getHasBeenTransformed() : bool {
+    public function getHasBeenTransformed(): bool
+    {
         return $this->hasBeenTransformed;
     }
 
@@ -398,7 +427,8 @@ class Image implements ModelInterface {
      *
      * @return ?int
      */
-    public function getOutputQualityCompression() : ?int {
+    public function getOutputQualityCompression(): ?int
+    {
         return $this->outputQualityCompression ?? null;
     }
 
@@ -409,7 +439,8 @@ class Image implements ModelInterface {
      * @param int $outputQualityCompression The requested compression or quality value
      * @return self
      */
-    public function setOutputQualityCompression(int $outputQualityCompression) : self {
+    public function setOutputQualityCompression(int $outputQualityCompression): self
+    {
         $this->outputQualityCompression = $outputQualityCompression;
 
         return $this;
@@ -418,7 +449,8 @@ class Image implements ModelInterface {
     /**
      * {@inheritdoc}
      */
-    public function getData() {
+    public function getData()
+    {
         return [
             'filesize'                 => $this->getFilesize(),
             'mimeType'                 => $this->getMimeType(),

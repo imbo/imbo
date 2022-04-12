@@ -58,7 +58,7 @@ class ResponseTest extends TestCase
 
         $error = $this->createConfiguredMock(Error::class, [
             'getHttpCode' => $code,
-            'getImboErrorCode' => $imboErrorCode,
+            'getImboErrorCode' => (int) $imboErrorCode,
             'getErrorMessage' => $message,
             'getDate' => $date,
         ]);

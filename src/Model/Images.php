@@ -1,70 +1,67 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Model;
 
-class Images implements ModelInterface {
+class Images implements ModelInterface
+{
     /**
      * An array of Image models
      *
-     * @var Image[]
+     * @var array<Image>
      */
-    private $images = [];
+    private array $images = [];
 
     /**
      * Which fields to display
      *
-     * @var string[]
+     * @var array<string>
      */
-    private $fields = [];
+    private array $fields = [];
 
     /**
      * Query hits
-     *
-     * @var int
      */
-    private $hits = 0;
+    private int $hits = 0;
 
     /**
      * Limit the number of images
-     *
-     * @var int
      */
-    private $limit = 20;
+    private int $limit = 20;
 
     /**
      * The page number
-     *
-     * @var int
      */
-    private $page = 1;
+    private int $page = 1;
 
     /**
      * Set the array of images
      *
-     * @param Image[] $images An array of Image models
-     * @return Images
+     * @param array<Image> $images An array of Image models
+     * @return self
      */
-    public function setImages(array $images) {
+    public function setImages(array $images): self
+    {
         $this->images = $images;
-
         return $this;
     }
 
     /**
      * Get the images
      *
-     * @return Image[]
+     * @return array<Image>
      */
-    public function getImages() {
+    public function getImages(): array
+    {
         return $this->images;
     }
 
     /**
      * Set the fields to display
      *
-     * @param string[]
+     * @param array<string>
      * @return self
      */
-    public function setFields(array $fields) {
+    public function setFields(array $fields): self
+    {
         $this->fields = $fields;
 
         return $this;
@@ -73,88 +70,77 @@ class Images implements ModelInterface {
     /**
      * Get the fields to display
      *
-     * @return string[]
+     * @return array<string>
      */
-    public function getFields() {
+    public function getFields(): array
+    {
         return $this->fields;
     }
 
     /**
      * Get the number of images
-     *
-     * @return int
      */
-    public function getCount() {
+    public function getCount(): int
+    {
         return count($this->images);
     }
 
     /**
      * Set the hits property
-     *
-     * @param int $hits The amount of query hits
-     * @return self
      */
-    public function setHits($hits) {
-        $this->hits = (int) $hits;
-
+    public function setHits(int $hits): self
+    {
+        $this->hits = $hits;
         return $this;
     }
 
     /**
      * Get the hits property
-     *
-     * @return int
      */
-    public function getHits() {
+    public function getHits(): int
+    {
         return $this->hits;
     }
 
     /**
      * Set the limit
-     *
-     * @param int $limit The limit
-     * @return self
      */
-    public function setLimit($limit) {
-        $this->limit = (int) $limit;
-
+    public function setLimit(int $limit): self
+    {
+        $this->limit = $limit;
         return $this;
     }
 
     /**
      * Get the limit
-     *
-     * @return int
      */
-    public function getLimit() {
+    public function getLimit(): int
+    {
         return $this->limit;
     }
 
     /**
      * Set the page
-     *
-     * @param int $page The page
-     * @return self
      */
-    public function setPage($page) {
-        $this->page = (int) $page;
-
+    public function setPage(int $page): self
+    {
+        $this->page = $page;
         return $this;
     }
 
     /**
      * Get the page
-     *
-     * @return int
      */
-    public function getPage() {
+    public function getPage(): int
+    {
         return $this->page;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array{images:array<Image>,fields:array<string>,count:int,hits:int,limit:int,page:int}
      */
-    public function getData() {
+    public function getData()
+    {
         return [
             'images' => $this->getImages(),
             'fields' => $this->getFields(),

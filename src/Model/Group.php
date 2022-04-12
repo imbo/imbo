@@ -1,67 +1,63 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Model;
 
-class Group implements ModelInterface {
+class Group implements ModelInterface
+{
     /**
      * Name of the group
-     *
-     * @var string
      */
-    private $name;
+    private ?string $name = null;
 
     /**
      * Resources
      *
-     * @var string[]
+     * @var array<string>
      */
-    private $resources = [];
+    private array $resources = [];
 
     /**
      * Set the group name
-     *
-     * @param string $name The name of the group
-     * @return self
      */
-    public function setName($name) {
+    public function setName(string $name): self
+    {
         $this->name = $name;
-
         return $this;
     }
 
     /**
      * Get the group name
-     *
-     * @return string
      */
-    public function getName() {
+    public function getName(): ?string
+    {
         return $this->name;
     }
 
     /**
      * Set the group resources
      *
-     * @param string[] $resources
-     * @return self
+     * @param array<string> $resources
      */
-    public function setResources(array $resources = []) {
+    public function setResources(array $resources = []): self
+    {
         $this->resources = $resources;
-
         return $this;
     }
 
     /**
      * Get the group resources
      *
-     * @return string[]
+     * @return array<string>
      */
-    public function getResources() {
+    public function getResources(): array
+    {
         return $this->resources;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array{name:?string,resources:array<string>}
      */
-    public function getData() {
+    public function getData(): array
+    {
         return [
             'name' => $this->getName(),
             'resources' => $this->getResources(),

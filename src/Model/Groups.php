@@ -1,132 +1,115 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Model;
 
-class Groups implements ModelInterface {
+class Groups implements ModelInterface
+{
     /**
      * An array of groups
      *
-     * @var array
+     * @var array<string,mixed>
      */
-    private $groups = [];
+    private array $groups = [];
 
     /**
      * Query hits
-     *
-     * @var int
      */
-    private $hits;
+    private ?int $hits = null;
 
     /**
      * Limit the number of groups
-     *
-     * @var int
      */
-    private $limit;
+    private ?int $limit = null;
 
     /**
      * The page number
-     *
-     * @var int
      */
-    private $page;
+    private ?int $page = null;
 
     /**
      * Set the array of groups
      *
-     * @param array $groups An array of groups
-     * @return Groups
+     * @param array<string,mixed> $groups An array of groups
      */
-    public function setGroups(array $groups) {
+    public function setGroups(array $groups): self
+    {
         $this->groups = $groups;
-
         return $this;
     }
 
     /**
      * Get the groups
      *
-     * @return array
+     * @return array<string,mixed>
      */
-    public function getGroups() {
+    public function getGroups(): array
+    {
         return $this->groups;
     }
 
     /**
      * Get the number of groups
-     *
-     * @return int
      */
-    public function getCount() {
+    public function getCount(): int
+    {
         return count($this->groups);
     }
 
     /**
      * Set the hits property
-     *
-     * @param int $hits The amount of query hits
-     * @return self
      */
-    public function setHits($hits) {
-        $this->hits = (int) $hits;
-
+    public function setHits(int $hits): self
+    {
+        $this->hits = $hits;
         return $this;
     }
 
     /**
      * Get the hits property
-     *
-     * @return int
      */
-    public function getHits() {
+    public function getHits(): ?int
+    {
         return $this->hits;
     }
 
     /**
      * Set the limit
-     *
-     * @param int $limit The limit
-     * @return self
      */
-    public function setLimit($limit) {
-        $this->limit = (int) $limit;
-
+    public function setLimit(int $limit): self
+    {
+        $this->limit = $limit;
         return $this;
     }
 
     /**
      * Get the limit
-     *
-     * @return int
      */
-    public function getLimit() {
+    public function getLimit(): ?int
+    {
         return $this->limit;
     }
 
     /**
      * Set the page
-     *
-     * @param int $page The page
-     * @return self
      */
-    public function setPage($page) {
-        $this->page = (int) $page;
-
+    public function setPage(int $page): self
+    {
+        $this->page = $page;
         return $this;
     }
 
     /**
      * Get the page
-     *
-     * @return int
      */
-    public function getPage() {
+    public function getPage(): ?int
+    {
         return $this->page;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array{groups:array<string,mixed>,count:int,hits:?int,limit:?int,page:?int}
      */
-    public function getData() {
+    public function getData(): array
+    {
         return [
             'groups' => $this->getGroups(),
             'count' => $this->getCount(),

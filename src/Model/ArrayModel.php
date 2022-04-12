@@ -1,58 +1,53 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Model;
 
-class ArrayModel implements ModelInterface {
+class ArrayModel implements ModelInterface
+{
     /**
      * Data
      *
-     * @var array
+     * @var array<string,mixed>
      */
-    private $data = [];
+    private array $data = [];
 
     /**
      * Title of the model, used in representations
-     *
-     * @var string
      */
-    private $title;
+    private ?string $title = null;
 
     /**
      * Set the data
      *
-     * @param array $data The data to set
-     * @return ArrayModel
+     * @param array<string,mixed> $data The data to set
      */
-    public function setData(array $data) {
+    public function setData(array $data): self
+    {
         $this->data = $data;
-
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<string,mixed>
      */
-    public function getData() {
+    public function getData(): array
+    {
         return $this->data;
     }
 
     /**
      * Set the title of the model
-     *
-     * @param string $title The title of the model, for instance "Statistics"
-     * @return ArrayModel
      */
-    public function setTitle($title) {
+    public function setTitle(string $title): self
+    {
         $this->title = $title;
-
         return $this;
     }
 
     /**
      * Get the title of the model
-     *
-     * @return string
      */
-    public function getTitle() {
+    public function getTitle(): ?string
+    {
         return $this->title;
     }
 }

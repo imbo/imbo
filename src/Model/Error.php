@@ -1,156 +1,128 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Model;
 
+use DateTime;
+use DateTimeZone;
 use Imbo\Exception;
 use Imbo\Http\Request\Request;
-use DateTimeZone;
-use DateTime;
 
-class Error implements ModelInterface {
+class Error implements ModelInterface
+{
     /**
      * HTTP code
-     *
-     * @var int
      */
-    private $httpCode;
+    private ?int $httpCode = null;
 
     /**
      * Error message from Imbo
-     *
-     * @var string
      */
-    private $errorMessage;
+    private ?string $errorMessage = null;
 
     /**
      * Current date
-     *
-     * @var DateTime
      */
-    private $date;
+    private ?DateTime $date = null;
 
     /**
      * Internal Imbo error code
-     *
-     * @var int
      */
-    private $imboErrorCode;
+    private ?int $imboErrorCode = null;
 
     /**
      * Optional image identifier
-     *
-     * @var string
      */
-    private $imageIdentifier;
+    private ?string $imageIdentifier = null;
 
     /**
      * Set the HTTP code
-     *
-     * @param int $code The code to set
-     * @return Error
      */
-    public function setHttpCode($code) {
-        $this->httpCode = (int) $code;
-
+    public function setHttpCode(int $code): self
+    {
+        $this->httpCode = $code;
         return $this;
     }
 
     /**
      * Get the HTTP code
-     *
-     * @return int
      */
-    public function getHttpCode() {
+    public function getHttpCode(): ?int
+    {
         return $this->httpCode;
     }
 
     /**
      * Set the error message
-     *
-     * @param string $message The message to set
-     * @return Error
      */
-    public function setErrorMessage($message) {
+    public function setErrorMessage(string $message): self
+    {
         $this->errorMessage = $message;
-
         return $this;
     }
 
     /**
      * Get the error message
-     *
-     * @return string
      */
-    public function getErrorMessage() {
+    public function getErrorMessage(): ?string
+    {
         return $this->errorMessage;
     }
 
     /**
      * Set the date
-     *
-     * @param DateTime $date The DateTime instance to set
-     * @return Error
      */
-    public function setDate(DateTime $date) {
+    public function setDate(DateTime $date): self
+    {
         $this->date = $date;
-
         return $this;
     }
 
     /**
      * Get the date
-     *
-     * @return DateTime
      */
-    public function getDate() {
+    public function getDate(): ?DateTime
+    {
         return $this->date;
     }
 
     /**
      * Set the imbo error code
-     *
-     * @param int $code The code to set
-     * @return Error
      */
-    public function setImboErrorCode($code) {
-        $this->imboErrorCode = (int) $code;
-
+    public function setImboErrorCode(int $code): self
+    {
+        $this->imboErrorCode = $code;
         return $this;
     }
 
     /**
      * Get the imbo error code
-     *
-     * @return int
      */
-    public function getImboErrorCode() {
+    public function getImboErrorCode(): ?int
+    {
         return $this->imboErrorCode;
     }
 
     /**
      * Set the image identifier
-     *
-     * @param string $imageIdentifier The image identifier to set
-     * @return Error
      */
-    public function setImageIdentifier($imageIdentifier) {
+    public function setImageIdentifier(string $imageIdentifier): self
+    {
         $this->imageIdentifier = $imageIdentifier;
-
         return $this;
     }
 
     /**
      * Get the image identifier
-     *
-     * @return string
      */
-    public function getImageIdentifier() {
+    public function getImageIdentifier(): ?string
+    {
         return $this->imageIdentifier;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array{httpCode:?int,errorMessage:?string,date:?DateTime,imboErrorCode:?int,imageIdentifier:?string}
      */
-    public function getData() {
+    public function getData(): array
+    {
         return [
             'httpCode' => $this->getHttpCode(),
             'errorMessage' => $this->getErrorMessage(),
@@ -167,7 +139,8 @@ class Error implements ModelInterface {
      * @param Request The current request
      * @return Error
      */
-    public static function createFromException(Exception $exception, Request $request) {
+    public static function createFromException(Exception $exception, Request $request)
+    {
         $date = new DateTime('now', new DateTimeZone('UTC'));
 
         $model = new self();
@@ -178,7 +151,7 @@ class Error implements ModelInterface {
 
         if ($image = $request->getImage()) {
             $model->setImageIdentifier($image->getImageIdentifier());
-        } else if ($identifier = $request->getImageIdentifier()) {
+        } elseif ($identifier = $request->getImageIdentifier()) {
             $model->setImageIdentifier($identifier);
         }
 
