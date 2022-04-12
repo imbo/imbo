@@ -50,6 +50,9 @@ jobs:
       - name: Check coding standard
         run: php-cs-fixer fix --dry-run --diff
 
+      - name: Run static analysis
+        run: vendor/bin/psalm
+
       - name: Run unit tests using PHPUnit
         run: vendor/bin/phpunit --verbose
 

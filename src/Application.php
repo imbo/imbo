@@ -142,7 +142,6 @@ class Application
         ];
         $contentNegotiation = new Http\ContentNegotiation();
 
-        // Collect event listener data
         $eventListeners = [
             Resource\Index::class,
             Resource\Status::class,
@@ -161,7 +160,6 @@ class Application
             Resource\Key::class,
             Resource\AccessRules::class,
             Resource\AccessRule::class,
-
             ResponseFormatter::class => [
                 'formatters' => $formatters,
                 'contentNegotiation' => $contentNegotiation,
@@ -176,15 +174,18 @@ class Application
         ];
 
         foreach ($eventListeners as $listener => $params) {
-            $name = $listener;
-            if (is_string($params)) {
+            if (is_int($listener) && is_string($params)) {
                 $listener = $params;
                 $params = [];
                 $name = $listener;
-            } elseif ($params instanceof ListenerInterface) {
+            } elseif (is_string($listener) && $params instanceof ListenerInterface) {
+                $name = $listener;
                 $listener = $params;
                 $params = [];
-                $name = get_class($listener);
+            } elseif (is_string($listener) && is_array($params)) {
+                $name = $listener;
+            } else {
+                throw new RuntimeException('Incorrect event listener configuration');
             }
 
             $eventManager->addEventHandler($name, $listener, $params)
