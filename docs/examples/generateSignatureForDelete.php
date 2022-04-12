@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 $user       = "<user>";                 // User id
 $publicKey  = "<public key>";           // The public key of the user
 $privateKey = "<secret value>";         // The private key of the user
