@@ -9,7 +9,7 @@ return [
             'listener' => AccessToken::class,
             'params' => [
                 'transformations' => [
-                   'whitelist' => [
+                    'whitelist' => [
                         'whitelisted',
                     ],
                 ],
