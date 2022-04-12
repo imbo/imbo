@@ -8,7 +8,7 @@ use Imbo\Resource;
  * Use individual read-only/read+write keys
  */
 return [
-    'accessControl' => function() : ArrayAdapter {
+    'accessControl' => function (): ArrayAdapter {
         return new ArrayAdapter([
             [
                 'publicKey'  => 'ro-pubkey',

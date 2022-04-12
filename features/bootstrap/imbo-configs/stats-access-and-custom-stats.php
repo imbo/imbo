@@ -2,8 +2,8 @@
 namespace Imbo\Behat;
 
 use Imbo\EventListener\StatsAccess;
-use Imbo\Http\Request\Request;
 use Imbo\EventManager\EventInterface;
+use Imbo\Http\Request\Request;
 
 /**
  * Enable the stats access event listener, using a HTTP request header to set the allowed range of
@@ -20,7 +20,7 @@ if (isset($_SERVER['HTTP_X_CLIENT_IP'])) {
 
 return [
     'eventListeners' => [
-        'statsAccess' => function(Request $request) : StatsAccess {
+        'statsAccess' => function (Request $request): StatsAccess {
             $statsAllow = [];
 
             if ($request->headers->has('x-imbo-stats-allowed-by')) {
@@ -33,7 +33,7 @@ return [
         },
         'customStats' => [
             'events' => ['stats.get'],
-            'callback' => function(EventInterface $event) : void {
+            'callback' => function (EventInterface $event): void {
                 // Fetch the model from the response
                 $model = $event->getResponse()->getModel();
 
@@ -43,7 +43,7 @@ return [
                     'foo' => 'bar',
                 ];
                 $model['someList'] = [1, 2, 3];
-            }
+            },
         ],
     ],
 ];

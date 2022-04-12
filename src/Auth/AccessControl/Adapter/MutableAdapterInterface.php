@@ -4,7 +4,8 @@ namespace Imbo\Auth\AccessControl\Adapter;
 /**
  * Mutable access control adapter interface
  */
-interface MutableAdapterInterface extends AdapterInterface {
+interface MutableAdapterInterface extends AdapterInterface
+{
     /**
      * Add a new public/private key pair
      *
@@ -12,7 +13,7 @@ interface MutableAdapterInterface extends AdapterInterface {
      * @param string $privateKey Corresponding private key
      * @return bool
      */
-    function addKeyPair(string $publicKey, string $privateKey): bool;
+    public function addKeyPair(string $publicKey, string $privateKey): bool;
 
     /**
      * Delete a public key
@@ -20,7 +21,7 @@ interface MutableAdapterInterface extends AdapterInterface {
      * @param string $publicKey Public key to delete
      * @return bool
      */
-    function deletePublicKey(string $publicKey): bool;
+    public function deletePublicKey(string $publicKey): bool;
 
     /**
      * Update the private key for a public key
@@ -29,7 +30,7 @@ interface MutableAdapterInterface extends AdapterInterface {
      * @param string $privateKey Private key to set
      * @return bool
      */
-    function updatePrivateKey(string $publicKey, string $privateKey): bool;
+    public function updatePrivateKey(string $publicKey, string $privateKey): bool;
 
     /**
      * Add a new access rule to the given public key
@@ -38,7 +39,7 @@ interface MutableAdapterInterface extends AdapterInterface {
      * @param array{resources:array<string>,users:array<string>} $accessRule Access rule definition
      * @return string Returns a generated access rule ID
      */
-    function addAccessRule(string $publicKey, array $accessRule): string;
+    public function addAccessRule(string $publicKey, array $accessRule): string;
 
     /**
      * Delete an access rule
@@ -47,7 +48,7 @@ interface MutableAdapterInterface extends AdapterInterface {
      * @param string $accessRuleId ID of the access rule
      * @return bool
      */
-    function deleteAccessRule(string $publicKey, string $accessRuleId): bool;
+    public function deleteAccessRule(string $publicKey, string $accessRuleId): bool;
 
     /**
      * Add a new group containing the given resources
@@ -56,7 +57,7 @@ interface MutableAdapterInterface extends AdapterInterface {
      * @param array<string> $resources Array of resources (eg. 'image.get', 'user.head' etc)
      * @return bool
      */
-    function addResourceGroup(string $groupName, array $resources = []): bool;
+    public function addResourceGroup(string $groupName, array $resources = []): bool;
 
     /**
      * Update resources for an existing resource group
@@ -65,7 +66,7 @@ interface MutableAdapterInterface extends AdapterInterface {
      * @param array<string> $resources Array of resources (eg. 'image.get', 'user.head' etc)
      * @param bool
      */
-    function updateResourceGroup(string $groupName, array $resources): bool;
+    public function updateResourceGroup(string $groupName, array $resources): bool;
 
     /**
      * Delete a resource group
@@ -73,5 +74,5 @@ interface MutableAdapterInterface extends AdapterInterface {
      * @param string $groupName Group name of the group to delete
      * @return bool
      */
-    function deleteResourceGroup(string $groupName): bool;
+    public function deleteResourceGroup(string $groupName): bool;
 }

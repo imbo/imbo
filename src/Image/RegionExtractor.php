@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Image;
 
 /**
@@ -6,7 +6,8 @@ namespace Imbo\Image;
  * can let Imbo know that the transformation will return a region of the input
  * image, given a set of parameters.
  */
-interface RegionExtractor {
+interface RegionExtractor
+{
     /**
      * Get the region of the image that is extracted when applying the transformation
      * with the parameters provided.

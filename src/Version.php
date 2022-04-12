@@ -1,14 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo;
 
 /**
  * Version class
  */
-class Version {
+class Version
+{
     /**
      * The current version
      *
      * @var string
      */
-    const VERSION = 'dev';
+    public const VERSION = 'dev';
 }

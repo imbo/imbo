@@ -1,13 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Http\Response\Formatter;
 
-use Imbo\Model;
 use Imbo\Exception\InvalidArgumentException;
+use Imbo\Model;
 
 /**
  * Interface for formatters
  */
-interface FormatterInterface {
+interface FormatterInterface
+{
     /**
      * Format a model
      *
@@ -15,7 +16,7 @@ interface FormatterInterface {
      * @return string
      * @throws InvalidArgumentException Throws an exception if the model is not supported
      */
-    function format(Model\ModelInterface $model);
+    public function format(Model\ModelInterface $model);
 
     /**
      * Format an error model
@@ -23,7 +24,7 @@ interface FormatterInterface {
      * @param Model\Error $model The model to format
      * @return string Formatted data
      */
-    function formatError(Model\Error $model);
+    public function formatError(Model\Error $model);
 
     /**
      * Format a status model
@@ -31,7 +32,7 @@ interface FormatterInterface {
      * @param Model\Status $model The model to format
      * @return string Formatted data
      */
-    function formatStatus(Model\Status $model);
+    public function formatStatus(Model\Status $model);
 
     /**
      * Format a user model
@@ -39,7 +40,7 @@ interface FormatterInterface {
      * @param Model\User $model The model to format
      * @return string Formatted data
      */
-    function formatUser(Model\User $model);
+    public function formatUser(Model\User $model);
 
     /**
      * Format an images model
@@ -47,7 +48,7 @@ interface FormatterInterface {
      * @param Model\Images $model The model to format
      * @return string Formatted data
      */
-    function formatImages(Model\Images $model);
+    public function formatImages(Model\Images $model);
 
     /**
      * Format a metadata model
@@ -55,7 +56,7 @@ interface FormatterInterface {
      * @param Model\Metadata $model The model to format
      * @return string Formatted data
      */
-    function formatMetadataModel(Model\Metadata $model);
+    public function formatMetadataModel(Model\Metadata $model);
 
     /**
      * Format a groups model
@@ -63,7 +64,7 @@ interface FormatterInterface {
      * @param  Model\Groups $model The model to format
      * @return string Formatted data
      */
-    function formatGroups(Model\Groups $model);
+    public function formatGroups(Model\Groups $model);
 
     /**
      * Format a group model
@@ -71,7 +72,7 @@ interface FormatterInterface {
      * @param  Model\Group $model The model to format
      * @return string Formatted data
      */
-    function formatGroup(Model\Group $model);
+    public function formatGroup(Model\Group $model);
 
     /**
      * Format an access rules model
@@ -79,7 +80,7 @@ interface FormatterInterface {
      * @param  Model\AccessRules $model The model to format
      * @return string Formatted data
      */
-    function formatAccessRules(Model\AccessRules $model);
+    public function formatAccessRules(Model\AccessRules $model);
 
     /**
      * Format an array model
@@ -87,7 +88,7 @@ interface FormatterInterface {
      * @param Model\ArrayModel $model The model to format
      * @return string Formatted data
      */
-    function formatArrayModel(Model\ArrayModel $model);
+    public function formatArrayModel(Model\ArrayModel $model);
 
     /**
      * Format a stats model
@@ -95,7 +96,7 @@ interface FormatterInterface {
      * @param Model\Stats $model The model to format
      * @return string Formatted data
      */
-    function formatStats(Model\Stats $model);
+    public function formatStats(Model\Stats $model);
 
     /**
      * Get the content type for the current formatter
@@ -105,5 +106,5 @@ interface FormatterInterface {
      *
      * @return string
      */
-    function getContentType();
+    public function getContentType();
 }

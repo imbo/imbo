@@ -1,18 +1,19 @@
 <?php declare(strict_types=1);
 namespace Imbo\Database;
 
+use DateTime;
+use Imbo\Exception\DatabaseException;
 use Imbo\Model\Image;
 use Imbo\Model\Images;
 use Imbo\Resource\Images\Query;
-use Imbo\Exception\DatabaseException;
-use DateTime;
 
 /**
  * Database adapter interface
  *
  * This is an interface for storage adapters in Imbo.
  */
-interface DatabaseInterface {
+interface DatabaseInterface
+{
     /**
      * Insert a new image
      *
@@ -26,7 +27,7 @@ interface DatabaseInterface {
      * @throws DatabaseException
      * @return bool Returns true on success or false on failure
      */
-    function insertImage(string $user, string $imageIdentifier, Image $image, bool $updateIfDuplicate = true) : bool;
+    public function insertImage(string $user, string $imageIdentifier, Image $image, bool $updateIfDuplicate = true): bool;
 
     /**
      * Delete an image from the database
@@ -36,7 +37,7 @@ interface DatabaseInterface {
      * @throws DatabaseException
      * @return bool Returns true on success or false on failure
      */
-    function deleteImage(string $user, string $imageIdentifier) : bool;
+    public function deleteImage(string $user, string $imageIdentifier): bool;
 
     /**
      * Edit metadata
@@ -47,7 +48,7 @@ interface DatabaseInterface {
      * @throws DatabaseException
      * @return bool Returns true on success or false on failure
      */
-    function updateMetadata(string $user, string $imageIdentifier, array $metadata) : bool;
+    public function updateMetadata(string $user, string $imageIdentifier, array $metadata): bool;
 
     /**
      * Get all metadata associated with an image
@@ -57,7 +58,7 @@ interface DatabaseInterface {
      * @throws DatabaseException
      * @return array<string, mixed> Returns the metadata as an array
      */
-    function getMetadata(string $user, string $imageIdentifier) : array;
+    public function getMetadata(string $user, string $imageIdentifier): array;
 
     /**
      * Delete all metadata associated with an image
@@ -67,7 +68,7 @@ interface DatabaseInterface {
      * @throws DatabaseException
      * @return bool Returns true on success or false on failure
      */
-    function deleteMetadata(string $user, string $imageIdentifier);
+    public function deleteMetadata(string $user, string $imageIdentifier);
 
     /**
      * Get images based on some query parameters
@@ -81,7 +82,7 @@ interface DatabaseInterface {
      * @throws DatabaseException
      * @return array<int, array<string, mixed>>
      */
-    function getImages(array $users, Query $query, Images $model) : array;
+    public function getImages(array $users, Query $query, Images $model): array;
 
     /**
      * Load information from database into the image object
@@ -92,7 +93,7 @@ interface DatabaseInterface {
      * @throws DatabaseException
      * @return bool
      */
-    function load(string $user, string $imageIdentifier, Image $image) : bool;
+    public function load(string $user, string $imageIdentifier, Image $image): bool;
 
     /**
      * Fetch image properties from the database
@@ -101,7 +102,7 @@ interface DatabaseInterface {
      * @param string $imageIdentifier The image identifier
      * @return array{size: int, width: int, height: int, mime: string, extension: string, added: int, updated: int}
      */
-    function getImageProperties(string $user, string $imageIdentifier) : array;
+    public function getImageProperties(string $user, string $imageIdentifier): array;
 
     /**
      * Get the last modified timestamp for given users
@@ -117,7 +118,7 @@ interface DatabaseInterface {
      * @throws DatabaseException
      * @return DateTime Returns an instance of DateTime
      */
-    function getLastModified(array $users, string $imageIdentifier = null) : DateTime;
+    public function getLastModified(array $users, string $imageIdentifier = null): DateTime;
 
     /**
      * Update the last modified timestamp for a given image to now.
@@ -126,7 +127,7 @@ interface DatabaseInterface {
      * @param string $imageIdentifier The image identifier
      * @return DateTime The date the timestamp was updated to
      */
-    function setLastModifiedNow(string $user, string $imageIdentifier) : DateTime;
+    public function setLastModifiedNow(string $user, string $imageIdentifier): DateTime;
 
     /**
      * Update the last modified timestamp for a given image
@@ -139,7 +140,7 @@ interface DatabaseInterface {
      * @param DateTime $time The timestamp to set last modified to
      * @return DateTime The date the timestamp was updated to
      */
-    function setLastModifiedTime(string $user, string $imageIdentifier, DateTime $time) : DateTime;
+    public function setLastModifiedTime(string $user, string $imageIdentifier, DateTime $time): DateTime;
 
     /**
      * Fetch the number of images, optionally filtered by a given user
@@ -148,7 +149,7 @@ interface DatabaseInterface {
      * @throws DatabaseException
      * @return int Returns the number of images
      */
-    function getNumImages(string $user = null) : int;
+    public function getNumImages(string $user = null): int;
 
     /**
      * Fetch the number of bytes stored, optionally filtered by a given user
@@ -157,7 +158,7 @@ interface DatabaseInterface {
      * @throws DatabaseException
      * @return int Returns the number of bytes
      */
-    function getNumBytes(string $user = null) : int;
+    public function getNumBytes(string $user = null): int;
 
     /**
      * Fetch the number of users which has one or more images
@@ -165,7 +166,7 @@ interface DatabaseInterface {
      * @throws DatabaseException
      * @return int Returns the number of users
      */
-    function getNumUsers() : int;
+    public function getNumUsers(): int;
 
     /**
      * Get the current status of the database connection
@@ -174,7 +175,7 @@ interface DatabaseInterface {
      *
      * @return bool
      */
-    function getStatus() : bool;
+    public function getStatus(): bool;
 
     /**
      * Get the mime type of an image
@@ -184,7 +185,7 @@ interface DatabaseInterface {
      * @throws DatabaseException
      * @return string Returns the mime type of the image
      */
-    function getImageMimeType(string $user, string $imageIdentifier) : string;
+    public function getImageMimeType(string $user, string $imageIdentifier): string;
 
     /**
      * Check if an image already exists
@@ -194,7 +195,7 @@ interface DatabaseInterface {
      * @throws DatabaseException
      * @return bool Returns true of the image exists, false otherwise
      */
-    function imageExists(string $user, string $imageIdentifier) : bool;
+    public function imageExists(string $user, string $imageIdentifier): bool;
 
     /**
      * Insert a short URL
@@ -206,7 +207,7 @@ interface DatabaseInterface {
      * @param array<string, string|string[]> $query Optional query parameters
      * @return bool
      */
-    function insertShortUrl(string $shortUrlId, string $user, string $imageIdentifier, string $extension = null, array $query = []) : bool;
+    public function insertShortUrl(string $shortUrlId, string $user, string $imageIdentifier, string $extension = null, array $query = []): bool;
 
     /**
      * Fetch the short URL identifier
@@ -217,7 +218,7 @@ interface DatabaseInterface {
      * @param array<string, string|string[]> $query Optional query parameters
      * @return ?string
      */
-    function getShortUrlId(string $user, string $imageIdentifier, string $extension = null, array $query = []) : ?string;
+    public function getShortUrlId(string $user, string $imageIdentifier, string $extension = null, array $query = []): ?string;
 
     /**
      * Fetch parameters for a short URL
@@ -230,7 +231,7 @@ interface DatabaseInterface {
      *   query: array<string, string|string[]>
      * }
      */
-    function getShortUrlParams(string $shortUrlId) : ?array;
+    public function getShortUrlParams(string $shortUrlId): ?array;
 
     /**
      * Delete short URLs attached to a specific image, or a single short URL
@@ -241,12 +242,12 @@ interface DatabaseInterface {
      *                           a user
      * @return bool
      */
-    function deleteShortUrls(string $user, string $imageIdentifier, string $shortUrlId = null) : bool;
+    public function deleteShortUrls(string $user, string $imageIdentifier, string $shortUrlId = null): bool;
 
     /**
      * Return a list of the users present in the database
      *
      * @return string[]
      */
-    function getAllUsers() : array;
+    public function getAllUsers(): array;
 }

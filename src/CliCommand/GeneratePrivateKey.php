@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\CliCommand;
 
 use Imbo\Exception\RuntimeException;
@@ -6,7 +6,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class GeneratePrivateKey extends Command {
+class GeneratePrivateKey extends Command
+{
     /**
      * How many times to try to generate before we give up
      *
@@ -17,7 +18,8 @@ class GeneratePrivateKey extends Command {
     /**
      * {@inheritdoc}
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct('generate-private-key');
 
         $this->setDescription('Generate a private key');
@@ -27,7 +29,8 @@ class GeneratePrivateKey extends Command {
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output) : int {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $output->writeln($this->generate());
         return self::SUCCESS;
     }
@@ -37,7 +40,8 @@ class GeneratePrivateKey extends Command {
      *
      * @return string
      */
-    public function generate() {
+    public function generate()
+    {
         $strong = false;
         $i = 0;
 

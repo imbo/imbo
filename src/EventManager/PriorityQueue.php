@@ -1,9 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventManager;
 
 use SplPriorityQueue;
 
-class PriorityQueue extends SplPriorityQueue {
+class PriorityQueue extends SplPriorityQueue
+{
     /**
      * Queue order counter
      *
@@ -17,7 +18,8 @@ class PriorityQueue extends SplPriorityQueue {
      * @param mixed $datum The entry to add
      * @param int $priority The priority of the entry in the queue
      */
-    public function insert($datum, $priority) {
+    public function insert($datum, $priority)
+    {
         if (is_int($priority)) {
             $priority = [$priority, $this->queueOrder--];
         }

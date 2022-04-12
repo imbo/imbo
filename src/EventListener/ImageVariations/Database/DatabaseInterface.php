@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener\ImageVariations\Database;
 
 use Imbo\Exception\DatabaseException;
@@ -6,7 +6,8 @@ use Imbo\Exception\DatabaseException;
 /**
  * Database adapter interface for the image variations event listener
  */
-interface DatabaseInterface {
+interface DatabaseInterface
+{
     /**
      * Store an image variation
      *
@@ -17,7 +18,7 @@ interface DatabaseInterface {
      * @throws DatabaseException
      * @return bool
      */
-    function storeImageVariationMetadata(string $user, string $imageIdentifier, int $width, int $height): bool;
+    public function storeImageVariationMetadata(string $user, string $imageIdentifier, int $width, int $height): bool;
 
     /**
      * Fetch the best match of an image
@@ -27,7 +28,7 @@ interface DatabaseInterface {
      * @param int $width The width we want to resize the image to
      * @return ?array{width:int,height:int} Returns the closest width, or null
      */
-    function getBestMatch(string $user, string $imageIdentifier, int $width): ?array;
+    public function getBestMatch(string $user, string $imageIdentifier, int $width): ?array;
 
     /**
      * Remove all metadata about image variations for an image
@@ -37,5 +38,5 @@ interface DatabaseInterface {
      * @param int $width Only delete the variation with this width
      * @return bool
      */
-    function deleteImageVariations(string $user, string $imageIdentifier, int $width = null): bool;
+    public function deleteImageVariations(string $user, string $imageIdentifier, int $width = null): bool;
 }

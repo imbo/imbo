@@ -1,10 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener\AccessToken;
 
 /**
  * Abstract class for Access Token Generation
  */
-abstract class AccessTokenGenerator implements AccessTokenInterface {
+abstract class AccessTokenGenerator implements AccessTokenInterface
+{
     /**
      * Parameters for the generator
      *
@@ -24,7 +25,8 @@ abstract class AccessTokenGenerator implements AccessTokenInterface {
      *
      * @param array $params Parameters for the listener
      */
-    public function __construct(array $params = null) {
+    public function __construct(array $params = null)
+    {
         if ($params) {
             $this->params = array_replace_recursive($this->params, $params);
         }
@@ -33,14 +35,16 @@ abstract class AccessTokenGenerator implements AccessTokenInterface {
     /**
      * {@inheritdoc}
      */
-    public function getArgumentKeys() {
+    public function getArgumentKeys()
+    {
         return $this->params['argumentKeys'];
     }
 
     /**
      * @param string $argumentKey Add an argument key to be handled by this generator
      */
-    public function addArgumentKey($argumentKey) {
+    public function addArgumentKey($argumentKey)
+    {
         $this->params['argumentKeys'][] = $argumentKey;
     }
 
@@ -48,7 +52,8 @@ abstract class AccessTokenGenerator implements AccessTokenInterface {
      * @param string[] $argumentKeys Set the argumentKeys that this generator handles
      * @return self
      */
-    public function setArgumentKeys($argumentKeys) {
+    public function setArgumentKeys($argumentKeys)
+    {
         $this->params['argumentKeys'] = $argumentKeys;
 
         return $this;

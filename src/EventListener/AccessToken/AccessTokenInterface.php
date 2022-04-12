@@ -1,10 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\EventListener\AccessToken;
 
 /**
  * Interface for Access Token Generation
  */
-interface AccessTokenInterface {
+interface AccessTokenInterface
+{
     /**
      * @param string $argumentKey The URL argument used for key comparison
      * @param string $data The data to be signed

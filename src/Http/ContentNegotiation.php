@@ -1,10 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Http;
 
 /**
  * Content negotiation
  */
-class ContentNegotiation {
+class ContentNegotiation
+{
     /**
      * Pick the best match from a set of mime types matched against acceptable types
      *
@@ -13,7 +14,8 @@ class ContentNegotiation {
      * @return boolean|string Returns false if none of the $mimetypes are acceptable or the best
      *                        match on success
      */
-    public function bestMatch(array $mimeTypes, array $acceptable) {
+    public function bestMatch(array $mimeTypes, array $acceptable)
+    {
         $maxQ = 0;
         $match = false;
 
@@ -36,7 +38,8 @@ class ContentNegotiation {
      * @return boolean|double Returns the quality of the mime type if it is accepted, or false
      *                        otherwise
      */
-    public function isAcceptable($mimeType, array $acceptable) {
+    public function isAcceptable($mimeType, array $acceptable)
+    {
         foreach ($acceptable as $type => $q) {
             $pattern = '#^' . str_replace('*', '.*', $type) . '#';
 

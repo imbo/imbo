@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Http\Response\Formatter;
 
 use Imbo\Model;
@@ -7,18 +7,21 @@ use stdClass;
 /**
  * JSON formatter
  */
-class JSON extends Formatter implements FormatterInterface {
+class JSON extends Formatter implements FormatterInterface
+{
     /**
      * {@inheritdoc}
      */
-    public function getContentType() {
+    public function getContentType()
+    {
         return 'application/json';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function formatError(Model\Error $model) {
+    public function formatError(Model\Error $model)
+    {
         $data = [
             'error' => [
                 'code' => $model->getHttpCode(),
@@ -38,7 +41,8 @@ class JSON extends Formatter implements FormatterInterface {
     /**
      * {@inheritdoc}
      */
-    public function formatStatus(Model\Status $model) {
+    public function formatStatus(Model\Status $model)
+    {
         return $this->encode([
             'date' => $this->dateFormatter->formatDate($model->getDate()),
             'database' => $model->getDatabaseStatus(),
@@ -49,7 +53,8 @@ class JSON extends Formatter implements FormatterInterface {
     /**
      * {@inheritdoc}
      */
-    public function formatUser(Model\User $model) {
+    public function formatUser(Model\User $model)
+    {
         return $this->encode([
             'user' => $model->getUserId(),
             'numImages' => $model->getNumImages(),
@@ -60,7 +65,8 @@ class JSON extends Formatter implements FormatterInterface {
     /**
      * {@inheritdoc}
      */
-    public function formatImages(Model\Images $model) {
+    public function formatImages(Model\Images $model)
+    {
         $images = $model->getImages();
         $data = [];
 
@@ -121,21 +127,24 @@ class JSON extends Formatter implements FormatterInterface {
     /**
      * {@inheritdoc}
      */
-    public function formatMetadataModel(Model\Metadata $model) {
+    public function formatMetadataModel(Model\Metadata $model)
+    {
         return $this->encode($model->getData() ?: new stdClass());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function formatArrayModel(Model\ArrayModel $model) {
+    public function formatArrayModel(Model\ArrayModel $model)
+    {
         return $this->encode($model->getData() ?: new stdClass());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function formatGroups(Model\Groups $model) {
+    public function formatGroups(Model\Groups $model)
+    {
         return $this->encode([
             'search' => [
                 'hits' => $model->getHits(),
@@ -150,7 +159,8 @@ class JSON extends Formatter implements FormatterInterface {
     /**
      * {@inheritdoc}
      */
-    public function formatGroup(Model\Group $model) {
+    public function formatGroup(Model\Group $model)
+    {
         return $this->encode([
             'name' => $model->getName(),
             'resources' => $model->getResources(),
@@ -160,7 +170,8 @@ class JSON extends Formatter implements FormatterInterface {
     /**
      * {@inheritdoc}
      */
-    public function formatAccessRule(Model\AccessRule $model) {
+    public function formatAccessRule(Model\AccessRule $model)
+    {
         $data = [
             'id' => $model->getId(),
             'users' => $model->getUsers(),
@@ -180,14 +191,16 @@ class JSON extends Formatter implements FormatterInterface {
     /**
      * {@inheritdoc}
      */
-    public function formatAccessRules(Model\AccessRules $model) {
+    public function formatAccessRules(Model\AccessRules $model)
+    {
         return $this->encode($model->getRules());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function formatStats(Model\Stats $model) {
+    public function formatStats(Model\Stats $model)
+    {
         $data = [
             'numImages' => $model->getNumImages(),
             'numUsers' => $model->getNumUsers(),
@@ -204,7 +217,8 @@ class JSON extends Formatter implements FormatterInterface {
      * @param mixed $data The data to encode
      * @return string
      */
-    private function encode($data) {
+    private function encode($data)
+    {
         return json_encode($data);
     }
 }

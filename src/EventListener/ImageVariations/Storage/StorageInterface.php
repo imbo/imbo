@@ -4,7 +4,8 @@ namespace Imbo\EventListener\ImageVariations\Storage;
 /**
  * Storage adapter interface for the image variations event listener
  */
-interface StorageInterface {
+interface StorageInterface
+{
     /**
      * Store an image variation
      *
@@ -14,7 +15,7 @@ interface StorageInterface {
      * @param int $width The width of the variation
      * @return bool
      */
-    function storeImageVariation(string $user, string $imageIdentifier, string $blob, int $width) : bool;
+    public function storeImageVariation(string $user, string $imageIdentifier, string $blob, int $width): bool;
 
     /**
      * Get the blob of an image variation
@@ -24,7 +25,7 @@ interface StorageInterface {
      * @param int $width The width of the variation
      * @return ?string
      */
-    function getImageVariation(string $user, string $imageIdentifier, int $width) : ?string;
+    public function getImageVariation(string $user, string $imageIdentifier, int $width): ?string;
 
     /**
      * Remove an image variation
@@ -34,5 +35,5 @@ interface StorageInterface {
      * @param int $width Only delete the variation with this width
      * @return bool
      */
-    function deleteImageVariations(string $user, string $imageIdentifier, int $width = null) : bool;
+    public function deleteImageVariations(string $user, string $imageIdentifier, int $width = null): bool;
 }

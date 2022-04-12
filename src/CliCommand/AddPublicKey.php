@@ -1,28 +1,30 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\CliCommand;
 
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Symfony\Component\Console\Output\OutputInterface;
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
-use Imbo\Resource;
 use Imbo\Exception\RuntimeException;
+use Imbo\Resource;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Question\Question;
 
-class AddPublicKey extends CliCommand {
-    const RESOURCES_READ_ONLY = 'Read-only on user resources';
-    const RESOURCES_READ_WRITE = 'Read+write on user resources';
-    const RESOURCES_SPECIFIC = 'Specific resources';
-    const RESOURCES_CUSTOM = 'Custom resources';
-    const RESOURCES_ALL = 'All resources (master user)';
+class AddPublicKey extends CliCommand
+{
+    public const RESOURCES_READ_ONLY = 'Read-only on user resources';
+    public const RESOURCES_READ_WRITE = 'Read+write on user resources';
+    public const RESOURCES_SPECIFIC = 'Specific resources';
+    public const RESOURCES_CUSTOM = 'Custom resources';
+    public const RESOURCES_ALL = 'All resources (master user)';
 
     /**
      * {@inheritdoc}
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct('add-public-key');
 
         $this
@@ -31,19 +33,20 @@ class AddPublicKey extends CliCommand {
             ->addArgument(
                 'publicKey',
                 InputArgument::REQUIRED,
-                'What should be the name of this public key?'
+                'What should be the name of this public key?',
             )
             ->addArgument(
                 'privateKey',
                 InputArgument::OPTIONAL,
-                'What should be the private key for this public key?'
+                'What should be the private key for this public key?',
             );
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output) : int {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $adapter = $this->getAclAdapter();
         $publicKey = $input->getArgument('publicKey');
 
@@ -64,7 +67,7 @@ class AddPublicKey extends CliCommand {
         do {
             $aclRules[] = [
                 'resources' => $this->askForResources($input, $output),
-                'users' => $this->askForUsers($input, $output)
+                'users' => $this->askForUsers($input, $output),
             ];
 
             $isFinished = !$this->askForAnotherAclRule($input, $output);
@@ -93,7 +96,8 @@ class AddPublicKey extends CliCommand {
      * @param  OutputInterface $output
      * @return array
      */
-    private function askForResources(InputInterface $input, OutputInterface $output) {
+    private function askForResources(InputInterface $input, OutputInterface $output)
+    {
         $question = new ChoiceQuestion(
             'Which resources should the public key have access to? ',
             [
@@ -103,7 +107,7 @@ class AddPublicKey extends CliCommand {
                 self::RESOURCES_SPECIFIC,
                 self::RESOURCES_CUSTOM,
             ],
-            self::RESOURCES_SPECIFIC
+            self::RESOURCES_SPECIFIC,
         );
 
         $type = $this->getHelper('question')->ask($input, $output, $question);
@@ -129,13 +133,14 @@ class AddPublicKey extends CliCommand {
      * @param  OutputInterface $output
      * @return array
      */
-    private function askForSpecificResources(InputInterface $input, OutputInterface $output) {
+    private function askForSpecificResources(InputInterface $input, OutputInterface $output)
+    {
         $resources = Resource::getAllResources();
         sort($resources);
 
         $question = new ChoiceQuestion(
             'Which resources should the public key have access to? (comma-separated) ',
-            $resources
+            $resources,
         );
         $question->setMultiselect(true);
 
@@ -149,18 +154,19 @@ class AddPublicKey extends CliCommand {
      * @param  OutputInterface $output
      * @return array|string
      */
-    private function askForCustomResources(InputInterface $input, OutputInterface $output) {
+    private function askForCustomResources(InputInterface $input, OutputInterface $output)
+    {
         $question = new Question(
             'Which custom resources should the public key have access to?' . PHP_EOL .
-            '(comma-separated) '
+            '(comma-separated) ',
         );
 
-        $question->setValidator(function($answer) {
+        $question->setValidator(function ($answer) {
             $resources = array_filter(array_map('trim', explode(',', (string) $answer)));
 
             if (empty($resources)) {
                 throw new RuntimeException(
-                    'You must specify at least one resource'
+                    'You must specify at least one resource',
                 );
             }
 
@@ -178,17 +184,18 @@ class AddPublicKey extends CliCommand {
      * @param  OutputInterface $output
      * @return array|string
      */
-    private function askForUsers(InputInterface $input, OutputInterface $output) {
+    private function askForUsers(InputInterface $input, OutputInterface $output)
+    {
         $question = new Question(
             'On which users should the public key have access to these resources?' . PHP_EOL .
-            '(comma-separated, specify "*" for all users) '
+            '(comma-separated, specify "*" for all users) ',
         );
-        $question->setValidator(function(?string $answer) {
+        $question->setValidator(function (?string $answer) {
             $users = array_filter(array_map('trim', explode(',', (string) $answer)));
 
             if (empty($users)) {
                 throw new RuntimeException(
-                    'You must specify at least one user, alternatively a wildcard character (*)'
+                    'You must specify at least one user, alternatively a wildcard character (*)',
                 );
             }
 
@@ -206,10 +213,11 @@ class AddPublicKey extends CliCommand {
      * @param  OutputInterface $output
      * @return boolean
      */
-    private function askForAnotherAclRule(InputInterface $input, OutputInterface $output) {
+    private function askForAnotherAclRule(InputInterface $input, OutputInterface $output)
+    {
         return $this->getHelper('question')->ask($input, $output, new ConfirmationQuestion(
             'Create more ACL-rules for this public key? (y/N) ',
-            false
+            false,
         ));
     }
 
@@ -220,12 +228,13 @@ class AddPublicKey extends CliCommand {
      * @param  OutputInterface $output
      * @return string
      */
-    private function askForPrivateKey(InputInterface $input, OutputInterface $output) {
+    private function askForPrivateKey(InputInterface $input, OutputInterface $output)
+    {
         $privateKeyGenerator = new GeneratePrivateKey();
 
         $question = new Question(
             'What do you want the private key to be (leave blank to generate)',
-            $privateKeyGenerator->generate()
+            $privateKeyGenerator->generate(),
         );
         $question->setMaxAttempts(1);
 
@@ -237,7 +246,8 @@ class AddPublicKey extends CliCommand {
      *
      * @return MutableAdapterInterface
      */
-    private function getAclAdapter() {
+    private function getAclAdapter()
+    {
         $config = $this->getConfig();
 
         // Access control adapter

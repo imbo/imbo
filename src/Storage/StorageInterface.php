@@ -9,7 +9,8 @@ use Imbo\Exception\StorageException;
  *
  * This is an interface for storage adapters in Imbo.
  */
-interface StorageInterface {
+interface StorageInterface
+{
     /**
      * Store an image
      *
@@ -25,7 +26,7 @@ interface StorageInterface {
      * @throws StorageException
      * @return bool Returns true on success or false on failure
      */
-    function store(string $user, string $imageIdentifier, string $imageData) : bool;
+    public function store(string $user, string $imageIdentifier, string $imageData): bool;
 
     /**
      * Delete an image
@@ -37,7 +38,7 @@ interface StorageInterface {
      * @throws StorageException
      * @return bool Returns true on success or false on failure
      */
-    function delete(string $user, string $imageIdentifier) : bool;
+    public function delete(string $user, string $imageIdentifier): bool;
 
     /**
      * Get image content
@@ -47,7 +48,7 @@ interface StorageInterface {
      * @throws StorageException
      * @return ?string The binary content of the image, null on failure
      */
-    function getImage(string $user, string $imageIdentifier) : ?string;
+    public function getImage(string $user, string $imageIdentifier): ?string;
 
     /**
      * Get the last modified timestamp
@@ -57,7 +58,7 @@ interface StorageInterface {
      * @throws StorageException
      * @return DateTime Returns an instance of DateTime, using the UTC timezone
      */
-    function getLastModified(string $user, string $imageIdentifier) : DateTime;
+    public function getLastModified(string $user, string $imageIdentifier): DateTime;
 
     /**
      * Get the current status of the storage
@@ -66,7 +67,7 @@ interface StorageInterface {
      *
      * @return bool
      */
-    function getStatus() : bool;
+    public function getStatus(): bool;
 
     /**
      * Check if the image already exists
@@ -76,5 +77,5 @@ interface StorageInterface {
      * @throws StorageException
      * @return bool True if the image exists, false otherwise
      */
-    function imageExists(string $user, string $imageIdentifier) : bool;
+    public function imageExists(string $user, string $imageIdentifier): bool;
 }
