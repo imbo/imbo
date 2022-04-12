@@ -1,123 +1,113 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Model;
 
-class AccessRule implements ModelInterface {
+class AccessRule implements ModelInterface
+{
     /**
      * ID of the rule
-     *
-     * @var int
      */
-    private $id;
+    private ?int $id = null;
 
     /**
      * Group name
-     *
-     * @var string
      */
-    private $group;
+    private ?string $group = null;
 
     /**
      * List of resources
      *
-     * @var string[]
+     * @var array<string>
      */
-    private $resources = [];
+    private array $resources = [];
 
     /**
      * List of users
      *
-     * @var string[]
+     * @var array<string>
      */
-    private $users = [];
+    private array $users = [];
 
     /**
      * Set the ID
-     *
-     * @param int $id
-     * @return self
      */
-    public function setId($id) {
+    public function setId(int $id): self
+    {
         $this->id = $id;
-
         return $this;
     }
 
     /**
      * Get the ID
-     *
-     * @return int
      */
-    public function getId() {
+    public function getId(): ?int
+    {
         return $this->id;
     }
 
     /**
      * Set the group
-     *
-     * @param string $group
-     * @return self
      */
-    public function setGroup($group) {
+    public function setGroup(string $group): self
+    {
         $this->group = $group;
-
         return $this;
     }
 
     /**
      * Get the group
-     *
-     * @return string
      */
-    public function getGroup() {
+    public function getGroup(): ?string
+    {
         return $this->group;
     }
 
     /**
      * Set the resources
      *
-     * @param string[] $resources
-     * @return self
+     * @param array<string> $resources
      */
-    public function setResources(array $resources) {
+    public function setResources(array $resources): self
+    {
         $this->resources = $resources;
-
         return $this;
     }
 
     /**
      * Get the resources
      *
-     * @return string[]
+     * @return array<string>
      */
-    public function getResources() {
+    public function getResources(): array
+    {
         return $this->resources;
     }
 
     /**
      * Set the users
      *
-     * @param string|string[] $users
-     * @return self
+     * @param array<string> $users
      */
-    public function setUsers($users) {
+    public function setUsers(array $users): self
+    {
         $this->users = $users;
-
         return $this;
     }
 
     /**
      * Get the users
      *
-     * @return string|string[]
+     * @return array<string>
      */
-    public function getUsers() {
+    public function getUsers(): array
+    {
         return $this->users;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array{id:string,group:string,resources:array<string>,users:array<string>}
      */
-    public function getData() {
+    public function getData(): array
+    {
         return [
             'id' => $this->getId(),
             'group' => $this->getGroup(),

@@ -1,39 +1,41 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Model;
 
-class AccessRules implements ModelInterface {
+class AccessRules implements ModelInterface
+{
     /**
      * List of rules
      *
-     * @var array[]
+     * @var array<array>
      */
-    private $rules = [];
+    private array $rules = [];
 
     /**
      * Set the rules
      *
-     * @param array[]
-     * @return self
+     * @param array<array>
      */
-    public function setRules(array $rules) {
+    public function setRules(array $rules): self
+    {
         $this->rules = $rules;
-
         return $this;
     }
 
     /**
      * Get the rules
      *
-     * @return array[]
+     * @return array<array>
      */
-    public function getRules() {
+    public function getRules(): array
+    {
         return $this->rules;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<array>
      */
-    public function getData() {
+    public function getData(): array
+    {
         return $this->getRules();
     }
 }
