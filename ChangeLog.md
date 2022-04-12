@@ -5,6 +5,7 @@ Imbo-3.0.0
 ----------
 __N/A__
 
+* #635: Remove ListModel
 * #501: Added image transformation limit event listener (Mats Lindh)
 * #495: Upgrade aws-sdk-php-dependency to new major: `^3.19` (Mats Lindh)
 * #477: Add Backblaze B2 Cloud Storage adapter (Mats Lindh)
