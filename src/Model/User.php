@@ -1,97 +1,81 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Model;
 
 use DateTime;
 
-class User implements ModelInterface {
+class User implements ModelInterface
+{
     /**
      * User ID
-     *
-     * @var string
      */
-    private $user;
+    private ?string $user = null;
 
     /**
      * Number of images
-     *
-     * @var int
      */
-    private $numImages;
+    private ?int $numImages = null;
 
     /**
      * Last modified
-     *
-     * @var DateTime
      */
-    private $lastModified;
+    private ?DateTime $lastModified = null;
 
     /**
      * Set the user ID
-     *
-     * @param string $user The user ID
-     * @return User
      */
-    public function setUserId($user) {
+    public function setUserId(string $user): self
+    {
         $this->user = $user;
-
         return $this;
     }
 
     /**
      * Get the user ID
-     *
-     * @return string
      */
-    public function getUserId() {
+    public function getUserId(): ?string
+    {
         return $this->user;
     }
 
     /**
      * Set the number of images
-     *
-     * @param int $num The number to set
-     * @return User
      */
-    public function setNumImages($num) {
-        $this->numImages = (int) $num;
-
+    public function setNumImages(int $num): self
+    {
+        $this->numImages = $num;
         return $this;
     }
 
     /**
      * Get the number of images
-     *
-     * @return int
      */
-    public function getNumImages() {
+    public function getNumImages(): ?int
+    {
         return $this->numImages;
     }
 
     /**
      * Set the last modified date
-     *
-     * @param DateTime $date The DateTime instance
-     * @return User
      */
-    public function setLastModified(DateTime $date) {
+    public function setLastModified(DateTime $date): self
+    {
         $this->lastModified = $date;
-
         return $this;
     }
 
     /**
      * Get the last modified date
-     *
-     * @return DateTime
      */
-    public function getLastModified() {
+    public function getLastModified(): ?DateTime
+    {
         return $this->lastModified;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array{id:string,numImages:int,lastModified:DateTime}
      */
-    public function getData() {
+    public function getData(): array
+    {
         return [
             'id' => $this->getUserId(),
             'numImages' => $this->getNumImages(),

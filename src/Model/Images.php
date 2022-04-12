@@ -139,7 +139,7 @@ class Images implements ModelInterface
     /**
      * @return array{images:array<Image>,fields:array<string>,count:int,hits:int,limit:int,page:int}
      */
-    public function getData()
+    public function getData(): array
     {
         return [
             'images' => $this->getImages(),

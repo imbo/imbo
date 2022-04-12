@@ -447,9 +447,9 @@ class Image implements ModelInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return array{filesize:int,mimeType:string,extension:string,metadata:array<string,mixed>,width:int,height:int,addedDate:DateTime,updatedDate:DateTime,user:string,imageIdentifier:string,checksum:string,originalChecksum:string,hasBeenTransformed:bool,outputQualityCompression:int}
      */
-    public function getData()
+    public function getData(): array
     {
         return [
             'filesize'                 => $this->getFilesize(),

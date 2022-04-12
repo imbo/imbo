@@ -1,97 +1,81 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Model;
 
 use DateTime;
 
-class Status implements ModelInterface {
+class Status implements ModelInterface
+{
     /**
      * Date
-     *
-     * @var DateTime
      */
-    private $date;
+    private ?DateTime $date = null;
 
     /**
      * Database status
-     *
-     * @var boolean
      */
-    private $databaseStatus;
+    private ?bool $databaseStatus = null;
 
     /**
      * Storage status
-     *
-     * @var boolean
      */
-    private $storageStatus;
+    private ?bool $storageStatus = null;
 
     /**
      * Set the date
-     *
-     * @param DateTime $date A DateTime instance
-     * @return Status
      */
-    public function setDate(DateTime $date) {
+    public function setDate(DateTime $date): self
+    {
         $this->date = $date;
-
         return $this;
     }
 
     /**
      * Get the date
-     *
-     * @return DateTime
      */
-    public function getDate() {
+    public function getDate(): ?DateTime
+    {
         return $this->date;
     }
 
     /**
      * Set the database status
-     *
-     * @param boolean $status The status flag
-     * @return Status
      */
-    public function setDatabaseStatus($status) {
-        $this->databaseStatus = (boolean) $status;
-
+    public function setDatabaseStatus(bool $status): self
+    {
+        $this->databaseStatus = $status;
         return $this;
     }
 
     /**
      * Get the database status
-     *
-     * @return boolean
      */
-    public function getDatabaseStatus() {
+    public function getDatabaseStatus(): ?bool
+    {
         return $this->databaseStatus;
     }
 
     /**
      * Set the storage status
-     *
-     * @param boolean $status The status flag
-     * @return Status
      */
-    public function setStorageStatus($status) {
-        $this->storageStatus = (boolean) $status;
-
+    public function setStorageStatus(bool $status): self
+    {
+        $this->storageStatus = $status;
         return $this;
     }
 
     /**
      * Get the storage status
-     *
-     * @return boolean
      */
-    public function getStorageStatus() {
+    public function getStorageStatus(): ?bool
+    {
         return $this->storageStatus;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array{date:DateTime,database:bool,storage:bool}
      */
-    public function getData() {
+    public function getData(): array
+    {
         return [
             'date' => $this->getDate(),
             'database' => $this->getDatabaseStatus(),

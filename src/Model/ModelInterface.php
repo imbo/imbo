@@ -1,11 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 namespace Imbo\Model;
 
-interface ModelInterface {
+interface ModelInterface
+{
     /**
      * Return the "data" found in the model
      *
-     * @return mixed
+     * @return array<mixed,mixed>
      */
-    function getData();
+    public function getData(): array;
 }
