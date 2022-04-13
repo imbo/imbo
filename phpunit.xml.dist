@@ -22,10 +22,4 @@
       <directory suffix="Test.php">tests</directory>
     </testsuite>
   </testsuites>
-
-  <groups>
-    <exclude>
-      <group>local</group>
-    </exclude>
-  </groups>
 </phpunit>
