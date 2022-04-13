@@ -5,12 +5,7 @@ use SplPriorityQueue;
 
 class PriorityQueue extends SplPriorityQueue
 {
-    /**
-     * Queue order counter
-     *
-     * @var int
-     */
-    private $queueOrder = PHP_INT_MAX;
+    private int $queueOrder = PHP_INT_MAX;
 
     /**
      * Add an entry to the queue
@@ -18,12 +13,12 @@ class PriorityQueue extends SplPriorityQueue
      * @param mixed $datum The entry to add
      * @param int $priority The priority of the entry in the queue
      */
-    public function insert($datum, $priority)
+    public function insert($datum, $priority): bool
     {
         if (is_int($priority)) {
             $priority = [$priority, $this->queueOrder--];
         }
 
-        parent::insert($datum, $priority);
+        return parent::insert($datum, $priority);
     }
 }
