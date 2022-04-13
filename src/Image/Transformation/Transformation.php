@@ -24,6 +24,9 @@ abstract class Transformation implements ListenerInterface, ImagickAware
         return $this;
     }
 
+    /**
+     * @return static
+     */
     public function setImage(Image $image): self
     {
         $this->image = $image;
@@ -64,17 +67,6 @@ abstract class Transformation implements ListenerInterface, ImagickAware
         }
 
         return $quantumRange['quantumRangeLong'];
-    }
-
-    protected function getImagickVersion(): string
-    {
-        // Newer versions of Imagick expose getVersion as a static method,
-        // and won't allow phpunit to mock it even when called on an instance
-        if (method_exists('Imagick', 'getVersion')) {
-            return Imagick::getVersion();
-        }
-
-        return $this->imagick->getVersion();
     }
 
     /**
