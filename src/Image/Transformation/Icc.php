@@ -40,15 +40,8 @@ class Icc extends Transformation
      *                        with the `profile` parameter for the transformation, and the values
      *                        are paths to the profiles themselves.
      */
-    public function __construct($profiles)
+    public function __construct(array $profiles)
     {
-        if (!is_array($profiles)) {
-            throw new ConfigurationException(
-                get_class() . ' requires an array with name => profile file (.icc) mappings when created.',
-                Response::HTTP_INTERNAL_SERVER_ERROR,
-            );
-        }
-
         $this->profiles = $profiles;
     }
 
