@@ -4,6 +4,7 @@ namespace Imbo\Http\Response;
 use Imbo\EventListener\ListenerInterface;
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception;
+use Imbo\Http\ContentNegotiation;
 use Imbo\Http\Request\Request;
 use Imbo\Model;
 use Symfony\Component\HttpFoundation\AcceptHeader;
@@ -77,6 +78,8 @@ class ResponseFormatter implements ListenerInterface
             // Supported image formats are populated from the output converter
         ],
     ];
+
+    private ContentNegotiation $contentNegotiation;
 
     /**
      * The formatter to use
