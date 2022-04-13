@@ -22,9 +22,9 @@ interface InputLoaderInterface
      * @param string $blob The file being loaded as a binary blob
      * @param string $mimeType The determined mime type of the file. Will match one of the mime
      *                         types specified in `getSupportedMimeTypes()`.
-     * @return mixed Return false to have the input loader manager try the next loader. All other
-     *               return values (including null / void) means that the loader successfully
-     *               managed to load the image.
+     * @return void|mixed Return false to have the input loader manager try the next loader. All other
+     *                    return values (including null / void) means that the loader successfully
+     *                    managed to load the image.
      */
     public function load(Imagick $imagick, string $blob, string $mimeType);
 }
