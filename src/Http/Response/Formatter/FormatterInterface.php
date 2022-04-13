@@ -75,6 +75,14 @@ interface FormatterInterface
     public function formatGroup(Model\Group $model);
 
     /**
+     * Format an access rule model
+     *
+     * @param  Model\AccessRule $model The model to format
+     * @return string Formatted data
+     */
+    public function formatAccessRule(Model\AccessRule $model);
+
+    /**
      * Format an access rules model
      *
      * @param  Model\AccessRules $model The model to format
