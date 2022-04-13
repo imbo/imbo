@@ -8,39 +8,35 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Image\Transformation\Transformation;
+use Imbo\Model\Image;
 
-/**
- * Image transformation manager
- */
 class TransformationManager implements ListenerInterface
 {
     /**
      * Uninitialized image transformations
      *
-     * @var array
+     * @var array<string,TLiteralClassString|Closure:Transformation>
      */
-    protected $transformations = [];
+    protected array $transformations = [];
 
     /**
      * Initialized transformation handlers
      *
-     * @var array
+     * @var array<string,Transformation>
      */
-    protected $handlers = [];
+    protected array $handlers = [];
 
     /**
      * Image transformation initializers
      *
-     * @var array
+     * @var array<InitializerInterface>
      */
-    protected $initializers = [];
+    protected array $initializers = [];
 
     /**
      * Track if the manager has attempted to apply transformations.
-     *
-     * @var boolean
      */
-    protected $transformationsApplied = false;
+    protected bool $transformationsApplied = false;
 
     public static function getSubscribedEvents(): array
     {
@@ -59,11 +55,9 @@ class TransformationManager implements ListenerInterface
     /**
      * Add a transformation to the manager
      *
-     * @param string $name Name of the transformation
-     * @param mixed $transformation Class name, Transformation instace or callable that returns one
-     * @return self
+     * @param TLiteralClassString|Closure:Transformation|Transformation $transformation Class name, Transformation instance or callable that returns one
      */
-    public function addTransformation($name, $transformation)
+    public function addTransformation(string $name, $transformation): self
     {
         if ($transformation instanceof Transformation) {
             $this->handlers[$name] = $transformation;
@@ -77,10 +71,9 @@ class TransformationManager implements ListenerInterface
     /**
      * Add a transformation to the manager
      *
-     * @param array $transformations Array of transformations, keys being the transformation names
-     * @return self
+     * @param array<string,TLiteralClassString|Closure:Transformation|Transformation> $transformations Array of transformations, keys being the transformation names
      */
-    public function addTransformations(array $transformations)
+    public function addTransformations(array $transformations): self
     {
         foreach ($transformations as $name => $transformation) {
             $this->addTransformation($name, $transformation);
@@ -91,24 +84,19 @@ class TransformationManager implements ListenerInterface
 
     /**
      * Add an event listener/transformation initializer
-     *
-     * @param InitializerInterface $initializer An initializer instance
-     * @return self
      */
-    public function addInitializer(InitializerInterface $initializer)
+    public function addInitializer(InitializerInterface $initializer): self
     {
         $this->initializers[] = $initializer;
-
         return $this;
     }
 
     /**
      * Get the transformation registered for the given transformation name
      *
-     * @param string $name Name of transformation
-     * @return Transformation
+     * @return Transformation|false
      */
-    public function getTransformation($name)
+    public function getTransformation(string $name)
     {
         if (isset($this->handlers[$name])) {
             return $this->handlers[$name];
@@ -138,10 +126,8 @@ class TransformationManager implements ListenerInterface
 
     /**
      * Apply image transformations
-     *
-     * @param EventInterface $event The current event
      */
-    public function applyTransformations(EventInterface $event)
+    public function applyTransformations(EventInterface $event): void
     {
         $request = $event->getRequest();
         $image = $event->getResponse()->getModel();
@@ -189,9 +175,8 @@ class TransformationManager implements ListenerInterface
      * in cases where we need to adjust the transformation parameters to account for the new size
      * of the input image.
      *
-     * @param  EventInterface $event The event that triggered this calculation
      * @throws InvalidArgumentException
-     * @return array|boolean `false` if we need the full size of the input image, array otherwise
+     * @return array|false `false` if we need the full size of the input image, array otherwise
      */
     public function getMinimumImageInputSize(EventInterface $event)
     {
@@ -201,6 +186,7 @@ class TransformationManager implements ListenerInterface
             return false;
         }
 
+        /** @var Image */
         $image = $event->getResponse()->getModel();
         $region = null;
 
@@ -301,10 +287,8 @@ class TransformationManager implements ListenerInterface
 
     /**
      * Adjust image transformations
-     *
-     * @param EventInterface $event
      */
-    public function adjustImageTransformations(EventInterface $event)
+    public function adjustImageTransformations(EventInterface $event): void
     {
         // If the image has not stepped through any input size transformations,
         // we don't set any ratio, and it should be safe to assume no transformations
@@ -338,12 +322,10 @@ class TransformationManager implements ListenerInterface
     /**
      * Trigger transformation with the given name, with the given parameters
      *
-     * @param string $name Name of transformation
      * @param array $params Transformation parameters
-     * @param EventInterface $event Event that triggered the transformation chain
      * @throws TransformationException If the transformation fails or is not registered
      */
-    protected function triggerTransformation($name, array $params, EventInterface $event)
+    protected function triggerTransformation(string $name, array $params, EventInterface $event)
     {
         $transformation = $this->getTransformation($name);
 
@@ -360,9 +342,9 @@ class TransformationManager implements ListenerInterface
     /**
      * Check whether the manager has attempted to apply transformations (i.e. transformations are present in the pipeline).
      *
-     * @return boolean Whether transformations has been triggered
+     * @return bool Whether transformations has been triggered
      */
-    public function hasAppliedTransformations()
+    public function hasAppliedTransformations(): bool
     {
         return $this->transformationsApplied;
     }

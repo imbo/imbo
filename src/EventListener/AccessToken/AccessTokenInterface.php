@@ -12,10 +12,10 @@ interface AccessTokenInterface
      * @param string $privateKey The private key used to sign the data
      * @return string The generated signature from the parameters given
      */
-    public function generateSignature($argumentKey, $data, $privateKey);
+    public function generateSignature(string $argumentKey, string $data, string $privateKey): string;
 
     /**
-     * @return string[] The defined argument keys handled by this generator
+     * @return array<string> The defined argument keys handled by this generator
      */
-    public function getArgumentKeys();
+    public function getArgumentKeys(): array;
 }

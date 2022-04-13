@@ -9,53 +9,45 @@ abstract class AccessTokenGenerator implements AccessTokenInterface
     /**
      * Parameters for the generator
      *
-     * @var array
+     * @var array<string,mixed>
      */
-    protected $params = [
+    protected array $params = [
         'argumentKeys' => ['accessToken'],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
-    abstract public function generateSignature($argumentKey, $data, $privateKey);
+    abstract public function generateSignature(string $argumentKey, string $data, string $privateKey): string;
 
     /**
      * Class constructor
      *
-     * @param array $params Parameters for the listener
+     * @param array<string,mixed> $params Parameters for the listener
      */
     public function __construct(array $params = null)
     {
-        if ($params) {
+        if (null !== $params) {
             $this->params = array_replace_recursive($this->params, $params);
         }
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<string>
      */
-    public function getArgumentKeys()
+    public function getArgumentKeys(): array
     {
         return $this->params['argumentKeys'];
     }
 
-    /**
-     * @param string $argumentKey Add an argument key to be handled by this generator
-     */
-    public function addArgumentKey($argumentKey)
+    public function addArgumentKey(string $argumentKey): void
     {
         $this->params['argumentKeys'][] = $argumentKey;
     }
 
     /**
-     * @param string[] $argumentKeys Set the argumentKeys that this generator handles
-     * @return self
+     * @param array<string> $argumentKeys Set the argumentKeys that this generator handles
      */
-    public function setArgumentKeys($argumentKeys)
+    public function setArgumentKeys(array $argumentKeys): self
     {
         $this->params['argumentKeys'] = $argumentKeys;
-
         return $this;
     }
 }

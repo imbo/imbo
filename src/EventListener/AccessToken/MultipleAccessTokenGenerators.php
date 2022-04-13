@@ -35,12 +35,15 @@ class MultipleAccessTokenGenerators extends AccessTokenGenerator
         parent::__construct($params);
     }
 
-    public function generateSignature($argumentKey, $data, $privateKey)
+    public function generateSignature(string $argumentKey, string $data, string $privateKey): string
     {
         return $this->params['generators'][$argumentKey]->generateSignature($argumentKey, $data, $privateKey);
     }
 
-    public function getArgumentKeys()
+    /**
+     * @return array<string>
+     */
+    public function getArgumentKeys(): array
     {
         return array_keys($this->params['generators']);
     }
