@@ -9,18 +9,12 @@ use stdClass;
  */
 class JSON extends Formatter implements FormatterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getContentType()
+    public function getContentType(): string
     {
         return 'application/json';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function formatError(Model\Error $model)
+    public function formatError(Model\Error $model): string
     {
         $data = [
             'error' => [
@@ -38,10 +32,7 @@ class JSON extends Formatter implements FormatterInterface
         return $this->encode($data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function formatStatus(Model\Status $model)
+    public function formatStatus(Model\Status $model): string
     {
         return $this->encode([
             'date' => $this->dateFormatter->formatDate($model->getDate()),
@@ -50,10 +41,7 @@ class JSON extends Formatter implements FormatterInterface
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function formatUser(Model\User $model)
+    public function formatUser(Model\User $model): string
     {
         return $this->encode([
             'user' => $model->getUserId(),
@@ -62,10 +50,7 @@ class JSON extends Formatter implements FormatterInterface
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function formatImages(Model\Images $model)
+    public function formatImages(Model\Images $model): string
     {
         $images = $model->getImages();
         $data = [];
@@ -124,26 +109,17 @@ class JSON extends Formatter implements FormatterInterface
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function formatMetadataModel(Model\Metadata $model)
+    public function formatMetadataModel(Model\Metadata $model): string
     {
         return $this->encode($model->getData() ?: new stdClass());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function formatArrayModel(Model\ArrayModel $model)
+    public function formatArrayModel(Model\ArrayModel $model): string
     {
         return $this->encode($model->getData() ?: new stdClass());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function formatGroups(Model\Groups $model)
+    public function formatGroups(Model\Groups $model): string
     {
         return $this->encode([
             'search' => [
@@ -156,10 +132,7 @@ class JSON extends Formatter implements FormatterInterface
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function formatGroup(Model\Group $model)
+    public function formatGroup(Model\Group $model): string
     {
         return $this->encode([
             'name' => $model->getName(),
@@ -167,10 +140,7 @@ class JSON extends Formatter implements FormatterInterface
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function formatAccessRule(Model\AccessRule $model)
+    public function formatAccessRule(Model\AccessRule $model): string
     {
         $data = [
             'id' => $model->getId(),
@@ -188,18 +158,12 @@ class JSON extends Formatter implements FormatterInterface
         return $this->encode($data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function formatAccessRules(Model\AccessRules $model)
+    public function formatAccessRules(Model\AccessRules $model): string
     {
         return $this->encode($model->getRules());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function formatStats(Model\Stats $model)
+    public function formatStats(Model\Stats $model): string
     {
         $data = [
             'numImages' => $model->getNumImages(),
@@ -215,9 +179,8 @@ class JSON extends Formatter implements FormatterInterface
      * JSON encode an array
      *
      * @param mixed $data The data to encode
-     * @return string
      */
-    private function encode($data)
+    private function encode($data): string
     {
         return json_encode($data);
     }

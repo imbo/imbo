@@ -19,7 +19,7 @@ abstract class Formatter implements FormatterInterface
         $this->dateFormatter = $formatter;
     }
 
-    public function format(Model\ModelInterface $model)
+    public function format(Model\ModelInterface $model): string
     {
         if ($model instanceof Model\Error) {
             return $this->formatError($model);
