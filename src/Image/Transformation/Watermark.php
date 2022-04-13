@@ -5,7 +5,6 @@ use Imagick;
 use ImagickException;
 use Imbo\Exception\StorageException;
 use Imbo\Exception\TransformationException;
-use Imbo\Helpers\Imagick as ImagickHelper;
 use Imbo\Http\Response\Response;
 use Imbo\Image\InputSizeConstraint;
 
@@ -96,18 +95,7 @@ class Watermark extends Transformation implements InputSizeConstraint
         if ($opacity < 1) {
             // if there's no alpha channel already, we have to enable it before calculating transparency
             if (!$watermark->getImageAlphaChannel()) {
-                try {
-                    $watermark->setImageAlphaChannel(Imagick::ALPHACHANNEL_ACTIVATE);
-                } catch (ImagickException $e) {
-                    // there's a bug in Imagemagick < 6.8.0-4 which throws an exception even if the value was set
-                    // https://imagemagick.org/discourse-server/viewtopic.php?t=22152
-                    $version = ImagickHelper::getInstalledVersion();
-
-                    if (version_compare($version, '6.8.0-4', '>=')) {
-                        // rethrow exception if we're on 6.8.0-4 or newer.
-                        throw $e;
-                    }
-                }
+                $watermark->setImageAlphaChannel(Imagick::ALPHACHANNEL_ACTIVATE);
             }
 
             $watermark->evaluateImage(Imagick::EVALUATE_MULTIPLY, $opacity, Imagick::CHANNEL_ALPHA);
