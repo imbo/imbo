@@ -6,7 +6,9 @@ use Imbo\EventManager\Event;
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\HeaderBag;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
@@ -25,6 +27,7 @@ class AuthenticateTest extends ListenerTests
 
     public function setUp(): void
     {
+        /** @var InputBag&MockObject */
         $this->query = $this->createMock(ParameterBag::class);
         $this->headers = $this->createMock(HeaderBag::class);
         $this->accessControl = $this->createMock(AdapterInterface::class);
@@ -34,7 +37,7 @@ class AuthenticateTest extends ListenerTests
         $this->request->headers = $this->headers;
 
         $this->response = $this->createMock(Response::class);
-        $this->response->headers = $this->createMock(HeaderBag::class);
+        $this->response->headers = $this->createMock(ResponseHeaderBag::class);
 
         $this->event = $this->getEventMock();
 

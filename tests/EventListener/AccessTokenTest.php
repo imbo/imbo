@@ -8,7 +8,9 @@ use Imbo\Exception\ConfigurationException;
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
+use PHPUnit\Framework\MockObject\MockObject;
 use stdClass;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
@@ -27,6 +29,7 @@ class AccessTokenTest extends ListenerTests
 
     public function setUp(): void
     {
+        /** @var InputBag&MockObject */
         $this->query = $this->createMock(ParameterBag::class);
 
         $this->accessControl = $this->createMock(AccessControlAdapter::class);
@@ -340,6 +343,7 @@ class AccessTokenTest extends ListenerTests
         foreach (['http', 'https'] as $signedProtocol) {
             $token = hash_hmac('sha256', $signedProtocol . ':' . $baseUrl, $privateKey);
 
+            /** @var InputBag&MockObject */
             $query = $this->createMock(ParameterBag::class);
             $query
                 ->method('has')

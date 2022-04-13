@@ -18,7 +18,9 @@ use Imbo\Image\Transformation\Transformation;
 use Imbo\Image\TransformationManager;
 use Imbo\Model\Image;
 use Imbo\Storage\StorageInterface as MainStorageInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use stdClass;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
@@ -31,13 +33,19 @@ class ImageVariationsTest extends ListenerTests
     private DatabaseInterface $db;
     private StorageInterface $storage;
     private EventInterface $event;
+    /** @var Request&MockObject */
     private Request $request;
+    /** @var Response&MockObject */
     private Response $response;
+    /** @var ResponseHeaderBag&MockObject */
     private ResponseHeaderBag $responseHeaders;
     private ParameterBag $query;
+    /** @var Image&MockObject */
     private Image $imageModel;
     private MainStorageInterface $imageStorage;
+    /** @var EventManager&MockObject */
     private EventManager $eventManager;
+    /** @var TransformationManager&MockObject */
     private TransformationManager $transformationManager;
     private string $user = 'user';
     private string $imageIdentifier = 'imgid';
@@ -58,13 +66,10 @@ class ImageVariationsTest extends ListenerTests
     {
         $this->db         = $this->createMock(DatabaseInterface::class);
         $this->storage    = $this->createMock(StorageInterface::class);
+        /** @var InputBag&MockObject */
         $this->query      = $this->createMock(ParameterBag::class);
         $this->imageModel = $this->createConfiguredMock(Image::class, [
             'getImageIdentifier' => $this->imageIdentifier,
-            //'setWidth'           => $this->returnSelf(),
-            //'setHeight'          => $this->returnSelf(),
-            //'setMimeType'        => $this->returnSelf(),
-            //'setExtension'       => $this->returnSelf(),
         ]);
         $this->imageModel
             ->method('setWidth')

@@ -7,7 +7,9 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Error;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\HeaderBag;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use TestFs\StreamWrapper as TestFs;
@@ -31,6 +33,7 @@ class ImageTransformationCacheTest extends ListenerTests
     {
         $this->responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $this->requestHeaders = $this->createMock(HeaderBag::class);
+        /** @var InputBag&MockObject */
         $this->query = $this->createMock(ParameterBag::class);
 
         $this->response = $this->createMock(Response::class);

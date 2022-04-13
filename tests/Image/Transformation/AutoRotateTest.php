@@ -8,6 +8,7 @@ use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Image\InputSizeConstraint;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\AutoRotate
@@ -42,6 +43,10 @@ class AutoRotateTest extends TransformationTests
             [
                 Imagick::ORIENTATION_TOPRIGHT,
                 Imagick::ORIENTATION_TOPLEFT,
+                /**
+                 * @param Imagick&MockObject $imagick
+                 * @param Image&MockObject $image
+                 */
                 function (Imagick $imagick, Image $image): void {
                     $imagick
                         ->expects($this->once())
@@ -54,6 +59,10 @@ class AutoRotateTest extends TransformationTests
             [
                 Imagick::ORIENTATION_BOTTOMRIGHT,
                 Imagick::ORIENTATION_TOPLEFT,
+                /**
+                 * @param Imagick&MockObject $imagick
+                 * @param Image&MockObject $image
+                 */
                 function (Imagick $imagick, Image $image): void {
                     $imagick
                         ->expects($this->never())
@@ -66,6 +75,10 @@ class AutoRotateTest extends TransformationTests
             [
                 Imagick::ORIENTATION_BOTTOMLEFT,
                 Imagick::ORIENTATION_TOPLEFT,
+                /**
+                 * @param Imagick&MockObject $imagick
+                 * @param Image&MockObject $image
+                 */
                 function (Imagick $imagick, Image $image): void {
                     $imagick
                         ->expects($this->never())
@@ -78,6 +91,10 @@ class AutoRotateTest extends TransformationTests
             [
                 Imagick::ORIENTATION_LEFTTOP,
                 Imagick::ORIENTATION_TOPLEFT,
+                /**
+                 * @param Imagick&MockObject $imagick
+                 * @param Image&MockObject $image
+                 */
                 function (Imagick $imagick, Image $image): void {
                     $imagick
                         ->expects($this->once())
@@ -105,6 +122,10 @@ class AutoRotateTest extends TransformationTests
             [
                 Imagick::ORIENTATION_RIGHTTOP,
                 Imagick::ORIENTATION_TOPLEFT,
+                /**
+                 * @param Imagick&MockObject $imagick
+                 * @param Image&MockObject $image
+                 */
                 function (Imagick $imagick, Image $image): void {
                     $imagick
                         ->expects($this->never())
@@ -132,6 +153,10 @@ class AutoRotateTest extends TransformationTests
             [
                 Imagick::ORIENTATION_RIGHTBOTTOM,
                 Imagick::ORIENTATION_TOPLEFT,
+                /**
+                 * @param Imagick&MockObject $imagick
+                 * @param Image&MockObject $image
+                 */
                 function (Imagick $imagick, Image $image): void {
                     $imagick
                         ->expects($this->never())
@@ -159,6 +184,10 @@ class AutoRotateTest extends TransformationTests
             [
                 Imagick::ORIENTATION_LEFTBOTTOM,
                 Imagick::ORIENTATION_TOPLEFT,
+                /**
+                 * @param Imagick&MockObject $imagick
+                 * @param Image&MockObject $image
+                 */
                 function (Imagick $imagick, Image $image): void {
                     $imagick
                         ->expects($this->never())

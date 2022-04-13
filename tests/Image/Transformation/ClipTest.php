@@ -9,6 +9,7 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -16,8 +17,9 @@ use PHPUnit\Framework\TestCase;
  */
 class ClipTest extends TestCase
 {
-    private Clip $transformation;
+    /** @var Image&MockObject */
     private Image $image;
+    private Clip $transformation;
     private Imagick $imagick;
 
     public function setUp(): void

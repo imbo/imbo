@@ -5,7 +5,7 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
-use Symfony\Component\HttpFoundation\HeaderBag;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
  * @coversDefaultClass Imbo\EventListener\ResponseSender
@@ -51,7 +51,7 @@ class ResponseSenderTest extends ListenerTests
             ->expects($this->once())
             ->method('send');
 
-        $response->headers = $this->createMock(HeaderBag::class);
+        $response->headers = $this->createMock(ResponseHeaderBag::class);
         $response->headers
             ->expects($this->once())
             ->method('set')
@@ -86,7 +86,7 @@ class ResponseSenderTest extends ListenerTests
             ->expects($this->once())
             ->method('send');
 
-        $response->headers = $this->createMock(HeaderBag::class);
+        $response->headers = $this->createMock(ResponseHeaderBag::class);
         $response->headers
             ->expects($this->once())
             ->method('set')

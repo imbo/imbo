@@ -41,6 +41,7 @@ class InputLoaderManagerTest extends TestCase
             'Given loader (stdClass) does not implement LoaderInterface',
             Response::HTTP_INTERNAL_SERVER_ERROR,
         ));
+        /** @psalm-suppress InvalidArgument */
         $this->manager->addLoaders([new stdClass()]);
     }
 

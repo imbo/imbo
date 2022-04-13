@@ -118,18 +118,6 @@ class IccTest extends TestCase
     }
 
     /**
-     * @covers ::__construct
-     */
-    public function testThrowsExceptionWhenConstructingWithWrongType(): void
-    {
-        $this->expectExceptionObject(new ConfigurationException(
-            'Imbo\Image\Transformation\Icc requires an array with name => profile file (.icc) mappings when created.',
-            Response::HTTP_INTERNAL_SERVER_ERROR,
-        ));
-        new Icc('/some/path');
-    }
-
-    /**
      * @covers ::transform
      */
     public function testThrowsExceptionWhenInvalidPathIsUsed(): void
