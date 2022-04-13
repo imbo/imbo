@@ -160,37 +160,31 @@ class Application
             Resource\Key::class,
             Resource\AccessRules::class,
             Resource\AccessRule::class,
-            ResponseFormatter::class => [
-                'formatters' => $formatters,
-                'contentNegotiation' => $contentNegotiation,
-            ],
             DatabaseOperations::class,
             StorageOperations::class,
             ImagePreparation::class,
             ResponseSender::class,
             ResponseETag::class,
             HttpCache::class,
-            TransformationManager::class => $transformationManager,
         ];
 
-        foreach ($eventListeners as $listener => $params) {
-            if (is_int($listener) && is_string($params)) {
-                $listener = $params;
-                $params = [];
-                $name = $listener;
-            } elseif (is_string($listener) && $params instanceof ListenerInterface) {
-                $name = $listener;
-                $listener = $params;
-                $params = [];
-            } elseif (is_string($listener) && is_array($params)) {
-                $name = $listener;
-            } else {
-                throw new RuntimeException('Incorrect event listener configuration');
-            }
-
-            $eventManager->addEventHandler($name, $listener, $params)
-                         ->addCallbacks($name, $listener::getSubscribedEvents());
+        foreach ($eventListeners as $listener) {
+            $eventManager
+                ->addEventHandler($listener, $listener)
+                ->addCallbacks($listener, $listener::getSubscribedEvents());
         }
+
+        $eventManager
+            ->addEventHandler(ResponseFormatter::class, ResponseFormatter::class, [
+                'formatters' => $formatters,
+                'contentNegotiation' => $contentNegotiation,
+            ])
+            ->addCallbacks(ResponseFormatter::class, ResponseFormatter::getSubscribedEvents());
+
+        $eventManager
+            ->addEventHandler(TransformationManager::class, $transformationManager)
+            ->addCallbacks(TransformationManager::class, TransformationManager::getSubscribedEvents());
+
 
         // Event listener initializers
         foreach ($this->config['eventListenerInitializers'] as $name => $initializer) {
