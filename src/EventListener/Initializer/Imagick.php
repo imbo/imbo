@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventListener\Initializer;
 
+use Imagick as BaseImagick;
 use Imbo\EventListener\ImagickAware;
 use Imbo\EventListener\ListenerInterface;
-use Imbo\Image\Transformation\Transformation;
 
 /**
  * Imagick initializer
@@ -15,20 +15,13 @@ class Imagick implements InitializerInterface
 {
     /**
      * Imagick instance used by Imbo's built in image transformations
-     *
-     * @var \Imagick
      */
-    private $imagick;
+    private BaseImagick $imagick;
 
-    /**
-     * Class constructor
-     *
-     * @param \Imagick $imagick An optional Imagick instance
-     */
-    public function __construct(\Imagick $imagick = null)
+    public function __construct(BaseImagick $imagick = null)
     {
         if ($imagick === null) {
-            $imagick = new \Imagick();
+            $imagick = new BaseImagick();
             $imagick->setOption('png:exclude-chunks', 'all');
         }
 
@@ -37,10 +30,8 @@ class Imagick implements InitializerInterface
 
     /**
      * Injects the Imagick instance into some event listeners
-     *
-     * @param ListenerInterface $listener An event listener
      */
-    public function initialize(ListenerInterface $listener)
+    public function initialize(ListenerInterface $listener): void
     {
         if ($listener instanceof ImagickAware) {
             $listener->setImagick($this->imagick);
