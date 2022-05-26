@@ -48,8 +48,8 @@ Feature: Imbo supports HTTP HEAD for all resources
         Then the last 2 "vary" response headers are the same
         Then the last 2 "content-type" response headers are the same
         Then the last 2 "content-length" response headers are the same
-        Then the last 2 "X-imbo-originalextension" response headers are the same
-        Then the last 2 "X-imbo-originalfilesize" response headers are the same
-        Then the last 2 "X-imbo-originalheight" response headers are the same
-        Then the last 2 "X-imbo-originalmimetype" response headers are the same
-        Then the last 2 "X-imbo-originalwidth" response headers are the same
+        Then the last 2 "X-Imbo-OriginalExtension" response headers are the same
+        Then the last 2 "X-Imbo-OriginalFilesize" response headers are the same
+        Then the last 2 "X-Imbo-OriginalHeight" response headers are the same
+        Then the last 2 "X-Imbo-OriginalMimeType" response headers are the same
+        Then the last 2 "X-Imbo-OriginalWidth" response headers are the same

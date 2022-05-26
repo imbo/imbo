@@ -93,6 +93,7 @@ Feature: Imbo provides an images endpoint
                     "width": 599,
                     "height": 417,
                     "mime": "image/png",
+                    "mimeType": "image/png",
                     "imageIdentifier": "@regExp(/^[a-zA-Z0-9-_]{12}$/)",
                     "user": "user"
                 }
@@ -113,9 +114,9 @@ Feature: Imbo provides an images endpoint
         Examples:
             | filter                           | response                                                                                                                                                                                                                                                                                                                                                    |
             | foobar                           | {"search":{"hits":0,"page":1,"limit":20,"count":0},"images":[]}                                                                                                                                                                                                                                                                                             |
-            | fc7d2d06993047a0b5056e8fac4462a2 | {"search":{"hits":1,"page":1,"limit":20,"count":1},"images":[{"added":"@isDate()","updated":"@isDate()","checksum":"fc7d2d06993047a0b5056e8fac4462a2","originalChecksum":"fc7d2d06993047a0b5056e8fac4462a2","extension":"png","size":95576,"width":599,"height":417,"mime":"image/png","imageIdentifier":"@regExp(/^[a-zA-Z0-9-_]{12}$/)","user":"user"}]}  |
-            | f3210f1bb34bfbfa432cc3560be40761 | {"search":{"hits":1,"page":1,"limit":20,"count":1},"images":[{"added":"@isDate()","updated":"@isDate()","checksum":"f3210f1bb34bfbfa432cc3560be40761","originalChecksum":"f3210f1bb34bfbfa432cc3560be40761","extension":"jpg","size":64828,"width":665,"height":463,"mime":"image/jpeg","imageIdentifier":"@regExp(/^[a-zA-Z0-9-_]{12}$/)","user":"user"}]} |
-            | b5426b4c008e378c201526d2baaec599 | {"search":{"hits":1,"page":1,"limit":20,"count":1},"images":[{"added":"@isDate()","updated":"@isDate()","checksum":"b5426b4c008e378c201526d2baaec599","originalChecksum":"b5426b4c008e378c201526d2baaec599","extension":"gif","size":66020,"width":665,"height":463,"mime":"image/gif","imageIdentifier":"@regExp(/^[a-zA-Z0-9-_]{12}$/)","user":"user"}]}  |
+            | fc7d2d06993047a0b5056e8fac4462a2 | {"search":{"hits":1,"page":1,"limit":20,"count":1},"images":[{"added":"@isDate()","updated":"@isDate()","checksum":"fc7d2d06993047a0b5056e8fac4462a2","originalChecksum":"fc7d2d06993047a0b5056e8fac4462a2","extension":"png","size":95576,"width":599,"height":417,"mime":"image/png","mimeType":"image/png","imageIdentifier":"@regExp(/^[a-zA-Z0-9-_]{12}$/)","user":"user"}]}  |
+            | f3210f1bb34bfbfa432cc3560be40761 | {"search":{"hits":1,"page":1,"limit":20,"count":1},"images":[{"added":"@isDate()","updated":"@isDate()","checksum":"f3210f1bb34bfbfa432cc3560be40761","originalChecksum":"f3210f1bb34bfbfa432cc3560be40761","extension":"jpg","size":64828,"width":665,"height":463,"mime":"image/jpeg","mimeType":"image/jpeg","imageIdentifier":"@regExp(/^[a-zA-Z0-9-_]{12}$/)","user":"user"}]} |
+            | b5426b4c008e378c201526d2baaec599 | {"search":{"hits":1,"page":1,"limit":20,"count":1},"images":[{"added":"@isDate()","updated":"@isDate()","checksum":"b5426b4c008e378c201526d2baaec599","originalChecksum":"b5426b4c008e378c201526d2baaec599","extension":"gif","size":66020,"width":665,"height":463,"mime":"image/gif","mimeType":"image/gif","imageIdentifier":"@regExp(/^[a-zA-Z0-9-_]{12}$/)","user":"user"}]}  |
 
     Scenario Outline: Fetch images only displaying certain fields
         Given I use "publicKey" and "privateKey" for public and private keys
@@ -213,6 +214,7 @@ Feature: Imbo provides an images endpoint
                     "width": 1024,
                     "height": 256,
                     "mime": "image/png",
+                    "mimeType": "image/png",
                     "imageIdentifier": "@regExp(/^[a-zA-Z0-9-_]{12}$/)",
                     "user": "user"
                 }

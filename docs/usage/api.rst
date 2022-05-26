@@ -317,7 +317,7 @@ results in:
           "size": 6791,
           "width": 1306,
           "height": 77,
-          "mime": "image/png",
+          "mimeType": "image/png",
           "imageIdentifier": "<image>",
           "user": "<user>",
           "metadata": {
@@ -340,7 +340,7 @@ The ``images`` list contains image objects. Each object has the following fields
 * ``size``: The size of the image in bytes.
 * ``width``: The width of the image in pixels.
 * ``height``: The height of the image in pixels.
-* ``mime``: The mime type of the image.
+* ``mimeType``: The mime type of the image.
 * ``imageIdentifier``: The image identifier stored in Imbo.
 * ``user``: The user who owns the image.
 * ``metadata``: A JSON object containing metadata attached to the image. This field is only available if the ``metadata`` query parameter described above is used.
@@ -375,11 +375,11 @@ results in:
 
 When fetching images Imbo also sends a set of custom HTTP response headers related to the image::
 
-    X-Imbo-Originalextension: png
-    X-Imbo-Originalmimetype: image/png
-    X-Imbo-Originalfilesize: 45826
-    X-Imbo-Originalheight: 390
-    X-Imbo-Originalwidth: 380
+    X-Imbo-OriginalExtension: png
+    X-Imbo-OriginalMimeType: image/png
+    X-Imbo-OriginalFilesize: 45826
+    X-Imbo-OriginalHeight: 390
+    X-Imbo-OriginalWidth: 380
 
 These are all related to the image that was just requested.
 
@@ -1026,7 +1026,7 @@ will result in:
       }
     )
 
-For images the default mime-type is the original mime-type of the image. If you add an ``image/gif`` image and fetch that image with ``Accept: */*`` or ``Accept: image/*`` the mime-type of the image returned will be ``image/gif``. To choose a different mime type either change the ``Accept`` header, or use ``.jpg`` or ``.png`` (for ``image/jpeg`` and ``image/png`` respectively).
+For images the default mime type is the original mime type of the image. If you add an ``image/gif`` image and fetch that image with ``Accept: */*`` or ``Accept: image/*`` the mime type of the image returned will be ``image/gif``. To choose a different mime type either change the ``Accept`` header, or use ``.jpg`` or ``.png`` (for ``image/jpeg`` and ``image/png`` respectively).
 
 An exception to this is if the configuration option  :ref:`contentNegotiateImages <configuration-content-negotiation>` is set to ``false``, in which case Imbo will not convert the image to a different format than the original, unless explicitly told to do so by specifying an extension (``.jpg``, ``.png``, ``.gif`` etc).
 

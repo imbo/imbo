@@ -70,7 +70,7 @@ class JSON extends Formatter implements FormatterInterface
                 'size' => $image->getFilesize(),
                 'width' => $image->getWidth(),
                 'height' => $image->getHeight(),
-                'mime' => $image->getMimeType(),
+                'mime' => $image->getMimeType(), // kept for backward compatibility
                 'mimeType' => $image->getMimeType(),
                 'imageIdentifier' => $image->getImageIdentifier(),
                 'user' => $image->getUser(),

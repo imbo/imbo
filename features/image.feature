@@ -48,11 +48,11 @@ Feature: Imbo provides an image endpoint
         When I request the previously added image
         Then the response status line is "200 OK"
         And the "Content-Type" response header is "image/png"
-        And the "X-Imbo-Originalextension" response header is "png"
-        And the "X-Imbo-Originalfilesize" response header is "95576"
-        And the "X-Imbo-Originalheight" response header is "417"
-        And the "X-Imbo-Originalmimetype" response header is "image/png"
-        And the "X-Imbo-Originalwidth" response header is "599"
+        And the "X-Imbo-OriginalExtension" response header is "png"
+        And the "X-Imbo-OriginalFilesize" response header is "95576"
+        And the "X-Imbo-OriginalHeight" response header is "417"
+        And the "X-Imbo-OriginalMimeType" response header is "image/png"
+        And the "X-Imbo-OriginalWidth" response header is "599"
         And the "Content-Length" response header is "95576"
         And the response body size is "95576"
 
@@ -64,11 +64,11 @@ Feature: Imbo provides an image endpoint
         When I request the previously added image
         Then the response status line is "406 Not acceptable"
         And the "Content-Type" response header is "application/json"
-        And the "X-Imbo-Originalextension" response header is "png"
-        And the "X-Imbo-Originalfilesize" response header is "95576"
-        And the "X-Imbo-Originalheight" response header is "417"
-        And the "X-Imbo-Originalmimetype" response header is "image/png"
-        And the "X-Imbo-Originalwidth" response header is "599"
+        And the "X-Imbo-OriginalExtension" response header is "png"
+        And the "X-Imbo-OriginalFilesize" response header is "95576"
+        And the "X-Imbo-OriginalHeight" response header is "417"
+        And the "X-Imbo-OriginalMimeType" response header is "image/png"
+        And the "X-Imbo-OriginalWidth" response header is "599"
 
     Scenario: Delete an image
         Given "tests/Fixtures/image1.png" exists for user "user"

@@ -31,10 +31,10 @@ Feature: Imbo allows plugins for loading new file types
     When I request the previously added image
     Then the response status line is "200 OK"
     And the "Content-Type" response header is "image/png"
-    And the "X-Imbo-Originalextension" response header is "tif"
-    And the "X-Imbo-Originalheight" response header is "640"
-    And the "X-Imbo-Originalmimetype" response header is "image/tiff"
-    And the "X-Imbo-Originalwidth" response header is "437"
+    And the "X-Imbo-OriginalExtension" response header is "tif"
+    And the "X-Imbo-OriginalHeight" response header is "640"
+    And the "X-Imbo-OriginalMimeType" response header is "image/tiff"
+    And the "X-Imbo-OriginalWidth" response header is "437"
 
   Scenario: Add an 'image' that isn't supported by imagick
     Given the request body contains "features/fixtures/foobar.txt"

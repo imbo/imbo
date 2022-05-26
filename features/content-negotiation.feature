@@ -72,11 +72,11 @@ Feature: Imbo supports content negotiation
         When I request the image resource for "tests/Fixtures/image1.png"
         Then the response status line is "406 Not acceptable"
         And the "Content-Type" response header is "application/json"
-        And the "X-Imbo-Originalextension" response header is "png"
-        And the "X-Imbo-Originalfilesize" response header is "95576"
-        And the "X-Imbo-Originalheight" response header is "417"
-        And the "X-Imbo-Originalmimetype" response header is "image/png"
-        And the "X-Imbo-Originalwidth" response header is "599"
+        And the "X-Imbo-OriginalExtension" response header is "png"
+        And the "X-Imbo-OriginalFilesize" response header is "95576"
+        And the "X-Imbo-OriginalHeight" response header is "417"
+        And the "X-Imbo-OriginalMimeType" response header is "image/png"
+        And the "X-Imbo-OriginalWidth" response header is "599"
         And the response body contains JSON:
           """
           {

@@ -65,11 +65,11 @@ Feature: Imbo can generate short URLs for images on demand
         When I request the image using the generated short URL
         Then the response status line is "200 OK"
         And the "Content-Type" response header is "<mime>"
-        And the "X-Imbo-Originalextension" response header is "png"
-        And the "X-Imbo-Originalfilesize" response header is "41423"
-        And the "X-Imbo-Originalwidth" response header is "665"
-        And the "X-Imbo-Originalheight" response header is "463"
-        And the "X-Imbo-Originalmimetype" response header is "image/png"
+        And the "X-Imbo-OriginalExtension" response header is "png"
+        And the "X-Imbo-OriginalFilesize" response header is "41423"
+        And the "X-Imbo-OriginalWidth" response header is "665"
+        And the "X-Imbo-OriginalHeight" response header is "463"
+        And the "X-Imbo-OriginalMimeType" response header is "image/png"
         And the image dimension is "<width>x<height>"
 
         Examples:
