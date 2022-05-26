@@ -14,11 +14,11 @@ Feature: Imbo enables dynamic transformations of images
         When I request the image resource for "tests/Fixtures/image1.png" as a "png"
         Then the response status line is "200 OK"
         And the "Content-Type" response header is "image/png"
-        And the "X-Imbo-Originalextension" response header is "png"
-        And the "X-Imbo-Originalfilesize" response header is "95576"
-        And the "X-Imbo-Originalheight" response header is "417"
-        And the "X-Imbo-Originalmimetype" response header is "image/png"
-        And the "X-Imbo-Originalwidth" response header is "599"
+        And the "X-Imbo-OriginalExtension" response header is "png"
+        And the "X-Imbo-OriginalFilesize" response header is "95576"
+        And the "X-Imbo-OriginalHeight" response header is "417"
+        And the "X-Imbo-OriginalMimeType" response header is "image/png"
+        And the "X-Imbo-OriginalWidth" response header is "599"
         And the image dimension is "<width>x<height>"
 
         Examples:
@@ -91,11 +91,11 @@ Feature: Imbo enables dynamic transformations of images
         When I request the image resource for "tests/Fixtures/image1.png" as a "png" using HTTP "HEAD"
         Then the response status line is "200 OK"
         And the "Content-Type" response header is "image/png"
-        And the "X-Imbo-Originalextension" response header is "png"
-        And the "X-Imbo-Originalfilesize" response header is "95576"
-        And the "X-Imbo-Originalheight" response header is "417"
-        And the "X-Imbo-Originalmimetype" response header is "image/png"
-        And the "X-Imbo-Originalwidth" response header is "599"
+        And the "X-Imbo-OriginalExtension" response header is "png"
+        And the "X-Imbo-OriginalFilesize" response header is "95576"
+        And the "X-Imbo-OriginalHeight" response header is "417"
+        And the "X-Imbo-OriginalMimeType" response header is "image/png"
+        And the "X-Imbo-OriginalWidth" response header is "599"
 
         Examples:
             | transformation                               |
@@ -159,11 +159,11 @@ Feature: Imbo enables dynamic transformations of images
         When I request the image resource for "tests/Fixtures/image1.png" as a "png"
         Then the response status line is "<reason-phrase>"
         And the "Content-Type" response header is "application/json"
-        And the "X-Imbo-Originalextension" response header is "png"
-        And the "X-Imbo-Originalfilesize" response header is "95576"
-        And the "X-Imbo-Originalheight" response header is "417"
-        And the "X-Imbo-Originalmimetype" response header is "image/png"
-        And the "X-Imbo-Originalwidth" response header is "599"
+        And the "X-Imbo-OriginalExtension" response header is "png"
+        And the "X-Imbo-OriginalFilesize" response header is "95576"
+        And the "X-Imbo-OriginalHeight" response header is "417"
+        And the "X-Imbo-OriginalMimetype" response header is "image/png"
+        And the "X-Imbo-OriginalWidth" response header is "599"
 
         Examples:
             | transformation                    | reason-phrase                                                               |
@@ -204,11 +204,11 @@ Feature: Imbo enables dynamic transformations of images
         When I request the image resource for "tests/Fixtures/image1.png" as a "png"
         Then the response status line is "200 OK"
         And the "Content-Type" response header is "image/png"
-        And the "X-Imbo-Originalextension" response header is "png"
-        And the "X-Imbo-Originalfilesize" response header is "95576"
-        And the "X-Imbo-Originalheight" response header is "417"
-        And the "X-Imbo-Originalmimetype" response header is "image/png"
-        And the "X-Imbo-Originalwidth" response header is "599"
+        And the "X-Imbo-OriginalExtension" response header is "png"
+        And the "X-Imbo-OriginalFilesize" response header is "95576"
+        And the "X-Imbo-OriginalHeight" response header is "417"
+        And the "X-Imbo-OriginalMimeType" response header is "image/png"
+        And the "X-Imbo-OriginalWidth" response header is "599"
         And the image dimension is "40x30"
 
     Scenario Outline: Fetch different formats of the image based on the Accept header
@@ -216,11 +216,11 @@ Feature: Imbo enables dynamic transformations of images
         When I request the image resource for "tests/Fixtures/image1.png"
         Then the response status line is "200 OK"
         And the "Content-Type" response header is "<content-type>"
-        And the "X-Imbo-Originalextension" response header is "png"
-        And the "X-Imbo-Originalfilesize" response header is "95576"
-        And the "X-Imbo-Originalheight" response header is "417"
-        And the "X-Imbo-Originalmimetype" response header is "image/png"
-        And the "X-Imbo-Originalwidth" response header is "599"
+        And the "X-Imbo-OriginalExtension" response header is "png"
+        And the "X-Imbo-OriginalFilesize" response header is "95576"
+        And the "X-Imbo-OriginalHeight" response header is "417"
+        And the "X-Imbo-OriginalMimeType" response header is "image/png"
+        And the "X-Imbo-OriginalWidth" response header is "599"
 
         Examples:
             | accept     | content-type |
@@ -232,11 +232,11 @@ Feature: Imbo enables dynamic transformations of images
         When I request the image resource for "tests/Fixtures/image1.png" as a "<extension>"
         Then the response status line is "200 OK"
         And the "Content-Type" response header is "<content-type>"
-        And the "X-Imbo-Originalextension" response header is "png"
-        And the "X-Imbo-Originalfilesize" response header is "95576"
-        And the "X-Imbo-Originalheight" response header is "417"
-        And the "X-Imbo-Originalmimetype" response header is "image/png"
-        And the "X-Imbo-Originalwidth" response header is "599"
+        And the "X-Imbo-OriginalExtension" response header is "png"
+        And the "X-Imbo-OriginalFilesize" response header is "95576"
+        And the "X-Imbo-OriginalHeight" response header is "417"
+        And the "X-Imbo-OriginalMimeType" response header is "image/png"
+        And the "X-Imbo-OriginalWidth" response header is "599"
 
         Examples:
             | extension | content-type |
