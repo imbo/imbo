@@ -71,6 +71,7 @@ class JSON extends Formatter implements FormatterInterface
                 'width' => $image->getWidth(),
                 'height' => $image->getHeight(),
                 'mime' => $image->getMimeType(),
+                'mimeType' => $image->getMimeType(),
                 'imageIdentifier' => $image->getImageIdentifier(),
                 'user' => $image->getUser(),
             ];
