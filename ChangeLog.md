@@ -5,6 +5,7 @@ Imbo-3.0.0
 ----------
 __N/A__
 
+* #637: Add mimeType in images response that will replace mime at some point
 * #635: Remove ListModel
 * #501: Added image transformation limit event listener (Mats Lindh)
 * #495: Upgrade aws-sdk-php-dependency to new major: `^3.19` (Mats Lindh)
