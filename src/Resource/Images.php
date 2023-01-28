@@ -92,7 +92,7 @@ class Images implements ResourceInterface
             $e->setImboErrorCode(ImageException::IMAGE_IDENTIFIER_GENERATION_FAILED);
 
             // Tell the client it's OK to retry later
-            $event->getResponse()->headers->set('Retry-After', 1);
+            $event->getResponse()->headers->set('Retry-After', '1');
             throw $e;
         }
 

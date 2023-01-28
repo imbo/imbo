@@ -56,7 +56,7 @@ class ExifMetadataTest extends ListenerTests
                 'data' => $data,
                 'tags' => ['*'],
                 'expectedData' => array_merge($data, [
-                    'gps:location' => [9.0841802, 63.680437300003],
+                    'gps:location' => [9.0841802, 63.68043730000316],
                     'gps:altitude' => 50.8,
                 ]),
 
@@ -86,7 +86,7 @@ class ExifMetadataTest extends ListenerTests
                     'exif:GPSVersionID' => '2, 2, 0, 0',
                     'exif:Make' => 'SAMSUNG',
                     'exif:Model' => 'GT-I9100',
-                    'gps:location' => [9.0841802, 63.680437300003],
+                    'gps:location' => [9.0841802, 63.68043730000316],
                     'gps:altitude' => 50.8,
                 ],
             ],

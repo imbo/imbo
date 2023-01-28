@@ -147,6 +147,71 @@ class RequestTest extends TestCase
         $this->assertSame($user, $this->request->getUser());
     }
 
+    public function getUsers(): array
+    {
+        return [
+
+            'no user' => [
+                'routeUser' => null,
+                'queryUsers' => null,
+                'expectedUsers' => [],
+            ],
+            'user only in route' => [
+                'routeUser' => 'routeUser',
+                'queryUsers' => null,
+                'expectedUsers' => [
+                    'routeUser',
+                ],
+            ],
+            'user only in query' => [
+                'routeUser' => null,
+                'queryUsers' => [
+                    'user1',
+                    'user2',
+                ],
+                'expectedUsers' => [
+                    'user1',
+                    'user2',
+                ],
+            ],
+            'user in both route and query' => [
+                'routeUser' => 'routeUser',
+                'queryUsers' => [
+                    'user1',
+                    'user2',
+                ],
+                'expectedUsers' => [
+                    'routeUser',
+                    'user1',
+                    'user2',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getUsers
+     * @covers ::getUsers
+     */
+    public function testGetUsers(?string $routeUser, ?array $queryUsers, array $expectedUsers): void
+    {
+        $route = new Route();
+        if (null !== $routeUser) {
+            $route->set('user', $routeUser);
+        }
+
+
+        $this->request->setRoute($route);
+        if (null !== $queryUsers) {
+            $this->request->query->set('users', $queryUsers);
+        }
+
+        $this->assertSame(
+            $expectedUsers,
+            $this->request->getUsers(),
+        );
+    }
+
     /**
      * @covers ::getPublicKey
      */

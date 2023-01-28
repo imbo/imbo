@@ -322,13 +322,10 @@ class ImageTransformationCache implements ListenerInterface
         $accept = implode(',', $accept);
 
         $extension = $request->getExtension();
-        $transformations = $request->query->get('t');
+        $transformations = $request->query->all('t');
+        $transformations = implode('&', $transformations);
 
-        if (!empty($transformations)) {
-            $transformations = implode('&', $transformations);
-        }
-
-        return md5($user . $imageIdentifier . $accept . $extension . $transformations);
+        return md5($user . $imageIdentifier . $accept . $extension . ($transformations ?: null));
     }
 
     /**

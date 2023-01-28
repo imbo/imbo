@@ -61,13 +61,6 @@ class ImagePreparation implements ListenerInterface
         // Attempt to load the image through one of the registered loaders
         try {
             $imagick = $event->getInputLoaderManager()->load($mime, $imageBlob);
-
-            if ($imagick) {
-                $size = $imagick->getImageGeometry();
-                if (0 === ($size['width'] * $size['height'])) {
-                    throw $invalidImageException;
-                }
-            }
         } catch (ImagickException|LoaderException $e) {
             throw $invalidImageException;
         }
@@ -78,6 +71,11 @@ class ImagePreparation implements ListenerInterface
             $e->setImboErrorCode(Exception::IMAGE_UNSUPPORTED_MIMETYPE);
 
             throw $e;
+        }
+
+        $size = $imagick->getImageGeometry();
+        if (0 === ($size['width'] * $size['height'])) {
+            throw $invalidImageException;
         }
 
         // Store relevant information in the image instance and attach it to the request

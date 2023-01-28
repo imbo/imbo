@@ -19,7 +19,7 @@ class SmartSize extends Transformation
     {
         $params = $this->validateParameters($params);
 
-        $this->event->getResponse()->headers->set('X-Imbo-POIs-Used', $params['poi'] ? 1 : 0);
+        $this->event->getResponse()->headers->set('X-Imbo-POIs-Used', $params['poi'] ? '1' : '0');
 
         if (!$params['poi']) {
             $this->simpleCrop($params['width'], $params['height']);

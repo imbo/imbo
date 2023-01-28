@@ -23,7 +23,7 @@ class Response extends SymfonyResponse
         return $this;
     }
 
-    public function setNotModified(): self
+    public function setNotModified(): static
     {
         parent::setNotModified();
         $this->setModel(null);
