@@ -64,10 +64,11 @@ class ImagePreparation implements ListenerInterface
 
             if ($imagick) {
                 $size = $imagick->getImageGeometry();
+                if (0 === ($size['width'] * $size['height'])) {
+                    throw $invalidImageException;
+                }
             }
-        } catch (ImagickException $e) {
-            throw $invalidImageException;
-        } catch (LoaderException $e) {
+        } catch (ImagickException|LoaderException $e) {
             throw $invalidImageException;
         }
 

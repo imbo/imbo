@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  */
 class ImagePreparationTest extends TestCase
 {
-    private $prepare;
+    private ImagePreparation $prepare;
     private $request;
     private $response;
     private $event;
@@ -111,6 +111,12 @@ class ImagePreparationTest extends TestCase
             ->expects($this->any())
             ->method('load')
             ->willReturnCallback($this->imagickLoader);
+
+        $this->inputLoaderManager
+            ->expects($this->any())
+            ->method('getExtensionFromMimetype')
+            ->with('image/jpeg')
+            ->willReturn('jpg');
 
         $this->request
             ->expects($this->once())
