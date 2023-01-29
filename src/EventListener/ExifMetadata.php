@@ -139,7 +139,6 @@ class ExifMetadata implements ListenerInterface
     {
         if (isset($rawProperties['exif:GPSLatitude']) &&
             isset($rawProperties['exif:GPSLongitude'])) {
-
             // We store coordinates in GeoJSON-format (lng/lat)
             $rawProperties['gps:location'] = [
                 $this->parseGpsCoordinate(
