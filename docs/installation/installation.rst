@@ -140,19 +140,7 @@ if your Imbo installation is available on ``[www.]example.com/imbo``.
 Database setup
 --------------
 
-If you choose to use a RDBMS to store data in, you will need to manually create a database, a user and the tables Imbo stores information in. Below you will find schemas for different RDBMSs. You will find information regarding how to authenticate against the RDBMS of you choice in the :ref:`configuration` topic.
-
-MySQL
-~~~~~
-
-.. literalinclude:: ../../setup/doctrine.mysql.sql
-    :language: sql
-
-SQLite
-~~~~~~
-
-.. literalinclude:: ../../setup/doctrine.sqlite.sql
-    :language: sql
+If you choose to use a RDBMS to store data in, you will need to manually create a database, a user and the tables Imbo stores information in. You will find information regarding how to authenticate against the RDBMS of you choice in the :ref:`configuration` topic.
 
 .. _Composer: https://getcomposer.org
 .. _Imbo on Packagist: https://packagist.org/packages/imbo/imbo

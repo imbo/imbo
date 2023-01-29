@@ -44,3 +44,17 @@ mongodb
 callables
 Backblaze
 rethrow
+checksums
+boolean
+onwards
+initializer
+initializers
+downscaled
+balancer
+formatter
+invokable
+lowercased
+amongst
+instantiation
+subdirectories
+installable

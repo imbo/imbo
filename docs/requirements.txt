@@ -1,1 +1,2 @@
 sphinxcontrib-phpdomain
+sphinxcontrib-spelling
