@@ -4,9 +4,10 @@ jobs:
   unit-tests:
     name: Unit tests and QA
     strategy:
+      fail-fast: false
       matrix:
-        operating-system: ['ubuntu-20.04']
-        php-versions: ['7.4', '8.0', '8.1']
+        operating-system: ['ubuntu-22.04']
+        php-versions: ['8.1', '8.2']
         mongodb-versions: ['5.0.2']
 
     runs-on: ${{ matrix.operating-system }}
@@ -28,16 +29,22 @@ jobs:
           tools: php-cs-fixer
           extensions: imagick
 
-      - uses: actions/checkout@v2
+      - name: Dump version information
+        run: |
+          php -v
+          php -i
+          php -m
+          php -r "var_dump(Imagick::queryFonts());"
+
+      - uses: actions/checkout@v3
 
       - name: Get Composer Cache Directory
         id: composer-cache-dir
-        run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache Composer packages
         id: composer-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
@@ -48,7 +55,7 @@ jobs:
         run: composer install
 
       - name: Check coding standard
-        run: php-cs-fixer fix --dry-run --diff
+        run: PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix --dry-run --diff
 
       - name: Run static analysis
         run: vendor/bin/psalm
@@ -59,9 +66,10 @@ jobs:
   integration-tests-mongodb-gridfs:
     name: Integration tests (MongoDB / GridFS)
     strategy:
+      fail-fast: false
       matrix:
-        operating-system: ['ubuntu-20.04']
-        php-versions: ['7.4', '8.0', '8.1']
+        operating-system: ['ubuntu-22.04']
+        php-versions: ['8.1', '8.2']
         mongodb-versions: ['5.0.2']
 
     runs-on: ${{ matrix.operating-system }}
@@ -82,16 +90,15 @@ jobs:
           php-version: ${{ matrix.php-versions }}
           extensions: imagick
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Get Composer Cache Directory
         id: composer-cache-dir
-        run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache Composer packages
         id: composer-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
@@ -109,7 +116,7 @@ jobs:
       - name: Run integration tests using Behat
         run: vendor/bin/behat --strict --suite=mongodb-gridfs
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: httpd-logs-mongodb-gridfs
@@ -118,9 +125,10 @@ jobs:
   integration-tests-mongodb-filesystem:
     name: Integration tests (MongoDB / Filesystem)
     strategy:
+      fail-fast: false
       matrix:
-        operating-system: ['ubuntu-20.04']
-        php-versions: ['7.4', '8.0', '8.1']
+        operating-system: ['ubuntu-22.04']
+        php-versions: ['8.1', '8.2']
         mongodb-versions: ['5.0.2']
 
     runs-on: ${{ matrix.operating-system }}
@@ -141,16 +149,15 @@ jobs:
           php-version: ${{ matrix.php-versions }}
           extensions: imagick
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Get Composer Cache Directory
         id: composer-cache-dir
-        run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache Composer packages
         id: composer-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
@@ -168,7 +175,7 @@ jobs:
       - name: Run integration tests using Behat
         run: vendor/bin/behat --strict --suite=mongodb-filesystem
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: httpd-logs-mongodb-filesystem
@@ -177,9 +184,10 @@ jobs:
   integration-tests-sqlite-filesystem:
     name: Integration tests (SQLite / Filesystem)
     strategy:
+      fail-fast: false
       matrix:
-        operating-system: ['ubuntu-20.04']
-        php-versions: ['7.4', '8.0', '8.1']
+        operating-system: ['ubuntu-22.04']
+        php-versions: ['8.1', '8.2']
         mongodb-versions: ['5.0.2']
 
     runs-on: ${{ matrix.operating-system }}
@@ -200,16 +208,15 @@ jobs:
           php-version: ${{ matrix.php-versions }}
           extensions: imagick
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Get Composer Cache Directory
         id: composer-cache-dir
-        run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache Composer packages
         id: composer-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
@@ -230,7 +237,7 @@ jobs:
       - name: Run integration tests using Behat
         run: vendor/bin/behat --strict --suite=sqlite-filesystem
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: httpd-logs-sqlite-filesystem
@@ -240,9 +247,10 @@ jobs:
     name: Integration tests (MySQL / Filesystem)
 
     strategy:
+      fail-fast: false
       matrix:
-        operating-system: ['ubuntu-20.04']
-        php-versions: ['7.4', '8.0', '8.1']
+        operating-system: ['ubuntu-22.04']
+        php-versions: ['8.1', '8.2']
         mongodb-versions: ['5.0.2']
         mysql-versions: ['8.0.20']
 
@@ -275,16 +283,15 @@ jobs:
           php-version: ${{ matrix.php-versions }}
           extensions: imagick
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Get Composer Cache Directory
         id: composer-cache-dir
-        run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache Composer packages
         id: composer-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
@@ -305,7 +312,7 @@ jobs:
       - name: Run integration tests using Behat
         run: vendor/bin/behat --strict --suite=mysql-filesystem
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: httpd-logs-mysql-filesystem
@@ -315,9 +322,10 @@ jobs:
     name: Integration tests (PostgreSQL / Filesystem)
 
     strategy:
+      fail-fast: false
       matrix:
-        operating-system: ['ubuntu-20.04']
-        php-versions: ['7.4', '8.0', '8.1']
+        operating-system: ['ubuntu-22.04']
+        php-versions: ['8.1', '8.2']
         mongodb-versions: ['5.0.2']
 
     runs-on: ${{ matrix.operating-system }}
@@ -346,16 +354,15 @@ jobs:
           php-version: ${{ matrix.php-versions }}
           extensions: imagick
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Get Composer Cache Directory
         id: composer-cache-dir
-        run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache Composer packages
         id: composer-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
@@ -376,7 +383,7 @@ jobs:
       - name: Run integration tests using Behat
         run: vendor/bin/behat --strict --suite=postgresql-filesystem
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: httpd-logs-postgresql-filesystem

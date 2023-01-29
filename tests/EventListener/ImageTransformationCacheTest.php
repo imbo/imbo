@@ -91,7 +91,7 @@ class ImageTransformationCacheTest extends ListenerTests
             ->willReturn('text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
 
         $this->query
-            ->method('get')
+            ->method('all')
             ->with('t')
             ->willReturn(['thumbnail']);
 
@@ -137,7 +137,7 @@ class ImageTransformationCacheTest extends ListenerTests
 
         $this->query
             ->expects($this->once())
-            ->method('get')
+            ->method('all')
             ->with('t')
             ->willReturn(['thumbnail']);
 
@@ -250,7 +250,7 @@ class ImageTransformationCacheTest extends ListenerTests
             ->willReturn('text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
 
         $this->query
-            ->method('get')
+            ->method('all')
             ->with('t')
             ->willReturn(['thumbnail']);
 

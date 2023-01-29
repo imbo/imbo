@@ -204,35 +204,23 @@ class DatabaseOperations implements ListenerInterface
         }
 
         if ($params->has('sort')) {
-            $sort = $params->get('sort');
-
-            if (is_array($sort)) {
-                $query->setSort($sort);
-            }
+            $sort = $params->all('sort');
+            $query->setSort($sort);
         }
 
         if ($params->has('ids')) {
-            $ids = $params->get('ids');
-
-            if (is_array($ids)) {
-                $query->setImageIdentifiers($ids);
-            }
+            $ids = $params->all('ids');
+            $query->setImageIdentifiers($ids);
         }
 
         if ($params->has('checksums')) {
-            $checksums = $params->get('checksums');
-
-            if (is_array($checksums)) {
-                $query->setChecksums($checksums);
-            }
+            $checksums = $params->all('checksums');
+            $query->setChecksums($checksums);
         }
 
         if ($params->has('originalChecksums')) {
-            $checksums = $params->get('originalChecksums');
-
-            if (is_array($checksums)) {
-                $query->setOriginalChecksums($checksums);
-            }
+            $checksums = $params->all('originalChecksums');
+            $query->setOriginalChecksums($checksums);
         }
 
         if ($event->hasArgument('users')) {
@@ -277,11 +265,8 @@ class DatabaseOperations implements ListenerInterface
         $model->setImages($modelImages);
 
         if ($params->has('fields')) {
-            $fields = $params->get('fields');
-
-            if (is_array($fields)) {
-                $model->setFields($fields);
-            }
+            $fields = $params->all('fields');
+            $model->setFields($fields);
         }
 
         $lastModified = $database->getLastModified($users);

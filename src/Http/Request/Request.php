@@ -5,6 +5,7 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use Imbo\Router\Route;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 /**
@@ -29,7 +30,7 @@ class Request extends SymfonyRequest
     /**
      * The current route
      *
-     * @param Route
+     * @var Route
      */
     private $route;
 
@@ -72,10 +73,8 @@ class Request extends SymfonyRequest
 
     /**
      * Get the user found in the request
-     *
-     * @return string
      */
-    public function getUser()
+    public function getUser(): ?string
     {
         return $this->route ? $this->route->get('user') : null;
     }
@@ -88,7 +87,7 @@ class Request extends SymfonyRequest
     public function getUsers()
     {
         $routeUser = $this->getUser();
-        $queryUsers = $this->query->get('users', []);
+        $queryUsers = $this->query->all('users');
 
         if (!$routeUser && !$queryUsers) {
             return [];
@@ -111,9 +110,9 @@ class Request extends SymfonyRequest
         if ($this->transformations === null) {
             $this->transformations = [];
 
-            $transformations = $this->query->get('t', []);
-
-            if (!is_array($transformations)) {
+            try {
+                $transformations = $this->query->all('t');
+            } catch (BadRequestException $e) {
                 throw new InvalidArgumentException('Transformations must be specifed as an array', Response::HTTP_BAD_REQUEST);
             }
 

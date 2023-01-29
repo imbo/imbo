@@ -2,6 +2,7 @@
 namespace Imbo\Behat;
 
 use Imagick;
+use ImagickPixel;
 use Imbo\Image\InputLoader\InputLoaderInterface;
 
 class OverrideJpegDummyLoader implements InputLoaderInterface
@@ -15,14 +16,11 @@ class OverrideJpegDummyLoader implements InputLoaderInterface
 
     public function load(Imagick $imagick, string $blob, string $mimeType)
     {
-        $im = imagecreatetruecolor(300, 300);
+        $im = new Imagick();
+        $im->newImage(300, 300, new ImagickPixel('white'));
+        $im->setImageFormat('png');
 
-        ob_start();
-        imagepng($im);
-        $image_data = ob_get_contents();
-        ob_end_clean();
-
-        $imagick->readImageBlob($image_data);
+        $imagick->readImageBlob($im->getImageBlob());
     }
 }
 

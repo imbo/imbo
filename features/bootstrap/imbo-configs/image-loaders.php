@@ -2,6 +2,8 @@
 namespace Imbo\Behat;
 
 use Imagick;
+use ImagickDraw;
+use ImagickPixel;
 use Imbo\Image\InputLoader\InputLoaderInterface;
 
 /**
@@ -20,19 +22,15 @@ class Text implements InputLoaderInterface
 
     public function load(Imagick $imagick, string $blob, string $mimeType)
     {
-        $im = imagecreatetruecolor(300, 300);
-        $textColor = imagecolorallocate($im, 0x00, 0x00, 0x00);
-        $backgroundColor = imagecolorallocate($im, 0xff, 0xff, 0xff);
+        $draw = new ImagickDraw();
+        $draw->setFillColor(new ImagickPixel('black'));
+        $draw->setFont('Liberation-Sans');
 
-        imagefill($im, 0, 0, $backgroundColor);
-        imagestring($im, 5, 0, 100, $blob, $textColor);
-
-        ob_start();
-        imagepng($im);
-        $image_data = ob_get_contents();
-        ob_end_clean();
-
-        $imagick->readImageBlob($image_data);
+        $im = new Imagick();
+        $im->newImage(300, 300, new ImagickPixel('white'));
+        $im->annotateImage($draw, 10, 150, 0, $blob);
+        $im->setImageFormat('png');
+        $imagick->readImageBlob($im->getImageBlob());
     }
 }
 
