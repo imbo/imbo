@@ -2,6 +2,7 @@
 namespace Imbo\EventListener;
 
 use DateTime;
+use Exception;
 use Imbo\EventListener\ImageVariations\Database\DatabaseInterface;
 use Imbo\EventListener\ImageVariations\Storage\StorageInterface;
 use Imbo\EventManager\EventInterface;
@@ -62,8 +63,21 @@ class ImageVariationsTest extends ListenerTests
         ]);
     }
 
+    public function tearDown(): void
+    {
+        restore_error_handler();
+    }
+
     public function setUp(): void
     {
+        set_error_handler(
+            function (int $errno, string $errstr) {
+                if (0 !== error_reporting()) {
+                    throw new ErrorException($errstr, $errno);
+                }
+            },
+        );
+
         $this->db         = $this->createMock(DatabaseInterface::class);
         $this->storage    = $this->createMock(StorageInterface::class);
         /** @var InputBag&MockObject */
@@ -469,10 +483,14 @@ class ImageVariationsTest extends ListenerTests
 
         // Running this twice, once with error suppression (to flag "return" for code coverage),
         // once for triggering the warning
-        @$this->listener->chooseVariation($this->event);
+        $level = error_reporting(0);
+        $this->listener->chooseVariation($this->event);
+        error_reporting($level);
 
-        $this->expectWarning();
-        $this->expectWarningMessage('Image variation storage is not in sync with the image variation database');
+        $this->expectExceptionObject(
+            new ErrorException('Image variation storage is not in sync with the image variation database', E_USER_WARNING),
+        );
+
         $this->listener->chooseVariation($this->event);
     }
 
@@ -616,9 +634,8 @@ class ImageVariationsTest extends ListenerTests
             )
             ->willThrowException(new DatabaseException());
 
-        $this->expectWarning();
-        $this->expectWarningMessage(
-            'Could not delete image variation metadata for user (imgid)',
+        $this->expectExceptionObject(
+            new ErrorException('Could not delete image variation metadata for user (imgid)', E_USER_WARNING),
         );
 
         $this->listener->deleteVariations($this->event);
@@ -638,9 +655,8 @@ class ImageVariationsTest extends ListenerTests
             )
             ->willThrowException(new StorageException());
 
-        $this->expectWarning();
-        $this->expectWarningMessage(
-            'Could not delete image variations from storage for user (imgid)',
+        $this->expectExceptionObject(
+            new ErrorException('Could not delete image variations from storage for user (imgid)', E_USER_WARNING),
         );
 
         $this->listener->deleteVariations($this->event);
@@ -952,9 +968,8 @@ class ImageVariationsTest extends ListenerTests
             ->with('resize')
             ->willReturn($transformation);
 
-        $this->expectWarning();
-        $this->expectWarningMessage(
-            'Could not generate image variation for user (imgid), width: 512',
+        $this->expectExceptionObject(
+            new ErrorException('Could not generate image variation for user (imgid), width: 512', E_USER_WARNING),
         );
 
         $this->listener->generateVariations($this->event);
@@ -996,9 +1011,8 @@ class ImageVariationsTest extends ListenerTests
             ->with('resize')
             ->willReturn($transformation);
 
-        $this->expectWarning();
-        $this->expectWarningMessage(
-            'Could not store image variation for user (imgid), width: 512',
+        $this->expectExceptionObject(
+            new ErrorException('Could not store image variation for user (imgid), width: 512', E_USER_WARNING),
         );
 
         $this->listener->generateVariations($this->event);
@@ -1040,9 +1054,8 @@ class ImageVariationsTest extends ListenerTests
             ->with('resize')
             ->willReturn($transformation);
 
-        $this->expectWarning();
-        $this->expectWarningMessage(
-            'Could not store image variation metadata for user (imgid), width: 512',
+        $this->expectExceptionObject(
+            new ErrorException('Could not store image variation metadata for user (imgid), width: 512', E_USER_WARNING),
         );
 
         $this->listener->generateVariations($this->event);
@@ -1098,6 +1111,12 @@ class ImageVariationsTest extends ListenerTests
             ->with($this->user, $this->imageIdentifier, 1000);
 
         // Need to suppress the warning, otherwise PHPUnit will stop executing the code
-        @$listener->generateVariations($this->event);
+        $level = error_reporting(0);
+        $listener->generateVariations($this->event);
+        error_reporting($level);
     }
+}
+
+class ErrorException extends Exception
+{
 }
