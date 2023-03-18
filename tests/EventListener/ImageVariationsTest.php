@@ -99,7 +99,6 @@ class ImageVariationsTest extends ListenerTests
             ->willReturnSelf();
         $this->eventManager = $this->createMock(EventManager::class);
         $this->imageStorage = $this->createMock(MainStorageInterface::class);
-        $this->config       = [];
 
         $this->transformationManager = $this->createMock(TransformationManager::class);
         $this->request               = $this->createConfiguredMock(Request::class, [
