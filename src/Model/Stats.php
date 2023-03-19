@@ -5,6 +5,9 @@ use ArrayAccess;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Response\Response;
 
+/**
+ * @template-implements ArrayAccess<array-key, mixed>
+ */
 class Stats implements ModelInterface, ArrayAccess
 {
     private array $customStats = [];
@@ -55,7 +58,7 @@ class Stats implements ModelInterface, ArrayAccess
         return isset($this->customStats[$offset]);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->customStats[$offset];
     }

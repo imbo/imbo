@@ -45,9 +45,9 @@
     "imbo/imbo-postgresql-adapters": "dev-main",
     "imbo/imbo-sqlite-adapters": "dev-main",
     "phpunit/phpunit": "^9.6",
-    "psalm/plugin-phpunit": "^0.16.1",
+    "psalm/plugin-phpunit": "^0.18.4",
     "symfony/var-dumper": "^6.2",
-    "vimeo/psalm": "^4.10"
+    "vimeo/psalm": "^5.8"
   },
   "suggest": {
     "imbo/imbo-s3-adapters": "Enables usage of AWS S3 for storing images",

@@ -58,7 +58,13 @@ abstract class AbstractAdapter implements AdapterInterface
     public function getUsersForResource(string $publicKey, string $resource): array
     {
         $accessList = $this->getAccessListForPublicKey($publicKey);
-        $userLists = array_filter(array_map(fn ($acl) => $acl['users'] ?? false, $accessList));
+        /** @var array<int,string> */
+        $userLists = array_filter(
+            array_map(
+                fn (array $acl): mixed => $acl['users'] ?? false,
+                $accessList,
+            ),
+        );
         $users = array_merge(...$userLists);
 
         if ($this->hasAccess($publicKey, $resource, $publicKey)) {

@@ -73,7 +73,7 @@ interface AdapterInterface
      * Get the access control list for a given public key
      *
      * @param string $publicKey
-     * @return array<array{id:int|string,users:array<string>,resources:array<string>}>
+     * @return array<array{id:int|string,users:array<string>,resources:array<string>,group?:string}>
      */
     public function getAccessListForPublicKey(string $publicKey): array;
 
