@@ -29,7 +29,7 @@ use RuntimeException;
  */
 class FeatureContextTest extends TestCase
 {
-    private $context;
+    private FeatureContext $context;
     private $client;
     private $history;
     private $mockHandler;
@@ -1065,9 +1065,8 @@ class FeatureContextTest extends TestCase
     {
         $this->mockHandler->append(new Response(200), new Response(200));
 
-        $this->context->setPublicAndPrivateKey($publicKey, $privateKey);
-
-        if ($publicKey && $privateKey) {
+        if (null !== $publicKey && null !== $privateKey) {
+            $this->context->setPublicAndPrivateKey($publicKey, $privateKey);
             $this->context->appendAccessToken();
         }
 

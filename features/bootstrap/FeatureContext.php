@@ -194,7 +194,7 @@ class FeatureContext extends ApiContext
      *
      * @throws RuntimeException
      */
-    public function setClient(ClientInterface $client, string $baseUri)
+    public function setClient(ClientInterface $client, string $baseUri): self
     {
         $handler = $client->getConfig('handler');
         $handler->push(Middleware::history($this->history), self::MIDDLEWARE_HISTORY);
@@ -219,7 +219,7 @@ class FeatureContext extends ApiContext
      *
      * {@inheritdoc}
      */
-    public function setArrayContainsComparator(ArrayContainsComparator $comparator)
+    public function setArrayContainsComparator(ArrayContainsComparator $comparator): self
     {
         $comparator->addFunction('isDate', [$this, 'isDate']);
 
@@ -229,7 +229,7 @@ class FeatureContext extends ApiContext
     /**
      * {@inheritdoc}
      */
-    public function setRequestHeader($header, $value)
+    public function setRequestHeader($header, $value): self
     {
         if ($value === 'current-timestamp') {
             $value = gmdate('Y-m-d\TH:i:s\Z');
@@ -346,11 +346,10 @@ class FeatureContext extends ApiContext
      *
      * @param string $adapter Which adapter to take down
      * @throws InvalidArgumentException
-     * @return self
      *
      * @Given /^the (storage|database) is down$/
      */
-    public function forceAdapterFailure($adapter)
+    public function forceAdapterFailure(string $adapter): self
     {
         if (!in_array($adapter, ['storage', 'database'])) {
             throw new InvalidArgumentException(sprintf('Invalid adapter: "%s".', $adapter));
@@ -362,7 +361,7 @@ class FeatureContext extends ApiContext
             $header = 'X-Imbo-Status-Database-Failure';
         }
 
-        return $this->setRequestHeader($header, 1);
+        return $this->setRequestHeader($header, '1');
     }
 
     /**
@@ -537,12 +536,10 @@ class FeatureContext extends ApiContext
      * @param PyStringNode $metadata Metadata to add to the image
      * @throws InvalidArgumentException Throws an exception if the user specified does not have a
      *                                  set of keys.
-     * @return self
-     *
      * @Given :imagePath exists for user :user
      * @Given :imagePath exists for user :user with the following metadata:
      */
-    public function addUserImageToImbo($imagePath, $user, PyStringNode $metadata = null)
+    public function addUserImageToImbo(string $imagePath, string $user, PyStringNode $metadata = null): self
     {
         if (!file_exists($imagePath)) {
             throw new InvalidArgumentException(sprintf('File does not exist: "%s".', $imagePath));
@@ -599,7 +596,10 @@ class FeatureContext extends ApiContext
         }
 
         // Reset the request / response
-        $this->setPublicAndPrivateKey($existingPublicKey, $existingPrivateKey);
+        if (null !== $existingPublicKey && null !== $existingPrivateKey) {
+            $this->setPublicAndPrivateKey($existingPublicKey, $existingPrivateKey);
+        }
+
         $this->request = $originalRequest;
         $this->requestOptions = $originalRequestOptions;
         $this->response = null;

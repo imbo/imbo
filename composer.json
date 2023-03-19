@@ -36,7 +36,7 @@
   },
   "require-dev": {
     "christeredvartsen/testfs": "^0.4.0",
-    "imbo/behat-api-extension": "^3.0",
+    "imbo/behat-api-extension": "^4.0",
     "imbo/imbo-adapters-sdk": "dev-main",
     "imbo/imbo-coding-standard": "^2.0",
     "imbo/imbo-filesystem-adapters": "dev-main",
