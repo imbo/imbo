@@ -130,7 +130,7 @@ class ResponseFormatterTest extends TestCase
         $this->responseFormatter->format($this->event);
     }
 
-    public function getJsonpTriggers(): array
+    public static function getJsonpTriggers(): array
     {
         return [
             ['callback', 'func', 'application/json'],
@@ -388,7 +388,7 @@ class ResponseFormatterTest extends TestCase
         $this->assertSame('json', $this->responseFormatter->getFormatter());
     }
 
-    public function getOriginalMimeTypes(): array
+    public static function getOriginalMimeTypes(): array
     {
         return [
             'jpg' => ['image/jpeg', 'jpg'],
@@ -476,7 +476,7 @@ class ResponseFormatterTest extends TestCase
         $this->assertSame($expectedFormatter, $this->responseFormatter->getFormatter());
     }
 
-    public function getImageResources(): array
+    public static function getImageResources(): array
     {
         return [
             'image' => ['image'],

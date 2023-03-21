@@ -44,7 +44,7 @@
     "imbo/imbo-mysql-adapters": "dev-main",
     "imbo/imbo-postgresql-adapters": "dev-main",
     "imbo/imbo-sqlite-adapters": "dev-main",
-    "phpunit/phpunit": "^9.6",
+    "phpunit/phpunit": "^10.0",
     "psalm/plugin-phpunit": "^0.18.4",
     "symfony/var-dumper": "^6.2",
     "vimeo/psalm": "^5.8"

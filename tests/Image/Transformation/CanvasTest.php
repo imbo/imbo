@@ -14,7 +14,7 @@ class CanvasTest extends TransformationTests
         return new Canvas();
     }
 
-    public function getCanvasParameters(): array
+    public static function getCanvasParameters(): array
     {
         return [
             // free mode with only width

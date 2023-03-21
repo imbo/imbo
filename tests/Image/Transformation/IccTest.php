@@ -149,21 +149,20 @@ class IccTest extends TestCase
             ->method('setHasBeenTransformed')
             ->with(true);
 
-        $profilePath = DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc';
-        $profile = file_get_contents($profilePath);
+        $expectedProfile = file_get_contents(DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc');
 
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->method('profileImage')
-            ->withConsecutive(
-                ['icc', $profile],
-                ['*', null],
-                ['icc', $profile],
-            )
-            ->willReturnOnConsecutiveCalls(
-                $this->throwException(new ImagickException('error #1', 465)),
-                true,
-                true,
+            ->willReturnCallback(
+                static function (string $name, string $profile) use ($expectedProfile): bool {
+                    static $i = 0;
+                    return match ([$i++, $name, $profile]) {
+                        [0, 'icc', $expectedProfile] => throw new ImagickException('error #1', 465),
+                        [1, '*', ''] => true,
+                        [2, 'icc', $expectedProfile] => true,
+                    };
+                },
             );
 
         (new Icc([
@@ -179,21 +178,21 @@ class IccTest extends TestCase
      */
     public function testThrowsExceptionWhenApplyingStrippedProfileFails(): void
     {
-        $profilePath = DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc';
-        $profile = file_get_contents($profilePath);
+        $expectedProfile = file_get_contents(DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc');
+        $e = new ImagickException('error #2');
 
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->method('profileImage')
-            ->withConsecutive(
-                ['icc', $profile],
-                ['*', ''],
-                ['icc', $profile],
-            )
-            ->willReturnOnConsecutiveCalls(
-                $this->throwException(new ImagickException('error #1', 465)),
-                true,
-                $this->throwException($e = new ImagickException('error #2')),
+            ->willReturnCallback(
+                static function (string $name, string $profile) use ($expectedProfile, $e): bool {
+                    static $i = 0;
+                    return match ([$i++, $name, $profile]) {
+                        [0, 'icc', $expectedProfile] => throw new ImagickException('error #1', 465),
+                        [1, '*', ''] => true,
+                        [2, 'icc', $expectedProfile] => throw $e,
+                    };
+                },
             );
 
         $this->expectExceptionObject(new TransformationException('error #2', Response::HTTP_BAD_REQUEST, $e));

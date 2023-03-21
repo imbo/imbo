@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventManager;
 
+use Closure;
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
 use Imbo\Database\DatabaseInterface;
 use Imbo\Exception\InvalidArgumentException;
@@ -24,35 +25,38 @@ class EventTest extends TestCase
         $this->event = new Event();
     }
 
-    public function getArguments(): array
+    public static function getArguments(): array
     {
+        $mockCreator = fn (string $className) =>
+            fn () => $this->createMock($className);
+
         return [
             'request' => [
-                'getRequest', 'request', $this->createMock(Request::class),
+                'getRequest', 'request', $mockCreator(Request::class),
             ],
             'response' => [
-                'getResponse', 'response', $this->createMock(Response::class),
+                'getResponse', 'response', $mockCreator(Response::class),
             ],
             'database' => [
-                'getDatabase', 'database', $this->createMock(DatabaseInterface::class),
+                'getDatabase', 'database', $mockCreator(DatabaseInterface::class),
             ],
             'storage' => [
-                'getStorage', 'storage', $this->createMock(StorageInterface::class),
+                'getStorage', 'storage', $mockCreator(StorageInterface::class),
             ],
             'accessControl' => [
-                'getAccessControl', 'accessControl', $this->createMock(AdapterInterface::class),
+                'getAccessControl', 'accessControl', $mockCreator(AdapterInterface::class),
             ],
             'manager' => [
-                'getManager', 'manager', $this->createMock(EventManager::class),
+                'getManager', 'manager', $mockCreator(EventManager::class),
             ],
             'transformationManager' => [
-                'getTransformationManager', 'transformationManager', $this->createMock(TransformationManager::class),
+                'getTransformationManager', 'transformationManager', $mockCreator(TransformationManager::class),
             ],
             'inputLoaderManager' => [
-                'getInputLoaderManager', 'inputLoaderManager', $this->createMock(InputLoaderManager::class),
+                'getInputLoaderManager', 'inputLoaderManager', $mockCreator(InputLoaderManager::class),
             ],
             'outputConverterManager' => [
-                'getOutputConverterManager', 'outputConverterManager', $this->createMock(OutputConverterManager::class),
+                'getOutputConverterManager', 'outputConverterManager', $mockCreator(OutputConverterManager::class),
             ],
             'config' => [
                 'getConfig', 'config', ['some' => 'config'],
@@ -80,6 +84,10 @@ class EventTest extends TestCase
      */
     public function testCanSetAndGetRequest(string $method, string $argument, $value): void
     {
+        if ($value instanceof Closure) {
+            $value = $value->bindTo($this)();
+        }
+
         $this->event->setArgument($argument, $value);
         $this->assertSame($value, $this->event->$method());
     }

@@ -12,7 +12,6 @@ use Imbo\Image\Identifier\Generator\GeneratorInterface;
 use Imbo\Model\ArrayModel;
 use Imbo\Model\Image;
 use Imbo\Storage\StorageInterface;
-use PHPUnit\Framework\MockObject\Stub\Exception as ExceptionStub;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
@@ -71,11 +70,17 @@ class ImagesTest extends ResourceTests
             ->method('generate')
             ->willReturn('id');
 
-        $this->manager
+        $manager = $this->manager;
+        $manager
             ->method('trigger')
-            ->withConsecutive(
-                ['db.image.insert', ['updateIfDuplicate' => false]],
-                ['storage.image.insert'],
+            ->willReturnCallback(
+                static function (string $event, array $params = []) use ($manager) {
+                    static $i = 0;
+                    return match ([$i++, $event, $params]) {
+                        [0, 'db.image.insert', ['updateIfDuplicate' => false]],
+                        [1, 'storage.image.insert', []] => $manager,
+                    };
+                },
             );
 
         $image = $this->createMock(Image::class);
@@ -152,19 +157,19 @@ class ImagesTest extends ResourceTests
      */
     public function testAddImageWithCallableImageIdentifierGenerator(): void
     {
-        $this->manager
+        $manager = $this->manager;
+        $manager
             ->method('trigger')
-            ->withConsecutive(
-                ['db.image.insert', ['updateIfDuplicate' => true]],
-                ['db.image.insert', ['updateIfDuplicate' => true]],
-                ['db.image.insert', ['updateIfDuplicate' => true]],
-                ['storage.image.insert'],
-            )
-            ->willReturnOnConsecutiveCalls(
-                new ExceptionStub(new DuplicateImageIdentifierException()),
-                $this->manager,
-                $this->manager,
-                $this->manager,
+            ->willReturnCallback(
+                static function (string $event, array $params = []) use ($manager) {
+                    static $i = 0;
+                    return match ([$i++, $event, $params]) {
+                        [0, 'db.image.insert', ['updateIfDuplicate' => true]] => throw new DuplicateImageIdentifierException(),
+                        [1, 'db.image.insert', ['updateIfDuplicate' => true]],
+                        [2, 'db.image.insert', ['updateIfDuplicate' => true]],
+                        [3, 'storage.image.insert', []] => $manager,
+                    };
+                },
             );
 
         $image = $this->createConfiguredMock(Image::class, [
@@ -184,17 +189,13 @@ class ImagesTest extends ResourceTests
             ->method('setModel')
             ->with($this->isInstanceOf(ArrayModel::class));
 
-        $imageIdentifierGenerator = function (): IdGenerator {
-            return new IdGenerator();
-        };
-
         $event = $this->createConfiguredMock(EventInterface::class, [
             'getRequest' => $this->request,
             'getResponse' => $this->response,
             'getDatabase' => $this->database,
             'getStorage' => $this->storage,
             'getManager' => $this->manager,
-            'getConfig' => ['imageIdentifierGenerator' => $imageIdentifierGenerator],
+            'getConfig' => ['imageIdentifierGenerator' => new IdGenerator()],
         ]);
 
         $this->resource->addImage($event);

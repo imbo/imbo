@@ -17,7 +17,7 @@ class TransformationTest extends TestCase
         $this->transformation = new Border();
     }
 
-    public function getColors(): array
+    public static function getColors(): array
     {
         return [
             ['red', 'red'],

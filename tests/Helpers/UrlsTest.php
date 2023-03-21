@@ -18,7 +18,7 @@ class UrlsTest extends TestCase
     /**
      * @return array<array{0:string}>
      */
-    public function getUrls(): array
+    public static function getUrls(): array
     {
         return [
             ['http://localhost'],

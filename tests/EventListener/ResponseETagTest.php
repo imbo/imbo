@@ -23,7 +23,7 @@ class ResponseETagTest extends ListenerTests
         return $this->listener;
     }
 
-    public function getTaintedHeaders(): array
+    public static function getTaintedHeaders(): array
     {
         return [
             'non-tainted' => ['"be7d5bb2f29494c0a1c95c81e8ae8b99"', '"be7d5bb2f29494c0a1c95c81e8ae8b99"', false],
@@ -67,7 +67,7 @@ class ResponseETagTest extends ListenerTests
         $this->listener->fixIfNoneMatchHeader($event);
     }
 
-    public function getRoutesForETags(): array
+    public static function getRoutesForETags(): array
     {
         return [
             'index route has no ETag' => ['index', false],

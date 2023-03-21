@@ -125,7 +125,7 @@ class EventManagerTest extends TestCase
         $this->assertTrue($this->manager->hasListenersForEvent('event'));
     }
 
-    public function getUsers(): array
+    public static function getUsers(): array
     {
         return [
             [null, [], '1'],
@@ -241,7 +241,7 @@ class EventManagerTest extends TestCase
         $this->manager->trigger('getParams');
     }
 
-    public function getWildcardListeners(): array
+    public static function getWildcardListeners(): array
     {
         $callback1 = function ($event) {
             echo '1:' . $event->getName() . ' ';

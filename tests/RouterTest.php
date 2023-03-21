@@ -37,7 +37,7 @@ class RouterTest extends TestCase
         (new Router())->route($request);
     }
 
-    public function getInvalidRoutes(): array
+    public static function getInvalidRoutes(): array
     {
         return [
             ['/foobar'],
@@ -69,7 +69,7 @@ class RouterTest extends TestCase
         (new Router())->route($request);
     }
 
-    public function getValidRoutes(): array
+    public static function getValidRoutes(): array
     {
         return [
             // Global short URL resource
@@ -138,7 +138,7 @@ class RouterTest extends TestCase
     {
         $request = $this
             ->getMockBuilder(Request::class)
-            ->setMethods(['getPathInfo', 'getMethod'])
+            ->onlyMethods(['getPathInfo', 'getMethod'])
             ->getMock();
 
         $request
@@ -168,7 +168,7 @@ class RouterTest extends TestCase
     {
         $request = $this
             ->getMockBuilder(Request::class)
-            ->setMethods(['getPathInfo', 'getMethod'])
+            ->onlyMethods(['getPathInfo', 'getMethod'])
             ->getMock();
 
         $request

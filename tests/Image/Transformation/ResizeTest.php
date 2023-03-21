@@ -14,7 +14,7 @@ class ResizeTest extends TransformationTests
         return new Resize();
     }
 
-    public function getResizeParams(): array
+    public static function getResizeParams(): array
     {
         return [
             'only width' => [

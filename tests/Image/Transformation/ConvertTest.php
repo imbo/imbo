@@ -91,7 +91,7 @@ class ConvertTest extends TransformationTests
         (new Convert())->transform([]);
     }
 
-    public function getConvertParams(): array
+    public static function getConvertParams(): array
     {
         return [
             ['png', 'jpg', 'image/jpeg'],

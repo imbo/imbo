@@ -14,7 +14,7 @@ class BorderTest extends TransformationTests
         return new Border();
     }
 
-    public function getBorderParams(): array
+    public static function getBorderParams(): array
     {
         return [
             'inline border' => [665, 463, 3, 4, 'inset'],

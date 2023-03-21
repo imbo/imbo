@@ -54,10 +54,15 @@ class ImageTest extends ResourceTests
     {
         $this->manager
             ->method('trigger')
-            ->withConsecutive(
-                ['db.image.delete'],
-                ['storage.image.delete'],
-            );
+            ->with($this->callback(
+                static function (string $event): bool {
+                    static $i = 0;
+                    return match ([$i++, $event]) {
+                        [0, 'db.image.delete'],
+                        [1, 'storage.image.delete'] => true,
+                    };
+                },
+            ));
 
         $this->request
             ->expects($this->once())
@@ -100,10 +105,16 @@ class ImageTest extends ResourceTests
 
         $this->manager
             ->method('trigger')
-            ->withConsecutive(
-                ['db.image.load'],
-                ['storage.image.load'],
-            );
+            ->with($this->callback(
+                static function (string $event): bool {
+                    static $i = 0;
+                    return match ([$i++, $event]) {
+                        [0, 'db.image.load'],
+                        [1, 'storage.image.load'],
+                        [2, 'image.transform'] => true,
+                    };
+                },
+            ));
 
         $this->response
             ->expects($this->once())

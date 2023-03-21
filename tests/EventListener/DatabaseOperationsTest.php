@@ -238,39 +238,39 @@ class DatabaseOperationsTest extends ListenerTests
         $query = $this->createMock(ParameterBag::class);
         $query
             ->method('has')
-            ->withConsecutive(
-                ['page'],
-                ['limit'],
-                ['metadata'],
-                ['from'],
-                ['to'],
-                ['sort'],
-                ['ids'],
-                ['checksums'],
-                ['originalChecksums'],
-            )
-            ->willReturn(true);
+            ->willReturnCallback(
+                static function (string $param): bool {
+                    static $i = 0;
+                    return match ([$i++, $param]) {
+                        [0, 'page'],
+                        [1, 'limit'],
+                        [2, 'metadata'],
+                        [3, 'from'],
+                        [4, 'to'],
+                        [5, 'sort'],
+                        [6, 'ids'],
+                        [7, 'checksums'],
+                        [8, 'originalChecksums'],
+                        [9, 'fields'] => true,
+                    };
+                },
+            );
         $query
             ->method('get')
-            ->withConsecutive(
-                ['page'],
-                ['limit'],
-                ['from'],
-                ['to'],
-                ['sort'],
-                ['ids'],
-                ['checksums'],
-                ['originalChecksums'],
-            )
-            ->willReturnOnConsecutiveCalls(
-                1,
-                5,
-                1355156488,
-                1355176488,
-                ['size:desc'],
-                ['identifier1', 'identifier2', 'identifier3'],
-                ['checksum1', 'checksum2', 'checksum3'],
-                ['checksum1', 'checksum2', 'checksum3'],
+            ->willReturnCallback(
+                static function (string $param): int|array {
+                    static $i = 0;
+                    return match ([$i++, $param]) {
+                        [0, 'page'] => 1,
+                        [1, 'limit'] => 5,
+                        [2, 'from'] => 1355156488,
+                        [3, 'to'] => 1355176488,
+                        [4, 'sort'] => ['size:desc'],
+                        [5, 'ids'] => ['identifier1', 'identifier2', 'identifier3'],
+                        [6, 'checksums'] => ['checksum1', 'checksum2', 'checksum3'],
+                        [7, 'originalChecksums'] => ['checksum1', 'checksum2', 'checksum3'],
+                    };
+                },
             );
 
         $this->request->query = $query;

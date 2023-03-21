@@ -32,7 +32,7 @@ class AddPublicKeyTest extends TestCase
         $this->application->add($this->command);
     }
 
-    public function getInvalidAccessControlConfig(): array
+    public static function getInvalidAccessControlConfig(): array
     {
         return [
             [
@@ -40,13 +40,11 @@ class AddPublicKeyTest extends TestCase
                 'Invalid access control adapter',
             ],
             [
-                ['accessControl' => function (): Exception {
-                    return new Exception();
-                }],
+                ['accessControl' => fn (): Exception => new Exception()],
                 'Invalid access control adapter',
             ],
             [
-                ['accessControl' => $this->createMock(AdapterInterface::class)],
+                ['accessControl' => AdapterInterface::class],
                 'The configured access control adapter is not mutable',
             ],
         ];
@@ -58,6 +56,10 @@ class AddPublicKeyTest extends TestCase
      */
     public function testThrowsWhenAccessControlIsNotValid(array $config, string $errorMessage): void
     {
+        if (is_string($config['accessControl'])) {
+            $config['accessControl'] = $this->createMock($config['accessControl']);
+        }
+
         $command = new AddPublicKey();
         $command->setConfig($config);
 
@@ -147,33 +149,38 @@ class AddPublicKeyTest extends TestCase
         $this->adapter
             ->expects($this->exactly(3))
             ->method('addAccessRule')
-            ->withConsecutive(
-                [$this->equalTo('foo'), $this->callback(function ($rule) {
-                    $diff = array_diff($rule['resources'], Resource::getReadOnlyResources());
-                    return (
-                        count($rule['users']) === 2 &&
-                        in_array('espenh', $rule['users']) &&
-                        in_array('kribrabr', $rule['users']) &&
-                        empty($diff)
-                    );
-                })],
-                [$this->equalTo('foo'), $this->callback(function ($rule) {
-                    $diff = array_diff($rule['resources'], Resource::getReadWriteResources());
-                    return (
-                        count($rule['users']) === 2 &&
-                        in_array('rexxars', $rule['users']) &&
-                        in_array('kbrabrand', $rule['users']) &&
-                        empty($diff)
-                    );
-                })],
-                [$this->equalTo('foo'), $this->callback(function ($rule) {
-                    $diff = array_diff($rule['resources'], Resource::getAllResources());
-                    return (
-                        $rule['users'] === '*' &&
-                        empty($diff)
-                    );
-                })],
-            );
+            ->with('foo', $this->callback(
+                static function (array $accessRule): bool {
+                    static $i = 0;
+                    switch ($i++) {
+                        case 0: {
+                            $diff = array_diff($accessRule['resources'], Resource::getReadOnlyResources());
+                            return (
+                                count($accessRule['users']) === 2 &&
+                                in_array('espenh', $accessRule['users']) &&
+                                in_array('kribrabr', $accessRule['users']) &&
+                                empty($diff)
+                            );
+                        }
+                        case 1: {
+                            $diff = array_diff($accessRule['resources'], Resource::getReadWriteResources());
+                            return (
+                                count($accessRule['users']) === 2 &&
+                                in_array('rexxars', $accessRule['users']) &&
+                                in_array('kbrabrand', $accessRule['users']) &&
+                                empty($diff)
+                            );
+                        }
+                        case 2: {
+                            $diff = array_diff($accessRule['resources'], Resource::getAllResources());
+                            return (
+                                $accessRule['users'] === '*' &&
+                                empty($diff)
+                            );
+                        }
+                    }
+                },
+            ));
 
         $commandTester = new CommandTester($this->command);
         $commandTester->setInputs([

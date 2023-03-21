@@ -17,7 +17,7 @@ class CropTest extends TransformationTests
         return new Crop();
     }
 
-    public function getCropParams(): array
+    public static function getCropParams(): array
     {
         return [
             'cropped area smaller than the image' => [['width' => 100, 'height' => 50], 100, 50, true],
@@ -98,7 +98,7 @@ class CropTest extends TransformationTests
         $transformation->transform(['width' => 123]);
     }
 
-    public function getImageParams(): array
+    public static function getImageParams(): array
     {
         return [
             'Do not perform work when cropping same sized images' => [
@@ -176,7 +176,7 @@ class CropTest extends TransformationTests
             ->transform($params);
     }
 
-    public function getInvalidImageParams(): array
+    public static function getInvalidImageParams(): array
     {
         return [
             'Dont throw if width/height are within bounds (no coords)' => [

@@ -78,7 +78,7 @@ class WatermarkTest extends TransformationTests
         $this->transformation->transform(['img' => 'foobar']);
     }
 
-    public function getParamsForWatermarks(): array
+    public static function getParamsForWatermarks(): array
     {
         $black = [0, 0, 0];
         $white = [255, 255, 255];

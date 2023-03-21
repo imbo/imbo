@@ -19,7 +19,7 @@ class DateFormatterTest extends TestCase
     /**
      * @return array<array{0:DateTime,1:string}>
      */
-    public function getDates(): array
+    public static function getDates(): array
     {
         return [
             [new DateTime('@1234567890'), 'Fri, 13 Feb 2009 23:31:30 GMT'],

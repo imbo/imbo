@@ -14,7 +14,7 @@ class ThumbnailTest extends TransformationTests
         return new Thumbnail();
     }
 
-    public function getThumbnailParams(): array
+    public static function getThumbnailParams(): array
     {
         return [
             'no params' => [

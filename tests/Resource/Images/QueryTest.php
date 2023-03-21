@@ -112,7 +112,7 @@ class QueryTest extends TestCase
         $this->assertSame($value, $this->query->getOriginalChecksums());
     }
 
-    public function getSortData(): array
+    public static function getSortData(): array
     {
         return [
             'single field without sort' => [

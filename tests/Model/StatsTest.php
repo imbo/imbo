@@ -17,7 +17,7 @@ class StatsTest extends TestCase
         $this->model = new Stats();
     }
 
-    public function getNumUsers(): array
+    public static function getNumUsers(): array
     {
         return [
             [0],
@@ -27,7 +27,7 @@ class StatsTest extends TestCase
         ];
     }
 
-    public function getNumImages(): array
+    public static function getNumImages(): array
     {
         return [
             [0],
@@ -37,7 +37,7 @@ class StatsTest extends TestCase
         ];
     }
 
-    public function getNumBytes(): array
+    public static function getNumBytes(): array
     {
         return [
             [0],

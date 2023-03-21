@@ -14,7 +14,7 @@ class RotateTest extends TransformationTests
         return new Rotate();
     }
 
-    public function getRotateParams(): array
+    public static function getRotateParams(): array
     {
         return [
             '90 angle' => [90, 463, 665],

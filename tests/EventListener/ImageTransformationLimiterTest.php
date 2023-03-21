@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ImageTransformationLimiterTest extends TestCase
 {
-    public function getLimitAndTransformations(): array
+    public static function getLimitAndTransformations(): array
     {
         return [
             [
@@ -64,7 +64,7 @@ class ImageTransformationLimiterTest extends TestCase
         );
     }
 
-    public function getLimits(): array
+    public static function getLimits(): array
     {
         return [
             [42],

@@ -28,7 +28,7 @@ class ExifMetadataTest extends ListenerTests
         return $this->listener;
     }
 
-    public function getFilterData(): array
+    public static function getFilterData(): array
     {
         $data = [
             'date:create' => '2013-11-26T19:42:48+01:00',

@@ -172,7 +172,7 @@ class ArrayAdapterTest extends TestCase
         ]);
     }
 
-    public function getGroupsData(): array
+    public static function getGroupsData(): array
     {
         return [
             'no groups' => [
@@ -213,7 +213,7 @@ class ArrayAdapterTest extends TestCase
         $this->assertSame(array_values($result), array_values($adapter->getGroups($query, $model)));
     }
 
-    public function getGroupsForTest(): array
+    public static function getGroupsForTest(): array
     {
         return [
             'no groups' => [
@@ -267,7 +267,7 @@ class ArrayAdapterTest extends TestCase
         $this->assertFalse($adapter->publicKeyExists('pubKey3'));
     }
 
-    public function getAccessRules(): array
+    public static function getAccessRules(): array
     {
         $acl = [
             [
@@ -337,7 +337,7 @@ class ArrayAdapterTest extends TestCase
         $this->assertSame($result, $adapter->getGroup($group));
     }
 
-    public function getDataForAccessListTest(): array
+    public static function getDataForAccessListTest(): array
     {
         return [
             'no acls' => [

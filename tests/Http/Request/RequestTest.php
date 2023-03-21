@@ -147,10 +147,9 @@ class RequestTest extends TestCase
         $this->assertSame($user, $this->request->getUser());
     }
 
-    public function getUsers(): array
+    public static function getUsers(): array
     {
         return [
-
             'no user' => [
                 'routeUser' => null,
                 'queryUsers' => null,
@@ -312,7 +311,7 @@ class RequestTest extends TestCase
         $request->getTransformations();
     }
 
-    public function getQueryStrings(): array
+    public static function getQueryStrings(): array
     {
         return [
             'transformation with params' => [

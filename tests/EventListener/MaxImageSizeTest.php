@@ -24,7 +24,7 @@ class MaxImageSizeTest extends ListenerTests
         return $this->listener;
     }
 
-    public function getImageDimensions(): array
+    public static function getImageDimensions(): array
     {
         return [
             'below limit' => [100, 100, 200, 200, false],

@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ContrastTest extends TestCase
 {
-    public function getContrastParams(): array
+    public static function getContrastParams(): array
     {
         return [
             'no params' => [

@@ -518,7 +518,7 @@ class JSONTest extends TestCase
         $this->assertSame('[{"id":1,"group":"group","users":["user1","user2"]},{"id":2,"resources":["image.get","image.head"],"users":["user3","user4"]}]', $this->formatter->format($model));
     }
 
-    public function getStats(): array
+    public static function getStats(): array
     {
         return [
             'no-custom-stats' => [

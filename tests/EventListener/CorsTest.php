@@ -188,10 +188,16 @@ class CorsTest extends ListenerTests
         ]);
         $headers
             ->method('add')
-            ->withConsecutive(
-                [['Access-Control-Allow-Origin' => 'http://imbo-project.org']],
-                [['Access-Control-Expose-Headers' => 'X-Imbo-ImageIdentifier, X-Imbo-Something']],
-            );
+            ->with($this->callback(
+                static function (array $headers): bool {
+                    static $i = 0;
+                    return match ([$i++, $headers]) {
+                        [0, ['Access-Control-Allow-Origin' => 'http://imbo-project.org']],
+                        [1, ['Access-Control-Expose-Headers' => 'X-Imbo-ImageIdentifier, X-Imbo-Something']] => true,
+                        default => false,
+                    };
+                },
+            ));
 
         $this->response->headers = $headers;
 
@@ -253,13 +259,14 @@ class CorsTest extends ListenerTests
         $this->request->headers = $this->createMock(HeaderBag::class);
         $this->request->headers
             ->method('get')
-            ->withConsecutive(
-                ['Origin'],
-                ['Access-Control-Request-Headers', ''],
-            )
-            ->willReturnOnConsecutiveCalls(
-                'http://imbo-project.org',
-                'x-imbo-signature,something-else',
+            ->willReturnCallback(
+                static function (string $header, ?string $value = ''): string {
+                    static $i = 0;
+                    return match ([$i++, $header, $value]) {
+                        [0, 'Origin', null] => 'http://imbo-project.org',
+                        [1, 'Access-Control-Request-Headers', ''] => 'x-imbo-signature,something-else',
+                    };
+                },
             );
 
         $headers = $this->createMock(ResponseHeaderBag::class);
@@ -335,7 +342,7 @@ class CorsTest extends ListenerTests
         $listener->invoke($event);
     }
 
-    public function getAllowedMethodsParams(): array
+    public static function getAllowedMethodsParams(): array
     {
         return [
             'default' => [

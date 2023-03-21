@@ -15,7 +15,7 @@ class ContentNegotiationTest extends TestCase
         $this->cn = new ContentNegotiation();
     }
 
-    public function getIsAcceptableData(): array
+    public static function getIsAcceptableData(): array
     {
         return [
             ['image/png', ['image/png' => 1, 'image/*' => 0.9], 1],
@@ -35,7 +35,7 @@ class ContentNegotiationTest extends TestCase
         $this->assertSame($result, $this->cn->isAcceptable($mimeType, $acceptable));
     }
 
-    public function getMimeTypes(): array
+    public static function getMimeTypes(): array
     {
         return [
             [['image/png', 'image/gif'], ['image/*' => 1], 'image/png'],

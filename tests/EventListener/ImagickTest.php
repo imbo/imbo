@@ -8,6 +8,7 @@ use Imbo\Http\Response\Response;
 use Imbo\Image\InputLoaderManager;
 use Imbo\Image\TransformationManager;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass Imbo\EventListener\Imagick
@@ -162,7 +163,7 @@ class ImagickTest extends ListenerTests
         $this->listener->readImageBlob($this->event);
     }
 
-    public function hasImageBeenTransformed(): array
+    public static function hasImageBeenTransformed(): array
     {
         return [
             'has been transformed' => [true],
@@ -266,11 +267,18 @@ class ImagickTest extends ListenerTests
             ->expects($this->once())
             ->method('getConfig')
             ->willReturn(['optimizations' => ['jpegSizeHint' => true]]);
+
+        $event = $this->event;
         $this->event
             ->method('setArgument')
-            ->withConsecutive(
-                ['ratio', 4],
-                ['transformationIndex', 0],
+            ->willReturnCallback(
+                static function (string $arg, int $value) use ($event): EventInterface&MockObject {
+                    static $i = 0;
+                    return match ([$i++, $arg, $value]) {
+                        [0, 'ratio', 4],
+                        [1, 'transformationIndex', 0] => $event,
+                    };
+                },
             );
 
         $this->transformationManager

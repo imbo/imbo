@@ -540,19 +540,24 @@ class ImageVariationsTest extends ListenerTests
                 'height' => $variationHeight,
             ]);
 
-        $this->eventManager
+        $manager = $this->eventManager;
+        $manager
             ->method('trigger')
-            ->withConsecutive(
-                [
-                    'image.transformations.adjust',
-                    [
-                        'transformationIndex' => 1,
-                        'ratio'               => $width / $variationWidth,
-                    ],
-                ],
-                [
-                    'image.loaded',
-                ],
+            ->willReturnCallback(
+                static function (string $transformation, array $params = []) use ($manager, $width, $variationWidth): EventManager&MockObject {
+                    static $i = 0;
+                    return match ([$i++, $transformation, $params]) {
+                        [
+                            0,
+                            'image.transformations.adjust',
+                            [
+                                'transformationIndex' => 1,
+                                'ratio'               => $width / $variationWidth,
+                            ],
+                        ],
+                        [1, 'image.loaded', []] => $manager,
+                    };
+                },
             );
 
         $this->storage
@@ -729,13 +734,18 @@ class ImageVariationsTest extends ListenerTests
 
         $this->storage
             ->method('storeImageVariation')
-            ->withConsecutive(
-                [$this->user, $this->imageIdentifier, 'some blob', 25],
-                [$this->user, $this->imageIdentifier, 'some blob', 100],
-                [$this->user, $this->imageIdentifier, 'some blob', 400],
-                [$this->user, $this->imageIdentifier, 'some blob', 800],
-                [$this->user, $this->imageIdentifier, 'some blob', 1024],
-                [$this->user, $this->imageIdentifier, 'some blob', 1700],
+            ->willReturnCallback(
+                static function (string $user, string $imageIdentifier, string $contents, int $width): bool {
+                    static $i = 0;
+                    return match ([$i++, $user, $imageIdentifier, $contents, $width]) {
+                        [0, 'user', 'imgid', 'some blob', 25],
+                        [1, 'user', 'imgid', 'some blob', 100],
+                        [2, 'user', 'imgid', 'some blob', 400],
+                        [3, 'user', 'imgid', 'some blob', 800],
+                        [4, 'user', 'imgid', 'some blob', 1024],
+                        [5, 'user', 'imgid', 'some blob', 1700] => true,
+                    };
+                },
             );
 
         $transformation = $this->createMock(Resize::class);
@@ -748,14 +758,19 @@ class ImageVariationsTest extends ListenerTests
         $transformation
             ->expects($this->exactly(6))
             ->method('transform')
-            ->withConsecutive(
-                [['width' => 25]],
-                [['width' => 100]],
-                [['width' => 400]],
-                [['width' => 800]],
-                [['width' => 1024]],
-                [['width' => 1700]],
-            );
+            ->with($this->callback(
+                static function (array $params): bool {
+                    static $i = 0;
+                    return match ([$i++, $params['width']]) {
+                        [0, 25],
+                        [1, 100],
+                        [2, 400],
+                        [3, 800],
+                        [4, 1024],
+                        [5, 1700] => true,
+                    };
+                },
+            ));
 
         $this->transformationManager
             ->expects($this->exactly(6))
@@ -815,13 +830,14 @@ class ImageVariationsTest extends ListenerTests
         $this->transformationManager
             ->expects($this->exactly(2))
             ->method('getTransformation')
-            ->withConsecutive(
-                ['convert'],
-                ['resize'],
-            )
-            ->willReturnOnConsecutiveCalls(
-                $convertTransformation,
-                $resizeTransformation,
+            ->willReturnCallback(
+                static function (string $transformation) use ($convertTransformation, $resizeTransformation) {
+                    static $i = 0;
+                    return match ([$i++, $transformation]) {
+                        [0, 'convert'] => $convertTransformation,
+                        [1, 'resize'] => $resizeTransformation,
+                    };
+                },
             );
 
         $this->imageModel
@@ -877,12 +893,16 @@ class ImageVariationsTest extends ListenerTests
             ->willReturn('image data');
 
         $this->storage
-            ->expects($this->exactly(3))
             ->method('storeImageVariation')
-            ->withConsecutive(
-                [$this->user, $this->imageIdentifier, $this->anything(), 865],
-                [$this->user, $this->imageIdentifier, $this->anything(), 562],
-                [$this->user, $this->imageIdentifier, $this->anything(), 365],
+            ->willReturnCallback(
+                static function (string $user, string $imageIdentifier, string $contents, int $width): bool {
+                    static $i = 0;
+                    return match ([$i++, $user, $imageIdentifier, $contents, $width]) {
+                        [0, 'user', 'imgid', 'image data', 865],
+                        [1, 'user', 'imgid', 'image data', 562],
+                        [2, 'user', 'imgid', 'image data', 365] => true,
+                    };
+                },
             );
 
         $listener->generateVariations($this->event);
@@ -923,11 +943,15 @@ class ImageVariationsTest extends ListenerTests
             ->willReturn('image data');
 
         $this->storage
-            ->expects($this->exactly(2))
             ->method('storeImageVariation')
-            ->withConsecutive(
-                [$this->user, $this->imageIdentifier, $this->anything(), 1337],
-                [$this->user, $this->imageIdentifier, $this->anything(), 410],
+            ->willReturnCallback(
+                static function (string $user, string $imageIdentifier, string $contents, int $width): bool {
+                    static $i = 0;
+                    return match ([$i++, $user, $imageIdentifier, $contents, $width]) {
+                        [0, 'user', 'imgid', 'image data', 1337],
+                        [1, 'user', 'imgid', 'image data', 410] => true,
+                    };
+                },
             );
 
         $listener->generateVariations($this->event);

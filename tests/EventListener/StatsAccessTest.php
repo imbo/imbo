@@ -47,7 +47,7 @@ class StatsAccessTest extends ListenerTests
         $this->listener->checkAccess($this->event);
     }
 
-    public function getFilterData(): array
+    public static function getFilterData(): array
     {
         return [
             'IPv4 in whitelist' => [

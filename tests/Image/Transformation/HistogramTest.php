@@ -14,7 +14,7 @@ class HistogramTest extends TransformationTests
         return new Histogram();
     }
 
-    public function getHistogramParameters(): array
+    public static function getHistogramParameters(): array
     {
         return [
             [1, 256],

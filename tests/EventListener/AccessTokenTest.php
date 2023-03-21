@@ -106,7 +106,7 @@ class AccessTokenTest extends ListenerTests
         $this->listener->checkAccessToken($this->event);
     }
 
-    public function getFilterData(): array
+    public static function getFilterData(): array
     {
         return [
             'no filter and no transformations' => [
@@ -207,7 +207,7 @@ class AccessTokenTest extends ListenerTests
         $listener->checkAccessToken($this->event);
     }
 
-    public function getAccessTokens(): array
+    public static function getAccessTokens(): array
     {
         return [
             [
@@ -432,11 +432,11 @@ class AccessTokenTest extends ListenerTests
         $listener->checkAccessToken($this->event);
     }
 
-    public function getAccessTokensForMultipleGenerator(): array
+    public static function getAccessTokensForMultipleGenerator(): array
     {
         $tokens = [];
 
-        foreach ($this->getAccessTokens() as $token) {
+        foreach (self::getAccessTokens() as $token) {
             $token[] = 'accessToken';
             $tokens[] = $token;
         }
@@ -502,9 +502,7 @@ class AccessTokenTest extends ListenerTests
                 $this->equalTo($argumentKey),
                 $this->anything(),
             ))
-            ->willReturnCallback(function ($val) use ($argumentKey) {
-                return $val == $argumentKey;
-            });
+            ->willReturnCallback(fn (string $val): bool => $val === $argumentKey);
 
         $this->query
             ->expects($this->atLeastOnce())
@@ -545,7 +543,7 @@ class AccessTokenTest extends ListenerTests
         new AccessToken(['accessTokenGenerator' => new StdClass()]);
     }
 
-    public function getRewrittenAccessTokenData(): array
+    public static function getRewrittenAccessTokenData(): array
     {
         $getAccessToken = function (string $url): string {
             return hash_hmac('sha256', $url, 'foobar');

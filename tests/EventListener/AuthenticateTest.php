@@ -91,21 +91,26 @@ class AuthenticateTest extends ListenerTests
     {
         $this->headers
             ->method('has')
-            ->withConsecutive(
-                ['x-imbo-authenticate-timestamp'],
-                ['x-imbo-authenticate-signature'],
-            )
-            ->willReturn(true);
+            ->willReturnCallback(
+                static function (string $header): bool {
+                    static $i = 0;
+                    return match ([$i++, $header]) {
+                        [0, 'x-imbo-authenticate-timestamp'],
+                        [1, 'x-imbo-authenticate-signature'] => true,
+                    };
+                },
+            );
 
         $this->headers
             ->method('get')
-            ->withConsecutive(
-                ['x-imbo-authenticate-timestamp', null],
-                ['x-imbo-authenticate-signature', null],
-            )
-            ->willReturnOnConsecutiveCalls(
-                gmdate('Y-m-d\TH:i:s\Z'),
-                null,
+            ->willReturnCallback(
+                static function (string $header, ?string $value) {
+                    static $i = 0;
+                    return match ([$i++, $header, $value]) {
+                        [0, 'x-imbo-authenticate-timestamp', null] => gmdate('Y-m-d\TH:i:s\Z'),
+                        [1, 'x-imbo-authenticate-signature', null] => null,
+                    };
+                },
             );
 
         $this->expectExceptionObject(new RuntimeException('Missing authentication signature', Response::HTTP_BAD_REQUEST));
@@ -120,11 +125,15 @@ class AuthenticateTest extends ListenerTests
     {
         $this->headers
             ->method('has')
-            ->withConsecutive(
-                ['x-imbo-authenticate-timestamp'],
-                ['x-imbo-authenticate-signature'],
-            )
-            ->willReturn(true);
+            ->willReturnCallback(
+                static function (string $header): bool {
+                    static $i = 0;
+                    return match ([$i++, $header]) {
+                        [0, 'x-imbo-authenticate-timestamp'],
+                        [1, 'x-imbo-authenticate-signature'] => true,
+                    };
+                },
+            );
 
         $this->headers
             ->method('get')
@@ -143,11 +152,15 @@ class AuthenticateTest extends ListenerTests
     {
         $this->headers
             ->method('has')
-            ->withConsecutive(
-                ['x-imbo-authenticate-timestamp'],
-                ['x-imbo-authenticate-signature'],
-            )
-            ->willReturn(true);
+            ->willReturnCallback(
+                static function (string $header): bool {
+                    static $i = 0;
+                    return match ([$i++, $header]) {
+                        [0, 'x-imbo-authenticate-timestamp'],
+                        [1, 'x-imbo-authenticate-signature'] => true,
+                    };
+                },
+            );
 
         $this->headers
             ->method('get')
@@ -165,21 +178,26 @@ class AuthenticateTest extends ListenerTests
     {
         $this->headers
             ->method('has')
-            ->withConsecutive(
-                ['x-imbo-authenticate-timestamp'],
-                ['x-imbo-authenticate-signature'],
-            )
-            ->willReturn(true);
+            ->willReturnCallback(
+                static function (string $header): bool {
+                    static $i = 0;
+                    return match ([$i++, $header]) {
+                        [0, 'x-imbo-authenticate-timestamp'],
+                        [1, 'x-imbo-authenticate-signature'] => true,
+                    };
+                },
+            );
 
         $this->headers
             ->method('get')
-            ->withConsecutive(
-                ['x-imbo-authenticate-timestamp'],
-                ['x-imbo-authenticate-signature'],
-            )
-            ->willReturnOnConsecutiveCalls(
-                gmdate('Y-m-d\TH:i:s\Z'),
-                'foobar',
+            ->willReturnCallback(
+                static function (string $header) {
+                    static $i = 0;
+                    return match ([$i++, $header]) {
+                        [0, 'x-imbo-authenticate-timestamp'] => gmdate('Y-m-d\TH:i:s\Z'),
+                        [1, 'x-imbo-authenticate-signature'] => 'foobar',
+                    };
+                },
             );
 
         $this->request
@@ -220,21 +238,26 @@ class AuthenticateTest extends ListenerTests
 
         $this->headers
             ->method('has')
-            ->withConsecutive(
-                ['x-imbo-authenticate-timestamp'],
-                ['x-imbo-authenticate-signature'],
-            )
-            ->willReturn(true);
+            ->willReturnCallback(
+                static function (string $header): bool {
+                    static $i = 0;
+                    return match ([$i++, $header]) {
+                        [0, 'x-imbo-authenticate-timestamp'],
+                        [1, 'x-imbo-authenticate-signature'] => true,
+                    };
+                },
+            );
 
         $this->headers
             ->method('get')
-            ->withConsecutive(
-                ['x-imbo-authenticate-timestamp'],
-                ['x-imbo-authenticate-signature'],
-            )
-            ->willReturnOnConsecutiveCalls(
-                $timestamp,
-                $signature,
+            ->willReturnCallback(
+                static function (string $header) use ($timestamp, $signature): string {
+                    static $i = 0;
+                    return match ([$i++, $header]) {
+                        [0, 'x-imbo-authenticate-timestamp'] => $timestamp,
+                        [1, 'x-imbo-authenticate-signature'] => $signature,
+                    };
+                },
             );
 
         $this->request
@@ -292,24 +315,26 @@ class AuthenticateTest extends ListenerTests
 
         $this->headers
             ->method('get')
-            ->withConsecutive(
-                ['x-imbo-authenticate-timestamp', $timestamp],
-                ['x-imbo-authenticate-signature', $signature],
-            )
-            ->willReturnOnConsecutiveCalls(
-                $timestamp,
-                $signature,
+            ->willReturnCallback(
+                static function (string $header, string $value) use ($timestamp, $signature): string {
+                    static $i = 0;
+                    return match ([$i++, $header, $value]) {
+                        [0, 'x-imbo-authenticate-timestamp', $timestamp] => $timestamp,
+                        [1, 'x-imbo-authenticate-signature', $signature] => $signature,
+                    };
+                },
             );
 
         $this->query
             ->method('get')
-            ->withConsecutive(
-                ['timestamp'],
-                ['signature'],
-            )
-            ->willReturnOnConsecutiveCalls(
-                $timestamp,
-                $signature,
+            ->willReturnCallback(
+                static function (string $header) use ($timestamp, $signature): string {
+                    static $i = 0;
+                    return match ([$i++, $header]) {
+                        [0, 'timestamp'] => $timestamp,
+                        [1, 'signature'] => $signature,
+                    };
+                },
             );
 
         $this->request
@@ -338,7 +363,7 @@ class AuthenticateTest extends ListenerTests
         $this->listener->authenticate($this->event);
     }
 
-    public function getRewrittenSignatureData(): array
+    public static function getRewrittenSignatureData(): array
     {
         return array_map(function ($dataSet) {
             $httpMethod = 'PUT';
@@ -462,24 +487,26 @@ class AuthenticateTest extends ListenerTests
 
         $this->headers
             ->method('get')
-            ->withConsecutive(
-                ['x-imbo-authenticate-timestamp', $timestamp],
-                ['x-imbo-authenticate-signature', $signature],
-            )
-            ->willReturnOnConsecutiveCalls(
-                $timestamp,
-                $signature,
+            ->willReturnCallback(
+                static function (string $header, string $value) use ($timestamp, $signature): string {
+                    static $i = 0;
+                    return match ([$i++, $header, $value]) {
+                        [0, 'x-imbo-authenticate-timestamp', $timestamp] => $timestamp,
+                        [1, 'x-imbo-authenticate-signature', $signature] => $signature,
+                    };
+                },
             );
 
         $this->query
             ->method('get')
-            ->withConsecutive(
-                ['timestamp'],
-                ['signature'],
-            )
-            ->willReturnOnConsecutiveCalls(
-                $timestamp,
-                $signature,
+            ->willReturnCallback(
+                static function (string $param) use ($timestamp, $signature): string {
+                    static $i = 0;
+                    return match ([$i++, $param]) {
+                        [0, 'timestamp'] => $timestamp,
+                        [1, 'signature'] => $signature,
+                    };
+                },
             );
 
         $this->request

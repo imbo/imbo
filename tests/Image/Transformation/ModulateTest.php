@@ -17,7 +17,7 @@ class ModulateTest extends TransformationTests
         return new Modulate();
     }
 
-    public function getModulateParamsForTransformation(): array
+    public static function getModulateParamsForTransformation(): array
     {
         return [
             'no params' => [
@@ -54,7 +54,7 @@ class ModulateTest extends TransformationTests
             ->transform($params);
     }
 
-    public function getModulateParams(): array
+    public static function getModulateParams(): array
     {
         return [
             'no params' => [

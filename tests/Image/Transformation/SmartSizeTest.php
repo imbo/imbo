@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  */
 class SmartSizeTest extends TestCase
 {
-    public function getSmartSizeArguments(): array
+    public static function getSmartSizeArguments(): array
     {
         return [
             'Square, close crop, (800,300) poi on landscape image' => [

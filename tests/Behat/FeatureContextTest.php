@@ -76,16 +76,18 @@ class FeatureContextTest extends TestCase
             ->method('push')
             ->with($this->isInstanceOf('Closure'), $this->isType('string'));
 
+        $baseUri = $this->baseUri;
         $client = $this->createMock(ClientInterface::class);
         $client
             ->method('getConfig')
-            ->withConsecutive(
-                ['handler'],
-                ['base_uri'],
-            )
-            ->willReturnOnConsecutiveCalls(
-                $handlerStack,
-                $this->baseUri,
+            ->willReturnCallback(
+                static function (string $param) use ($handlerStack, $baseUri) {
+                    static $i = 0;
+                    return match ([$i++, $param]) {
+                        [0, 'handler'] => $handlerStack,
+                        [1, 'base_uri'] => $baseUri,
+                    };
+                },
             );
 
         $context = new FeatureContext();
@@ -125,7 +127,7 @@ class FeatureContextTest extends TestCase
         $this->assertSame('current', $request->getHeaderLine('X-Bar'));
     }
 
-    public function getValidDates(): array
+    public static function getValidDates(): array
     {
         return [
             ['date' => 'Wed, 15 Mar 2017 21:28:14 GMT'],
@@ -150,7 +152,7 @@ class FeatureContextTest extends TestCase
         $this->context->isDate('invalid date');
     }
 
-    public function getImboConfigFiles(): array
+    public static function getImboConfigFiles(): array
     {
         return array_map(function ($file) {
             return [basename($file)];
@@ -189,7 +191,7 @@ class FeatureContextTest extends TestCase
         $this->assertSame('*', $this->makeRequest()->getHeaderLine('X-Imbo-Stats-Allowed-By'));
     }
 
-    public function getAdaptersForFailure(): array
+    public static function getAdaptersForFailure(): array
     {
         return [
             ['adapter' => 'database', 'header' => 'X-Imbo-Status-Database-Failure'],
@@ -294,7 +296,7 @@ class FeatureContextTest extends TestCase
         $this->context->signRequest();
     }
 
-    public function getDataForAccessTokens(): array
+    public static function getDataForAccessTokens(): array
     {
         return [
             'path with no query params' => [
@@ -547,7 +549,7 @@ class FeatureContextTest extends TestCase
         $this->context->authenticateRequest('auth');
     }
 
-    public function getAuthDetails(): array
+    public static function getAuthDetails(): array
     {
         return [
             'access-token' => [
@@ -628,7 +630,7 @@ class FeatureContextTest extends TestCase
         }
     }
 
-    public function getRequestQueryParams(): array
+    public static function getRequestQueryParams(): array
     {
         return [
             'single key / value' => [
@@ -747,7 +749,7 @@ class FeatureContextTest extends TestCase
         $this->context->generateShortImageUrl('/path', new PyStringNode([], 1));
     }
 
-    public function getShortUrlParams(): array
+    public static function getShortUrlParams(): array
     {
         return [
             [
@@ -846,7 +848,7 @@ class FeatureContextTest extends TestCase
         $this->context->specifyAsTheWatermarkImage('/path');
     }
 
-    public function getDataForWatermarkImages(): array
+    public static function getDataForWatermarkImages(): array
     {
         return [
             'no params' => [
@@ -904,7 +906,7 @@ class FeatureContextTest extends TestCase
         $this->context->requestPreviouslyAddedImage();
     }
 
-    public function getDataForRequestingPreviouslyAddedImage(): array
+    public static function getDataForRequestingPreviouslyAddedImage(): array
     {
         return [
             'HTTP GET' => [
@@ -957,7 +959,7 @@ class FeatureContextTest extends TestCase
         );
     }
 
-    public function getDataForRequestingPreviouslyAddedImageWithExtension(): array
+    public static function getDataForRequestingPreviouslyAddedImageWithExtension(): array
     {
         return [
             [
@@ -1023,7 +1025,7 @@ class FeatureContextTest extends TestCase
         $this->context->makeSameRequest();
     }
 
-    public function getDataForReplayingRequests(): array
+    public static function getDataForReplayingRequests(): array
     {
         return [
             'use original method' => [
@@ -1116,7 +1118,7 @@ class FeatureContextTest extends TestCase
         $this->context->requestMetadataOfPreviouslyAddedImage();
     }
 
-    public function getDataForRequestingMetadataOfPreviouslyAddedImage(): array
+    public static function getDataForRequestingMetadataOfPreviouslyAddedImage(): array
     {
         return [
             'no metadata' => [
@@ -1184,7 +1186,7 @@ class FeatureContextTest extends TestCase
         $this->context->requestImageResourceForLocalImage(FIXTURES_DIR . '/image1.png');
     }
 
-    public function getDataForRequestingImageWithLocalPath(): array
+    public static function getDataForRequestingImageWithLocalPath(): array
     {
         return [
             'default values' => [
@@ -1260,7 +1262,7 @@ class FeatureContextTest extends TestCase
         ]));
     }
 
-    public function getDataForBulkRequests(): array
+    public static function getDataForBulkRequests(): array
     {
         return [
             'single request with no options' => [
@@ -1663,7 +1665,7 @@ class FeatureContextTest extends TestCase
         );
     }
 
-    public function getApproximateImageWidths(): array
+    public static function getApproximateImageWidths(): array
     {
         return [
             ['598±1'],
@@ -1692,7 +1694,7 @@ class FeatureContextTest extends TestCase
         );
     }
 
-    public function getApproximateImageWidthsForFailure(): array
+    public static function getApproximateImageWidthsForFailure(): array
     {
         return [
             [
@@ -1765,7 +1767,7 @@ class FeatureContextTest extends TestCase
         );
     }
 
-    public function getApproximateImageHeights(): array
+    public static function getApproximateImageHeights(): array
     {
         return [
             ['416±1'],
@@ -1794,7 +1796,7 @@ class FeatureContextTest extends TestCase
         );
     }
 
-    public function getApproximateImageHeightsForFailure(): array
+    public static function getApproximateImageHeightsForFailure(): array
     {
         return [
             [
@@ -1833,7 +1835,7 @@ class FeatureContextTest extends TestCase
         $this->context->assertImageHeight($approximateHeight);
     }
 
-    public function getDataForImageDimensionAssertion(): array
+    public static function getDataForImageDimensionAssertion(): array
     {
         $image1 = file_get_contents(FIXTURES_DIR . '/image1.png');
         $image2 = file_get_contents(FIXTURES_DIR . '/image2.png');
@@ -1910,7 +1912,7 @@ class FeatureContextTest extends TestCase
         );
     }
 
-    public function getApproximateImageDimensions(): array
+    public static function getApproximateImageDimensions(): array
     {
         return [
             ['598±1x415±2'],
@@ -1939,7 +1941,7 @@ class FeatureContextTest extends TestCase
         );
     }
 
-    public function getApproximateImageDimensionsForFailure(): array
+    public static function getApproximateImageDimensionsForFailure(): array
     {
         return [
             [
@@ -1970,7 +1972,7 @@ class FeatureContextTest extends TestCase
         $this->context->assertImageDimension($approximateDimension);
     }
 
-    public function getDataForAssertingImagePixelInfoFailures(): array
+    public static function getDataForAssertingImagePixelInfoFailures(): array
     {
         $image = file_get_contents(FIXTURES_DIR . '/image1.png');
 
@@ -2013,7 +2015,7 @@ class FeatureContextTest extends TestCase
         $this->context->assertImagePixelColor($coordinate, $color);
     }
 
-    public function getDataForAssertingImagePixelInfo(): array
+    public static function getDataForAssertingImagePixelInfo(): array
     {
         $image = file_get_contents(FIXTURES_DIR . '/image1.png');
 
@@ -2072,7 +2074,7 @@ class FeatureContextTest extends TestCase
         $this->context->assertImagePixelColor('1, 1', 'ffffff');
     }
 
-    public function getDataForAssertingImagePixelAlphaFailures(): array
+    public static function getDataForAssertingImagePixelAlphaFailures(): array
     {
         $image = file_get_contents(FIXTURES_DIR . '/transparency.png');
 
@@ -2109,7 +2111,7 @@ class FeatureContextTest extends TestCase
         $this->context->assertImagePixelAlpha($coordinate, $alpha);
     }
 
-    public function getDataForAssertingImagePixelAlpha(): array
+    public static function getDataForAssertingImagePixelAlpha(): array
     {
         $image = file_get_contents(FIXTURES_DIR . '/transparency.png');
 
@@ -2239,7 +2241,7 @@ class FeatureContextTest extends TestCase
         $this->assertSame('/keys/publicKey', $this->history[0]['request']->getUri()->getPath());
     }
 
-    public function getCacheabilityData(): array
+    public static function getCacheabilityData(): array
     {
         return [
             'cacheable, expect cacheable' => [
@@ -2655,7 +2657,7 @@ class FeatureContextTest extends TestCase
         ]));
     }
 
-    public function getDataForMatchingSeveralResponses()
+    public static function getDataForMatchingSeveralResponses()
     {
         return [
             'status line' => [
@@ -2744,7 +2746,7 @@ class FeatureContextTest extends TestCase
         );
     }
 
-    public function getDataForMatchingSeveralResponsesWhenFailing(): array
+    public static function getDataForMatchingSeveralResponsesWhenFailing(): array
     {
         return [
             'status line' => [
@@ -2893,7 +2895,7 @@ class FeatureContextTest extends TestCase
         $this->context->assertImageProperties('png');
     }
 
-    public function getSuiteSettings(): array
+    public static function getSuiteSettings(): array
     {
         return [
             'invalid database' => [

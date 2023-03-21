@@ -68,10 +68,27 @@ class GlobalShortUrlTest extends ResourceTests
 
         $route
             ->method('set')
-            ->withConsecutive(
-                ['user', $user],
-                ['imageIdentifier', $imageIdentifier],
-                ['extension', $extension],
+            ->with(
+                $this->callback(
+                    static function (string $name): bool {
+                        static $i = 0;
+                        return match ([$i++, $name]) {
+                            [0, 'user'],
+                            [1, 'imageIdentifier'],
+                            [2, 'extension'] => true,
+                        };
+                    },
+                ),
+                $this->callback(
+                    static function (string $value): bool {
+                        static $i = 0;
+                        return match ([$i++, $value]) {
+                            [0, 'christer'],
+                            [1, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'],
+                            [2, 'png'] => true,
+                        };
+                    },
+                ),
             );
 
         $this->request

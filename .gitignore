@@ -9,6 +9,7 @@ public/.htaccess
 behat.yml
 phpunit.xml
 .phpunit.result.cache
+.phpunit.cache
 test.php
 .php-cs-fixer.cache
 .vscode

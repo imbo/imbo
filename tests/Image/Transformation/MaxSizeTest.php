@@ -14,7 +14,7 @@ class MaxSizeTest extends TransformationTests
         return new MaxSize();
     }
 
-    public function getMaxSizeParams(): array
+    public static function getMaxSizeParams(): array
     {
         return [
             'landscape image with only width in params' => [

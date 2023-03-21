@@ -143,7 +143,7 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    public function createShortUrlParams(): array
+    public static function createShortUrlParams(): array
     {
         return [
             'no extension, no query' => [
@@ -282,12 +282,9 @@ class ShortUrlsTest extends ResourceTests
             ->with('user', 'id', null, [])
             ->willReturn(null);
         $this->database
+            ->expects($this->exactly(3))
             ->method('getShortUrlParams')
-            ->withConsecutive(
-                [$this->matchesRegularExpression('/[a-zA-Z0-9]{7}/')],
-                [$this->matchesRegularExpression('/[a-zA-Z0-9]{7}/')],
-                [$this->matchesRegularExpression('/[a-zA-Z0-9]{7}/')],
-            )
+            ->with($this->matchesRegularExpression('/[a-zA-Z0-9]{7}/'))
             ->willReturnOnConsecutiveCalls(
                 ['user' => 'value'],
                 ['user' => 'value'],

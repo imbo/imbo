@@ -38,7 +38,7 @@ class StatusTest extends ResourceTests
         $this->resource = $this->getNewResource();
     }
 
-    public function getStatuses(): array
+    public static function getStatuses(): array
     {
         return [
             'no error' => [

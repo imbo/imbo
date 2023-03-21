@@ -131,10 +131,15 @@ class ClipTest extends TestCase
         $imagick
             ->expects($this->exactly(2))
             ->method('setImageAlphaChannel')
-            ->withConsecutive(
-                [Imagick::ALPHACHANNEL_TRANSPARENT],
-                [Imagick::ALPHACHANNEL_ACTIVATE], // activate because the first causes a failure
-            );
+            ->with($this->callback(
+                static function (int $option): bool {
+                    static $i = 0;
+                    return match ([$i++, $option]) {
+                        [0, Imagick::ALPHACHANNEL_TRANSPARENT],
+                        [1, Imagick::ALPHACHANNEL_ACTIVATE] => true,
+                    };
+                },
+            ));
 
         $imagick
             ->expects($this->once())

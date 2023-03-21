@@ -11,7 +11,7 @@ class RuntimeExceptionTest extends TestCase
     /**
      * @return array<int,array{0:int,1:int}>
      */
-    public function getErrorCodes(): array
+    public static function getErrorCodes(): array
     {
         return [
             [123, 123],
