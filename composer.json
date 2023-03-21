@@ -77,11 +77,11 @@
     "bin/imbo"
   ],
   "scripts": {
-    "test:phpunit": "vendor/bin/phpunit --verbose",
+    "test:phpunit": "vendor/bin/phpunit",
     "test:phpunit:coverage": [
       "rm -rf build/coverage",
       "mkdir -p build/coverage",
-      "vendor/bin/phpunit --verbose --coverage-html build/coverage --coverage-text"
+      "vendor/bin/phpunit --coverage-html build/coverage --coverage-text"
     ],
     "test:behat": [
       "@test:behat:mongodb-gridfs",
