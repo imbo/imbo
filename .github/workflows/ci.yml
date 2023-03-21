@@ -61,7 +61,7 @@ jobs:
         run: vendor/bin/psalm
 
       - name: Run unit tests using PHPUnit
-        run: vendor/bin/phpunit --verbose
+        run: vendor/bin/phpunit
 
   integration-tests-mongodb-gridfs:
     name: Integration tests (MongoDB / GridFS)
