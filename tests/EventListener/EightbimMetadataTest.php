@@ -9,13 +9,14 @@ use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass Imbo\EventListener\EightbimMetadata
  */
 class EightbimMetadataTest extends ListenerTests
 {
-    protected $listener;
+    protected EightbimMetadata $listener;
 
     public function setUp(): void
     {
@@ -49,11 +50,13 @@ class EightbimMetadataTest extends ListenerTests
             'getImage' => $image,
         ]);
 
+        /** @var DatabaseInterface&MockObject */
         $database = $this->createMock(DatabaseInterface::class);
         $database->expects($this->once())->method('updateMetadata')->with($user, $imageIdentifier, [
             'paths' => ['House', 'Panda'],
         ]);
 
+        /** @var EventInterface&MockObject */
         $event = $this->createMock(EventInterface::class);
         $event
             ->expects($this->exactly(2))
@@ -64,8 +67,8 @@ class EightbimMetadataTest extends ListenerTests
             ->method('getDatabase')
             ->willReturn($database);
 
+        /** @var array{paths:array<string>} */
         $addedPaths = $this->listener->populate($event);
-        $this->assertIsArray($addedPaths);
         $this->assertEquals($addedPaths, ['paths' => ['House', 'Panda']]);
 
         $this->listener->save($event);
@@ -76,6 +79,7 @@ class EightbimMetadataTest extends ListenerTests
      */
     public function testReturnsEarlyOnMissingProperties(): void
     {
+        /** @var EventInterface&MockObject */
         $event = $this->createMock(EventInterface::class);
         $event
             ->expects($this->never())
@@ -106,6 +110,7 @@ class EightbimMetadataTest extends ListenerTests
             'getImage' => $image,
         ]);
 
+        /** @var DatabaseInterface&MockObject */
         $database = $this->createMock(DatabaseInterface::class);
         $database
             ->expects($this->once())

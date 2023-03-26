@@ -10,41 +10,11 @@ use PHPUnit\Framework\TestCase;
  */
 class StatsTest extends TestCase
 {
-    private $model;
+    private Stats $model;
 
     public function setUp(): void
     {
         $this->model = new Stats();
-    }
-
-    public static function getNumUsers(): array
-    {
-        return [
-            [0],
-            [1],
-            [2],
-            [4],
-        ];
-    }
-
-    public static function getNumImages(): array
-    {
-        return [
-            [0],
-            [2],
-            [44],
-            [14],
-        ];
-    }
-
-    public static function getNumBytes(): array
-    {
-        return [
-            [0],
-            [1349],
-            [100114],
-            [1000],
-        ];
     }
 
     /**
@@ -133,5 +103,44 @@ class StatsTest extends TestCase
             'numImages' => 10000,
             'customStats' => ['some' => 'value'],
         ], $this->model->getData());
+    }
+
+    /**
+     * @return array<array{users:int}>
+     */
+    public static function getNumUsers(): array
+    {
+        return [
+            ['users' => 0],
+            ['users' => 1],
+            ['users' => 2],
+            ['users' => 4],
+        ];
+    }
+
+    /**
+     * @return array<array{images:int}>
+     */
+    public static function getNumImages(): array
+    {
+        return [
+            ['images' => 0],
+            ['images' => 2],
+            ['images' => 44],
+            ['images' => 14],
+        ];
+    }
+
+    /**
+     * @return array<array{bytes:int}>
+     */
+    public static function getNumBytes(): array
+    {
+        return [
+            ['bytes' => 0],
+            ['bytes' => 1349],
+            ['bytes' => 100114],
+            ['bytes' => 1000],
+        ];
     }
 }

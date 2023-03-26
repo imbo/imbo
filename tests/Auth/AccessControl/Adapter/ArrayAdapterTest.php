@@ -6,6 +6,7 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Groups;
 use Imbo\Resource;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -172,29 +173,6 @@ class ArrayAdapterTest extends TestCase
         ]);
     }
 
-    public static function getGroupsData(): array
-    {
-        return [
-            'no groups' => [
-                [],
-                [],
-                new GroupQuery(),
-            ],
-            'some groups' => [
-                ['g1' => [], 'g2' => [], 'g3' => []],
-                ['g1' => [], 'g2' => [], 'g3' => []],
-                new GroupQuery(),
-            ],
-            'groups with query object' => [
-                ['g1' => [], 'g2' => [], 'g3' => [], 'g4' => [], 'g5' => []],
-                ['g3' => [], 'g4' => []],
-                (new GroupQuery())
-                    ->setPage(2)
-                    ->setLimit(2),
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getGroupsData
      * @covers ::getGroups
@@ -203,6 +181,7 @@ class ArrayAdapterTest extends TestCase
     {
         $numGroups = count($groups);
 
+        /** @var Groups&MockObject */
         $model = $this->createMock(Groups::class);
         $model
             ->expects($this->once())
@@ -211,21 +190,6 @@ class ArrayAdapterTest extends TestCase
 
         $adapter = new ArrayAdapter([], $groups);
         $this->assertSame(array_values($result), array_values($adapter->getGroups($query, $model)));
-    }
-
-    public static function getGroupsForTest(): array
-    {
-        return [
-            'no groups' => [
-                [], 'group', false,
-            ],
-            'group exists' => [
-                ['group' => [], 'othergroup' => []], 'group', true,
-            ],
-            'group does not exist' => [
-                ['group' => [], 'othergroup' => []], 'somegroup', false,
-            ],
-        ];
     }
 
     /**
@@ -267,55 +231,6 @@ class ArrayAdapterTest extends TestCase
         $this->assertFalse($adapter->publicKeyExists('pubKey3'));
     }
 
-    public static function getAccessRules(): array
-    {
-        $acl = [
-            [
-                'id' => 1,
-                'publicKey' => 'pubKey1',
-                'privateKey' => 'privateKey1',
-                'acl' => [[
-                    'resources' => [Resource::IMAGES_GET],
-                    'users' => ['user1', 'user2'],
-                ]],
-            ],
-            [
-                'id' => 2,
-                'publicKey' => 'pubKey2',
-                'privateKey' => 'privateKey2',
-                'acl' => [[
-                    'resources' => [Resource::IMAGES_GET],
-                    'users' => ['user2', 'user3', '*'],
-                ]],
-            ],
-        ];
-
-        return [
-            'access rule exists' => [
-                'acl' => $acl,
-                'publicKey' => 'pubKey1',
-                'ruleId' => 1,
-                'rule' => [
-                    'id' => 1,
-                    'resources' => [Resource::IMAGES_GET],
-                    'users' => ['user1', 'user2'],
-                ],
-            ],
-            'no access rules' => [
-                'acl' => [],
-                'publicKey' => 'key',
-                'ruleId' => 1,
-                'rule' => null,
-            ],
-            'access rule that does not exist' => [
-                'acl' => $acl,
-                'publicKey' => 'pubKey1',
-                'ruleId' => 2,
-                'rule' => null,
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getAccessRules
      * @covers ::getAccessRule
@@ -327,70 +242,13 @@ class ArrayAdapterTest extends TestCase
     }
 
     /**
-     * @testWith [[], "some-group", null]
-     *           [{"foo": {"some": "data"}, "some-group": {"other": "data"}}, "some-group", {"other": "data"}]
+     * @dataProvider getGroupForArrayAdapter
      * @covers ::getGroup
      */
-    public function testCanGetGroup(array $groups, string $group, $result): void
+    public function testCanGetGroup(array $groups, string $group, ?array $result): void
     {
         $adapter = new ArrayAdapter([], $groups);
         $this->assertSame($result, $adapter->getGroup($group));
-    }
-
-    public static function getDataForAccessListTest(): array
-    {
-        return [
-            'no acls' => [
-                'acl' => [],
-                'publicKey' => 'some-public-key',
-                'result' => [],
-            ],
-            'no matching keys' => [
-                'acl' => [
-                    [
-                        'publicKey' => 'key',
-                        'privateKey' => 'private1',
-                        'acl' => [[
-                            'foo' => 'bar',
-                        ]],
-                    ],
-                    [
-                        'publicKey' => 'other-key',
-                        'privateKey' => 'private2',
-                        'acl' => [[
-                            'foo' => 'bar',
-                        ]],
-                    ],
-
-                ],
-                'publicKey' => 'some-public-key',
-                'result' => [],
-            ],
-            'match' => [
-                'acl' => [
-                    [
-                        'publicKey' => 'key',
-                        'privateKey' => 'private1',
-                        'acl' => [[
-                            'foo' => 'bar',
-                        ]],
-                    ],
-                    [
-                        'publicKey' => 'other-key',
-                        'privateKey' => 'private2',
-                        'acl' => [[
-                            'foo' => 'bar',
-                        ]],
-                    ],
-
-                ],
-                'publicKey' => 'other-key',
-                'result' => [[
-                    'id' => 1,
-                    'foo' => 'bar',
-                ]],
-            ],
-        ];
     }
 
     /**
@@ -450,5 +308,188 @@ class ArrayAdapterTest extends TestCase
         ));
 
         $this->assertFalse($adapter->hasAccess('pubkey', Resource::IMAGES_GET, 'user1'));
+    }
+
+    /**
+     * @return array<array{groups:array,result:array,query:GroupQuery}>
+     */
+    public static function getGroupsData(): array
+    {
+        return [
+            'no groups' => [
+                'groups' => [],
+                'result' => [],
+                'query' => new GroupQuery(),
+            ],
+            'some groups' => [
+                'groups' => ['g1' => [], 'g2' => [], 'g3' => []],
+                'result' => ['g1' => [], 'g2' => [], 'g3' => []],
+                'query' => new GroupQuery(),
+            ],
+            'groups with query object' => [
+                'groups' => ['g1' => [], 'g2' => [], 'g3' => [], 'g4' => [], 'g5' => []],
+                'result' => ['g3' => [], 'g4' => []],
+                'query' => (new GroupQuery())
+                    ->setPage(2)
+                    ->setLimit(2),
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{groups:array,group:string,exists:bool}>
+     */
+    public static function getGroupsForTest(): array
+    {
+        return [
+            'no groups' => [
+                'groups' => [],
+                'group' => 'group',
+                'exists' => false,
+            ],
+            'group exists' => [
+                'groups' => ['group' => [], 'othergroup' => []],
+                'group' => 'group',
+                'exists' => true,
+            ],
+            'group does not exist' => [
+                'groups' => ['group' => [], 'othergroup' => []],
+                'group' => 'somegroup',
+                'exists' => false,
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{acl:array,publicKey:string,ruleId:int,rule:?array}>
+     */
+    public static function getAccessRules(): array
+    {
+        $acl = [
+            [
+                'id' => 1,
+                'publicKey' => 'pubKey1',
+                'privateKey' => 'privateKey1',
+                'acl' => [[
+                    'resources' => [Resource::IMAGES_GET],
+                    'users' => ['user1', 'user2'],
+                ]],
+            ],
+            [
+                'id' => 2,
+                'publicKey' => 'pubKey2',
+                'privateKey' => 'privateKey2',
+                'acl' => [[
+                    'resources' => [Resource::IMAGES_GET],
+                    'users' => ['user2', 'user3', '*'],
+                ]],
+            ],
+        ];
+
+        return [
+            'access rule exists' => [
+                'acl' => $acl,
+                'publicKey' => 'pubKey1',
+                'ruleId' => 1,
+                'rule' => [
+                    'id' => 1,
+                    'resources' => [Resource::IMAGES_GET],
+                    'users' => ['user1', 'user2'],
+                ],
+            ],
+            'no access rules' => [
+                'acl' => [],
+                'publicKey' => 'key',
+                'ruleId' => 1,
+                'rule' => null,
+            ],
+            'access rule that does not exist' => [
+                'acl' => $acl,
+                'publicKey' => 'pubKey1',
+                'ruleId' => 2,
+                'rule' => null,
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{groups:array,group:string,result:?array}>
+     */
+    public static function getGroupForArrayAdapter(): array
+    {
+        return [
+            'no groups' => [
+                'groups' => [],
+                'group' => 'some-group',
+                'result' => null,
+            ],
+            'groups' => [
+                'groups' => [
+                    'foo' => ['some' => 'data'],
+                    'some-group' => ['other' => 'data'],
+                ],
+                'group' => 'some-group',
+                'result' => ['other' => 'data'],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{acl:array,publicKey:string,result:array}>
+     */
+    public static function getDataForAccessListTest(): array
+    {
+        return [
+            'no acls' => [
+                'acl' => [],
+                'publicKey' => 'some-public-key',
+                'result' => [],
+            ],
+            'no matching keys' => [
+                'acl' => [
+                    [
+                        'publicKey' => 'key',
+                        'privateKey' => 'private1',
+                        'acl' => [[
+                            'foo' => 'bar',
+                        ]],
+                    ],
+                    [
+                        'publicKey' => 'other-key',
+                        'privateKey' => 'private2',
+                        'acl' => [[
+                            'foo' => 'bar',
+                        ]],
+                    ],
+
+                ],
+                'publicKey' => 'some-public-key',
+                'result' => [],
+            ],
+            'match' => [
+                'acl' => [
+                    [
+                        'publicKey' => 'key',
+                        'privateKey' => 'private1',
+                        'acl' => [[
+                            'foo' => 'bar',
+                        ]],
+                    ],
+                    [
+                        'publicKey' => 'other-key',
+                        'privateKey' => 'private2',
+                        'acl' => [[
+                            'foo' => 'bar',
+                        ]],
+                    ],
+
+                ],
+                'publicKey' => 'other-key',
+                'result' => [[
+                    'id' => 1,
+                    'foo' => 'bar',
+                ]],
+            ],
+        ];
     }
 }

@@ -3,6 +3,7 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Border
@@ -14,20 +15,13 @@ class BorderTest extends TransformationTests
         return new Border();
     }
 
-    public static function getBorderParams(): array
-    {
-        return [
-            'inline border' => [665, 463, 3, 4, 'inset'],
-            'outbound border' => [671, 471, 3, 4, 'outbound'],
-        ];
-    }
-
     /**
      * @dataProvider getBorderParams
      * @covers ::transform
      */
     public function testTransformationSupportsDifferentModes(int $expectedWidth, int $expectedHeight, int $borderWidth, int $borderHeight, string $borderMode): void
     {
+        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getWidth' => $expectedWidth,
             'getHeight' => $expectedHeight,
@@ -63,5 +57,28 @@ class BorderTest extends TransformationTests
                 'height' => $borderHeight,
                 'mode' => $borderMode,
             ]);
+    }
+
+    /**
+     * @return array<string,array{expectedWidth:int,expectedHeight:int,borderWidth:int,borderHeight:int,borderMode:string}>
+     */
+    public static function getBorderParams(): array
+    {
+        return [
+            'inline border' => [
+                'expectedWidth' => 665,
+                'expectedHeight' => 463,
+                'borderWidth' => 3,
+                'borderHeight' => 4,
+                'borderMode' => 'inset',
+            ],
+            'outbound border' => [
+                'expectedWidth' => 671,
+                'expectedHeight' => 471,
+                'borderWidth' => 3,
+                'borderHeight' => 4,
+                'borderMode' => 'outbound',
+            ],
+        ];
     }
 }

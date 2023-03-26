@@ -7,6 +7,8 @@ interface ResourceInterface extends ListenerInterface
 {
     /**
      * Return an array with the allowed (implemented) HTTP methods for the current resource
+     *
+     * @return array<string>
      */
     public function getAllowedMethods(): array;
 }

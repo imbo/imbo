@@ -10,19 +10,20 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use Imbo\Storage\StorageInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass Imbo\EventListener\StorageOperations
  */
 class StorageOperationsTest extends ListenerTests
 {
-    private $listener;
-    private $event;
-    private $request;
-    private $response;
-    private $user = 'user';
-    private $imageIdentifier = 'id';
-    private $storage;
+    private StorageOperations $listener;
+    private EventInterface&MockObject $event;
+    private Request&MockObject $request;
+    private Response&MockObject $response;
+    private string $user = 'user';
+    private string $imageIdentifier = 'id';
+    private StorageInterface&MockObject $storage;
 
     public function setUp(): void
     {
@@ -82,6 +83,7 @@ class StorageOperationsTest extends ListenerTests
             ->with($date)
             ->willReturnSelf();
 
+        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -93,6 +95,7 @@ class StorageOperationsTest extends ListenerTests
             ->method('getModel')
             ->willReturn($image);
 
+        /** @var EventManager&MockObject */
         $eventManager = $this->createMock(EventManager::class);
         $eventManager
             ->expects($this->once())
@@ -211,6 +214,7 @@ class StorageOperationsTest extends ListenerTests
                 new StorageException('Could not store image', Response::HTTP_INTERNAL_SERVER_ERROR),
             );
 
+        /** @var DatabaseInterface&MockObject */
         $database = $this->createMock(DatabaseInterface::class);
         $database
             ->expects($this->once())

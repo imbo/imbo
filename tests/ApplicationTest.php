@@ -9,6 +9,7 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Resource\ResourceInterface;
 use Imbo\Storage\StorageInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -99,49 +100,20 @@ class ApplicationTest extends TestCase
         // We just want to swallow the output, since we're testing it explicitly below.
         $this->expectOutputRegex('|.*}|');
 
+        /** @var array */
         $default = require __DIR__ . '/../config/config.default.php';
         $test = [
-            'database' => function ($request, $response) {
-                $this->assertInstanceOf(Request::class, $request);
-                $this->assertInstanceOf(Response::class, $response);
-
-                return $this->createMock(DatabaseInterface::class);
-            },
-            'storage' => function ($request, $response) {
-                $this->assertInstanceOf(Request::class, $request);
-                $this->assertInstanceOf(Response::class, $response);
-
-                return $this->createMock(StorageInterface::class);
-            },
-            'accessControl' => function ($request, $response) {
-                $this->assertInstanceOf(Request::class, $request);
-                $this->assertInstanceOf(Response::class, $response);
-
-                return $this->createMock(AdapterInterface::class);
-            },
+            'database' => fn (Request $request, Response $response): DatabaseInterface&MockObject => $this->createMock(DatabaseInterface::class),
+            'storage' => fn (Request $request, Response $response): StorageInterface&MockObject => $this->createMock(StorageInterface::class),
+            'accessControl' => fn (Request $request, Response $response): AdapterInterface&MockObject => $this->createMock(AdapterInterface::class),
             'eventListeners' => [
-                'test' => function ($request, $response) {
-                    $this->assertInstanceOf(Request::class, $request);
-                    $this->assertInstanceOf(Response::class, $response);
-
-                    return new TestListener();
-                },
+                'test' => fn (Request $request, Response $response): TestListener => new TestListener(),
                 'testSubelement' => [
-                    'listener' => function ($request, $response) {
-                        $this->assertInstanceOf(Request::class, $request);
-                        $this->assertInstanceOf(Response::class, $response);
-
-                        return new TestListener();
-                    },
+                    'listener' => fn (Request $request, Response $response): TestListener => new TestListener(),
                 ],
             ],
             'resources' => [
-                'test' => function ($request, $response) {
-                    $this->assertInstanceOf(Request::class, $request);
-                    $this->assertInstanceOf(Response::class, $response);
-
-                    return new TestResource();
-                },
+                'test' => fn (Request $request, Response $response): TestResource => new TestResource(),
             ],
         ];
 
@@ -163,7 +135,7 @@ class ApplicationTest extends TestCase
     public function testThrowsExceptionIfTransformationsIsSetAndIsNotAnArray(): void
     {
         $config = $this->getDefaultConfig();
-        $config['transformations'] = function () {
+        $config['transformations'] = function (): void {
         };
         $this->expectExceptionObject(new InvalidArgumentException(
             'The "transformations" configuration key must be specified as an array',
@@ -174,8 +146,11 @@ class ApplicationTest extends TestCase
 
     private function getDefaultConfig(): array
     {
+        /** @var array */
+        $defaultConfig = require __DIR__ . '/../config/config.default.php';
+
         return array_replace_recursive(
-            require __DIR__ . '/../config/config.default.php',
+            $defaultConfig,
             [
                 'accessControl' => $this->createMock(AdapterInterface::class),
                 'database' => $this->createMock(DatabaseInterface::class),

@@ -30,13 +30,16 @@ use RuntimeException;
 class FeatureContextTest extends TestCase
 {
     private FeatureContext $context;
-    private $client;
-    private $history;
-    private $mockHandler;
-    private $handlerStack;
-    private $baseUri = 'http://localhost:8080';
-    private $publicKey = 'publicKey';
-    private $privateKey = 'privateKey';
+    private Client $client;
+    /**
+     * @var array<array{request:Request,response:Response}>
+     */
+    private array $history;
+    private MockHandler $mockHandler;
+    private HandlerStack $handlerStack;
+    private string $baseUri = 'http://localhost:8080';
+    private string $publicKey = 'publicKey';
+    private string $privateKey = 'privateKey';
 
     public function setUp(): void
     {
@@ -82,6 +85,7 @@ class FeatureContextTest extends TestCase
             ->method('getConfig')
             ->willReturnCallback(
                 static function (string $param) use ($handlerStack, $baseUri) {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $param]) {
                         [0, 'handler'] => $handlerStack,
@@ -127,20 +131,12 @@ class FeatureContextTest extends TestCase
         $this->assertSame('current', $request->getHeaderLine('X-Bar'));
     }
 
-    public static function getValidDates(): array
-    {
-        return [
-            ['date' => 'Wed, 15 Mar 2017 21:28:14 GMT'],
-        ];
-    }
-
     /**
-     * @dataProvider getValidDates
      * @covers ::isDate
      */
-    public function testIsDateFunctionValidatesDates(string $date): void
+    public function testIsDateFunctionValidatesDates(): void
     {
-        $this->assertNull($this->context->isDate($date));
+        $this->assertNull($this->context->isDate('Wed, 15 Mar 2017 21:28:14 GMT'));
     }
 
     /**
@@ -150,13 +146,6 @@ class FeatureContextTest extends TestCase
     {
         $this->expectExceptionObject(new InvalidArgumentException('Date is not properly formatted: "invalid date".'));
         $this->context->isDate('invalid date');
-    }
-
-    public static function getImboConfigFiles(): array
-    {
-        return array_map(function ($file) {
-            return [basename($file)];
-        }, glob(__DIR__ . '/../../features/bootstrap/imbo-configs/*.php'));
     }
 
     /**
@@ -189,14 +178,6 @@ class FeatureContextTest extends TestCase
     {
         $this->assertSame($this->context, $this->context->statsAllowedBy('*'));
         $this->assertSame('*', $this->makeRequest()->getHeaderLine('X-Imbo-Stats-Allowed-By'));
-    }
-
-    public static function getAdaptersForFailure(): array
-    {
-        return [
-            ['adapter' => 'database', 'header' => 'X-Imbo-Status-Database-Failure'],
-            ['adapter' => 'storage', 'header' => 'X-Imbo-Status-Storage-Failure'],
-        ];
     }
 
     /**
@@ -234,6 +215,7 @@ class FeatureContextTest extends TestCase
         $request = $this->makeRequest($path);
 
         // Generate the URI and make sure the request URI is the same
+        /** @var array{query:string} */
         $uri = parse_url((string) $request->getUri());
         $query = [];
         parse_str($uri['query'], $query);
@@ -243,7 +225,7 @@ class FeatureContextTest extends TestCase
             $request->getMethod(),
             sprintf('%s%s?publicKey=%s', $this->baseUri, $path, $this->publicKey),
             $this->publicKey,
-            $query['timestamp'],
+            (string) $query['timestamp'],
         );
         $signature = hash_hmac('sha256', $data, $this->privateKey);
 
@@ -294,24 +276,6 @@ class FeatureContextTest extends TestCase
             'The authentication handler is currently added to the stack. It can not be added more than once.',
         ));
         $this->context->signRequest();
-    }
-
-    public static function getDataForAccessTokens(): array
-    {
-        return [
-            'path with no query params' => [
-                'path' => '/path',
-                'expectedUrl' => 'http://localhost:8080/path?publicKey=publicKey&accessToken=582386896ffacd2c34a39476f0fa71ac9e6b22f079482ea7ee687e15826b08ef',
-            ],
-            'path with query params' => [
-                'path' => '/path?foo=bar',
-                'expectedUrl' => 'http://localhost:8080/path?foo=bar&publicKey=publicKey&accessToken=67bd5be81cd63180d9dba642e22fc6c9940c4313913dee5db692b0eb86aabb6b',
-            ],
-            'path with problematic query params' => [
-                'path' => '/path?bar=foo&publicKey=foobar&accessToken=sometoken',
-                'expectedUrl' => 'http://localhost:8080/path?bar=foo&publicKey=publicKey&accessToken=f43f2db7f8c34c521456c4bb6f926812b39c3081a7a3d295ca14ccdc38926f2c',
-            ],
-        ];
     }
 
     /**
@@ -549,66 +513,12 @@ class FeatureContextTest extends TestCase
         $this->context->authenticateRequest('auth');
     }
 
-    public static function getAuthDetails(): array
-    {
-        return [
-            'access-token' => [
-                'publicKey' => 'publicKey',
-                'privateKey' => 'privateKey',
-                'authMethod' => 'access-token',
-                'uriRegExp' => '|^http://localhost:8080/path\?publicKey=publicKey&accessToken=582386896ffacd2c34a39476f0fa71ac9e6b22f079482ea7ee687e15826b08ef$|',
-                'headers' => [],
-            ],
-            'access-token #2' => [
-                'publicKey' => 'key',
-                'privateKey' => 'secret',
-                'authMethod' => 'access-token',
-                'uriRegExp' => '|^http://localhost:8080/path\?publicKey=key&accessToken=dd4217a681cf8abdcecdc68cf49630df1e57dc733735e902b8a69859e50797a8$|',
-                'headers' => [],
-            ],
-            'signature' => [
-                'publicKey' => 'publicKey',
-                'privateKey' => 'privateKey',
-                'authMethod' => 'signature',
-                'uriRegExp' => '|^http://localhost:8080/path\?publicKey=publicKey&signature=[a-z0-9]{64}&timestamp=[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$|',
-                'headers' => [],
-            ],
-            'signature #2' => [
-                'publicKey' => 'key',
-                'privateKey' => 'secret',
-                'authMethod' => 'signature',
-                'uriRegExp' => '|^http://localhost:8080/path\?publicKey=key&signature=[a-z0-9]{64}&timestamp=[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$|',
-                'headers' => [],
-            ],
-            'signature (headers)' => [
-                'publicKey' => 'publicKey',
-                'privateKey' => 'privateKey',
-                'authMethod' => 'signature (headers)',
-                'uriRegExp' => '|^http://localhost:8080/path$|',
-                'headers' => [
-                    'X-Imbo-PublicKey' => '/^publicKey$/',
-                    'X-Imbo-Authenticate-Signature' => '/^[a-z0-9]{64}$/',
-                    'X-Imbo-Authenticate-Timestamp' => '/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$/',
-                ],
-            ],
-            'signature (headers) #2' => [
-                'publicKey' => 'key',
-                'privateKey' => 'secret',
-                'authMethod' => 'signature (headers)',
-                'uriRegExp' => '|^http://localhost:8080/path$|',
-                'headers' => [
-                    'X-Imbo-PublicKey' => '/^key$/',
-                    'X-Imbo-Authenticate-Signature' => '/^[a-z0-9]{64}$/',
-                    'X-Imbo-Authenticate-Timestamp' => '/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$/',
-                ],
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getAuthDetails
      * @covers ::setPublicAndPrivateKey
      * @covers ::authenticateRequest
+     *
+     * @param array<string,string> $headers
      */
     public function testCanUseDifferentAuthenticationMethods(string $publicKey, string $privateKey, string $authMethod, string $uriRegExp, array $headers = []): void
     {
@@ -630,45 +540,11 @@ class FeatureContextTest extends TestCase
         }
     }
 
-    public static function getRequestQueryParams(): array
-    {
-        return [
-            'single key / value' => [
-                'params' => [
-                    ['name' => 'key', 'value' => 'value'],
-                ],
-                'uri' => 'http://localhost:8080/path?key=value',
-            ],
-            'multiple key / value' => [
-                'params' => [
-                    ['name' => 'foo', 'value' => 'bar'],
-                    ['name' => 'bar', 'value' => 'foo'],
-                    ['name' => 'foobar', 'value' => 'barfoo'],
-                ],
-                'uri' => 'http://localhost:8080/path?foo=bar&bar=foo&foobar=barfoo',
-            ],
-            'array values' => [
-                'params' => [
-                    ['name' => 't[]', 'value' => 'border'],
-                    ['name' => 't[]', 'value' => 'thumb'],
-                ],
-                'uri' => 'http://localhost:8080/path?t%5B0%5D=border&t%5B1%5D=thumb',
-            ],
-            'mixed values' => [
-                'params' => [
-                    ['name' => 'foo', 'value' => 'bar'],
-                    ['name' => 't[]', 'value' => 'border'],
-                    ['name' => 'bar', 'value' => 'foo'],
-                    ['name' => 't[]', 'value' => 'thumb'],
-                ],
-                'uri' => 'http://localhost:8080/path?foo=bar&t%5B0%5D=border&t%5B1%5D=thumb&bar=foo',
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getRequestQueryParams
      * @covers ::setRequestQueryParameter
+     *
+     * @param array<array{name:string,value:string}> $params
      */
     public function testCanSetRequestQueryParameters(array $params, string $uri): void
     {
@@ -749,48 +625,6 @@ class FeatureContextTest extends TestCase
         $this->context->generateShortImageUrl('/path', new PyStringNode([], 1));
     }
 
-    public static function getShortUrlParams(): array
-    {
-        return [
-            [
-                'image' => FIXTURES_DIR . '/image1.png',
-                'user' => 'user',
-                'imageIdentifier' => 'fc7d2d06993047a0b5056e8fac4462a2',
-                'params' => [
-                    'user' => 'user',
-                ],
-            ],
-            [
-                'image' => FIXTURES_DIR . '/image2.png',
-                'user' => 'user',
-                'imageIdentifier' => 'b914b28f4d5faa516e2049b9a6a2577c',
-                'params' => [
-                    'user' => 'user',
-                    'extension' => 'gif',
-                ],
-            ],
-            [
-                'image' => FIXTURES_DIR . '/image3.png',
-                'user' => 'user',
-                'imageIdentifier' => '1d5b88aec8a3e1c4c57071307b2dae3a',
-                'params' => [
-                    'user' => 'user',
-                    'query' => 't[]=thumbnail:width=45,height=55&t[]=desaturate',
-                ],
-            ],
-            [
-                'image' => FIXTURES_DIR . '/image4.png',
-                'user' => 'user',
-                'imageIdentifier' => 'a501051db16e3cbf88ea50bfb0138a47',
-                'params' => [
-                    'user' => 'user',
-                    'extension' => 'jpg',
-                    'query' => 't[]=thumbnail:width=45,height=55&t[]=desaturate',
-                ],
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getShortUrlParams
      * @covers ::generateShortImageUrl
@@ -848,24 +682,6 @@ class FeatureContextTest extends TestCase
         $this->context->specifyAsTheWatermarkImage('/path');
     }
 
-    public static function getDataForWatermarkImages(): array
-    {
-        return [
-            'no params' => [
-                'image' => FIXTURES_DIR . '/image1.png',
-                'imageIdentifier' => 'someId',
-                'params' => null,
-                'uri' => 'http://localhost:8080/path?t%5B0%5D=watermark%3Aimg%3DsomeId',
-            ],
-            'with params' => [
-                'image' => FIXTURES_DIR . '/image1.png',
-                'imageIdentifier' => 'someId',
-                'params' => 'x=10,y=5,position=bottom-right,width=20,height=20',
-                'uri' => 'http://localhost:8080/path?t%5B0%5D=watermark%3Aimg%3DsomeId%2Cx%3D10%2Cy%3D5%2Cposition%3Dbottom-right%2Cwidth%3D20%2Cheight%3D20',
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getDataForWatermarkImages
      * @covers ::specifyAsTheWatermarkImage
@@ -906,22 +722,6 @@ class FeatureContextTest extends TestCase
         $this->context->requestPreviouslyAddedImage();
     }
 
-    public static function getDataForRequestingPreviouslyAddedImage(): array
-    {
-        return [
-            'HTTP GET' => [
-                'imageIdentifier' => 'imageId',
-                'image' => FIXTURES_DIR . '/image1.png',
-                'method' => 'GET',
-            ],
-            'HTTP DELETE' => [
-                'imageIdentifier' => 'imageId',
-                'image' => FIXTURES_DIR . '/image1.png',
-                'method' => 'DELETE',
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getDataForRequestingPreviouslyAddedImage
      * @covers ::requestPreviouslyAddedImage
@@ -957,24 +757,6 @@ class FeatureContextTest extends TestCase
             ),
             (string) $request->getUri(),
         );
-    }
-
-    public static function getDataForRequestingPreviouslyAddedImageWithExtension(): array
-    {
-        return [
-            [
-                'imageIdentifier' => 'imageId',
-                'image' => FIXTURES_DIR . '/image1.png',
-                'method' => 'HEAD',
-                'extension' => 'png',
-            ],
-            [
-                'imageIdentifier' => 'imageId',
-                'image' => FIXTURES_DIR . '/image1.png',
-                'method' => 'GET',
-                'extension' => 'jpg',
-            ],
-        ];
     }
 
     /**
@@ -1023,40 +805,6 @@ class FeatureContextTest extends TestCase
     {
         $this->expectExceptionObject(new RuntimeException('No request has been made yet.'));
         $this->context->makeSameRequest();
-    }
-
-    public static function getDataForReplayingRequests(): array
-    {
-        return [
-            'use original method' => [
-                'orignalMethod' => 'GET',
-                'method' => null,
-                'expectedUrl' => 'http://localhost:8080/path',
-                'publicKey' => null,
-                'privateKey' => null,
-            ],
-            'specify custom method' => [
-                'orignalMethod' => 'GET',
-                'method' => 'HEAD',
-                'expectedUrl' => 'http://localhost:8080/path',
-                'publicKey' => null,
-                'privateKey' => null,
-            ],
-            'specify custom method that the same as the original' => [
-                'orignalMethod' => 'DELETE',
-                'method' => 'DELETE',
-                'expectedUrl' => 'http://localhost:8080/path',
-                'publicKey' => null,
-                'privateKey' => null,
-            ],
-            'specify custom method and append access token' => [
-                'orignalMethod' => 'DELETE',
-                'method' => 'DELETE',
-                'expectedUrl' => 'http://localhost:8080/path?publicKey=key&accessToken=dd4217a681cf8abdcecdc68cf49630df1e57dc733735e902b8a69859e50797a8',
-                'publicKey' => 'key',
-                'privateKey' => 'secret',
-            ],
-        ];
     }
 
     /**
@@ -1118,24 +866,6 @@ class FeatureContextTest extends TestCase
         $this->context->requestMetadataOfPreviouslyAddedImage();
     }
 
-    public static function getDataForRequestingMetadataOfPreviouslyAddedImage(): array
-    {
-        return [
-            'no metadata' => [
-                'imageIdentifier' => 'imageId',
-                'image' => FIXTURES_DIR . '/image1.png',
-                'method' => 'GET',
-                'metadata' => [],
-            ],
-            'with metadata and custom method' => [
-                'imageIdentifier' => 'imageId',
-                'image' => FIXTURES_DIR . '/image1.png',
-                'method' => 'HEAD',
-                'metadata' => ['key' => 'value'],
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getDataForRequestingMetadataOfPreviouslyAddedImage
      * @covers ::requestMetadataOfPreviouslyAddedImage
@@ -1184,26 +914,6 @@ class FeatureContextTest extends TestCase
             '|Image URL for image with path ".*?[\\/]tests[\\/]Fixtures[\\/]image1\.png" can not be found\.|',
         );
         $this->context->requestImageResourceForLocalImage(FIXTURES_DIR . '/image1.png');
-    }
-
-    public static function getDataForRequestingImageWithLocalPath(): array
-    {
-        return [
-            'default values' => [
-                'image' => FIXTURES_DIR . '/image1.png',
-                'imageIdentifier' => 'imageId',
-                'extension' => null,
-                'method' => 'GET',
-                'expectedPath' => '/users/user/images/imageId',
-            ],
-            'custom extension and method' => [
-                'image' => FIXTURES_DIR . '/image1.png',
-                'imageIdentifier' => 'imageId',
-                'extension' => 'gif',
-                'method' => 'HEAD',
-                'expectedPath' => '/users/user/images/imageId.gif',
-            ],
-        ];
     }
 
     /**
@@ -1262,71 +972,13 @@ class FeatureContextTest extends TestCase
         ]));
     }
 
-    public static function getDataForBulkRequests(): array
-    {
-        return [
-            'single request with no options' => [
-                'table' => new TableNode([
-                    ['path'],
-                    ['/path'],
-                ]),
-                'requests' => [
-                    [
-                        'path' => '/path',
-                        'method' => 'GET',
-                        'query' => '',
-                        'requestBody' => '',
-                    ],
-                ],
-            ],
-            'append access token' => [
-                'table' => new TableNode([
-                    ['path',  'access token'],
-                    ['/path', 'yes'],
-                ]),
-                'requests' => [
-                    [
-                        'path' => '/path',
-                        'method' => 'GET',
-                        'query' => 'publicKey=publicKey&accessToken=582386896ffacd2c34a39476f0fa71ac9e6b22f079482ea7ee687e15826b08ef',
-                        'requestBody' => '',
-                    ],
-                ],
-            ],
-            'add transformation' => [
-                'table' => new TableNode([
-                    ['path',  'transformation'],
-                    ['/path', 'border'],
-                ]),
-                'requests' => [
-                    [
-                        'path' => '/path',
-                        'method' => 'GET',
-                        'query' => 't%5B0%5D=border',
-                        'requestBody' => '',
-                    ],
-                ],
-            ],
-            'set request body' => [
-                'table' => new TableNode([
-                    ['path',  'request body'],
-                    ['/path', 'some data'],
-                ]),
-                'requests' => [
-                    [
-                        'path' => '/path',
-                        'method' => 'GET',
-                        'query' => '',
-                        'requestBody' => 'some data',
-                    ],
-                ],
-            ],
-        ];
-    }
+
 
     /**
      * @dataProvider getDataForBulkRequests
      * @covers ::requestPaths
+     *
+     * @param array<int,array{path:string,method:string,query:string,requestBody:string}> $requests
      */
     public function testCanBulkRequest(TableNode $table, array $requests): void
     {
@@ -1665,16 +1317,6 @@ class FeatureContextTest extends TestCase
         );
     }
 
-    public static function getApproximateImageWidths(): array
-    {
-        return [
-            ['598±1'],
-            ['600±1'],
-            ['589±10'],
-            ['609±10'],
-        ];
-    }
-
     /**
      * @dataProvider getApproximateImageWidths
      * @covers ::assertImageWidth
@@ -1692,28 +1334,6 @@ class FeatureContextTest extends TestCase
                 ->requestPath('/path')
                 ->assertImageWidth($approximateWidth),
         );
-    }
-
-    public static function getApproximateImageWidthsForFailure(): array
-    {
-        return [
-            [
-                'approximateWidth' => '597±1',
-                'exceptionMessage' => 'Expected image width to be between 596 and 598 inclusive, got 599.',
-            ],
-            [
-                'approximateWidth' => '601±1',
-                'exceptionMessage' => 'Expected image width to be between 600 and 602 inclusive, got 599.',
-            ],
-            [
-                'approximateWidth' => '588±10',
-                'exceptionMessage' => 'Expected image width to be between 578 and 598 inclusive, got 599.',
-            ],
-            [
-                'approximateWidth' => '610±10',
-                'exceptionMessage' => 'Expected image width to be between 600 and 620 inclusive, got 599.',
-            ],
-        ];
     }
 
     /**
@@ -1767,16 +1387,6 @@ class FeatureContextTest extends TestCase
         );
     }
 
-    public static function getApproximateImageHeights(): array
-    {
-        return [
-            ['416±1'],
-            ['418±1'],
-            ['407±10'],
-            ['427±10'],
-        ];
-    }
-
     /**
      * @dataProvider getApproximateImageHeights
      * @covers ::assertImageHeight
@@ -1796,28 +1406,6 @@ class FeatureContextTest extends TestCase
         );
     }
 
-    public static function getApproximateImageHeightsForFailure(): array
-    {
-        return [
-            [
-                'approximateHeight' => '415±1',
-                'exceptionMessage' => 'Expected image height to be between 414 and 416 inclusive, got 417.',
-            ],
-            [
-                'approximateHeight' => '419±1',
-                'exceptionMessage' => 'Expected image height to be between 418 and 420 inclusive, got 417.',
-            ],
-            [
-                'approximateHeight' => '406±10',
-                'exceptionMessage' => 'Expected image height to be between 396 and 416 inclusive, got 417.',
-            ],
-            [
-                'approximateHeight' => '428±10',
-                'exceptionMessage' => 'Expected image height to be between 418 and 438 inclusive, got 417.',
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getApproximateImageHeightsForFailure
      * @covers ::assertImageHeight
@@ -1833,35 +1421,6 @@ class FeatureContextTest extends TestCase
         $this->expectException(Assert\InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);
         $this->context->assertImageHeight($approximateHeight);
-    }
-
-    public static function getDataForImageDimensionAssertion(): array
-    {
-        $image1 = file_get_contents(FIXTURES_DIR . '/image1.png');
-        $image2 = file_get_contents(FIXTURES_DIR . '/image2.png');
-
-        return [
-            [
-                'image' => $image1,
-                'dimension' => '123x456',
-                'exceptionMessage' => 'Incorrect image width, expected 123, got 599.',
-            ],
-            [
-                'image' => $image1,
-                'dimension' => '599x456',
-                'exceptionMessage' => 'Incorrect image height, expected 456, got 417.',
-            ],
-            [
-                'image' => $image2,
-                'dimension' => '123x456',
-                'exceptionMessage' => 'Incorrect image width, expected 123, got 539.',
-            ],
-            [
-                'image' => $image2,
-                'dimension' => '539x123',
-                'exceptionMessage' => 'Incorrect image height, expected 123, got 375.',
-            ],
-        ];
     }
 
     /**
@@ -1912,16 +1471,6 @@ class FeatureContextTest extends TestCase
         );
     }
 
-    public static function getApproximateImageDimensions(): array
-    {
-        return [
-            ['598±1x415±2'],
-            ['600±1x419±2'],
-            ['589±10x400±17'],
-            ['609±10x434±17'],
-        ];
-    }
-
     /**
      * @dataProvider getApproximateImageDimensions
      * @covers ::assertImageDimension
@@ -1941,20 +1490,6 @@ class FeatureContextTest extends TestCase
         );
     }
 
-    public static function getApproximateImageDimensionsForFailure(): array
-    {
-        return [
-            [
-                'approximateDimension' => '597±1x416±1',
-                'exceptionMessage' => 'Expected image width to be between 596 and 598 inclusive, got 599.',
-            ],
-            [
-                'approximateDimension' => '599x414±2',
-                'exceptionMessage' => 'Expected image height to be between 412 and 416 inclusive, got 417.',
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getApproximateImageDimensionsForFailure
      * @covers ::assertImageWidth
@@ -1972,32 +1507,6 @@ class FeatureContextTest extends TestCase
         $this->context->assertImageDimension($approximateDimension);
     }
 
-    public static function getDataForAssertingImagePixelInfoFailures(): array
-    {
-        $image = file_get_contents(FIXTURES_DIR . '/image1.png');
-
-        return [
-            [
-                'imageData' => $image,
-                'coordinate' => '1,1',
-                'color' => '000000',
-                'exceptionMessage' => 'Incorrect color at coordinate "1,1", expected "000000", got "ffffff".',
-            ],
-            [
-                'imageData' => $image,
-                'coordinate' => '247,32',
-                'color' => '000000',
-                'exceptionMessage' => 'Incorrect color at coordinate "247,32", expected "000000", got "e8e7e6".',
-            ],
-            [
-                'imageData' => $image,
-                'coordinate' => '275,150',
-                'color' => 'ffffff',
-                'exceptionMessage' => 'Incorrect color at coordinate "275,150", expected "ffffff", got "000000".',
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getDataForAssertingImagePixelInfoFailures
      * @covers ::assertImagePixelColor
@@ -2013,29 +1522,6 @@ class FeatureContextTest extends TestCase
         $this->expectException(Assert\InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);
         $this->context->assertImagePixelColor($coordinate, $color);
-    }
-
-    public static function getDataForAssertingImagePixelInfo(): array
-    {
-        $image = file_get_contents(FIXTURES_DIR . '/image1.png');
-
-        return [
-            [
-                'imageData' => $image,
-                'coordinate' => '1,1',
-                'color' => 'ffffff',
-            ],
-            [
-                'imageData' => $image,
-                'coordinate' => '247,32',
-                'color' => 'e8e7e6',
-            ],
-            [
-                'imageData' => $image,
-                'coordinate' => '275,150',
-                'color' => '000000',
-            ],
-        ];
     }
 
     /**
@@ -2074,32 +1560,12 @@ class FeatureContextTest extends TestCase
         $this->context->assertImagePixelColor('1, 1', 'ffffff');
     }
 
-    public static function getDataForAssertingImagePixelAlphaFailures(): array
-    {
-        $image = file_get_contents(FIXTURES_DIR . '/transparency.png');
-
-        return [
-            [
-                'imageData' => $image,
-                'coordinate' => '448,192',
-                'alpha' => '0',
-                'exceptionMessage' => sprintf('Incorrect alpha value at coordinate "448,192", expected "%f", got "%f".', 0, 1),
-            ],
-            [
-                'imageData' => $image,
-                'coordinate' => '192,64',
-                'alpha' => '1',
-                'exceptionMessage' => sprintf('Incorrect alpha value at coordinate "192,64", expected "%f", got "%f".', 1, 0),
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getDataForAssertingImagePixelAlphaFailures
      * @covers ::assertImagePixelAlpha
      * @covers ::getImagePixelInfo
      */
-    public function testAssertingImagePixelAlphaCanFail(string $imageData, string $coordinate, string $alpha, string $exceptionMessage): void
+    public function testAssertingImagePixelAlphaCanFail(string $imageData, string $coordinate, float $alpha, string $exceptionMessage): void
     {
         $this->mockHandler->append(
             new Response(200, [], $imageData),
@@ -2111,30 +1577,12 @@ class FeatureContextTest extends TestCase
         $this->context->assertImagePixelAlpha($coordinate, $alpha);
     }
 
-    public static function getDataForAssertingImagePixelAlpha(): array
-    {
-        $image = file_get_contents(FIXTURES_DIR . '/transparency.png');
-
-        return [
-            [
-                'imageData' => $image,
-                'coordinate' => '448,192',
-                'alpha' => '1',
-            ],
-            [
-                'imageData' => $image,
-                'coordinate' => '192,64',
-                'alpha' => '0',
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getDataForAssertingImagePixelAlpha
      * @covers ::assertImagePixelAlpha
      * @covers ::getImagePixelInfo
      */
-    public function testCanAssertImagePixelAlpha(string $imageData, string $coordinate, string $alpha): void
+    public function testCanAssertImagePixelAlpha(string $imageData, string $coordinate, float $alpha): void
     {
         $this->mockHandler->append(
             new Response(200, [], $imageData),
@@ -2162,7 +1610,7 @@ class FeatureContextTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException(
             'Invalid coordinates: "1, 1". Format is "<w>x<h>", no spaces allowed.',
         ));
-        $this->context->assertImagePixelAlpha('1, 1', '1');
+        $this->context->assertImagePixelAlpha('1, 1', 1);
     }
 
     /**
@@ -2229,7 +1677,7 @@ class FeatureContextTest extends TestCase
         $this->context->setPublicAndPrivateKey($this->publicKey, $this->privateKey);
         $this->assertSame(
             $this->context,
-            $this->context->assertPublicKeyDoesNotExist('publicKey', 'someId'),
+            $this->context->assertPublicKeyDoesNotExist('publicKey'),
         );
 
         $this->assertCount(
@@ -2239,38 +1687,6 @@ class FeatureContextTest extends TestCase
         );
 
         $this->assertSame('/keys/publicKey', $this->history[0]['request']->getUri()->getPath());
-    }
-
-    public static function getCacheabilityData(): array
-    {
-        return [
-            'cacheable, expect cacheable' => [
-                'response' => new Response(200),
-                'expected' => true,
-            ],
-            'not cacheable, expect not cacheable' => [
-                'response' => new Response(400),
-                'expected' => false,
-            ],
-            'cacheable, expect not cacheable' => [
-                'response' => new Response(200),
-                'expected' => false,
-                'exceptionMessage' => 'Response was not supposed to be cacheable, but it is.',
-            ],
-            'not cacheable, expect cacheable' => [
-                'cacheable' => new Response(400),
-                'expected' => true,
-                'exceptionMessage' => 'Response was supposed to be cacheble, but it\'s not.',
-            ],
-            'not cacheable (no-store)' => [
-                'response' => new Response(200, ['cache-control' => 'no-store']),
-                'expected' => false,
-            ],
-            'not cacheable (private)' => [
-                'response' => new Response(200, ['cache-control' => 'private']),
-                'expected' => false,
-            ],
-        ];
     }
 
     /**
@@ -2464,8 +1880,8 @@ class FeatureContextTest extends TestCase
     public function testThrowsExceptionWhenAssertingLastResponseHeadersAndHeaderIsNotPresentInAllResponses(): void
     {
         $this->mockHandler->append(
-            new Response(200, ['content-length' => 123]),
-            new Response(200, ['content-length' => 123]),
+            new Response(200, ['content-length' => '123']),
+            new Response(200, ['content-length' => '123']),
             new Response(200),
         );
         $this->context->requestPath('/path1');
@@ -2483,9 +1899,9 @@ class FeatureContextTest extends TestCase
     public function testCanAssertLastResponesHeadersForUniqueness(): void
     {
         $this->mockHandler->append(
-            new Response(200, ['content-length' => 123]),
-            new Response(200, ['content-length' => 456]),
-            new Response(200, ['content-length' => 789]),
+            new Response(200, ['content-length' => '123']),
+            new Response(200, ['content-length' => '456']),
+            new Response(200, ['content-length' => '789']),
         );
         $this->assertSame(
             $this->context,
@@ -2503,9 +1919,9 @@ class FeatureContextTest extends TestCase
     public function testCanAssertLastResponesHeadersForNonUniqueness(): void
     {
         $this->mockHandler->append(
-            new Response(200, ['content-length' => 123]),
-            new Response(200, ['content-length' => 123]),
-            new Response(200, ['content-length' => 123]),
+            new Response(200, ['content-length' => '123']),
+            new Response(200, ['content-length' => '123']),
+            new Response(200, ['content-length' => '123']),
         );
         $this->assertSame(
             $this->context,
@@ -2523,9 +1939,9 @@ class FeatureContextTest extends TestCase
     public function testCanAssertingLastResponesHeadersForUniquenessCanFail(): void
     {
         $this->mockHandler->append(
-            new Response(200, ['content-length' => 123]),
-            new Response(200, ['content-length' => 456]),
-            new Response(200, ['content-length' => 456]),
+            new Response(200, ['content-length' => '123']),
+            new Response(200, ['content-length' => '456']),
+            new Response(200, ['content-length' => '456']),
         );
         $this->context->requestPath('/path1');
         $this->context->requestPath('/path2');
@@ -2545,9 +1961,9 @@ class FeatureContextTest extends TestCase
     public function testCanAssertingLastResponesHeadersForNonUniquenessCanFail(): void
     {
         $this->mockHandler->append(
-            new Response(200, ['content-length' => 123]),
-            new Response(200, ['content-length' => 123]),
-            new Response(200, ['content-length' => 456]),
+            new Response(200, ['content-length' => '123']),
+            new Response(200, ['content-length' => '123']),
+            new Response(200, ['content-length' => '456']),
         );
         $this->context->requestPath('/path1');
         $this->context->requestPath('/path2');
@@ -2657,77 +2073,6 @@ class FeatureContextTest extends TestCase
         ]));
     }
 
-    public static function getDataForMatchingSeveralResponses()
-    {
-        return [
-            'status line' => [
-                'responses' => [
-                    new Response(200),
-                    new Response(204),
-                    new Response(404),
-                    new Response(500),
-                ],
-                'match' => new TableNode([
-                    ['response', 'status line'              ],
-                    ['1',        '200 OK'                   ],
-                    ['2',        '204 No Content'           ],
-                    ['3',        '404 Not Found'            ],
-                    ['4',        '500 Internal Server Error'],
-                ]),
-            ],
-            'headers' => [
-                'responses' => [
-                    new Response(200, [
-                        'content-type' => 'application/json',
-                        'content-length' => 13,
-                    ], '{"foo":"bar"}'),
-                    new Response(200, [
-                        'x-imbo-foo' => 'bar',
-                    ], '{"foo":"bar"}'),
-                ],
-                'match' => new TableNode([
-                    ['response', 'header name',    'header value'    ],
-                    ['1',        'content-type',   'application/json'],
-                    ['1',        'content-length', '13'              ],
-                    ['2',        'x-imbo-foo',     'bar'             ],
-                ]),
-            ],
-            'checksum' => [
-                'responses' => [
-                    new Response(200, [], '{"foo":"bar"}'),
-                    new Response(200, [], '{"bar":"foo"}'),
-                ],
-                'match' => new TableNode([
-                    ['response', 'checksum'                        ],
-                    ['1',        '9bb58f26192e4ba00f01e2e7b136bbd8'],
-                    ['2',        'e561e07998cff8eca9f3acc8a2fdb12f'],
-                ]),
-            ],
-            'image width / height' => [
-                'responses' => [
-                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/1024x256.png')),
-                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png')),
-                ],
-                'match' => new TableNode([
-                    ['response', 'image width', 'image height'],
-                    ['1',        1024,          256           ],
-                    ['2',        256,           1024          ],
-                ]),
-            ],
-            'body is' => [
-                'responses' => [
-                    new Response(200, [], '{"foo":"bar"}'),
-                    new Response(200, [], '{"bar":"foo"}'),
-                ],
-                'match' => new TableNode([
-                    ['response', 'body is'      ],
-                    ['1',        '{"foo":"bar"}'],
-                    ['2',        '{"bar":"foo"}'],
-                ]),
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getDataForMatchingSeveralResponses
      * @covers ::assertLastResponsesMatch
@@ -2744,76 +2089,6 @@ class FeatureContextTest extends TestCase
             $this->context,
             $this->context->assertLastResponsesMatch($table),
         );
-    }
-
-    public static function getDataForMatchingSeveralResponsesWhenFailing(): array
-    {
-        return [
-            'status line' => [
-                'responses' => [
-                    new Response(200),
-                    new Response(201),
-                ],
-                'match' => new TableNode([
-                    ['response', 'status line'   ],
-                    ['1',        '200 OK'        ],
-                    ['2',        '204 No Content'],
-                ]),
-                'exceptionMessage' => 'Incorrect status line in response 2, expected "204 No Content", got: "201 Created".',
-            ],
-            'headers' => [
-                'responses' => [
-                    new Response(200, [
-                        'content-type' => 'application/json',
-                    ], '{"foo":"bar"}'),
-                    new Response(200, [
-                        'x-imbo-foo' => 'bar',
-                    ], '{"foo":"bar"}'),
-                ],
-                'match' => new TableNode([
-                    ['response', 'header name',    'header value'    ],
-                    ['1',        'content-type',   'application/json'],
-                    ['2',        'x-imbo-foo',     'foobar'          ],
-                ]),
-                'exceptionMessage' => 'Incorrect "x-imbo-foo" header value in response 2, expected "foobar", got: "bar".',
-            ],
-            'checksum' => [
-                'responses' => [
-                    new Response(200, [], '{"foo":"bar"}'),
-                    new Response(200, [], '{"bar":"foo"}'),
-                ],
-                'match' => new TableNode([
-                    ['response', 'checksum'                        ],
-                    ['1',        '9bb58f26192e4ba00f01e2e7b136bbd8'],
-                    ['2',        '9bb58f26192e4ba00f01e2e7b136bbd8'],
-                ]),
-                'exceptionMessage' => 'Incorrect checksum in response 2, expected "9bb58f26192e4ba00f01e2e7b136bbd8", got: "e561e07998cff8eca9f3acc8a2fdb12f".',
-            ],
-            'image width / height (failure on width)' => [
-                'responses' => [
-                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/1024x256.png')),
-                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png')),
-                ],
-                'match' => new TableNode([
-                    ['response', 'image width', 'image height'],
-                    ['1',        1024,          256           ],
-                    ['2',        255,           1024          ],
-                ]),
-                'exceptionMessage' => 'Expected image in response 2 to be 255 pixel(s) wide, actual: 256.',
-            ],
-            'image width / height (failure on height)' => [
-                'responses' => [
-                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/1024x256.png')),
-                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png')),
-                ],
-                'match' => new TableNode([
-                    ['response', 'image width', 'image height'],
-                    ['1',        1024,          256           ],
-                    ['2',        256,           1023          ],
-                ]),
-                'exceptionMessage' => 'Expected image in response 2 to be 1023 pixel(s) high, actual: 1024.',
-            ],
-        ];
     }
 
     /**
@@ -2895,6 +2170,873 @@ class FeatureContextTest extends TestCase
         $this->context->assertImageProperties('png');
     }
 
+    /**
+     * @dataProvider getSuiteSettings
+     * @covers ::setUpAdapters
+     */
+    public function testSetupAdaptersThrowsExceptionOnInvalidClassNames(array $settings, string $expectedExceptionMessage): void
+    {
+        $suite = $this->createConfiguredMock(Suite::class, ['getSettings' => $settings]);
+        $environment = $this->createConfiguredMock(Environment::class, ['getSuite' => $suite]);
+
+        $this->expectExceptionObject(new InvalidArgumentException($expectedExceptionMessage));
+        FeatureContext::setUpAdapters(new BeforeScenarioScope(
+            $environment,
+            $this->createMock(FeatureNode::class),
+            $this->createMock(ScenarioInterface::class),
+        ));
+    }
+
+    /**
+     * @dataProvider getCoordsAndColorsForFailures
+     * @covers ::assertApproximateImagePixelColor
+     */
+    public function testAssertApproximatePixelColorCanFail(string $coordinates, string $color, string $exceptionMessage): void
+    {
+        $this->mockHandler->append(
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/colors.png')),
+        );
+
+        $this->context->requestPath('/path');
+        $this->expectException(Assert\InvalidArgumentException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+        $this->context->assertApproximateImagePixelColor($coordinates, $color);
+    }
+
+    /**
+     * @dataProvider getCoordsAndColors
+     * @covers ::assertApproximateImagePixelColor
+     * @covers ::hexToRgb
+     */
+    public function testAssertApproximatePixelColor(string $coordinates, string $color): void
+    {
+        $this->mockHandler->append(
+            new Response(200, [], file_get_contents(FIXTURES_DIR . '/colors.png')),
+        );
+
+        $this->assertSame(
+            $this->context,
+            $this->context
+                ->requestPath('/path')
+                ->assertApproximateImagePixelColor($coordinates, $color),
+        );
+    }
+
+    /**
+     * @return array<array<string>>
+     */
+    public static function getImboConfigFiles(): array
+    {
+        return array_map(
+            fn (string $file): array => [basename($file)],
+            glob(__DIR__ . '/../../features/bootstrap/imbo-configs/*.php'),
+        );
+    }
+
+    /**
+     * @return array<array{adapter:string,header:string}>
+     */
+    public static function getAdaptersForFailure(): array
+    {
+        return [
+            ['adapter' => 'database', 'header' => 'X-Imbo-Status-Database-Failure'],
+            ['adapter' => 'storage', 'header' => 'X-Imbo-Status-Storage-Failure'],
+        ];
+    }
+
+    /**
+     * @return array<array{path:string,expectedUrl:string}>
+     */
+    public static function getDataForAccessTokens(): array
+    {
+        return [
+            'path with no query params' => [
+                'path' => '/path',
+                'expectedUrl' => 'http://localhost:8080/path?publicKey=publicKey&accessToken=582386896ffacd2c34a39476f0fa71ac9e6b22f079482ea7ee687e15826b08ef',
+            ],
+            'path with query params' => [
+                'path' => '/path?foo=bar',
+                'expectedUrl' => 'http://localhost:8080/path?foo=bar&publicKey=publicKey&accessToken=67bd5be81cd63180d9dba642e22fc6c9940c4313913dee5db692b0eb86aabb6b',
+            ],
+            'path with problematic query params' => [
+                'path' => '/path?bar=foo&publicKey=foobar&accessToken=sometoken',
+                'expectedUrl' => 'http://localhost:8080/path?bar=foo&publicKey=publicKey&accessToken=f43f2db7f8c34c521456c4bb6f926812b39c3081a7a3d295ca14ccdc38926f2c',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{publicKey:string,privateKey:string,authMethod:string,uriRegExp:string,headers:array<string,string>}>
+     */
+    public static function getAuthDetails(): array
+    {
+        return [
+            'access-token' => [
+                'publicKey' => 'publicKey',
+                'privateKey' => 'privateKey',
+                'authMethod' => 'access-token',
+                'uriRegExp' => '|^http://localhost:8080/path\?publicKey=publicKey&accessToken=582386896ffacd2c34a39476f0fa71ac9e6b22f079482ea7ee687e15826b08ef$|',
+                'headers' => [],
+            ],
+            'access-token #2' => [
+                'publicKey' => 'key',
+                'privateKey' => 'secret',
+                'authMethod' => 'access-token',
+                'uriRegExp' => '|^http://localhost:8080/path\?publicKey=key&accessToken=dd4217a681cf8abdcecdc68cf49630df1e57dc733735e902b8a69859e50797a8$|',
+                'headers' => [],
+            ],
+            'signature' => [
+                'publicKey' => 'publicKey',
+                'privateKey' => 'privateKey',
+                'authMethod' => 'signature',
+                'uriRegExp' => '|^http://localhost:8080/path\?publicKey=publicKey&signature=[a-z0-9]{64}&timestamp=[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$|',
+                'headers' => [],
+            ],
+            'signature #2' => [
+                'publicKey' => 'key',
+                'privateKey' => 'secret',
+                'authMethod' => 'signature',
+                'uriRegExp' => '|^http://localhost:8080/path\?publicKey=key&signature=[a-z0-9]{64}&timestamp=[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$|',
+                'headers' => [],
+            ],
+            'signature (headers)' => [
+                'publicKey' => 'publicKey',
+                'privateKey' => 'privateKey',
+                'authMethod' => 'signature (headers)',
+                'uriRegExp' => '|^http://localhost:8080/path$|',
+                'headers' => [
+                    'X-Imbo-PublicKey' => '/^publicKey$/',
+                    'X-Imbo-Authenticate-Signature' => '/^[a-z0-9]{64}$/',
+                    'X-Imbo-Authenticate-Timestamp' => '/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$/',
+                ],
+            ],
+            'signature (headers) #2' => [
+                'publicKey' => 'key',
+                'privateKey' => 'secret',
+                'authMethod' => 'signature (headers)',
+                'uriRegExp' => '|^http://localhost:8080/path$|',
+                'headers' => [
+                    'X-Imbo-PublicKey' => '/^key$/',
+                    'X-Imbo-Authenticate-Signature' => '/^[a-z0-9]{64}$/',
+                    'X-Imbo-Authenticate-Timestamp' => '/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}Z$/',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{params:array<array{name:string,value:string}>,uri:string}>
+     */
+    public static function getRequestQueryParams(): array
+    {
+        return [
+            'single key / value' => [
+                'params' => [
+                    ['name' => 'key', 'value' => 'value'],
+                ],
+                'uri' => 'http://localhost:8080/path?key=value',
+            ],
+            'multiple key / value' => [
+                'params' => [
+                    ['name' => 'foo', 'value' => 'bar'],
+                    ['name' => 'bar', 'value' => 'foo'],
+                    ['name' => 'foobar', 'value' => 'barfoo'],
+                ],
+                'uri' => 'http://localhost:8080/path?foo=bar&bar=foo&foobar=barfoo',
+            ],
+            'array values' => [
+                'params' => [
+                    ['name' => 't[]', 'value' => 'border'],
+                    ['name' => 't[]', 'value' => 'thumb'],
+                ],
+                'uri' => 'http://localhost:8080/path?t%5B0%5D=border&t%5B1%5D=thumb',
+            ],
+            'mixed values' => [
+                'params' => [
+                    ['name' => 'foo', 'value' => 'bar'],
+                    ['name' => 't[]', 'value' => 'border'],
+                    ['name' => 'bar', 'value' => 'foo'],
+                    ['name' => 't[]', 'value' => 'thumb'],
+                ],
+                'uri' => 'http://localhost:8080/path?foo=bar&t%5B0%5D=border&t%5B1%5D=thumb&bar=foo',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{image:string,user:string,imageIdentifier:string,params:array<string,string>}>
+     */
+    public static function getShortUrlParams(): array
+    {
+        return [
+            [
+                'image' => FIXTURES_DIR . '/image1.png',
+                'user' => 'user',
+                'imageIdentifier' => 'fc7d2d06993047a0b5056e8fac4462a2',
+                'params' => [
+                    'user' => 'user',
+                ],
+            ],
+            [
+                'image' => FIXTURES_DIR . '/image2.png',
+                'user' => 'user',
+                'imageIdentifier' => 'b914b28f4d5faa516e2049b9a6a2577c',
+                'params' => [
+                    'user' => 'user',
+                    'extension' => 'gif',
+                ],
+            ],
+            [
+                'image' => FIXTURES_DIR . '/image3.png',
+                'user' => 'user',
+                'imageIdentifier' => '1d5b88aec8a3e1c4c57071307b2dae3a',
+                'params' => [
+                    'user' => 'user',
+                    'query' => 't[]=thumbnail:width=45,height=55&t[]=desaturate',
+                ],
+            ],
+            [
+                'image' => FIXTURES_DIR . '/image4.png',
+                'user' => 'user',
+                'imageIdentifier' => 'a501051db16e3cbf88ea50bfb0138a47',
+                'params' => [
+                    'user' => 'user',
+                    'extension' => 'jpg',
+                    'query' => 't[]=thumbnail:width=45,height=55&t[]=desaturate',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{image:string,imageIdentifier:string,params:?string,uri:string}>
+     */
+    public static function getDataForWatermarkImages(): array
+    {
+        return [
+            'no params' => [
+                'image' => FIXTURES_DIR . '/image1.png',
+                'imageIdentifier' => 'someId',
+                'params' => null,
+                'uri' => 'http://localhost:8080/path?t%5B0%5D=watermark%3Aimg%3DsomeId',
+            ],
+            'with params' => [
+                'image' => FIXTURES_DIR . '/image1.png',
+                'imageIdentifier' => 'someId',
+                'params' => 'x=10,y=5,position=bottom-right,width=20,height=20',
+                'uri' => 'http://localhost:8080/path?t%5B0%5D=watermark%3Aimg%3DsomeId%2Cx%3D10%2Cy%3D5%2Cposition%3Dbottom-right%2Cwidth%3D20%2Cheight%3D20',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{imageIdentifier:string,image:string,method:string}>
+     */
+    public static function getDataForRequestingPreviouslyAddedImage(): array
+    {
+        return [
+            'HTTP GET' => [
+                'imageIdentifier' => 'imageId',
+                'image' => FIXTURES_DIR . '/image1.png',
+                'method' => 'GET',
+            ],
+            'HTTP DELETE' => [
+                'imageIdentifier' => 'imageId',
+                'image' => FIXTURES_DIR . '/image1.png',
+                'method' => 'DELETE',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{imageIdentifier:string,image:string,method:string,extension:string}>
+     */
+    public static function getDataForRequestingPreviouslyAddedImageWithExtension(): array
+    {
+        return [
+            [
+                'imageIdentifier' => 'imageId',
+                'image' => FIXTURES_DIR . '/image1.png',
+                'method' => 'HEAD',
+                'extension' => 'png',
+            ],
+            [
+                'imageIdentifier' => 'imageId',
+                'image' => FIXTURES_DIR . '/image1.png',
+                'method' => 'GET',
+                'extension' => 'jpg',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{orignalMethod:string,method:?string,expectedUrl:string,publicKey:?string,privateKey:?string}>
+     */
+    public static function getDataForReplayingRequests(): array
+    {
+        return [
+            'use original method' => [
+                'orignalMethod' => 'GET',
+                'method' => null,
+                'expectedUrl' => 'http://localhost:8080/path',
+                'publicKey' => null,
+                'privateKey' => null,
+            ],
+            'specify custom method' => [
+                'orignalMethod' => 'GET',
+                'method' => 'HEAD',
+                'expectedUrl' => 'http://localhost:8080/path',
+                'publicKey' => null,
+                'privateKey' => null,
+            ],
+            'specify custom method that the same as the original' => [
+                'orignalMethod' => 'DELETE',
+                'method' => 'DELETE',
+                'expectedUrl' => 'http://localhost:8080/path',
+                'publicKey' => null,
+                'privateKey' => null,
+            ],
+            'specify custom method and append access token' => [
+                'orignalMethod' => 'DELETE',
+                'method' => 'DELETE',
+                'expectedUrl' => 'http://localhost:8080/path?publicKey=key&accessToken=dd4217a681cf8abdcecdc68cf49630df1e57dc733735e902b8a69859e50797a8',
+                'publicKey' => 'key',
+                'privateKey' => 'secret',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{imageIdentifier:string,image:string,method:string,metadata:array<string,string>}>
+     */
+    public static function getDataForRequestingMetadataOfPreviouslyAddedImage(): array
+    {
+        return [
+            'no metadata' => [
+                'imageIdentifier' => 'imageId',
+                'image' => FIXTURES_DIR . '/image1.png',
+                'method' => 'GET',
+                'metadata' => [],
+            ],
+            'with metadata and custom method' => [
+                'imageIdentifier' => 'imageId',
+                'image' => FIXTURES_DIR . '/image1.png',
+                'method' => 'HEAD',
+                'metadata' => ['key' => 'value'],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{image:string,imageIdentifier:string,extension:?string,method:string,expectedPath:string}>
+     */
+    public static function getDataForRequestingImageWithLocalPath(): array
+    {
+        return [
+            'default values' => [
+                'image' => FIXTURES_DIR . '/image1.png',
+                'imageIdentifier' => 'imageId',
+                'extension' => null,
+                'method' => 'GET',
+                'expectedPath' => '/users/user/images/imageId',
+            ],
+            'custom extension and method' => [
+                'image' => FIXTURES_DIR . '/image1.png',
+                'imageIdentifier' => 'imageId',
+                'extension' => 'gif',
+                'method' => 'HEAD',
+                'expectedPath' => '/users/user/images/imageId.gif',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{table:TableNode,requests:array<int,array{path:string,method:string,query:string,requestBody:string}>}>
+     */
+    public static function getDataForBulkRequests(): array
+    {
+        return [
+            'single request with no options' => [
+                'table' => new TableNode([
+                    ['path'],
+                    ['/path'],
+                ]),
+                'requests' => [
+                    [
+                        'path' => '/path',
+                        'method' => 'GET',
+                        'query' => '',
+                        'requestBody' => '',
+                    ],
+                ],
+            ],
+            'append access token' => [
+                'table' => new TableNode([
+                    ['path',  'access token'],
+                    ['/path', 'yes'],
+                ]),
+                'requests' => [
+                    [
+                        'path' => '/path',
+                        'method' => 'GET',
+                        'query' => 'publicKey=publicKey&accessToken=582386896ffacd2c34a39476f0fa71ac9e6b22f079482ea7ee687e15826b08ef',
+                        'requestBody' => '',
+                    ],
+                ],
+            ],
+            'add transformation' => [
+                'table' => new TableNode([
+                    ['path',  'transformation'],
+                    ['/path', 'border'],
+                ]),
+                'requests' => [
+                    [
+                        'path' => '/path',
+                        'method' => 'GET',
+                        'query' => 't%5B0%5D=border',
+                        'requestBody' => '',
+                    ],
+                ],
+            ],
+            'set request body' => [
+                'table' => new TableNode([
+                    ['path',  'request body'],
+                    ['/path', 'some data'],
+                ]),
+                'requests' => [
+                    [
+                        'path' => '/path',
+                        'method' => 'GET',
+                        'query' => '',
+                        'requestBody' => 'some data',
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array<string>>
+     */
+    public static function getApproximateImageWidths(): array
+    {
+        return [
+            ['598±1'],
+            ['600±1'],
+            ['589±10'],
+            ['609±10'],
+        ];
+    }
+
+    /**
+     * @return array<array{approximateWidth:string,exceptionMessage:string}>
+     */
+    public static function getApproximateImageWidthsForFailure(): array
+    {
+        return [
+            [
+                'approximateWidth' => '597±1',
+                'exceptionMessage' => 'Expected image width to be between 596 and 598 inclusive, got 599.',
+            ],
+            [
+                'approximateWidth' => '601±1',
+                'exceptionMessage' => 'Expected image width to be between 600 and 602 inclusive, got 599.',
+            ],
+            [
+                'approximateWidth' => '588±10',
+                'exceptionMessage' => 'Expected image width to be between 578 and 598 inclusive, got 599.',
+            ],
+            [
+                'approximateWidth' => '610±10',
+                'exceptionMessage' => 'Expected image width to be between 600 and 620 inclusive, got 599.',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array<string>>
+     */
+    public static function getApproximateImageHeights(): array
+    {
+        return [
+            ['416±1'],
+            ['418±1'],
+            ['407±10'],
+            ['427±10'],
+        ];
+    }
+
+    /**
+     * @return array<array{approximateHeight:string,exceptionMessage:string}>
+     */
+    public static function getApproximateImageHeightsForFailure(): array
+    {
+        return [
+            [
+                'approximateHeight' => '415±1',
+                'exceptionMessage' => 'Expected image height to be between 414 and 416 inclusive, got 417.',
+            ],
+            [
+                'approximateHeight' => '419±1',
+                'exceptionMessage' => 'Expected image height to be between 418 and 420 inclusive, got 417.',
+            ],
+            [
+                'approximateHeight' => '406±10',
+                'exceptionMessage' => 'Expected image height to be between 396 and 416 inclusive, got 417.',
+            ],
+            [
+                'approximateHeight' => '428±10',
+                'exceptionMessage' => 'Expected image height to be between 418 and 438 inclusive, got 417.',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{image:string,dimension:string,exceptionMessage:string}>
+     */
+    public static function getDataForImageDimensionAssertion(): array
+    {
+        $image1 = file_get_contents(FIXTURES_DIR . '/image1.png');
+        $image2 = file_get_contents(FIXTURES_DIR . '/image2.png');
+
+        return [
+            [
+                'image' => $image1,
+                'dimension' => '123x456',
+                'exceptionMessage' => 'Incorrect image width, expected 123, got 599.',
+            ],
+            [
+                'image' => $image1,
+                'dimension' => '599x456',
+                'exceptionMessage' => 'Incorrect image height, expected 456, got 417.',
+            ],
+            [
+                'image' => $image2,
+                'dimension' => '123x456',
+                'exceptionMessage' => 'Incorrect image width, expected 123, got 539.',
+            ],
+            [
+                'image' => $image2,
+                'dimension' => '539x123',
+                'exceptionMessage' => 'Incorrect image height, expected 123, got 375.',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array<string>>
+     */
+    public static function getApproximateImageDimensions(): array
+    {
+        return [
+            ['598±1x415±2'],
+            ['600±1x419±2'],
+            ['589±10x400±17'],
+            ['609±10x434±17'],
+        ];
+    }
+
+    /**
+     * @return array<array{approximateDimension:string,exceptionMessage:string}>
+     */
+    public static function getApproximateImageDimensionsForFailure(): array
+    {
+        return [
+            [
+                'approximateDimension' => '597±1x416±1',
+                'exceptionMessage' => 'Expected image width to be between 596 and 598 inclusive, got 599.',
+            ],
+            [
+                'approximateDimension' => '599x414±2',
+                'exceptionMessage' => 'Expected image height to be between 412 and 416 inclusive, got 417.',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{imageData:string,coordinate:string,color:string,exceptionMessage:string}>
+     */
+    public static function getDataForAssertingImagePixelInfoFailures(): array
+    {
+        $image = file_get_contents(FIXTURES_DIR . '/image1.png');
+
+        return [
+            [
+                'imageData' => $image,
+                'coordinate' => '1,1',
+                'color' => '000000',
+                'exceptionMessage' => 'Incorrect color at coordinate "1,1", expected "000000", got "ffffff".',
+            ],
+            [
+                'imageData' => $image,
+                'coordinate' => '247,32',
+                'color' => '000000',
+                'exceptionMessage' => 'Incorrect color at coordinate "247,32", expected "000000", got "e8e7e6".',
+            ],
+            [
+                'imageData' => $image,
+                'coordinate' => '275,150',
+                'color' => 'ffffff',
+                'exceptionMessage' => 'Incorrect color at coordinate "275,150", expected "ffffff", got "000000".',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{imageData:string,coordinate:string,color:string}>
+     */
+    public static function getDataForAssertingImagePixelInfo(): array
+    {
+        $image = file_get_contents(FIXTURES_DIR . '/image1.png');
+
+        return [
+            [
+                'imageData' => $image,
+                'coordinate' => '1,1',
+                'color' => 'ffffff',
+            ],
+            [
+                'imageData' => $image,
+                'coordinate' => '247,32',
+                'color' => 'e8e7e6',
+            ],
+            [
+                'imageData' => $image,
+                'coordinate' => '275,150',
+                'color' => '000000',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{imageData:string,coordinate:string,alpha:float,exceptionMessage:string}>
+     */
+    public static function getDataForAssertingImagePixelAlphaFailures(): array
+    {
+        $image = file_get_contents(FIXTURES_DIR . '/transparency.png');
+
+        return [
+            [
+                'imageData' => $image,
+                'coordinate' => '448,192',
+                'alpha' => 0,
+                'exceptionMessage' => sprintf('Incorrect alpha value at coordinate "448,192", expected "%f", got "%f".', 0, 1),
+            ],
+            [
+                'imageData' => $image,
+                'coordinate' => '192,64',
+                'alpha' => 1,
+                'exceptionMessage' => sprintf('Incorrect alpha value at coordinate "192,64", expected "%f", got "%f".', 1, 0),
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{imageData:string,coordinate:string,alpha:float}>
+     */
+    public static function getDataForAssertingImagePixelAlpha(): array
+    {
+        $image = file_get_contents(FIXTURES_DIR . '/transparency.png');
+
+        return [
+            [
+                'imageData' => $image,
+                'coordinate' => '448,192',
+                'alpha' => 1,
+            ],
+            [
+                'imageData' => $image,
+                'coordinate' => '192,64',
+                'alpha' => 0,
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{response:Response,expected:bool,exceptionMessage?:string}>
+     */
+    public static function getCacheabilityData(): array
+    {
+        return [
+            'cacheable, expect cacheable' => [
+                'response' => new Response(200),
+                'expected' => true,
+            ],
+            'not cacheable, expect not cacheable' => [
+                'response' => new Response(400),
+                'expected' => false,
+            ],
+            'cacheable, expect not cacheable' => [
+                'response' => new Response(200),
+                'expected' => false,
+                'exceptionMessage' => 'Response was not supposed to be cacheable, but it is.',
+            ],
+            'not cacheable, expect cacheable' => [
+                'response' => new Response(400),
+                'expected' => true,
+                'exceptionMessage' => 'Response was supposed to be cacheble, but it\'s not.',
+            ],
+            'not cacheable (no-store)' => [
+                'response' => new Response(200, ['cache-control' => 'no-store']),
+                'expected' => false,
+            ],
+            'not cacheable (private)' => [
+                'response' => new Response(200, ['cache-control' => 'private']),
+                'expected' => false,
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{responses:array<Response>,match:TableNode}>
+     */
+    public static function getDataForMatchingSeveralResponses(): array
+    {
+        return [
+            'status line' => [
+                'responses' => [
+                    new Response(200),
+                    new Response(204),
+                    new Response(404),
+                    new Response(500),
+                ],
+                'match' => new TableNode([
+                    ['response', 'status line'              ],
+                    ['1',        '200 OK'                   ],
+                    ['2',        '204 No Content'           ],
+                    ['3',        '404 Not Found'            ],
+                    ['4',        '500 Internal Server Error'],
+                ]),
+            ],
+            'headers' => [
+                'responses' => [
+                    new Response(200, [
+                        'content-type' => 'application/json',
+                        'content-length' => '13',
+                    ], '{"foo":"bar"}'),
+                    new Response(200, [
+                        'x-imbo-foo' => 'bar',
+                    ], '{"foo":"bar"}'),
+                ],
+                'match' => new TableNode([
+                    ['response', 'header name',    'header value'    ],
+                    ['1',        'content-type',   'application/json'],
+                    ['1',        'content-length', '13'              ],
+                    ['2',        'x-imbo-foo',     'bar'             ],
+                ]),
+            ],
+            'checksum' => [
+                'responses' => [
+                    new Response(200, [], '{"foo":"bar"}'),
+                    new Response(200, [], '{"bar":"foo"}'),
+                ],
+                'match' => new TableNode([
+                    ['response', 'checksum'                        ],
+                    ['1',        '9bb58f26192e4ba00f01e2e7b136bbd8'],
+                    ['2',        'e561e07998cff8eca9f3acc8a2fdb12f'],
+                ]),
+            ],
+            'image width / height' => [
+                'responses' => [
+                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/1024x256.png')),
+                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png')),
+                ],
+                'match' => new TableNode([
+                    ['response', 'image width', 'image height'],
+                    ['1',        1024,          256           ],
+                    ['2',        256,           1024          ],
+                ]),
+            ],
+            'body is' => [
+                'responses' => [
+                    new Response(200, [], '{"foo":"bar"}'),
+                    new Response(200, [], '{"bar":"foo"}'),
+                ],
+                'match' => new TableNode([
+                    ['response', 'body is'      ],
+                    ['1',        '{"foo":"bar"}'],
+                    ['2',        '{"bar":"foo"}'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{responses:array<Response>,match:TableNode,exceptionMessage:string}>
+     */
+    public static function getDataForMatchingSeveralResponsesWhenFailing(): array
+    {
+        return [
+            'status line' => [
+                'responses' => [
+                    new Response(200),
+                    new Response(201),
+                ],
+                'match' => new TableNode([
+                    ['response', 'status line'   ],
+                    ['1',        '200 OK'        ],
+                    ['2',        '204 No Content'],
+                ]),
+                'exceptionMessage' => 'Incorrect status line in response 2, expected "204 No Content", got: "201 Created".',
+            ],
+            'headers' => [
+                'responses' => [
+                    new Response(200, [
+                        'content-type' => 'application/json',
+                    ], '{"foo":"bar"}'),
+                    new Response(200, [
+                        'x-imbo-foo' => 'bar',
+                    ], '{"foo":"bar"}'),
+                ],
+                'match' => new TableNode([
+                    ['response', 'header name',    'header value'    ],
+                    ['1',        'content-type',   'application/json'],
+                    ['2',        'x-imbo-foo',     'foobar'          ],
+                ]),
+                'exceptionMessage' => 'Incorrect "x-imbo-foo" header value in response 2, expected "foobar", got: "bar".',
+            ],
+            'checksum' => [
+                'responses' => [
+                    new Response(200, [], '{"foo":"bar"}'),
+                    new Response(200, [], '{"bar":"foo"}'),
+                ],
+                'match' => new TableNode([
+                    ['response', 'checksum'                        ],
+                    ['1',        '9bb58f26192e4ba00f01e2e7b136bbd8'],
+                    ['2',        '9bb58f26192e4ba00f01e2e7b136bbd8'],
+                ]),
+                'exceptionMessage' => 'Incorrect checksum in response 2, expected "9bb58f26192e4ba00f01e2e7b136bbd8", got: "e561e07998cff8eca9f3acc8a2fdb12f".',
+            ],
+            'image width / height (failure on width)' => [
+                'responses' => [
+                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/1024x256.png')),
+                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png')),
+                ],
+                'match' => new TableNode([
+                    ['response', 'image width', 'image height'],
+                    ['1',        1024,          256           ],
+                    ['2',        255,           1024          ],
+                ]),
+                'exceptionMessage' => 'Expected image in response 2 to be 255 pixel(s) wide, actual: 256.',
+            ],
+            'image width / height (failure on height)' => [
+                'responses' => [
+                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/1024x256.png')),
+                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png')),
+                ],
+                'match' => new TableNode([
+                    ['response', 'image width', 'image height'],
+                    ['1',        1024,          256           ],
+                    ['2',        256,           1023          ],
+                ]),
+                'exceptionMessage' => 'Expected image in response 2 to be 1023 pixel(s) high, actual: 1024.',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{settings:array,expectedExceptionMessage:string}>
+     */
     public static function getSuiteSettings(): array
     {
         return [
@@ -2916,59 +3058,27 @@ class FeatureContextTest extends TestCase
     }
 
     /**
-     * @dataProvider getSuiteSettings
-     * @covers ::setUpAdapters
+     * @return array<array{coordinates:string,color:string}>
      */
-    public function testSetupAdaptersThrowsExceptionOnInvalidClassNames(array $settings, string $expectedExceptionMessage): void
+    public static function getCoordsAndColors(): array
     {
-        $suite = $this->createConfiguredMock(Suite::class, ['getSettings' => $settings]);
-        $environment = $this->createConfiguredMock(Environment::class, ['getSuite' => $suite]);
-
-        $this->expectExceptionObject(new InvalidArgumentException($expectedExceptionMessage));
-        FeatureContext::setUpAdapters(new BeforeScenarioScope(
-            $environment,
-            $this->createMock(FeatureNode::class),
-            $this->createMock(ScenarioInterface::class),
-        ));
+        return [
+            ['coordinates' => '35,35', 'color' => '#008000'],
+            ['coordinates' => '35,35', 'color' => '#008100'],
+            ['coordinates' => '35,35', 'color' => '#008200'],
+            ['coordinates' => '35,35', 'color' => '#008300'],
+        ];
     }
 
     /**
-     * @testWith ["22,22", "#333333", "Color approximation failed for red color, expected \"49 - 53\", got \"255\"."]
-     *           ["22,22", "#ff3333", "Color approximation failed for green color, expected \"49 - 53\", got \"0\"."]
-     *           ["22,22", "#ff0033", "Color approximation failed for blue color, expected \"49 - 53\", got \"255\"."]
-     * @covers ::assertApproximateImagePixelColor
+     * @return array<array{coordinates:string,color:string,exceptionMessage:string}>
      */
-    public function testAssertApproximatePixelColorCanFail(string $coordinates, string $color, string $exceptionMessage): void
+    public static function getCoordsAndColorsForFailures(): array
     {
-        $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/colors.png')),
-        );
-
-        $this->context->requestPath('/path');
-        $this->expectException(Assert\InvalidArgumentException::class);
-        $this->expectExceptionMessage($exceptionMessage);
-        $this->context->assertApproximateImagePixelColor($coordinates, $color);
-    }
-
-    /**
-     * @testWith ["35,35", "#008000"]
-     *           ["35,35", "#008100"]
-     *           ["35,35", "#008200"]
-     *           ["35,35", "#008300"]
-     * @covers ::assertApproximateImagePixelColor
-     * @covers ::hexToRgb
-     */
-    public function testAssertApproximatePixelColor(string $coordinates, string $color): void
-    {
-        $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/colors.png')),
-        );
-
-        $this->assertSame(
-            $this->context,
-            $this->context
-                ->requestPath('/path')
-                ->assertApproximateImagePixelColor($coordinates, $color),
-        );
+        return [
+            ['coordinates' => '22,22', 'color' => '#333333', 'exceptionMessage' => 'Color approximation failed for red color, expected "49 - 53", got "255".'],
+            ['coordinates' => '22,22', 'color' => '#ff3333', 'exceptionMessage' => 'Color approximation failed for green color, expected "49 - 53", got "0".'],
+            ['coordinates' => '22,22', 'color' => '#ff0033', 'exceptionMessage' => 'Color approximation failed for blue color, expected "49 - 53", got "255".'],
+        ];
     }
 }

@@ -4,6 +4,7 @@ namespace Imbo\EventListener;
 use Imbo\EventManager\EventInterface;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
 /**
@@ -11,7 +12,7 @@ use Symfony\Component\HttpFoundation\HeaderBag;
  */
 class ResponseETagTest extends ListenerTests
 {
-    private $listener;
+    private ResponseETag $listener;
 
     public function setUp(): void
     {
@@ -23,20 +24,13 @@ class ResponseETagTest extends ListenerTests
         return $this->listener;
     }
 
-    public static function getTaintedHeaders(): array
-    {
-        return [
-            'non-tainted' => ['"be7d5bb2f29494c0a1c95c81e8ae8b99"', '"be7d5bb2f29494c0a1c95c81e8ae8b99"', false],
-            'tainted' => ['"be7d5bb2f29494c0a1c95c81e8ae8b99-gzip"', '"be7d5bb2f29494c0a1c95c81e8ae8b99"', true],
-        ];
-    }
-
     /**
      * @dataProvider getTaintedHeaders
      * @covers ::fixIfNoneMatchHeader
      */
     public function testCanFixATaintedInNoneMatchHeader(string $incoming, string $real, bool $willFix): void
     {
+        /** @var HeaderBag&MockObject */
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
             ->expects($this->once())
@@ -58,6 +52,7 @@ class ResponseETagTest extends ListenerTests
         $request = $this->createMock(Request::class);
         $request->headers = $requestHeaders;
 
+        /** @var EventInterface&MockObject */
         $event = $this->createMock(EventInterface::class);
         $event
             ->expects($this->once())
@@ -67,33 +62,20 @@ class ResponseETagTest extends ListenerTests
         $this->listener->fixIfNoneMatchHeader($event);
     }
 
-    public static function getRoutesForETags(): array
-    {
-        return [
-            'index route has no ETag' => ['index', false],
-            'stats route has no ETag' => ['stats', false],
-            'status route has no ETag' => ['status', false],
-            'user route has ETag' => ['user', true, true, '{"user":"christer"}'],
-            'images route has ETag' => ['images', true, true, '{"search":{"hits":0,"page":1,"limit":20,"count":0},"images":[]}'],
-            'image route has ETag' => ['image', true, true, file_get_contents(FIXTURES_DIR . '/image.png')],
-            'metadata route has ETag' => ['metadata', true, true, '{"foo":"bar"}'],
-            'shorturl route has ETag' => ['globalshorturl', true, true, file_get_contents(FIXTURES_DIR . '/image.png')],
-            'response codes other than 200 does not get ETags' => ['globalshorturl', true, false],
-        ];
-    }
-
     /**
      * @dataProvider getRoutesForETags
      * @covers ::setETag
      */
     public function testWillSetETagForSomeRoutes(string $route, bool $hasETag, bool $isOk = false, string $content = null): void
     {
+        /** @var Request&MockObject */
         $request = $this->createMock(Request::class);
         $request
             ->expects($this->once())
             ->method('getRoute')
             ->willReturn($route);
 
+        /** @var Response&MockObject */
         $response = $this->createMock(Response::class);
 
         if ($hasETag) {
@@ -102,7 +84,7 @@ class ResponseETagTest extends ListenerTests
                 ->method('isOk')
                 ->willReturn($isOk);
 
-            if ($isOk) {
+            if ($isOk && null !== $content) {
                 $response
                     ->expects($this->once())
                     ->method('getContent')
@@ -119,6 +101,7 @@ class ResponseETagTest extends ListenerTests
                 ->method('isOk');
         }
 
+        /** @var EventInterface&MockObject */
         $event = $this->createMock(EventInterface::class);
         $event
             ->expects($this->once())
@@ -131,5 +114,80 @@ class ResponseETagTest extends ListenerTests
             ->willReturn($response);
 
         $this->listener->setETag($event);
+    }
+
+    /**
+     * @return array<array{incoming:string,real:string,willFix:bool}>
+     */
+    public static function getTaintedHeaders(): array
+    {
+        return [
+            'non-tainted' => [
+                'incoming' => '"be7d5bb2f29494c0a1c95c81e8ae8b99"',
+                'real' => '"be7d5bb2f29494c0a1c95c81e8ae8b99"',
+                'willFix' => false,
+            ],
+            'tainted' => [
+                'incoming' => '"be7d5bb2f29494c0a1c95c81e8ae8b99-gzip"',
+                'real' => '"be7d5bb2f29494c0a1c95c81e8ae8b99"',
+                'willFix' => true,
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{route:string,hasETag:bool,isOk?:bool,content?:string}>
+     */
+    public static function getRoutesForETags(): array
+    {
+        return [
+            'index route has no ETag' => [
+                'route' => 'index',
+                'hasETag' => false,
+            ],
+            'stats route has no ETag' => [
+                'route' => 'stats',
+                'hasETag' => false,
+            ],
+            'status route has no ETag' => [
+                'route' => 'status',
+                'hasETag' => false,
+            ],
+            'user route has ETag' => [
+                'route' => 'user',
+                'hasETag' => true,
+                'isOk' => true,
+                'content' => '{"user":"christer"}',
+            ],
+            'images route has ETag' => [
+                'route' => 'images',
+                'hasETag' => true,
+                'isOk' => true,
+                'content' => '{"search":{"hits":0,"page":1,"limit":20,"count":0},"images":[]}',
+            ],
+            'image route has ETag' => [
+                'route' => 'image',
+                'hasETag' => true,
+                'isOk' => true,
+                'content' => file_get_contents(FIXTURES_DIR . '/image.png'),
+            ],
+            'metadata route has ETag' => [
+                'route' => 'metadata',
+                'hasETag' => true,
+                'isOk' => true,
+                'content' => '{"foo":"bar"}',
+            ],
+            'shorturl route has ETag' => [
+                'route' => 'globalshorturl',
+                'hasETag' => true,
+                'isOk' => true,
+                'content' => file_get_contents(FIXTURES_DIR . '/image.png'),
+            ],
+            'response codes other than 200 does not get ETags' => [
+                'route' => 'globalshorturl',
+                'hasETag' => true,
+                'isOk' => false,
+            ],
+        ];
     }
 }

@@ -3,6 +3,7 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -10,25 +11,11 @@ use PHPUnit\Framework\TestCase;
  */
 class TransformationTest extends TestCase
 {
-    private $transformation;
+    private Border $transformation;
 
     public function setUp(): void
     {
         $this->transformation = new Border();
-    }
-
-    public static function getColors(): array
-    {
-        return [
-            ['red', 'red'],
-            ['000', '#000'],
-            ['000000', '#000000'],
-            ['fff', '#fff'],
-            ['FFF', '#FFF'],
-            ['FFF000', '#FFF000'],
-            ['#FFF', '#FFF'],
-            ['#FFF000', '#FFF000'],
-        ];
     }
 
     /**
@@ -39,10 +26,12 @@ class TransformationTest extends TestCase
      */
     public function testCanFormatColors(string $color, string $expected): void
     {
+        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image->expects($this->once())->method('setWidth')->willReturnSelf();
         $image->expects($this->once())->method('setHeight')->willReturnSelf();
 
+        /** @var Imagick&MockObject */
         $imagick = $this->createConfiguredMock(Imagick::class, [
             'getImageGeometry' => [
                 'width'  => 100,
@@ -60,5 +49,46 @@ class TransformationTest extends TestCase
             ->setImage($image)
             ->setImagick($imagick)
             ->transform(['color' => $color]);
+    }
+
+    /**
+     * @return array<array{color:string,expected:string}>
+     */
+    public static function getColors(): array
+    {
+        return [
+            [
+                'color' => 'red',
+                'expected' => 'red',
+            ],
+            [
+                'color' => '000',
+                'expected' => '#000',
+            ],
+            [
+                'color' => '000000',
+                'expected' => '#000000',
+            ],
+            [
+                'color' => 'fff',
+                'expected' => '#fff',
+            ],
+            [
+                'color' => 'FFF',
+                'expected' => '#FFF',
+            ],
+            [
+                'color' => 'FFF000',
+                'expected' => '#FFF000',
+            ],
+            [
+                'color' => '#FFF',
+                'expected' => '#FFF',
+            ],
+            [
+                'color' => '#FFF000',
+                'expected' => '#FFF000',
+            ],
+        ];
     }
 }

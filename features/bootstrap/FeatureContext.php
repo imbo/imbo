@@ -194,7 +194,7 @@ class FeatureContext extends ApiContext
      *
      * @throws RuntimeException
      */
-    public function setClient(ClientInterface $client, string $baseUri): self
+    public function setClient(ClientInterface $client, string $baseUri): static
     {
         $handler = $client->getConfig('handler');
         $handler->push(Middleware::history($this->history), self::MIDDLEWARE_HISTORY);
@@ -219,7 +219,7 @@ class FeatureContext extends ApiContext
      *
      * {@inheritdoc}
      */
-    public function setArrayContainsComparator(ArrayContainsComparator $comparator): self
+    public function setArrayContainsComparator(ArrayContainsComparator $comparator): static
     {
         $comparator->addFunction('isDate', [$this, 'isDate']);
 
@@ -229,7 +229,7 @@ class FeatureContext extends ApiContext
     /**
      * {@inheritdoc}
      */
-    public function setRequestHeader($header, $value): self
+    public function setRequestHeader($header, $value): static
     {
         if ($value === 'current-timestamp') {
             $value = gmdate('Y-m-d\TH:i:s\Z');
@@ -349,7 +349,7 @@ class FeatureContext extends ApiContext
      *
      * @Given /^the (storage|database) is down$/
      */
-    public function forceAdapterFailure(string $adapter): self
+    public function forceAdapterFailure(string $adapter): static
     {
         if (!in_array($adapter, ['storage', 'database'])) {
             throw new InvalidArgumentException(sprintf('Invalid adapter: "%s".', $adapter));
@@ -539,7 +539,7 @@ class FeatureContext extends ApiContext
      * @Given :imagePath exists for user :user
      * @Given :imagePath exists for user :user with the following metadata:
      */
-    public function addUserImageToImbo(string $imagePath, string $user, PyStringNode $metadata = null): self
+    public function addUserImageToImbo(string $imagePath, string $user, PyStringNode $metadata = null): static
     {
         if (!file_exists($imagePath)) {
             throw new InvalidArgumentException(sprintf('File does not exist: "%s".', $imagePath));

@@ -6,13 +6,14 @@ use Imbo\Http\Request\Request;
 use Imbo\Image\Transformation\MaxSize;
 use Imbo\Image\TransformationManager;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass Imbo\EventListener\MaxImageSize
  */
 class MaxImageSizeTest extends ListenerTests
 {
-    private $listener;
+    private MaxImageSize $listener;
 
     public function setUp(): void
     {
@@ -24,22 +25,13 @@ class MaxImageSizeTest extends ListenerTests
         return $this->listener;
     }
 
-    public static function getImageDimensions(): array
-    {
-        return [
-            'below limit' => [100, 100, 200, 200, false],
-            'width above' => [300, 100, 200, 200, true],
-            'height above' => [100, 300, 200, 200, true],
-            'both above' => [300, 300, 200, 200, true],
-        ];
-    }
-
     /**
      * @dataProvider getImageDimensions
      * @covers ::enforceMaxSize
      */
     public function testWillTriggerTransformationWhenImageIsAboveTheLimits(int $imageWidth, int $imageHeight, int $maxWidth, int $maxHeight, bool $willTrigger): void
     {
+        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -51,12 +43,14 @@ class MaxImageSizeTest extends ListenerTests
             ->method('getHeight')
             ->willReturn($imageHeight);
 
+        /** @var Request&MockObject */
         $request = $this->createMock(Request::class);
         $request
             ->expects($this->once())
             ->method('getImage')
             ->willReturn($image);
 
+        /** @var EventInterface&MockObject */
         $event = $this->createMock(EventInterface::class);
         $event
             ->expects($this->once())
@@ -64,6 +58,7 @@ class MaxImageSizeTest extends ListenerTests
             ->willReturn($request);
 
         if ($willTrigger) {
+            /** @var MaxSize&MockObject */
             $maxSize = $this->createMock(MaxSize::class);
             $maxSize
                 ->expects($this->once())
@@ -75,6 +70,7 @@ class MaxImageSizeTest extends ListenerTests
                 ->method('transform')
                 ->with(['width' => $maxWidth, 'height' => $maxHeight]);
 
+            /** @var TransformationManager&MockObject */
             $transformationManager = $this->createMock(TransformationManager::class);
             $transformationManager
                 ->expects($this->once())
@@ -90,5 +86,42 @@ class MaxImageSizeTest extends ListenerTests
 
         $listener = new MaxImageSize(['width' => $maxWidth, 'height' => $maxHeight]);
         $listener->enforceMaxSize($event);
+    }
+
+    /**
+     * @return array<array{imageWidth:int,imageHeight:int,maxWidth:int,maxHeight:int,willTrigger:bool}>
+     */
+    public static function getImageDimensions(): array
+    {
+        return [
+            'below limit' => [
+                'imageWidth' => 100,
+                'imageHeight' => 100,
+                'maxWidth' => 200,
+                'maxHeight' => 200,
+                'willTrigger' => false,
+            ],
+            'width above' => [
+                'imageWidth' => 300,
+                'imageHeight' => 100,
+                'maxWidth' => 200,
+                'maxHeight' => 200,
+                'willTrigger' => true,
+            ],
+            'height above' => [
+                'imageWidth' => 100,
+                'imageHeight' => 300,
+                'maxWidth' => 200,
+                'maxHeight' => 200,
+                'willTrigger' => true,
+            ],
+            'both above' => [
+                'imageWidth' => 300,
+                'imageHeight' => 300,
+                'maxWidth' => 200,
+                'maxHeight' => 200,
+                'willTrigger' => true,
+            ],
+        ];
     }
 }

@@ -4,6 +4,7 @@ namespace Imbo\EventListener;
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface as AccessControlAdapter;
 use Imbo\EventListener\AccessToken\AccessTokenInterface;
 use Imbo\EventManager\Event;
+use Imbo\EventManager\EventInterface;
 use Imbo\Exception\ConfigurationException;
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
@@ -11,7 +12,6 @@ use Imbo\Http\Response\Response;
 use PHPUnit\Framework\MockObject\MockObject;
 use stdClass;
 use Symfony\Component\HttpFoundation\InputBag;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
@@ -19,23 +19,19 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  */
 class AccessTokenTest extends ListenerTests
 {
-    private $listener;
-    private $event;
-    private $accessControl;
-    private $request;
-    private $response;
-    private $responseHeaders;
-    private $query;
+    private AccessToken $listener;
+    private EventInterface&MockObject $event;
+    private AccessControlAdapter&MockObject $accessControl;
+    private Request&MockObject $request;
+    private Response&MockObject $response;
+    private ResponseHeaderBag&MockObject $responseHeaders;
 
     public function setUp(): void
     {
-        /** @var InputBag&MockObject */
-        $this->query = $this->createMock(ParameterBag::class);
-
         $this->accessControl = $this->createMock(AccessControlAdapter::class);
 
         $this->request = $this->createMock(Request::class);
-        $this->request->query = $this->query;
+        $this->request->query = new InputBag();
 
         $this->responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $this->response = $this->createMock(Response::class);
@@ -56,18 +52,7 @@ class AccessTokenTest extends ListenerTests
      */
     public function testRequestWithBogusAccessToken(): void
     {
-        $this->query
-            ->expects($this->once())
-            ->method('has')
-            ->with('accessToken')
-            ->willReturn(true);
-
-        $this->query
-            ->expects($this->once())
-            ->method('get')
-            ->with('accessToken')
-            ->willReturn('/string');
-
+        $this->request->query = new InputBag(['accessToken' => '/string']);
         $this->request
             ->method('getRawUri')
             ->willReturn('someuri');
@@ -96,89 +81,8 @@ class AccessTokenTest extends ListenerTests
             ->method('getName')
             ->willReturn('image.get');
 
-        $this->query
-            ->expects($this->once())
-            ->method('has')
-            ->with('accessToken')
-            ->willReturn(false);
-
         $this->expectExceptionObject(new RuntimeException('Missing access token', Response::HTTP_BAD_REQUEST));
         $this->listener->checkAccessToken($this->event);
-    }
-
-    public static function getFilterData(): array
-    {
-        return [
-            'no filter and no transformations' => [
-                [],
-                [],
-                false,
-            ],
-            // @see https://github.com/imbo/imbo/issues/258
-            'configured filters, but no transformations in the request' => [
-                ['transformations' => ['whitelist' => ['border']]],
-                [],
-                false,
-            ],
-            [
-                [],
-                [
-                    ['name' => 'border', 'params' => []],
-                ],
-                false,
-            ],
-            [
-                ['transformations' => ['whitelist' => ['border']]],
-                [
-                    ['name' => 'border', 'params' => []],
-                ],
-                true,
-            ],
-            [
-                ['transformations' => ['whitelist' => ['border']]],
-                [
-                    ['name' => 'border', 'params' => []],
-                    ['name' => 'thumbnail', 'params' => []],
-                ],
-                false,
-            ],
-            [
-                ['transformations' => ['blacklist' => ['border']]],
-                [
-                    ['name' => 'thumbnail', 'params' => []],
-                ],
-                true,
-            ],
-            [
-                ['transformations' => ['blacklist' => ['border']]],
-                [
-                    ['name' => 'border', 'params' => []],
-                    ['name' => 'thumbnail', 'params' => []],
-                ],
-                false,
-            ],
-            [
-                ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['thumbnail']]],
-                [
-                    ['name' => 'border', 'params' => []],
-                ],
-                true,
-            ],
-            [
-                ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['thumbnail']]],
-                [
-                    ['name' => 'canvas', 'params' => []],
-                ],
-                false,
-            ],
-            [
-                ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['border']]],
-                [
-                    ['name' => 'border', 'params' => []],
-                ],
-                false,
-            ],
-        ];
     }
 
     /**
@@ -207,64 +111,6 @@ class AccessTokenTest extends ListenerTests
         $listener->checkAccessToken($this->event);
     }
 
-    public static function getAccessTokens(): array
-    {
-        return [
-            [
-                'http://imbo/users/christer',
-                'some access token',
-                'private key',
-                false,
-            ],
-            [
-                'http://imbo/users/christer',
-                '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a',
-                'private key',
-                true,
-            ],
-            [
-                'http://imbo/users/christer',
-                '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a',
-                'other private key',
-                false,
-            ],
-            // Test that checking URL "as is" works properly. This is for backwards compatibility.
-            [
-                'http://imbo/users/christer?t[]=thumbnail%3Awidth%3D40%2Cheight%3D40%2Cfit%3Doutbound',
-                'f0166cb4f7c8eabbe82c5d753f681ed53bcfa10391d4966afcfff5806cc2bff4',
-                'some random private key',
-                true,
-            ],
-            // Test checking URL against incorrect protocol
-            [
-                'https://imbo/users/christer',
-                '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a',
-                'private key',
-                false,
-            ],
-            // Test that URLs with t[0] and t[] can use the same accessToken
-            [
-                'http://imbo/users/imbo/images/foobar?t%5B0%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B1%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50',
-                '1ae7643a70e68377502c30ba54d0ffbfedd67a1f3c4b3f038a42c0ed17ad3551',
-                'foo',
-                true,
-            ],
-            [
-                'http://imbo/users/imbo/images/foobar?t%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50',
-                '1ae7643a70e68377502c30ba54d0ffbfedd67a1f3c4b3f038a42c0ed17ad3551',
-                'foo',
-                true,
-            ],
-            // and that they still break if something else is changed
-            [
-                'http://imbo/users/imbo/images/foobar?g%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50',
-                '1ae7643a70e68377502c30ba54d0ffbfedd67a1f3c4b3f038a42c0ed17ad3551',
-                'foo',
-                false,
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getAccessTokens
      * @covers ::checkAccessToken
@@ -275,18 +121,7 @@ class AccessTokenTest extends ListenerTests
             $this->expectExceptionObject(new RuntimeException('Incorrect access token', Response::HTTP_BAD_REQUEST));
         }
 
-        $this->query
-            ->expects($this->once())
-            ->method('has')
-            ->with('accessToken')
-            ->willReturn(true);
-
-        $this->query
-            ->expects($this->once())
-            ->method('get')
-            ->with('accessToken')
-            ->willReturn($token);
-
+        $this->request->query = new InputBag(['accessToken' => $token]);
         $this->request
             ->expects($this->atLeastOnce())
             ->method('getRawUri')
@@ -321,10 +156,6 @@ class AccessTokenTest extends ListenerTests
             ->with('X-Imbo-ShortUrl')
             ->willReturn(true);
 
-        $this->query
-            ->expects($this->never())
-            ->method('has');
-
         $this->listener->checkAccessToken($this->event);
     }
 
@@ -343,18 +174,6 @@ class AccessTokenTest extends ListenerTests
         foreach (['http', 'https'] as $signedProtocol) {
             $token = hash_hmac('sha256', $signedProtocol . ':' . $baseUrl, $privateKey);
 
-            /** @var InputBag&MockObject */
-            $query = $this->createMock(ParameterBag::class);
-            $query
-                ->method('has')
-                ->with('accessToken')
-                ->willReturn(true);
-
-            $query
-                ->method('get')
-                ->with('accessToken')
-                ->willReturn($token);
-
             foreach (['http', 'https'] as $protocol) {
                 $url = $protocol . ':' . $baseUrl . '&accessToken=' . $token;
 
@@ -363,7 +182,7 @@ class AccessTokenTest extends ListenerTests
                     'getUriAsIs' => $url,
                     'getPublicKey' => 'some-key',
                 ]);
-                $request->query = $query;
+                $request->query = new InputBag(['accessToken' => $token]);
 
                 $event = $this->createConfiguredMock(Event::class, [
                     'getAccessControl' => $this->accessControl,
@@ -397,18 +216,7 @@ class AccessTokenTest extends ListenerTests
             'accessTokenGenerator' => new AccessToken\SHA256(['argumentKeys' => ['foo']]),
         ]);
 
-        $this->query
-            ->expects($this->once())
-            ->method('has')
-            ->with('foo')
-            ->willReturn(true);
-
-        $this->query
-            ->expects($this->once())
-            ->method('get')
-            ->with('foo')
-            ->willReturn($token);
-
+        $this->request->query = new InputBag(['foo' => $token]);
         $this->request
             ->expects($this->atLeastOnce())
             ->method('getRawUri')
@@ -430,42 +238,6 @@ class AccessTokenTest extends ListenerTests
             ->willReturn($privateKey);
 
         $listener->checkAccessToken($this->event);
-    }
-
-    public static function getAccessTokensForMultipleGenerator(): array
-    {
-        $tokens = [];
-
-        foreach (self::getAccessTokens() as $token) {
-            $token[] = 'accessToken';
-            $tokens[] = $token;
-        }
-
-        $tokens = array_merge($tokens, [
-            [
-                'http://imbo/users/imbo/images/foobar?t%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50',
-                'dummy',
-                'foo',
-                true,
-                'dummy',
-            ],
-            [
-                'http://imbo/users/imbo/images/foobar?t%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50123',
-                'dummy',
-                'foobar',
-                true,
-                'dummy',
-            ],
-            [
-                'http://imbo/users/imbo/images/foobar?t%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50123',
-                'boop',
-                'foobar',
-                false,
-                'dummy',
-            ],
-        ]);
-
-        return $tokens;
     }
 
     /**
@@ -494,22 +266,7 @@ class AccessTokenTest extends ListenerTests
             ]),
         ]);
 
-        // Allows us to return 'false' as default if the key isn't present
-        $this->query
-            ->expects($this->atLeastOnce())
-            ->method('has')
-            ->with($this->logicalOr(
-                $this->equalTo($argumentKey),
-                $this->anything(),
-            ))
-            ->willReturnCallback(fn (string $val): bool => $val === $argumentKey);
-
-        $this->query
-            ->expects($this->atLeastOnce())
-            ->method('get')
-            ->with($argumentKey)
-            ->willReturn($token);
-
+        $this->request->query = new InputBag([$argumentKey => $token]);
         $this->request
             ->expects($this->atLeastOnce())
             ->method('getRawUri')
@@ -543,62 +300,6 @@ class AccessTokenTest extends ListenerTests
         new AccessToken(['accessTokenGenerator' => new StdClass()]);
     }
 
-    public static function getRewrittenAccessTokenData(): array
-    {
-        $getAccessToken = function (string $url): string {
-            return hash_hmac('sha256', $url, 'foobar');
-        };
-
-        return [
-            [
-                // Access token created from URL
-                $getAccessToken('http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
-                // URL returned by Imbo
-                'http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
-                // Protocol which Imbo is configured to rewrite incoming URL to
-                'http',
-                // Should it accept the access token as correct?
-                true,
-            ],
-            [
-                $getAccessToken('http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
-                'https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
-                'http',
-                true,
-            ],
-            [
-                $getAccessToken('https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
-                'https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
-                'http',
-                false,
-            ],
-            [
-                $getAccessToken('https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
-                'http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
-                'http',
-                false,
-            ],
-            [
-                $getAccessToken('https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
-                'http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
-                'https',
-                true,
-            ],
-            [
-                $getAccessToken('https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
-                'https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
-                'https',
-                true,
-            ],
-            [
-                $getAccessToken('http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
-                'https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
-                'https',
-                false,
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getRewrittenAccessTokenData
      * @covers ::checkAccessToken
@@ -617,16 +318,7 @@ class AccessTokenTest extends ListenerTests
 
         $url = $url . '&accessToken=' . $accessToken;
 
-        $this->query
-            ->method('has')
-            ->with('accessToken')
-            ->willReturn(true);
-
-        $this->query
-            ->method('get')
-            ->with('accessToken')
-            ->willReturn($accessToken);
-
+        $this->request->query = new InputBag(['accessToken' => $accessToken]);
         $this->request
             ->method('getRawUri')
             ->willReturn(urldecode($url));
@@ -649,9 +341,9 @@ class AccessTokenTest extends ListenerTests
         );
     }
 
-    protected function getEventMock(array $config = null): Event
+    protected function getEventMock(array $config = null): EventInterface&MockObject
     {
-        return $this->createConfiguredMock(Event::class, [
+        return $this->createConfiguredMock(EventInterface::class, [
             'getAccessControl' => $this->accessControl,
             'getRequest'       => $this->request,
             'getResponse'      => $this->response,
@@ -661,5 +353,234 @@ class AccessTokenTest extends ListenerTests
                 ],
             ],
         ]);
+    }
+
+    /**
+     * @return array<array{filter:array{transformations?:array{whitelist?:array<string>,blacklist?:array<string>}},transformations:array<array{name:string,params:array}>,whitelisted:bool}>
+     */
+    public static function getFilterData(): array
+    {
+        return [
+            'no filter and no transformations' => [
+                'filter' => [],
+                'transformations' => [],
+                'whitelisted' => false,
+            ],
+            // @see https://github.com/imbo/imbo/issues/258
+            'configured filters, but no transformations in the request' => [
+                'filter' => ['transformations' => ['whitelist' => ['border']]],
+                'transformations' => [],
+                'whitelisted' => false,
+            ],
+            [
+                'filter' => [],
+                'transformations' => [
+                    ['name' => 'border', 'params' => []],
+                ],
+                'whitelisted' => false,
+            ],
+            [
+                'filter' => ['transformations' => ['whitelist' => ['border']]],
+                'transformations' => [
+                    ['name' => 'border', 'params' => []],
+                ],
+                'whitelisted' => true,
+            ],
+            [
+                'filter' => ['transformations' => ['whitelist' => ['border']]],
+                'transformations' => [
+                    ['name' => 'border', 'params' => []],
+                    ['name' => 'thumbnail', 'params' => []],
+                ],
+                'whitelisted' => false,
+            ],
+            [
+                'filter' => ['transformations' => ['blacklist' => ['border']]],
+                'transformations' => [
+                    ['name' => 'thumbnail', 'params' => []],
+                ],
+                'whitelisted' => true,
+            ],
+            [
+                'filter' => ['transformations' => ['blacklist' => ['border']]],
+                'transformations' => [
+                    ['name' => 'border', 'params' => []],
+                    ['name' => 'thumbnail', 'params' => []],
+                ],
+                'whitelisted' => false,
+            ],
+            [
+                'filter' => ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['thumbnail']]],
+                'transformations' => [
+                    ['name' => 'border', 'params' => []],
+                ],
+                'whitelisted' => true,
+            ],
+            [
+                'filter' => ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['thumbnail']]],
+                'transformations' => [
+                    ['name' => 'canvas', 'params' => []],
+                ],
+                'whitelisted' => false,
+            ],
+            [
+                'filter' => ['transformations' => ['whitelist' => ['border'], 'blacklist' => ['border']]],
+                'transformations' => [
+                    ['name' => 'border', 'params' => []],
+                ],
+                'whitelisted' => false,
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{url:string,token:string,privateKey:string,correct:bool}>
+     */
+    public static function getAccessTokens(): array
+    {
+        return [
+            [
+                'url' => 'http://imbo/users/christer',
+                'token' => 'some access token',
+                'privateKey' => 'private key',
+                'correct' => false,
+            ],
+            [
+                'url' => 'http://imbo/users/christer',
+                'token' => '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a',
+                'privateKey' => 'private key',
+                'correct' => true,
+            ],
+            [
+                'url' => 'http://imbo/users/christer',
+                'token' => '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a',
+                'privateKey' => 'other private key',
+                'correct' => false,
+            ],
+            // Test that checking URL "as is" works properly. This is for backwards compatibility.
+            [
+                'url' => 'http://imbo/users/christer?t[]=thumbnail%3Awidth%3D40%2Cheight%3D40%2Cfit%3Doutbound',
+                'token' => 'f0166cb4f7c8eabbe82c5d753f681ed53bcfa10391d4966afcfff5806cc2bff4',
+                'privateKey' => 'some random private key',
+                'correct' => true,
+            ],
+            // Test checking URL against incorrect protocol
+            [
+                'url' => 'https://imbo/users/christer',
+                'token' => '81b52f01115401e5bcd0b65b625258510f8823e0b3189c13d279f84c4eb0ac3a',
+                'privateKey' => 'private key',
+                'correct' => false,
+            ],
+            // Test that URLs with t[0] and t[] can use the same accessToken
+            [
+                'url' => 'http://imbo/users/imbo/images/foobar?t%5B0%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B1%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50',
+                'token' => '1ae7643a70e68377502c30ba54d0ffbfedd67a1f3c4b3f038a42c0ed17ad3551',
+                'privateKey' => 'foo',
+                'correct' => true,
+            ],
+            [
+                'url' => 'http://imbo/users/imbo/images/foobar?t%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50',
+                'token' => '1ae7643a70e68377502c30ba54d0ffbfedd67a1f3c4b3f038a42c0ed17ad3551',
+                'privateKey' => 'foo',
+                'correct' => true,
+            ],
+            // and that they still break if something else is changed
+            [
+                'url' => 'http://imbo/users/imbo/images/foobar?g%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50',
+                'token' => '1ae7643a70e68377502c30ba54d0ffbfedd67a1f3c4b3f038a42c0ed17ad3551',
+                'privateKey' => 'foo',
+                'correct' => false,
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{url:string,token:string,privateKey:string,correct:bool,argumentKey:string}>
+     */
+    public static function getAccessTokensForMultipleGenerator(): array
+    {
+        $tokens = [];
+
+        foreach (self::getAccessTokens() as $token) {
+            $token['argumentKey'] = 'accessToken';
+            $tokens[] = $token;
+        }
+
+        return array_merge($tokens, [
+            [
+                'url' => 'http://imbo/users/imbo/images/foobar?t%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50',
+                'token' => 'dummy',
+                'privateKey' => 'foo',
+                'correct' => true,
+                'argumentKey' => 'dummy',
+            ],
+            [
+                'url' => 'http://imbo/users/imbo/images/foobar?t%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50123',
+                'token' => 'dummy',
+                'privateKey' => 'foobar',
+                'correct' => true,
+                'argumentKey' => 'dummy',
+            ],
+            [
+                'url' => 'http://imbo/users/imbo/images/foobar?t%5B%5D=maxSize%3Awidth%3D400%2Cheight%3D400&t%5B%5D=crop%3Ax%3D50%2Cy%3D50%2Cwidth%3D50%2Cheight%3D50123',
+                'token' => 'boop',
+                'privateKey' => 'foobar',
+                'correct' => false,
+                'argumentKey' => 'dummy',
+            ],
+        ]);
+    }
+
+    /**
+     * @return array<array{accessToken:string,url:string,protocol:string,correct:bool}>
+     */
+    public static function getRewrittenAccessTokenData(): array
+    {
+        $getAccessToken = fn (string $url): string => hash_hmac('sha256', $url, 'foobar');
+
+        return [
+            [
+                'accessToken' => $getAccessToken('http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
+                'url' => 'http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
+                'protocol' => 'http',
+                'correct' => true,
+            ],
+            [
+                'accessToken' => $getAccessToken('http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
+                'url' => 'https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
+                'protocol' => 'http',
+                'correct' => true,
+            ],
+            [
+                'accessToken' => $getAccessToken('https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
+                'url' => 'https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
+                'protocol' => 'http',
+                'correct' => false,
+            ],
+            [
+                'accessToken' => $getAccessToken('https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
+                'url' => 'http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
+                'protocol' => 'http',
+                'correct' => false,
+            ],
+            [
+                'accessToken' => $getAccessToken('https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
+                'url' => 'http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
+                'protocol' => 'https',
+                'correct' => true,
+            ],
+            [
+                'accessToken' => $getAccessToken('https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
+                'url' => 'https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
+                'protocol' => 'https',
+                'correct' => true,
+            ],
+            [
+                'accessToken' => $getAccessToken('http://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240'),
+                'url' => 'https://imbo/users/espen/img.png?t[]=smartSize:width=320,height=240',
+                'protocol' => 'https',
+                'correct' => false,
+            ],
+        ];
     }
 }

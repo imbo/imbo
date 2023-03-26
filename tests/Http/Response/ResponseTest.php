@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ResponseTest extends TestCase
 {
-    private $response;
+    private Response $response;
 
     public function setUp(): void
     {

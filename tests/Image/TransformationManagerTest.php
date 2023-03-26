@@ -5,28 +5,30 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\InputBag;
 
 /**
  * @coversDefaultClass Imbo\Image\TransformationManager
  */
 class TransformationManagerTest extends TestCase
 {
-    protected $manager;
-    protected $request;
-    protected $response;
-    protected $event;
-    protected $query;
-    protected $image;
-    private $config;
+    protected TransformationManager $manager;
+    protected Request $request;
+    protected Response&MockObject $response;
+    protected EventInterface&MockObject $event;
+    protected InputBag $query;
+    protected Image&MockObject $image;
+    private array $config;
 
     public function setUp(): void
     {
+        /** @var array{transformations:array<string,class-string>} */
         $this->config = require __DIR__ . '/../../config/config.default.php';
         $this->manager = new TransformationManager();
         $this->manager->addTransformations($this->config['transformations']);
-        $this->query = new ParameterBag([]);
+        $this->query = new InputBag([]);
         $this->request = new Request();
         $this->request->query = $this->query;
 
@@ -52,7 +54,7 @@ class TransformationManagerTest extends TestCase
     {
         $this->query->set('t', ['maxSize:width=1024']);
         $minimum = $this->manager->getMinimumImageInputSize($this->event);
-
+        $this->assertIsArray($minimum);
         $this->assertSame(1024, $minimum['width']);
         $this->assertSame(576, $minimum['height']);
     }
@@ -64,14 +66,14 @@ class TransformationManagerTest extends TestCase
     {
         $this->query->set('t', ['maxSize:width=1024', 'maxSize:height=620']);
         $minimum = $this->manager->getMinimumImageInputSize($this->event);
-
+        $this->assertIsArray($minimum);
         $this->assertSame(1024, $minimum['width']);
         $this->assertSame(576, $minimum['height']);
 
         // Regardless of order
         $this->query->set('t', ['maxSize:height=620', 'maxSize:width=1024']);
         $minimum = $this->manager->getMinimumImageInputSize($this->event);
-
+        $this->assertIsArray($minimum);
         $this->assertSame(1024, $minimum['width']);
         $this->assertSame(576, $minimum['height']);
     }
@@ -83,7 +85,7 @@ class TransformationManagerTest extends TestCase
     {
         $this->query->set('t', ['rotate:angle=90', 'maxSize:width=600']);
         $minimum = $this->manager->getMinimumImageInputSize($this->event);
-
+        $this->assertIsArray($minimum);
         $this->assertSame(1067, $minimum['width']);
         $this->assertSame(600, $minimum['height']);
     }
@@ -101,7 +103,7 @@ class TransformationManagerTest extends TestCase
         ]);
 
         $minimum = $this->manager->getMinimumImageInputSize($this->event);
-
+        $this->assertIsArray($minimum);
         $this->assertSame(320, $minimum['width']);
         $this->assertSame(180, $minimum['height']);
     }
@@ -132,6 +134,7 @@ class TransformationManagerTest extends TestCase
         // Sanity check for the test that follows
         $this->query->set('t', ['maxSize:width=750', 'maxSize:width=320']);
         $minimum = $this->manager->getMinimumImageInputSize($this->event);
+        $this->assertIsArray($minimum);
         $this->assertSame(320, $minimum['width']);
     }
 
@@ -143,6 +146,7 @@ class TransformationManagerTest extends TestCase
         $this->query->set('t', ['maxSize:width=750', 'rotate:angle=17.3', 'maxSize:width=320']);
 
         $minimum = $this->manager->getMinimumImageInputSize($this->event);
+        $this->assertIsArray($minimum);
         $this->assertSame(750, $minimum['width']);
         $this->assertSame(422, $minimum['height']);
     }
@@ -155,6 +159,7 @@ class TransformationManagerTest extends TestCase
         $this->query->set('t', ['crop:width=784,height=700,x=384,y=200', 'maxSize:width=320']);
 
         $minimum = $this->manager->getMinimumImageInputSize($this->event);
+        $this->assertIsArray($minimum);
         $this->assertSame(654, $minimum['width']);
         $this->assertSame(368, $minimum['height']);
     }

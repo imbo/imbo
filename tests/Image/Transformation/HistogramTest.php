@@ -3,6 +3,7 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Histogram
@@ -14,16 +15,6 @@ class HistogramTest extends TransformationTests
         return new Histogram();
     }
 
-    public static function getHistogramParameters(): array
-    {
-        return [
-            [1, 256],
-            [2, 512],
-            [4, 1024],
-            [8, 2048],
-        ];
-    }
-
     /**
      * @dataProvider getHistogramParameters
      * @covers ::transform
@@ -32,6 +23,7 @@ class HistogramTest extends TransformationTests
     {
         $blob = file_get_contents(FIXTURES_DIR . '/512x512.png');
 
+        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getBlob' => $blob,
             'getWidth' => 512,
@@ -64,5 +56,30 @@ class HistogramTest extends TransformationTests
             ->transform([
                 'scale' => $scale,
             ]);
+    }
+
+    /**
+     * @return array<array{scale:int,resultingWidth:int}>
+     */
+    public static function getHistogramParameters(): array
+    {
+        return [
+            [
+                'scale' => 1,
+                'resultingWidth' => 256,
+            ],
+            [
+                'scale' => 2,
+                'resultingWidth' => 512,
+            ],
+            [
+                'scale' => 4,
+                'resultingWidth' => 1024,
+            ],
+            [
+                'scale' => 8,
+                'resultingWidth' => 2048,
+            ],
+        ];
     }
 }

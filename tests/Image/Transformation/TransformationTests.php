@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 
 abstract class TransformationTests extends TestCase
 {
-    abstract protected function getTransformation();
+    abstract protected function getTransformation(): Transformation;
 
     /**
      * @covers ::getSubscribedEvents

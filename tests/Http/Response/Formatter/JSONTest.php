@@ -16,6 +16,7 @@ use Imbo\Model\Metadata;
 use Imbo\Model\Stats;
 use Imbo\Model\Status;
 use Imbo\Model\User;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -23,9 +24,8 @@ use PHPUnit\Framework\TestCase;
  */
 class JSONTest extends TestCase
 {
-    private $formatter;
-
-    private $dateFormatter;
+    private JSON $formatter;
+    private DateFormatter&MockObject $dateFormatter;
 
     public function setUp(): void
     {
@@ -67,6 +67,7 @@ class JSONTest extends TestCase
 
         $json = $this->formatter->format($model);
 
+        /** @var array{error:array{date:string,message:string,code:int,imboErrorCode:int},imageIdentifier:string} */
         $data = json_decode($json, true);
         $this->assertSame($formattedDate, $data['error']['date']);
         $this->assertSame('Public key not found', $data['error']['message']);
@@ -89,6 +90,7 @@ class JSONTest extends TestCase
 
         $json = $this->formatter->format($model);
 
+        /** @var array{imageIdentifier:string} */
         $data = json_decode($json, true);
         $this->assertArrayNotHasKey('imageIdentifier', $data);
     }
@@ -116,6 +118,7 @@ class JSONTest extends TestCase
 
         $json = $this->formatter->format($model);
 
+        /** @var array{date:string,database:bool,storage:bool} */
         $data = json_decode($json, true);
         $this->assertSame($formattedDate, $data['date']);
         $this->assertTrue($data['database']);
@@ -145,6 +148,7 @@ class JSONTest extends TestCase
 
         $json = $this->formatter->format($model);
 
+        /** @var array{lastModified:string,user:string,numImages:int} */
         $data = json_decode($json, true);
         $this->assertSame($formattedDate, $data['lastModified']);
         $this->assertSame('christer', $data['user']);
@@ -207,6 +211,29 @@ class JSONTest extends TestCase
 
         $json = $this->formatter->format($model);
 
+        /**
+         * @var array{
+         *   search:array{
+         *     hits:int,
+         *     page:int,
+         *     limit:int,
+         *     count:int
+         *   },
+         *   images:array<array{
+         *     added:string,
+         *     updated:string,
+         *     user:string,
+         *     size:int,
+         *     width:int,
+         *     height:int,
+         *     imageIdentifier:string,
+         *     checksum:string,
+         *     extension:string,
+         *     mime:string,
+         *     metadata:array
+         *   }>
+         * }
+         */
         $data = json_decode($json, true);
         $this->assertSame(['hits' => 100, 'page' => 2, 'limit' => 20, 'count' => 1], $data['search']);
         $this->assertCount(1, $data['images']);
@@ -238,6 +265,7 @@ class JSONTest extends TestCase
         ]);
 
         $images = [$image];
+        /** @var Images&MockObject */
         $model = $this->createMock(Images::class);
         $model
             ->expects($this->once())
@@ -246,6 +274,7 @@ class JSONTest extends TestCase
 
         $json = $this->formatter->format($model);
 
+        /** @var array{images:array<array{metadata:array}>} */
         $data = json_decode($json, true);
         $this->assertCount(1, $data['images']);
         $image = $data['images'][0];
@@ -266,6 +295,7 @@ class JSONTest extends TestCase
         ]);
 
         $images = [$image];
+        /** @var Images&MockObject */
         $model = $this->createMock(Images::class);
         $model
             ->expects($this->once())
@@ -274,6 +304,7 @@ class JSONTest extends TestCase
 
         $json = $this->formatter->format($model);
 
+        /** @var array{images:array<array{metadata:array}>} */
         $data = json_decode($json, true);
         $this->assertCount(1, $data['images']);
         $image = $data['images'][0];
@@ -287,6 +318,7 @@ class JSONTest extends TestCase
      */
     public function testCanFormatAnImagesModelWithNoImages(): void
     {
+        /** @var Images&MockObject */
         $model = $this->createMock(Images::class);
         $model
             ->expects($this->once())
@@ -295,6 +327,7 @@ class JSONTest extends TestCase
 
         $json = $this->formatter->format($model);
 
+        /** @var array{images:array} */
         $data = json_decode($json, true);
         $this->assertCount(0, $data['images']);
     }
@@ -311,6 +344,7 @@ class JSONTest extends TestCase
         ]);
 
         $images = [$image];
+        /** @var Images&MockObject */
         $model = $this->createMock(Images::class);
         $model
             ->expects($this->once())
@@ -325,6 +359,7 @@ class JSONTest extends TestCase
 
         $json = $this->formatter->format($model);
 
+        /** @var array{images:array<array<string,mixed>>} */
         $data = json_decode($json, true);
         $this->assertCount(1, $data['images']);
         $image = $data['images'][0];
@@ -352,6 +387,7 @@ class JSONTest extends TestCase
 
         $json = $this->formatter->format($model);
 
+        /** @var array<string,string> */
         $data = json_decode($json, true);
         $this->assertSame($data, $metadata);
     }
@@ -518,37 +554,12 @@ class JSONTest extends TestCase
         $this->assertSame('[{"id":1,"group":"group","users":["user1","user2"]},{"id":2,"resources":["image.get","image.head"],"users":["user3","user4"]}]', $this->formatter->format($model));
     }
 
-    public static function getStats(): array
-    {
-        return [
-            'no-custom-stats' => [
-                1,
-                2,
-                3,
-                [],
-                '{"numImages":1,"numUsers":2,"numBytes":3,"custom":{}}',
-            ],
-            'custom-stats' => [
-                4,
-                5,
-                6,
-                [
-                    'foo' => 'bar',
-                    'bar' => [
-                        'foobar' => 'foooo',
-                    ],
-                ],
-                '{"numImages":4,"numUsers":5,"numBytes":6,"custom":{"foo":"bar","bar":{"foobar":"foooo"}}}',
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getStats
      * @covers Imbo\Http\Response\Formatter\Formatter::format
      * @covers ::formatStats
      */
-    public function testCanFormatAStatsModel($images, $users, $bytes, $customStats, $expectedJson): void
+    public function testCanFormatAStatsModel(int $images, int $users, int $bytes, array $customStats, string $expectedJson): void
     {
         $model = $this->createConfiguredMock(Stats::class, [
             'getNumImages' => $images,
@@ -561,5 +572,33 @@ class JSONTest extends TestCase
             $this->formatter->format($model),
             $expectedJson,
         );
+    }
+
+    /**
+     * @return array<string,array{images:int,users:int,bytes:int,customStats:array,expectedJson:string}>
+     */
+    public static function getStats(): array
+    {
+        return [
+            'no-custom-stats' => [
+                'images' => 1,
+                'users' => 2,
+                'bytes' => 3,
+                'customStats' => [],
+                'expectedJson' => '{"numImages":1,"numUsers":2,"numBytes":3,"custom":{}}',
+            ],
+            'custom-stats' => [
+                'images' => 4,
+                'users' => 5,
+                'bytes' => 6,
+                'customStats' => [
+                    'foo' => 'bar',
+                    'bar' => [
+                        'foobar' => 'foooo',
+                    ],
+                ],
+                'expectedJson' => '{"numImages":4,"numUsers":5,"numBytes":6,"custom":{"foo":"bar","bar":{"foobar":"foooo"}}}',
+            ],
+        ];
     }
 }

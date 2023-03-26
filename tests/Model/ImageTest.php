@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ImageTest extends TestCase
 {
-    private $image;
+    private Image $image;
 
     public function setUp(): void
     {

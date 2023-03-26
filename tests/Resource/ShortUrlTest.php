@@ -8,17 +8,18 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
 use Imbo\Router\Route;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass Imbo\Resource\ShortUrl
  */
 class ShortUrlTest extends ResourceTests
 {
-    private $request;
-    private $route;
-    private $response;
-    private $database;
-    private $event;
+    private Request&MockObject $request;
+    private Route&MockObject $route;
+    private Response&MockObject $response;
+    private DatabaseInterface&MockObject $database;
+    private EventInterface&MockObject $event;
 
     protected function getNewResource(): ShortUrl
     {
@@ -27,7 +28,6 @@ class ShortUrlTest extends ResourceTests
 
     public function setUp(): void
     {
-        $this->resource = $this->getNewResource();
         $this->route = $this->createMock(Route::class);
         $this->request = $this->createConfiguredMock(Request::class, [
             'getRoute' => $this->route,

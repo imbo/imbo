@@ -14,32 +14,33 @@ use Imbo\Model\Image;
 use Imbo\Model\ModelInterface;
 use Imbo\Model\Stats;
 use Imbo\Router\Route;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\HeaderBag;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\InputBag;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
  * @coversDefaultClass Imbo\Http\Response\ResponseFormatter
  */
 class ResponseFormatterTest extends TestCase
 {
-    private $responseFormatter;
-    private $formatters;
-    private $contentNegotiation;
-    private $formatter;
-    private $request;
-    private $response;
-    private $event;
-    private $outputConverterManager;
-    private $transformationManager;
+    private ResponseFormatter $responseFormatter;
+    private array $formatters;
+    private ContentNegotiation&MockObject $contentNegotiation;
+    private FormatterInterface&MockObject $formatter;
+    private Request&MockObject $request;
+    private Response&MockObject $response;
+    private EventInterface&MockObject $event;
+    private OutputConverterManager&MockObject $outputConverterManager;
+    private TransformationManager&MockObject $transformationManager;
 
     public function setUp(): void
     {
         $defaultSupported = [];
 
         foreach ($this->getOriginalMimeTypes() as $type) {
-            $defaultSupported[$type[0]] = $type[1];
+            $defaultSupported[$type['originalMimeType']] = $type['expectedFormatter'];
         }
 
         $this->outputConverterManager = $this->createConfiguredMock(OutputConverterManager::class, [
@@ -47,15 +48,9 @@ class ResponseFormatterTest extends TestCase
             'getExtensionToMimetypeMap' => array_flip($defaultSupported),
             'getSupportedMimetypes' => array_keys($defaultSupported),
             'getSupportedExtensions' => array_values($defaultSupported),
-            'supportsExtension' => $this->returnCallback(function ($ext) use ($defaultSupported) {
-                return in_array($ext, $defaultSupported);
-            }),
-            'getMimetypeFromExtension' => $this->returnCallback(function ($ext) use ($defaultSupported) {
-                return array_search($ext, $defaultSupported) ?: null;
-            }),
-            'getExtensionFromMimetype' => $this->returnCallback(function ($ext) use ($defaultSupported) {
-                return isset($defaultSupported[$ext]) ? $defaultSupported[$ext] : null;
-            }),
+            'supportsExtension' => $this->returnCallback(fn (?string $ext): bool => null !== $ext && in_array($ext, $defaultSupported)),
+            'getMimetypeFromExtension' => $this->returnCallback(fn (string $ext): ?string => array_search($ext, $defaultSupported) ?: null),
+            'getExtensionFromMimetype' => $this->returnCallback(fn (string $ext): ?string => isset($defaultSupported[$ext]) ? $defaultSupported[$ext] : null),
         ]);
 
         $this->transformationManager = $this->createConfiguredMock(TransformationManager::class, [
@@ -130,21 +125,11 @@ class ResponseFormatterTest extends TestCase
         $this->responseFormatter->format($this->event);
     }
 
-    public static function getJsonpTriggers(): array
-    {
-        return [
-            ['callback', 'func', 'application/json'],
-            ['json', 'func', 'application/json'],
-            ['jsonp', 'func', 'application/json'],
-            ['function', 'func', 'application/json', false],
-        ];
-    }
-
     /**
      * @dataProvider getJsonpTriggers
      * @covers ::format
      */
-    public function testCanWrapJsonDataInSpecifiedCallback($param, $callback, $contentType, $valid = true): void
+    public function testCanWrapJsonDataInSpecifiedCallback(string $param, string $callback, bool $valid = true): void
     {
         $json = '{"key":"value"}';
         $expectedContent = $json;
@@ -164,24 +149,21 @@ class ResponseFormatterTest extends TestCase
         $this->formatter
             ->expects($this->once())
             ->method('getContentType')
-            ->willReturn($contentType);
+            ->willReturn('application/json');
 
-        $query = new ParameterBag([
-            $param => $callback,
-        ]);
-
+        $this->request->query = new InputBag([$param => $callback]);
         $this->request
             ->expects($this->once())
             ->method('getMethod')
             ->willReturn('GET');
 
-        $this->request->query = $query;
-        $this->response->headers = $this->createMock(HeaderBag::class);
+        /** @var ResponseHeaderBag&MockObject */
+        $this->response->headers = $this->createMock(ResponseHeaderBag::class);
         $this->response->headers
             ->expects($this->once())
             ->method('add')
             ->with([
-                'Content-Type' => $contentType,
+                'Content-Type' => 'application/json',
                 'Content-Length' => strlen($expectedContent),
             ]);
 
@@ -260,14 +242,14 @@ class ResponseFormatterTest extends TestCase
             ->expects($this->never())
             ->method('setContent');
 
-        $this->response->headers = $this->createMock(HeaderBag::class);
+        $this->response->headers = $this->createMock(ResponseHeaderBag::class);
 
         $this->request
             ->expects($this->once())
             ->method('getMethod')
             ->willReturn('HEAD');
 
-        $this->request->query = $this->createMock(ParameterBagInterface::class);
+        $this->request->query = new InputBag();
 
         $this->formatter
             ->expects($this->once())
@@ -303,6 +285,7 @@ class ResponseFormatterTest extends TestCase
             ->method('getModel')
             ->willReturn($this->createMock(Image::class));
 
+        /** @var HeaderBag&MockObject */
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
             ->expects($this->once())
@@ -327,6 +310,7 @@ class ResponseFormatterTest extends TestCase
             ->with('noStrict')
             ->willReturn(true);
 
+        /** @var HeaderBag&MockObject */
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
             ->expects($this->once())
@@ -360,6 +344,7 @@ class ResponseFormatterTest extends TestCase
      */
     public function testPicksThePrioritizedMediaTypeIfMoreThanOneWithSameQualityAreSupportedByTheUserAgent(): void
     {
+        /** @var HeaderBag&MockObject */
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
             ->expects($this->once())
@@ -388,20 +373,11 @@ class ResponseFormatterTest extends TestCase
         $this->assertSame('json', $this->responseFormatter->getFormatter());
     }
 
-    public static function getOriginalMimeTypes(): array
-    {
-        return [
-            'jpg' => ['image/jpeg', 'jpg'],
-            'gif' => ['image/gif', 'gif'],
-            'png' => ['image/png', 'png'],
-        ];
-    }
-
     /**
      * @dataProvider getOriginalMimeTypes
      * @covers ::negotiate
      */
-    public function testUsesTheOriginalMimeTypeOfTheImageIfTheClientHasNoPreference($originalMimeType, $expectedFormatter): void
+    public function testUsesTheOriginalMimeTypeOfTheImageIfTheClientHasNoPreference(string $originalMimeType, string $expectedFormatter): void
     {
         // Use a real object since the code we are testing uses get_class(), which won't work as
         // expected when the object used is a mock
@@ -409,6 +385,7 @@ class ResponseFormatterTest extends TestCase
         $image->setMimeType($originalMimeType);
         $image->setExtension($expectedFormatter);
 
+        /** @var HeaderBag&MockObject */
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
             ->expects($this->once())
@@ -441,7 +418,7 @@ class ResponseFormatterTest extends TestCase
      * @dataProvider getOriginalMimeTypes
      * @covers ::negotiate
      */
-    public function testUsesTheOriginalMimeTypeOfTheImageIfConfigDisablesContentNegotiationForImages($originalMimeType, $expectedFormatter): void
+    public function testUsesTheOriginalMimeTypeOfTheImageIfConfigDisablesContentNegotiationForImages(string $originalMimeType, string $expectedFormatter): void
     {
         // Use a real object since the code we are testing uses get_class(), which won't work as
         // expected when the object used is a mock
@@ -476,23 +453,16 @@ class ResponseFormatterTest extends TestCase
         $this->assertSame($expectedFormatter, $this->responseFormatter->getFormatter());
     }
 
-    public static function getImageResources(): array
-    {
-        return [
-            'image' => ['image'],
-            'global short url' => ['globalshorturl'],
-        ];
-    }
-
     /**
      * @dataProvider getImageResources
      * @covers ::negotiate
      */
-    public function testForcesContentNegotiationOnErrorModelsWhenResourceIsAnImage($routeName): void
+    public function testForcesContentNegotiationOnErrorModelsWhenResourceIsAnImage(string $routeName): void
     {
         $route = new Route();
         $route->setName($routeName);
 
+        /** @var HeaderBag&MockObject */
         $this->request->headers = $this->createMock(HeaderBag::class);
         $this->request->headers
             ->expects($this->once())
@@ -565,6 +535,7 @@ class ResponseFormatterTest extends TestCase
      */
     public function testTriggersAConversionTransformationIfNeededWhenTheModelIsAnImage(): void
     {
+        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getMimeType' => 'image/jpeg',
         ]);
@@ -578,9 +549,10 @@ class ResponseFormatterTest extends TestCase
             ->method('getModel')
             ->willReturn($image);
 
-        $this->response->headers = $this->createMock(HeaderBag::class);
+        $this->response->headers = $this->createMock(ResponseHeaderBag::class);
         $this->responseFormatter->setFormatter('png');
 
+        /** @var EventManager&MockObject */
         $eventManager = $this->createMock(EventManager::class);
         $eventManager
             ->method('trigger')
@@ -613,9 +585,10 @@ class ResponseFormatterTest extends TestCase
             ->method('getModel')
             ->willReturn($image);
 
-        $this->response->headers = $this->createMock(HeaderBag::class);
+        $this->response->headers = $this->createMock(ResponseHeaderBag::class);
         $this->responseFormatter->setFormatter('jpg');
 
+        /** @var EventManager&MockObject */
         $eventManager = $this->createMock(EventManager::class);
         $eventManager
             ->expects($this->once())
@@ -632,5 +605,67 @@ class ResponseFormatterTest extends TestCase
             ->willReturn($eventManager);
 
         $this->responseFormatter->format($this->event);
+    }
+
+    /**
+     * @return array<string,array{param:string,callback:string,valid?:bool}>
+     */
+    public static function getJsonpTriggers(): array
+    {
+        return [
+            'callback' => [
+                'param' => 'callback',
+                'callback' => 'func',
+            ],
+            'json' => [
+                'param' => 'json',
+                'callback' => 'func',
+            ],
+            'jsonp' => [
+                'param' => 'jsonp',
+                'callback' => 'func',
+            ],
+            'function' => [
+                'param' => 'function',
+                'callback' => 'func',
+                'valid' => false,
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string,array{originalMimeType:string,expectedFormatter:string}>
+     */
+    public static function getOriginalMimeTypes(): array
+    {
+        return [
+            'jpg' => [
+                'originalMimeType' => 'image/jpeg',
+                'expectedFormatter' => 'jpg',
+            ],
+            'gif' => [
+                'originalMimeType' => 'image/gif',
+                'expectedFormatter' => 'gif',
+            ],
+            'png' => [
+                'originalMimeType' => 'image/png',
+                'expectedFormatter' => 'png',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string,array{routeName:string}>
+     */
+    public static function getImageResources(): array
+    {
+        return [
+            'image' => [
+                'routeName' => 'image',
+            ],
+            'global short url' => [
+                'routeName' => 'globalshorturl',
+            ],
+        ];
     }
 }

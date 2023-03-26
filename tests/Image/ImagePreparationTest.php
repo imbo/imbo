@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace Imbo\Image;
 
+use Closure;
 use Imagick;
 use Imbo\Database\DatabaseInterface;
 use Imbo\EventManager\EventInterface;
@@ -9,6 +10,7 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Image\Identifier\Generator\GeneratorInterface;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
@@ -18,16 +20,16 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 class ImagePreparationTest extends TestCase
 {
     private ImagePreparation $prepare;
-    private $request;
-    private $response;
-    private $event;
-    private $config;
-    private $database;
-    private $headers;
-    private $imageIdentifierGenerator;
-    private $inputLoaderManager;
-    private $outputConverterManager;
-    private $imagickLoader;
+    private Request&MockObject $request;
+    private Response&MockObject $response;
+    private EventInterface&MockObject $event;
+    private array $config;
+    private DatabaseInterface&MockObject $database;
+    private ResponseHeaderBag&MockObject $headers;
+    private GeneratorInterface&MockObject $imageIdentifierGenerator;
+    private InputLoaderManager&MockObject $inputLoaderManager;
+    private OutputConverterManager&MockObject $outputConverterManager;
+    private Closure $imagickLoader;
 
     public function setUp(): void
     {
@@ -40,7 +42,6 @@ class ImagePreparationTest extends TestCase
         $this->imagickLoader = function (string $mime, string $data): Imagick {
             $imagick = new Imagick();
             $imagick->readImageBlob($data);
-
             return $imagick;
         };
         $this->outputConverterManager = $this->createMock(OutputConverterManager::class);

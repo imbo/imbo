@@ -103,9 +103,9 @@ class Request extends SymfonyRequest
     /**
      * Get image transformations from the request
      *
-     * @return array
+     * @return array<array{name:string,params:array}>
      */
-    public function getTransformations()
+    public function getTransformations(): array
     {
         if ($this->transformations === null) {
             $this->transformations = [];

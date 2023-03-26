@@ -8,41 +8,20 @@ use PHPUnit\Framework\TestCase;
  */
 class ContentNegotiationTest extends TestCase
 {
-    private $cn;
+    private ContentNegotiation $cn;
 
     public function setUp(): void
     {
         $this->cn = new ContentNegotiation();
     }
 
-    public static function getIsAcceptableData(): array
-    {
-        return [
-            ['image/png', ['image/png' => 1, 'image/*' => 0.9], 1],
-            ['image/png', ['text/html' => 1, '*/*' => 0.9], 0.9],
-            ['image/png', ['text/html' => 1], false],
-            ['image/jpeg', ['application/json' => 1, 'text/*' => 0.9], false],
-            ['application/json', ['text/html;level=1' => 1, 'text/html' => 0.9, '*/*' => 0.8, 'text/html;level=2' => 0.7, 'text/*' => 0.9], 0.8],
-        ];
-    }
-
     /**
      * @dataProvider getIsAcceptableData
      * @covers ::isAcceptable
      */
-    public function testCanCheckIfAMimeTypeIsAcceptable($mimeType, $acceptable, $result): void
+    public function testCanCheckIfAMimeTypeIsAcceptable(string $mimeType, array $acceptable, float|bool $result): void
     {
         $this->assertSame($result, $this->cn->isAcceptable($mimeType, $acceptable));
-    }
-
-    public static function getMimeTypes(): array
-    {
-        return [
-            [['image/png', 'image/gif'], ['image/*' => 1], 'image/png'],
-            [['image/png', 'image/gif'], ['image/png' => 0.9, 'image/gif' => 1], 'image/gif'],
-            [['image/png', 'image/gif'], ['application/json' => 1, 'image/*' => 0.9], 'image/png'],
-            [['image/png', 'image/gif'], ['application/json' => 1], false],
-        ];
     }
 
     /**
@@ -50,8 +29,71 @@ class ContentNegotiationTest extends TestCase
      * @covers ::bestMatch
      * @covers ::isAcceptable
      */
-    public function testCanPickTheBestMatchFromASetOfMimeTypes($mimeTypes, $acceptable, $result): void
+    public function testCanPickTheBestMatchFromASetOfMimeTypes(array $mimeTypes, array $acceptable, string|bool $result): void
     {
         $this->assertSame($result, $this->cn->bestMatch($mimeTypes, $acceptable));
+    }
+
+    /**
+     * @return array<array{mimeType:string,acceptable:array<string,double>,result:double|bool}>
+     */
+    public static function getIsAcceptableData(): array
+    {
+        return [
+            [
+                'mimeType' => 'image/png',
+                'acceptable' => ['image/png' => 1.0, 'image/*' => 0.9],
+                'result' => 1.0,
+            ],
+            [
+                'mimeType' => 'image/png',
+                'acceptable' => ['text/html' => 1, '*/*' => 0.9],
+                'result' => 0.9,
+            ],
+            [
+                'mimeType' => 'image/png',
+                'acceptable' => ['text/html' => 1],
+                'result' => false,
+            ],
+            [
+                'mimeType' => 'image/jpeg',
+                'acceptable' => ['application/json' => 1, 'text/*' => 0.9],
+                'result' => false,
+            ],
+            [
+                'mimeType' => 'application/json',
+                'acceptable' => ['text/html;level=1' => 1, 'text/html' => 0.9, '*/*' => 0.8, 'text/html;level=2' => 0.7, 'text/*' => 0.9],
+                'result' => 0.8,
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{mimeTypes:array<string>,acceptable:array<string,double>,result:string|bool}>
+     */
+    public static function getMimeTypes(): array
+    {
+        return [
+            [
+                'mimeTypes' => ['image/png', 'image/gif'],
+                'acceptable' => ['image/*' => 1],
+                'result' => 'image/png',
+            ],
+            [
+                'mimeTypes' => ['image/png', 'image/gif'],
+                'acceptable' => ['image/png' => 0.9, 'image/gif' => 1],
+                'result' => 'image/gif',
+            ],
+            [
+                'mimeTypes' => ['image/png', 'image/gif'],
+                'acceptable' => ['application/json' => 1, 'image/*' => 0.9],
+                'result' => 'image/png',
+            ],
+            [
+                'mimeTypes' => ['image/png', 'image/gif'],
+                'acceptable' => ['application/json' => 1],
+                'result' => false,
+            ],
+        ];
     }
 }

@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
  */
 class GroupTest extends TestCase
 {
-    private $model;
+    private Group $model;
 
     public function setUp(): void
     {

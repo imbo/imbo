@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ImagesTest extends TestCase
 {
-    private $model;
+    private Images $model;
 
     public function setUp(): void
     {

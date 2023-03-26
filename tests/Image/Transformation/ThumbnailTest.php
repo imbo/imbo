@@ -3,6 +3,7 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Thumbnail
@@ -14,6 +15,46 @@ class ThumbnailTest extends TransformationTests
         return new Thumbnail();
     }
 
+    /**
+     * @dataProvider getThumbnailParams
+     * @covers ::transform
+     */
+    public function testCanTransformImage(array $params, int $width, int $height, int $diff = 0): void
+    {
+        /** @var Image&MockObject */
+        $image = $this->createMock(Image::class);
+        $image
+            ->expects($this->once())
+            ->method('setWidth')
+            ->with($this->callback(function (int $setWidth) use ($width, $diff): bool {
+                return $setWidth <= ($width + $diff) && $setWidth >= ($width - $diff);
+            }))
+            ->willReturn($image);
+
+        $image
+            ->expects($this->once())
+            ->method('setHeight')
+            ->with($this->callback(fn (int $setHeight): bool => $setHeight <= ($height + $diff) && $setHeight >= ($height - $diff)))
+            ->willReturn($image);
+
+        $image
+            ->expects($this->once())
+            ->method('setHasBeenTransformed')
+            ->with(true)
+            ->willReturn($image);
+
+        $imagick = new Imagick();
+        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
+
+        $this->getTransformation()
+            ->setImage($image)
+            ->setImagick($imagick)
+            ->transform($params);
+    }
+
+    /**
+     * @return array<string,array{params:array<string,string|int>,width:int,height:int,diff?:int}>
+     */
     public static function getThumbnailParams(): array
     {
         return [
@@ -55,43 +96,5 @@ class ThumbnailTest extends TransformationTests
                 'height' => 456,
             ],
         ];
-    }
-
-    /**
-     * @dataProvider getThumbnailParams
-     * @covers ::transform
-     */
-    public function testCanTransformImage(array $params, int $width, int $height, int $diff = 0): void
-    {
-        $image = $this->createMock(Image::class);
-        $image
-            ->expects($this->once())
-            ->method('setWidth')
-            ->with($this->callback(function (int $setWidth) use ($width, $diff): bool {
-                return $setWidth <= ($width + $diff) && $setWidth >= ($width - $diff);
-            }))
-            ->willReturn($image);
-
-        $image
-            ->expects($this->once())
-            ->method('setHeight')
-            ->with($this->callback(function (int $setHeight) use ($height, $diff): bool {
-                return $setHeight <= ($height + $diff) && $setHeight >= ($height - $diff);
-            }))
-            ->willReturn($image);
-
-        $image
-            ->expects($this->once())
-            ->method('setHasBeenTransformed')
-            ->with(true)
-            ->willReturn($image);
-
-        $imagick = new Imagick();
-        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
-
-        $this->getTransformation()
-            ->setImage($image)
-            ->setImagick($imagick)
-            ->transform($params);
     }
 }

@@ -5,6 +5,7 @@ use Imagick;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -12,32 +13,15 @@ use PHPUnit\Framework\TestCase;
  */
 class ContrastTest extends TestCase
 {
-    public static function getContrastParams(): array
-    {
-        return [
-            'no params' => [
-                [], true,
-            ],
-            'positive contrast' => [
-                ['alpha' => 2.5], true,
-            ],
-            'zero contrast' => [
-                ['alpha' => 0], false,
-            ],
-            'negative contrast, specific beta' => [
-                ['alpha' => -2, 'beta' => 0.75], true,
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getContrastParams
      * @covers ::transform
      * @todo Rewrite test when we can get the call to Imagick::getQuantumRange() out of the
      *       Transformation class
      */
-    public function testSetsTheCorrectContrast(array $params, bool $shouldTransform)
+    public function testSetsTheCorrectContrast(array $params, bool $shouldTransform): void
     {
+        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
 
         $imagick = new Imagick();
@@ -65,7 +49,7 @@ class ContrastTest extends TestCase
      * @todo Rewrite test when we can get the call to Imagick::getQuantumRange() out of the
      *       Transformation class
      */
-    public function testThrowsException()
+    public function testThrowsException(): void
     {
         $this->expectException(TransformationException::class);
         $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
@@ -73,5 +57,30 @@ class ContrastTest extends TestCase
         (new Contrast())
             ->setImagick(new Imagick())
             ->transform([]);
+    }
+
+    /**
+     * @return array<string,array{params:array<string,double>,shouldTransform:bool}>
+     */
+    public static function getContrastParams(): array
+    {
+        return [
+            'no params' => [
+                'params' => [],
+                'shouldTransform' => true,
+            ],
+            'positive contrast' => [
+                'params' => ['alpha' => 2.5],
+                'shouldTransform' => true,
+            ],
+            'zero contrast' => [
+                'params' => ['alpha' => 0],
+                'shouldTransform' => false,
+            ],
+            'negative contrast, specific beta' => [
+                'params' => ['alpha' => -2, 'beta' => 0.75],
+                'shouldTransform' => true,
+            ],
+        ];
     }
 }

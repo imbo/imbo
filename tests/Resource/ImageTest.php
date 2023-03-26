@@ -9,6 +9,7 @@ use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
 use Imbo\Model\Image as ImageModel;
 use Imbo\Storage\StorageInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
@@ -16,13 +17,13 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  */
 class ImageTest extends ResourceTests
 {
-    private $resource;
-    private $request;
-    private $response;
-    private $database;
-    private $storage;
-    private $manager;
-    private $event;
+    private Image $resource;
+    private Request&MockObject $request;
+    private Response&MockObject $response;
+    private DatabaseInterface&MockObject $database;
+    private StorageInterface&MockObject $storage;
+    private EventManager&MockObject $manager;
+    private EventInterface&MockObject $event;
 
     protected function getNewResource(): Image
     {
@@ -56,6 +57,7 @@ class ImageTest extends ResourceTests
             ->method('trigger')
             ->with($this->callback(
                 static function (string $event): bool {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $event]) {
                         [0, 'db.image.delete'],
@@ -85,6 +87,7 @@ class ImageTest extends ResourceTests
         $user = 'christer';
         $imageIdentifier = 'imageIdentifier';
 
+        /** @var ResponseHeaderBag&MockObject */
         $responseHeaders = $this->createMock(ResponseHeaderBag::class);
 
         $this->request
@@ -107,6 +110,7 @@ class ImageTest extends ResourceTests
             ->method('trigger')
             ->with($this->callback(
                 static function (string $event): bool {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $event]) {
                         [0, 'db.image.load'],

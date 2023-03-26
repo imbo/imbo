@@ -1,21 +1,24 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventManager;
 
+use Closure;
 use Imbo\EventListener\Initializer\InitializerInterface;
 use Imbo\EventListener\ListenerInterface;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 /**
  * @coversDefaultClass Imbo\EventManager\EventManager
  */
 class EventManagerTest extends TestCase
 {
-    private $manager;
-    private $request;
-    private $event;
+    private EventManager $manager;
+    private Request&MockObject $request;
+    private Event $event;
 
     public function setUp(): void
     {
@@ -32,13 +35,13 @@ class EventManagerTest extends TestCase
      */
     public function testCanRegisterAndExecuteRegularCallbacksInAPrioritizedFashion(): void
     {
-        $callback1 = function ($event) {
+        $callback1 = function (EventInterface $event): void {
             echo 1;
         };
-        $callback2 = function ($event) {
+        $callback2 = function (EventInterface $event): void {
             echo 2;
         };
-        $callback3 = function ($event) {
+        $callback3 = function (EventInterface $event): void {
             echo 3;
         };
 
@@ -75,16 +78,16 @@ class EventManagerTest extends TestCase
      */
     public function testLetsListenerStopPropagation(): void
     {
-        $callback1 = function ($event) {
+        $callback1 = function (EventInterface $event): void {
             echo 1;
         };
-        $callback2 = function ($event) {
+        $callback2 = function (EventInterface $event): void {
             echo 2;
         };
-        $callback3 = function ($event) {
+        $callback3 = function (EventInterface $event): void {
             echo 3;
         };
-        $stopper = function ($event) {
+        $stopper = function (EventInterface $event): void {
             $event->stopPropagation();
         };
 
@@ -117,24 +120,12 @@ class EventManagerTest extends TestCase
     public function testCanCheckIfTheManagerHasListenersForSpecificEvents(): void
     {
         $this->manager
-            ->addEventHandler('handler', function ($event) {
+            ->addEventHandler('handler', function (EventInterface $event): void {
             })
             ->addCallbacks('handler', ['event' => 0]);
 
         $this->assertFalse($this->manager->hasListenersForEvent('some.event'));
         $this->assertTrue($this->manager->hasListenersForEvent('event'));
-    }
-
-    public static function getUsers(): array
-    {
-        return [
-            [null, [], '1'],
-            [null, ['christer'], '1'],
-            ['christer', ['blacklist' => ['christer', 'user']], ''],
-            ['christer', ['blacklist' => ['user']], '1'],
-            ['christer', ['whitelist' => ['user']], ''],
-            ['christer', ['whitelist' => ['christer', 'user']], '1'],
-        ];
     }
 
     /**
@@ -143,23 +134,29 @@ class EventManagerTest extends TestCase
      * @covers ::triggersFor
      * @covers ::trigger
      */
-    public function testCanIncludeAndExcludeUsers(?string $user, array $users, string $output = ''): void
+    public function testCanIncludeAndExcludeUsers(string $user, array $users, bool $willTrigger): void
     {
-        $callback = function ($event) {
-            echo '1';
+        $check = new stdClass();
+        $check->triggered = false;
+
+        $callback = function (EventInterface $event) use ($check): void {
+            $check->triggered = true;
         };
 
         $this->manager
             ->addEventHandler('handler', $callback)
             ->addCallbacks('handler', ['event' => 0], $users);
 
-        $this->request
-            ->expects($this->any())
-            ->method('getUser')
-            ->willReturn($user);
+        if ('' !== $user) {
+            $this->request
+                ->expects($this->once())
+                ->method('getUser')
+                ->willReturn($user);
+        }
 
-        $this->expectOutputString($output);
+
         $this->manager->trigger('event');
+        $this->assertSame($willTrigger, $check->triggered);
     }
 
     /**
@@ -167,9 +164,9 @@ class EventManagerTest extends TestCase
      */
     public function testCanAddExtraParametersToTheEvent(): void
     {
-        $this->manager->addEventHandler('handler', function ($event) {
-            echo $event->getArgument('foo');
-            echo $event->getArgument('bar');
+        $this->manager->addEventHandler('handler', function (EventInterface $event): void {
+            echo (string) $event->getArgument('foo');
+            echo (string) $event->getArgument('bar');
         })->addCallbacks('handler', ['event' => 0]);
 
         $this->expectOutputString('barbaz');
@@ -188,13 +185,12 @@ class EventManagerTest extends TestCase
      */
     public function testCanInitializeListeners(): void
     {
-        $listenerClassName = __NAMESPACE__ . '\Listener';
         $this->manager
             ->addInitializer($i = new Initializer())
-            ->addEventHandler('someHandler', $listenerClassName)
-            ->addCallbacks('someHandler', $listenerClassName::getSubscribedEvents());
+            ->addEventHandler('someHandler', Listener::class)
+            ->addCallbacks('someHandler', Listener::getSubscribedEvents());
 
-        $this->expectOutputString('initeventHandler');
+        $this->expectOutputString('eventHandler');
         $this->manager->trigger('event');
         $this->assertSame([$i], $this->manager->getInitializers());
     }
@@ -208,8 +204,9 @@ class EventManagerTest extends TestCase
             'Invalid event definition for listener: someName',
             Response::HTTP_INTERNAL_SERVER_ERROR,
         ));
-        $this->manager->addCallbacks('someName', ['event' => function ($event) {
-        }]);
+        $callback = function (EventInterface $event): void {
+        };
+        $this->manager->addCallbacks('someName', ['event' => $callback]);
     }
 
     /**
@@ -218,10 +215,9 @@ class EventManagerTest extends TestCase
      */
     public function testCanAddMultipleHandlersAtOnce(): void
     {
-        $listenerClassName = __NAMESPACE__ . '\Listener';
         $this->manager
-            ->addEventHandler('someHandler', $listenerClassName)
-            ->addCallbacks('someHandler', $listenerClassName::getSubscribedEvents());
+            ->addEventHandler('someHandler', Listener::class)
+            ->addCallbacks('someHandler', Listener::getSubscribedEvents());
 
         $this->expectOutputString('bazbarfoo');
         $this->manager->trigger('someEvent');
@@ -232,25 +228,104 @@ class EventManagerTest extends TestCase
      */
     public function testCanInjectParamsInConstructor(): void
     {
-        $listenerClassName = __NAMESPACE__ . '\Listener';
         $this->manager
-            ->addEventHandler('someHandler', $listenerClassName, ['param'])
-            ->addCallbacks('someHandler', $listenerClassName::getSubscribedEvents());
+            ->addEventHandler('someHandler', Listener::class, ['param'])
+            ->addCallbacks('someHandler', Listener::getSubscribedEvents());
 
         $this->expectOutputString('a:1:{i:0;s:5:"param";}');
         $this->manager->trigger('getParams');
     }
 
+    /**
+     * @dataProvider getWildcardListeners
+     * @covers ::getListenersForEvent
+     * @covers ::getEventNameParts
+     *
+     * @param array<array{callback:Closure,event:string,priority:int}> $listeners
+     * @param array<string> $events
+     */
+    public function testSupportsWildcardListeners(array $listeners, array $events, string $output): void
+    {
+        foreach ($listeners as $name => $listener) {
+            $this->manager
+                ->addEventHandler($name, $listener['callback'])
+                ->addCallbacks($name, [$listener['event'] => $listener['priority']]);
+        }
+
+        $this->expectOutputString($output);
+
+        foreach ($events as $event) {
+            $this->manager->trigger($event);
+        }
+    }
+
+    /**
+     * @covers ::setEventTemplate
+     */
+    public function testCanSetEventTemplate(): void
+    {
+        $this->expectOutputString('bar');
+        (new EventManager())
+            ->setEventTemplate(new Event(['foo' => 'bar', 'request' => $this->createMock(Request::class)]))
+            ->addEventHandler('handler', function (EventInterface $event): void {
+                echo (string) $event->getArgument('foo');
+            })
+            ->addCallbacks('handler', ['event' => 0])
+            ->trigger('event');
+    }
+
+    /**
+     * @return array<array{user:string,users:array,willTrigger:bool}>
+     */
+    public static function getUsers(): array
+    {
+        return [
+            'no specified user and empty filter, will trigger' => [
+                'user' => '',
+                'users' => [],
+                'willTrigger' => true,
+            ],
+            'no specified user and non-empty filter, will trigger' => [
+                'user' => '',
+                'users' => ['christer'],
+                'willTrigger' => true,
+            ],
+            'user in blacklist, will not trigger' => [
+                'user' => 'christer',
+                'users' => ['blacklist' => ['christer', 'user']],
+                'willTrigger' => false,
+            ],
+            'user not in blacklist, will trigger' => [
+                'user' => 'christer',
+                'users' => ['blacklist' => ['user']],
+                'willTrigger' => true,
+            ],
+            'user not in whitelist, will not trigger' => [
+                'user' => 'christer',
+                'users' => ['whitelist' => ['user']],
+                'willTrigger' => false,
+            ],
+            'user in whitelist, will trigger' => [
+                'user' => 'christer',
+                'users' => ['whitelist' => ['christer', 'user']],
+                'willTrigger' => true,
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{listeners:array<array{callback:Closure,event:string,priority:int}>,events:array<string>,output:string}>
+     */
     public static function getWildcardListeners(): array
     {
-        $callback1 = function ($event) {
-            echo '1:' . $event->getName() . ' ';
+        $callback1 = function (EventInterface $event): void {
+            echo '1:' . (string) $event->getName() . ' ';
         };
-        $callback2 = function ($event) {
-            echo '2:' . $event->getName() . ' ';
+        $callback2 = function (EventInterface $event): void {
+            echo '2:' . (string) $event->getName() . ' ';
         };
-        $callback3 = function ($event) {
-            echo '3:' . $event->getName() . ' ';
+        $callback3 = function (EventInterface $event): void {
+            echo '3:' . (string) $event->getName() . ' ';
         };
 
         return [
@@ -295,46 +370,11 @@ class EventManagerTest extends TestCase
             ],
         ];
     }
-
-    /**
-     * @dataProvider getWildcardListeners
-     * @covers ::getListenersForEvent
-     * @covers ::getEventNameParts
-     */
-    public function testSupportsWildcardListeners(array $listeners, array $events, string $output): void
-    {
-        foreach ($listeners as $name => $listener) {
-            $this->manager
-                ->addEventHandler($name, $listener['callback'])
-                ->addCallbacks($name, [$listener['event'] => $listener['priority']]);
-        }
-
-        $this->expectOutputString($output);
-
-        foreach ($events as $event) {
-            $this->manager->trigger($event);
-        }
-    }
-
-    /**
-     * @covers ::setEventTemplate
-     */
-    public function testCanSetEventTemplate(): void
-    {
-        $this->expectOutputString('bar');
-        (new EventManager())
-            ->setEventTemplate(new Event(['foo' => 'bar', 'request' => $this->createMock(Request::class)]))
-            ->addEventHandler('handler', function ($event) {
-                echo $event->getArgument('foo');
-            })
-            ->addCallbacks('handler', ['event' => 0])
-            ->trigger('event');
-    }
 }
 
 class Listener implements ListenerInterface
 {
-    private $params;
+    private ?array $params;
 
     public function __construct(array $params = null)
     {
@@ -354,41 +394,35 @@ class Listener implements ListenerInterface
         ];
     }
 
-    public function getParams($event)
+    public function getParams(EventInterface $event): void
     {
         echo serialize($this->params);
     }
 
-    public function foo($event)
+    public function foo(EventInterface $event): void
     {
         echo 'foo';
     }
 
-    public function bar($event)
+    public function bar(EventInterface $event): void
     {
         echo 'bar';
     }
 
-    public function baz($event)
+    public function baz(EventInterface $event): void
     {
         echo 'baz';
     }
 
-    public function method($event)
+    public function method(EventInterface $event): void
     {
         echo 'eventHandler';
-    }
-
-    public function init()
-    {
-        echo 'init';
     }
 }
 
 class Initializer implements InitializerInterface
 {
-    public function initialize(ListenerInterface $listener)
+    public function initialize(ListenerInterface $listener): void
     {
-        $listener->init();
     }
 }

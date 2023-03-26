@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 
 abstract class ListenerTests extends TestCase
 {
-    abstract protected function getListener();
+    abstract protected function getListener(): ListenerInterface;
 
     /**
      * @covers ::getSubscribedEvents
@@ -16,8 +16,6 @@ abstract class ListenerTests extends TestCase
         $className = get_class($listener);
         $events = $className::getSubscribedEvents();
 
-        $this->assertIsArray($events);
-
         foreach ($events as $callbacks) {
             if (is_string($callbacks)) {
                 $this->assertTrue(
@@ -27,7 +25,7 @@ abstract class ListenerTests extends TestCase
             } else {
                 foreach ($callbacks as $method => $priority) {
                     $this->assertTrue(
-                        method_exists($listener, $method),
+                        method_exists($listener, (string) $method),
                         sprintf('Method %s does not exist in class %s', $method, $className),
                     );
                     $this->assertIsInt($priority);

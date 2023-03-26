@@ -112,51 +112,13 @@ class QueryTest extends TestCase
         $this->assertSame($value, $this->query->getOriginalChecksums());
     }
 
-    public static function getSortData(): array
-    {
-        return [
-            'single field without sort' => [
-                ['field1'],
-                [
-                    [
-                        'field' => 'field1',
-                        'sort' => 'asc',
-                    ],
-                ],
-            ],
-            'single field with sort' => [
-                ['field1:desc'],
-                [
-                    [
-                        'field' => 'field1',
-                        'sort' => 'desc',
-                    ],
-                ],
-            ],
-            'multiple fields' => [
-                ['field1', 'field2:desc', 'field3:asc'],
-                [
-                    [
-                        'field' => 'field1',
-                        'sort' => 'asc',
-                    ],
-                    [
-                        'field' => 'field2',
-                        'sort' => 'desc',
-                    ],
-                    [
-                        'field' => 'field3',
-                        'sort' => 'asc',
-                    ],
-                ],
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getSortData
      * @covers ::setSort
      * @covers ::getSort
+     *
+     * @param array<string> $value
+     * @param array<array{field:string,sort:string}> $formatted
      */
     public function testSort(array $value, array $formatted): void
     {
@@ -181,5 +143,49 @@ class QueryTest extends TestCase
     {
         $this->expectExceptionObject(new RuntimeException('Badly formatted sort', Response::HTTP_BAD_REQUEST));
         $this->query->setSort(['field:asc', '']);
+    }
+
+    /**
+     * @return array<string,array{value:array<string>,formatted:array<array{field:string,sort:string}>}>
+     */
+    public static function getSortData(): array
+    {
+        return [
+            'single field without sort' => [
+                'value' => ['field1'],
+                'formatted' => [
+                    [
+                        'field' => 'field1',
+                        'sort' => 'asc',
+                    ],
+                ],
+            ],
+            'single field with sort' => [
+                'value' => ['field1:desc'],
+                'formatted' => [
+                    [
+                        'field' => 'field1',
+                        'sort' => 'desc',
+                    ],
+                ],
+            ],
+            'multiple fields' => [
+                'value' => ['field1', 'field2:desc', 'field3:asc'],
+                'formatted' => [
+                    [
+                        'field' => 'field1',
+                        'sort' => 'asc',
+                    ],
+                    [
+                        'field' => 'field2',
+                        'sort' => 'desc',
+                    ],
+                    [
+                        'field' => 'field3',
+                        'sort' => 'asc',
+                    ],
+                ],
+            ],
+        ];
     }
 }

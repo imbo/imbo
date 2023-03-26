@@ -6,6 +6,7 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Crop
@@ -17,23 +18,13 @@ class CropTest extends TransformationTests
         return new Crop();
     }
 
-    public static function getCropParams(): array
-    {
-        return [
-            'cropped area smaller than the image' => [['width' => 100, 'height' => 50], 100, 50, true],
-            'cropped area smaller than the image with x and y offset' => [['width' => 100, 'height' => 63, 'x' => 565, 'y' => 400], 100, 63, true],
-            'center mode' => [['mode' => 'center', 'width' => 150, 'height' => 100], 150, 100, true],
-            'center-x mode' => [['mode' => 'center-x', 'y' => 10, 'width' => 50, 'height' => 40], 50, 40, true],
-            'center-y mode' => [['mode' => 'center-y', 'x' => 10, 'width' => 50, 'height' => 40], 50, 40, true],
-        ];
-    }
-
     /**
      * @dataProvider getCropParams
      * @covers ::transform
      */
     public function testCanCropImages(array $params, int $endWidth, int $endHeight, bool $transformed): void
     {
+        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getWidth' => 665,
             'getHeight' => 463,
@@ -98,47 +89,16 @@ class CropTest extends TransformationTests
         $transformation->transform(['width' => 123]);
     }
 
-    public static function getImageParams(): array
-    {
-        return [
-            'Do not perform work when cropping same sized images' => [
-                ['width' => 123, 'height' => 234],
-                123,
-                234,
-                123,
-                234,
-                0,
-                0,
-                false,
-            ],
-            'Create new cropped image #1' => [
-                ['width' => 100, 'height' => 200, 'y' => 10],
-                100,
-                400,
-                100,
-                200,
-                0,
-                10,
-            ],
-            'Create new cropped image #2' => [
-                ['width' => 123, 'height' => 234, 'x' => 10, 'y' => 20],
-                200,
-                260,
-                123,
-                234,
-                10,
-                20,
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getImageParams
      * @covers ::transform
      */
-    public function testUsesAllParams(array $params, int $originalWidth, int $originalHeight, int $width, int $height, int $x, int $y, ?bool $shouldCrop = true): void
+    public function testUsesAllParams(array $params, int $originalWidth, int $originalHeight, int $width, int $height, int $x, int $y, bool $shouldCrop): void
     {
+        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
+
+        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getWidth'  => $originalWidth,
             'getHeight' => $originalHeight,
@@ -176,65 +136,16 @@ class CropTest extends TransformationTests
             ->transform($params);
     }
 
-    public static function getInvalidImageParams(): array
-    {
-        return [
-            'Dont throw if width/height are within bounds (no coords)' => [
-                ['width' => 100, 'height' => 100],
-                200,
-                200,
-            ],
-            'Dont throw if coords are within bounds' => [
-                ['width' => 100, 'height' => 100, 'x' => 100, 'y' => 100],
-                200,
-                200,
-            ],
-            'Throw if width is out of bounds'  => [
-                ['width' => 300, 'height' => 100],
-                200,
-                200,
-                '#image width#i',
-            ],
-            'Throw if height is out of bounds' => [
-                ['width' => 100, 'height' => 300],
-                200,
-                200,
-                '#image height#i',
-            ],
-            'Throw if X is out of bounds'  => [
-                ['width' => 100, 'height' => 100, 'x' => 500],
-                200,
-                200,
-                '#image width#i',
-            ],
-            'Throw if Y is out of bounds'  => [
-                ['width' => 100, 'height' => 100, 'y' => 500],
-                200,
-                200,
-                '#image height#i',
-            ],
-            'Throw if X + width is out of bounds'  => [
-                ['width' => 100, 'height' => 100, 'x' => 105],
-                200,
-                200,
-                '#image width#i',
-            ],
-            'Throw if Y + height is out of bounds' => [
-                ['width' => 100, 'height' => 100, 'y' => 105],
-                200,
-                200,
-                '#image height#i',
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getInvalidImageParams
      * @covers ::transform
      */
     public function testThrowsOnInvalidCropParams(array $params, int $originalWidth, int $originalHeight, ?string $errRegex = null): void
     {
+        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
+
+        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getWidth'  => $originalWidth,
             'getHeight' => $originalHeight,
@@ -275,5 +186,138 @@ class CropTest extends TransformationTests
             ->setImagick($imagick)
             ->setImage($image)
             ->transform($params);
+    }
+
+    /**
+     * @return array<string,array{params:array<string,int|string>,endWidth:int,endHeight:int,transformed:bool}>
+     */
+    public static function getCropParams(): array
+    {
+        return [
+            'cropped area smaller than the image' => [
+                'params' => ['width' => 100, 'height' => 50],
+                'endWidth' => 100,
+                'endHeight' => 50,
+                'transformed' => true,
+            ],
+            'cropped area smaller than the image with x and y offset' => [
+                'params' => ['width' => 100, 'height' => 63, 'x' => 565, 'y' => 400],
+                'endWidth' => 100,
+                'endHeight' => 63,
+                'transformed' => true,
+            ],
+            'center mode' => [
+                'params' => ['mode' => 'center', 'width' => 150, 'height' => 100],
+                'endWidth' => 150,
+                'endHeight' => 100,
+                'transformed' => true,
+            ],
+            'center-x mode' => [
+                'params' => ['mode' => 'center-x', 'y' => 10, 'width' => 50, 'height' => 40],
+                'endWidth' => 50,
+                'endHeight' => 40,
+                'transformed' => true,
+            ],
+            'center-y mode' => [
+                'params' => ['mode' => 'center-y', 'x' => 10, 'width' => 50, 'height' => 40],
+                'endWidth' => 50,
+                'endHeight' => 40,
+                'transformed' => true,
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string,array{params:array<string,int>,originalWidth:int,originalHeight:int,width:int,height:int,x:int,y:int,shouldCrop:bool}>
+     */
+    public static function getImageParams(): array
+    {
+        return [
+            'Do not perform work when cropping same sized images' => [
+                'params' => ['width' => 123, 'height' => 234],
+                'originalWidth' => 123,
+                'originalHeight' => 234,
+                'width' => 123,
+                'height' => 234,
+                'x' => 0,
+                'y' => 0,
+                'shouldCrop' => false,
+            ],
+            'Create new cropped image #1' => [
+                'params' => ['width' => 100, 'height' => 200, 'y' => 10],
+                'originalWidth' => 100,
+                'originalHeight' => 400,
+                'width' => 100,
+                'height' => 200,
+                'x' => 0,
+                'y' => 10,
+                'shouldCrop' => true,
+            ],
+            'Create new cropped image #2' => [
+                'params' => ['width' => 123, 'height' => 234, 'x' => 10, 'y' => 20],
+                'originalWidth' => 200,
+                'originalHeight' => 260,
+                'width' => 123,
+                'height' => 234,
+                'x' => 10,
+                'y' => 20,
+                'shouldCrop' => true,
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string,array{params:array<string,int>,originalWidth:int,originalHeight:int,errRegex?:string}>
+     */
+    public static function getInvalidImageParams(): array
+    {
+        return [
+            'Dont throw if width/height are within bounds (no coords)' => [
+                'params' => ['width' => 100, 'height' => 100],
+                'originalWidth' => 200,
+                'originalHeight' => 200,
+            ],
+            'Dont throw if coords are within bounds' => [
+                'params' => ['width' => 100, 'height' => 100, 'x' => 100, 'y' => 100],
+                'originalWidth' => 200,
+                'originalHeight' => 200,
+            ],
+            'Throw if width is out of bounds'  => [
+                'params' => ['width' => 300, 'height' => 100],
+                'originalWidth' => 200,
+                'originalHeight' => 200,
+                'errRegex' => '#image width#i',
+            ],
+            'Throw if height is out of bounds' => [
+                'params' => ['width' => 100, 'height' => 300],
+                'originalWidth' => 200,
+                'originalHeight' => 200,
+                'errRegex' => '#image height#i',
+            ],
+            'Throw if X is out of bounds'  => [
+                'params' => ['width' => 100, 'height' => 100, 'x' => 500],
+                'originalWidth' => 200,
+                'originalHeight' => 200,
+                'errRegex' => '#image width#i',
+            ],
+            'Throw if Y is out of bounds'  => [
+                'params' => ['width' => 100, 'height' => 100, 'y' => 500],
+                'originalWidth' => 200,
+                'originalHeight' => 200,
+                'errRegex' => '#image height#i',
+            ],
+            'Throw if X + width is out of bounds'  => [
+                'params' => ['width' => 100, 'height' => 100, 'x' => 105],
+                'originalWidth' => 200,
+                'originalHeight' => 200,
+                'errRegex' => '#image width#i',
+            ],
+            'Throw if Y + height is out of bounds' => [
+                'params' => ['width' => 100, 'height' => 100, 'y' => 105],
+                'originalWidth' => 200,
+                'originalHeight' => 200,
+                'errRegex' => '#image height#i',
+            ],
+        ];
     }
 }
