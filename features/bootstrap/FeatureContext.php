@@ -130,6 +130,11 @@ class FeatureContext extends ApiContext
     private static $storageTestConfig;
 
     /**
+     * Handler stack for the internal Guzzle client
+     */
+    private HandlerStack $handlerStack;
+
+    /**
      * Set up adapters for the suite
      *
      * @BeforeScenario
@@ -194,9 +199,9 @@ class FeatureContext extends ApiContext
      */
     public function initializeClient(array $config): static
     {
-        $stack = $config['handler'] ?? HandlerStack::create();
-        $stack->push(Middleware::history($this->history), self::MIDDLEWARE_HISTORY);
-        $stack->push(
+        $this->handlerStack = $config['handler'] ?? HandlerStack::create();
+        $this->handlerStack->push(Middleware::history($this->history), self::MIDDLEWARE_HISTORY);
+        $this->handlerStack->push(
             Middleware::mapRequest(
                 fn (RequestInterface $request): RequestInterface =>
                     $request
@@ -207,7 +212,7 @@ class FeatureContext extends ApiContext
             ),
             self::MIDDLEWARE_BEHAT_CONTEXT_CLASS,
         );
-        $config['handler'] = $stack;
+        $config['handler'] = $this->handlerStack;
         return parent::initializeClient($config);
     }
 
@@ -401,9 +406,9 @@ class FeatureContext extends ApiContext
 
         $useHeaders = (bool) $useHeaders;
 
-        // Fetch the handler stack and push a signature function to it
-        $stack = $this->client->getConfig('handler');
-        $stack->unshift(Middleware::mapRequest(function (RequestInterface $request) use ($useHeaders, $stack) {
+        // Push a signature function to the handler stack
+        $stack = $this->handlerStack;
+        $stack->unshift(Middleware::mapRequest(function (RequestInterface $request) use ($useHeaders, $stack): RequestInterface {
             // Add public key as a query parameter if we're told not to use headers. We do this
             // before the signing below since this parameter needs to be a part of the data that
             // will be used for signing
@@ -484,9 +489,9 @@ class FeatureContext extends ApiContext
         // Set the token handler as active
         $this->accessTokenHandlerIsActive = true;
 
-        // Fetch the handler stack and push an access token function to it
-        $stack = $this->client->getConfig('handler');
-        $stack->unshift(Middleware::mapRequest(function (RequestInterface $request) use ($stack, $allRequests) {
+        // Push an access token function to the handler stack
+        $stack = $this->handlerStack;
+        $stack->unshift(Middleware::mapRequest(function (RequestInterface $request) use ($stack, $allRequests): RequestInterface {
             $uri = $request->getUri();
 
             // Set the public key and remove a possible accessToken query parameter
