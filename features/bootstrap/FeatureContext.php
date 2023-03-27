@@ -6,7 +6,7 @@ use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
-use GuzzleHttp\ClientInterface;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Header;
 use GuzzleHttp\Psr7\Uri;
@@ -190,23 +190,25 @@ class FeatureContext extends ApiContext
      * - Set the request header that informs Imbo which class is responsible for configuring the
      *   database and storage adapters in the test
      *
-     * {@inheritdoc}
-     *
      * @throws RuntimeException
      */
-    public function setClient(ClientInterface $client, string $baseUri): static
+    public function initializeClient(array $config): static
     {
-        $handler = $client->getConfig('handler');
-        $handler->push(Middleware::history($this->history), self::MIDDLEWARE_HISTORY);
-        $handler->push(Middleware::mapRequest(function (RequestInterface $request) {
-            return $request
-                ->withHeader('X-Behat-Database-Test', self::$databaseTest)
-                ->withHeader('X-Behat-Storage-Test', self::$storageTest)
-                ->withHeader('X-Behat-Database-Test-Config', urlencode(json_encode(self::$databaseTestConfig)))
-                ->withHeader('X-Behat-Storage-Test-Config', urlencode(json_encode(self::$storageTestConfig)));
-        }), self::MIDDLEWARE_BEHAT_CONTEXT_CLASS);
-
-        return parent::setClient($client, $baseUri);
+        $stack = $config['handler'] ?? HandlerStack::create();
+        $stack->push(Middleware::history($this->history), self::MIDDLEWARE_HISTORY);
+        $stack->push(
+            Middleware::mapRequest(
+                fn (RequestInterface $request): RequestInterface =>
+                    $request
+                        ->withHeader('X-Behat-Database-Test', self::$databaseTest)
+                        ->withHeader('X-Behat-Storage-Test', self::$storageTest)
+                        ->withHeader('X-Behat-Database-Test-Config', urlencode(json_encode(self::$databaseTestConfig)))
+                        ->withHeader('X-Behat-Storage-Test-Config', urlencode(json_encode(self::$storageTestConfig))),
+            ),
+            self::MIDDLEWARE_BEHAT_CONTEXT_CLASS,
+        );
+        $config['handler'] = $stack;
+        return parent::initializeClient($config);
     }
 
     /**
@@ -216,8 +218,6 @@ class FeatureContext extends ApiContext
      * `Then the response body contains JSON:` step:
      *
      * - @isDate(): Check if a field that is supposed to represent a date is property formatted
-     *
-     * {@inheritdoc}
      */
     public function setArrayContainsComparator(ArrayContainsComparator $comparator): static
     {
@@ -226,9 +226,6 @@ class FeatureContext extends ApiContext
         return parent::setArrayContainsComparator($comparator);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setRequestHeader($header, $value): static
     {
         if ($value === 'current-timestamp') {

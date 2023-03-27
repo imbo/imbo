@@ -9,8 +9,6 @@ use Behat\Gherkin\Node\ScenarioInterface;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\Environment\Environment;
 use Behat\Testwork\Suite\Suite;
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -20,6 +18,7 @@ use Imbo\BehatApiExtension\ArrayContainsComparator;
 use Imbo\BehatApiExtension\Exception\AssertionFailedException;
 use InvalidArgumentException;
 use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
@@ -30,7 +29,6 @@ use RuntimeException;
 class FeatureContextTest extends TestCase
 {
     private FeatureContext $context;
-    private Client $client;
     /**
      * @var array<array{request:Request,response:Response}>
      */
@@ -48,13 +46,12 @@ class FeatureContextTest extends TestCase
         $this->mockHandler = new MockHandler();
         $this->handlerStack = HandlerStack::create($this->mockHandler);
         $this->handlerStack->push(Middleware::history($this->history));
-        $this->client = new Client([
+
+        $this->context = new FeatureContext();
+        $this->context->initializeClient([
             'handler' => $this->handlerStack,
             'base_uri' => $this->baseUri,
         ]);
-
-        $this->context = new FeatureContext();
-        $this->context->setClient($this->client, $this->baseUri);
     }
 
     /**
@@ -73,29 +70,15 @@ class FeatureContextTest extends TestCase
      */
     public function testCanSetAnApiClient(): void
     {
+        /** @var HandlerStack&MockObject */
         $handlerStack = $this->createMock(HandlerStack::class);
         $handlerStack
             ->expects($this->exactly(2))
             ->method('push')
             ->with($this->isInstanceOf('Closure'), $this->isType('string'));
 
-        $baseUri = $this->baseUri;
-        $client = $this->createMock(ClientInterface::class);
-        $client
-            ->method('getConfig')
-            ->willReturnCallback(
-                static function (string $param) use ($handlerStack, $baseUri) {
-                    /** @var int */
-                    static $i = 0;
-                    return match ([$i++, $param]) {
-                        [0, 'handler'] => $handlerStack,
-                        [1, 'base_uri'] => $baseUri,
-                    };
-                },
-            );
-
         $context = new FeatureContext();
-        $this->assertSame($context, $context->setClient($client, $this->baseUri));
+        $this->assertSame($context, $context->initializeClient(['handler' => $handlerStack, 'base_uri' => $this->baseUri]));
     }
 
     /**
@@ -103,6 +86,7 @@ class FeatureContextTest extends TestCase
      */
     public function testAttachesComparatorFunctions(): void
     {
+        /** @var ArrayContainsComparator&MockObject */
         $comparator = $this->createMock(ArrayContainsComparator::class);
         $comparator
             ->expects($this->once())
