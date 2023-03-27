@@ -74,6 +74,7 @@ class ImageVariationsTest extends ListenerTests
         $this->db         = $this->createMock(DatabaseInterface::class);
         $this->storage    = $this->createMock(StorageInterface::class);
         $this->query      = new InputBag();
+        /** @var Image&MockObject */
         $this->imageModel = $this->createConfiguredMock(Image::class, [
             'getImageIdentifier' => $this->imageIdentifier,
         ]);
@@ -743,6 +744,7 @@ class ImageVariationsTest extends ListenerTests
                 },
             );
 
+        /** @var Resize&MockObject */
         $transformation = $this->createMock(Resize::class);
         $transformation
             ->expects($this->exactly(6))
@@ -799,6 +801,7 @@ class ImageVariationsTest extends ListenerTests
             'lossless'  => true,
         ]);
 
+        /** @var Convert&MockObject */
         $convertTransformation = $this->createMock(Convert::class);
         $convertTransformation
             ->expects($this->once())
@@ -811,6 +814,7 @@ class ImageVariationsTest extends ListenerTests
             ->method('transform')
             ->with(['type' => 'png']);
 
+        /** @var Resize&MockObject */
         $resizeTransformation = $this->createMock(Resize::class);
         $resizeTransformation
             ->expects($this->once())
@@ -866,6 +870,7 @@ class ImageVariationsTest extends ListenerTests
             'scaleFactor' => .65,
         ]);
 
+        /** @var Resize&MockObject */
         $resize = $this->createMock(Resize::class);
         $resize
             ->expects($this->exactly(3))
@@ -918,6 +923,7 @@ class ImageVariationsTest extends ListenerTests
             'scaleFactor' => .2,
         ]);
 
+        /** @var Resize&MockObject */
         $resize = $this->createMock(Resize::class);
         $resize
             ->method('setImage')
@@ -973,6 +979,7 @@ class ImageVariationsTest extends ListenerTests
             ->method('getBlob')
             ->willReturn('image data');
 
+        /** @var Transformation&MockObject */
         $transformation = $this->createMock(Transformation::class);
         $transformation
             ->expects($this->once())
@@ -1019,6 +1026,7 @@ class ImageVariationsTest extends ListenerTests
             ->method('storeImageVariation')
             ->willThrowException(new StorageException());
 
+        /** @var Transformation&MockObject */
         $transformation = $this->createConfiguredMock(Transformation::class, [
             'transform' => null,
         ]);
@@ -1062,6 +1070,7 @@ class ImageVariationsTest extends ListenerTests
             ->method('storeImageVariationMetadata')
             ->willThrowException(new DatabaseException());
 
+        /** @var Transformation&MockObject */
         $transformation = $this->createConfiguredMock(Transformation::class, [
             'transform' => null,
         ]);
@@ -1113,6 +1122,7 @@ class ImageVariationsTest extends ListenerTests
             ->with($this->user, )
             ->willThrowException(new DatabaseException());
 
+        /** @var Transformation&MockObject */
         $transformation = $this->createConfiguredMock(Transformation::class, [
             'transform' => null,
         ]);

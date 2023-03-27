@@ -30,9 +30,7 @@ class ApplicationTest extends TestCase
     {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid database adapter', Response::HTTP_INTERNAL_SERVER_ERROR));
         $this->runImbo([
-            'database' => function () {
-                return new stdClass();
-            },
+            'database' => fn () => new stdClass(),
             'trustedProxies' => [],
         ]);
     }
@@ -45,9 +43,7 @@ class ApplicationTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException('Invalid storage adapter', Response::HTTP_INTERNAL_SERVER_ERROR));
         $this->runImbo([
             'database' => $this->createMock(DatabaseInterface::class),
-            'storage' => function () {
-                return new stdClass();
-            },
+            'storage' => fn () => new stdClass(),
             'trustedProxies' => [],
         ]);
     }
@@ -63,9 +59,7 @@ class ApplicationTest extends TestCase
             'storage' => $this->createMock(StorageInterface::class),
             'routes' => [],
             'trustedProxies' => [],
-            'accessControl' => function () {
-                return new stdClass();
-            },
+            'accessControl' => fn () => new stdClass(),
         ]);
     }
 

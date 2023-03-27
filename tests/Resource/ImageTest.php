@@ -129,14 +129,14 @@ class ImageTest extends ResourceTests
         $responseHeaders
             ->expects($this->once())
             ->method('add')
-            ->with($this->callback(function (array $headers): bool {
-                return
+            ->with($this->callback(
+                fn (array $headers): bool =>
                     array_key_exists('X-Imbo-OriginalMimeType', $headers)
                     && array_key_exists('X-Imbo-OriginalWidth', $headers)
                     && array_key_exists('X-Imbo-OriginalHeight', $headers)
                     && array_key_exists('X-Imbo-OriginalFileSize', $headers)
-                    && array_key_exists('X-Imbo-OriginalExtension', $headers);
-            }));
+                    && array_key_exists('X-Imbo-OriginalExtension', $headers),
+            ));
 
         $this->resource->getImage($this->event);
     }
