@@ -82,7 +82,7 @@ interface AdapterInterface
      *
      * @param string $publicKey    Public key to add access rule to
      * @param int|string $accessRuleId Access rule id
-     * @return array{id:int|string,users:array<string>,resources:array<string>} Access rule
+     * @return array{id:int|string,users:array<string>,resources:array<string>,group?:string} Access rule
      */
     public function getAccessRule(string $publicKey, $accessRuleId): ?array;
 }
