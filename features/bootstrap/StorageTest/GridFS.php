@@ -16,7 +16,7 @@ class GridFS implements AdapterTest
                 'password' => $config['database.password'],
             ],
         );
-        $client->{$config['database.name']}->drop();
+        $client->selectDatabase($config['database.name'])->drop();
 
         return $config;
     }

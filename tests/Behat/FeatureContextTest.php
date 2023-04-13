@@ -66,7 +66,7 @@ class FeatureContextTest extends TestCase
     }
 
     /**
-     * @covers ::setClient
+     * @covers ::initializeClient
      */
     public function testCanSetAnApiClient(): void
     {
@@ -670,7 +670,7 @@ class FeatureContextTest extends TestCase
      * @dataProvider getDataForWatermarkImages
      * @covers ::specifyAsTheWatermarkImage
      */
-    public function testCanSpecifyWatermarkImage(string $image, string $imageIdentifier, ?string $params = null, string $uri): void
+    public function testCanSpecifyWatermarkImage(string $image, string $imageIdentifier, string $params = null, string $uri): void
     {
         $this->mockHandler->append(
             new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
@@ -795,7 +795,7 @@ class FeatureContextTest extends TestCase
      * @dataProvider getDataForReplayingRequests
      * @covers ::makeSameRequest
      */
-    public function testCanReplayTheLastRequest(string $originalMethod, ?string $method, string $expectedUrl, ?string $publicKey, ?string $privateKey): void
+    public function testCanReplayTheLastRequest(string $originalMethod, string $method = null, string $expectedUrl, string $publicKey = null, string $privateKey = null): void
     {
         $this->mockHandler->append(new Response(200), new Response(200));
 

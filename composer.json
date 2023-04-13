@@ -104,7 +104,10 @@
       "cd docs; make html"
     ],
     "cs": "php-cs-fixer fix --dry-run --diff",
-    "sa": "vendor/bin/psalm",
+    "sa": [
+      "vendor/bin/psalm -c psalm-src.xml",
+      "vendor/bin/psalm -c psalm-tests.xml"
+    ],
     "dev": [
       "mkdir -p build/logs",
       "php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &"
