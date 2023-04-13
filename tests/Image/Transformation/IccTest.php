@@ -8,6 +8,7 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -46,6 +47,7 @@ class IccTest extends TestCase
      */
     public function testTransformationHappensWithMatchingName(): void
     {
+        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -54,6 +56,7 @@ class IccTest extends TestCase
 
         $profilePath = DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc';
 
+        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
@@ -74,6 +77,7 @@ class IccTest extends TestCase
      */
     public function testTransformationHappensWithDefaultKey(): void
     {
+        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -82,6 +86,7 @@ class IccTest extends TestCase
 
         $profilePath = DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc';
 
+        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
@@ -102,6 +107,7 @@ class IccTest extends TestCase
      */
     public function testThrowsExceptionWhenImagickFailsWithAFatalError(): void
     {
+        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
@@ -132,10 +138,7 @@ class IccTest extends TestCase
             Response::HTTP_INTERNAL_SERVER_ERROR,
         ));
 
-        (new Icc([
-            'default' => $path,
-        ]))
-            ->transform([]);
+        (new Icc(['default' => $path]))->transform([]);
     }
 
     /**
@@ -143,6 +146,7 @@ class IccTest extends TestCase
      */
     public function testStripProfileOnMismatch(): void
     {
+        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -151,11 +155,13 @@ class IccTest extends TestCase
 
         $expectedProfile = file_get_contents(DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc');
 
+        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->method('profileImage')
             ->willReturnCallback(
                 static function (string $name, string $profile) use ($expectedProfile): bool {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $name, $profile]) {
                         [0, 'icc', $expectedProfile] => throw new ImagickException('error #1', 465),
@@ -181,11 +187,13 @@ class IccTest extends TestCase
         $expectedProfile = file_get_contents(DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc');
         $e = new ImagickException('error #2');
 
+        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->method('profileImage')
             ->willReturnCallback(
                 static function (string $name, string $profile) use ($expectedProfile, $e): bool {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $name, $profile]) {
                         [0, 'icc', $expectedProfile] => throw new ImagickException('error #1', 465),

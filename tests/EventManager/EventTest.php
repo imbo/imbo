@@ -18,53 +18,11 @@ use PHPUnit\Framework\TestCase;
  */
 class EventTest extends TestCase
 {
-    private $event;
+    private Event $event;
 
     public function setUp(): void
     {
         $this->event = new Event();
-    }
-
-    public static function getArguments(): array
-    {
-        $mockCreator = fn (string $className) =>
-            fn () => $this->createMock($className);
-
-        return [
-            'request' => [
-                'getRequest', 'request', $mockCreator(Request::class),
-            ],
-            'response' => [
-                'getResponse', 'response', $mockCreator(Response::class),
-            ],
-            'database' => [
-                'getDatabase', 'database', $mockCreator(DatabaseInterface::class),
-            ],
-            'storage' => [
-                'getStorage', 'storage', $mockCreator(StorageInterface::class),
-            ],
-            'accessControl' => [
-                'getAccessControl', 'accessControl', $mockCreator(AdapterInterface::class),
-            ],
-            'manager' => [
-                'getManager', 'manager', $mockCreator(EventManager::class),
-            ],
-            'transformationManager' => [
-                'getTransformationManager', 'transformationManager', $mockCreator(TransformationManager::class),
-            ],
-            'inputLoaderManager' => [
-                'getInputLoaderManager', 'inputLoaderManager', $mockCreator(InputLoaderManager::class),
-            ],
-            'outputConverterManager' => [
-                'getOutputConverterManager', 'outputConverterManager', $mockCreator(OutputConverterManager::class),
-            ],
-            'config' => [
-                'getConfig', 'config', ['some' => 'config'],
-            ],
-            'handler' => [
-                'getHandler', 'handler', 'handler name',
-            ],
-        ];
     }
 
     /**
@@ -82,10 +40,13 @@ class EventTest extends TestCase
      * @covers ::getInputLoaderManager
      * @covers ::getOutputConverterManager
      */
-    public function testCanSetAndGetRequest(string $method, string $argument, $value): void
+    public function testCanSetAndGetRequest(string $method, string $argument, mixed $value): void
     {
         if ($value instanceof Closure) {
-            $value = $value->bindTo($this)();
+            /** @var Closure */
+            $new = $value->bindTo($this);
+            /** @var mixed */
+            $value = $new();
         }
 
         $this->event->setArgument($argument, $value);
@@ -153,5 +114,74 @@ class EventTest extends TestCase
         $this->assertSame($this->event, $this->event->setArguments(['bar' => 'foo']));
         $this->assertFalse($this->event->hasArgument('foo'));
         $this->assertSame('foo', $this->event->getArgument('bar'));
+    }
+
+    /**
+     * @return array<array{method:string,argument:string,value:mixed}>
+     */
+    public static function getArguments(): array
+    {
+        $mockCreator =
+            /** @param class-string $className */
+            fn (string $className): Closure =>
+                fn () => $this->createMock($className);
+
+        return [
+            'request' => [
+                'method' => 'getRequest',
+                'argument' => 'request',
+                'value' => $mockCreator(Request::class),
+            ],
+            'response' => [
+                'method' => 'getResponse',
+                'argument' => 'response',
+                'value' => $mockCreator(Response::class),
+            ],
+            'database' => [
+                'method' => 'getDatabase',
+                'argument' => 'database',
+                'value' => $mockCreator(DatabaseInterface::class),
+            ],
+            'storage' => [
+                'method' => 'getStorage',
+                'argument' => 'storage',
+                'value' => $mockCreator(StorageInterface::class),
+            ],
+            'accessControl' => [
+                'method' => 'getAccessControl',
+                'argument' => 'accessControl',
+                'value' => $mockCreator(AdapterInterface::class),
+            ],
+            'manager' => [
+                'method' => 'getManager',
+                'argument' => 'manager',
+                'value' => $mockCreator(EventManager::class),
+            ],
+            'transformationManager' => [
+                'method' => 'getTransformationManager',
+                'argument' => 'transformationManager',
+                'value' => $mockCreator(TransformationManager::class),
+            ],
+            'inputLoaderManager' => [
+                'method' => 'getInputLoaderManager',
+                'argument' => 'inputLoaderManager',
+                'value' => $mockCreator(InputLoaderManager::class),
+            ],
+            'outputConverterManager' => [
+                'method' => 'getOutputConverterManager',
+                'argument' => 'outputConverterManager',
+                'value' => $mockCreator(OutputConverterManager::class),
+            ],
+            'config' => [
+                'method' => 'getConfig',
+                'argument' => 'config',
+                'value' => ['some' => 'config'],
+            ],
+            'handler' => [
+                'method' => 'getHandler',
+                'argument' => 'handler',
+                'value' => 'handler name',
+            ],
+        ];
     }
 }

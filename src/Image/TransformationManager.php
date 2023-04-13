@@ -176,9 +176,9 @@ class TransformationManager implements ListenerInterface
      * of the input image.
      *
      * @throws InvalidArgumentException
-     * @return array|false `false` if we need the full size of the input image, array otherwise
+     * @return array{width:int,height:int,index:int}|false `false` if we need the full size of the input image, array otherwise
      */
-    public function getMinimumImageInputSize(EventInterface $event)
+    public function getMinimumImageInputSize(EventInterface $event): array|false
     {
         $transformations = $event->getRequest()->getTransformations();
 

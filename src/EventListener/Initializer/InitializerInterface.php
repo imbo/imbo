@@ -8,5 +8,5 @@ use Imbo\EventListener\ListenerInterface;
  */
 interface InitializerInterface
 {
-    public function initialize(ListenerInterface $listener);
+    public function initialize(ListenerInterface $listener): void;
 }

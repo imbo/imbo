@@ -26,6 +26,7 @@ class AutoRotateTest extends TransformationTests
      */
     public function testWillNotUpdateTheImageWhenNotNeeded(): void
     {
+        /** @var Imagick&MockObject */
         $imagick = $this->createConfiguredMock(Imagick::class, [
             'getImageOrientation' => 0,
         ]);
@@ -38,13 +39,92 @@ class AutoRotateTest extends TransformationTests
             ->transform([]);
     }
 
+    /**
+     * @dataProvider getTransformationData
+     * @covers ::transform
+     */
+    public function testWillRotateWhenNeeded(int $imageOrientation, int $newOrientation, Closure $expectations): void
+    {
+        /** @var Imagick&MockObject */
+        $imagick = $this->createConfiguredMock(Imagick::class, [
+            'getImageOrientation' => $imageOrientation,
+        ]);
+
+        $image = $this->createMock(Image::class);
+
+        /** @var Closure */
+        $new = $expectations->bindTo($this);
+        $new($imagick, $image);
+
+        $imagick
+            ->expects($this->once())
+            ->method('setImageOrientation')
+            ->with($newOrientation);
+
+        (new AutoRotate())
+            ->setImage($image)
+            ->setImagick($imagick)
+            ->transform([]);
+    }
+
+    /**
+     * @covers ::getMinimumInputSize
+     */
+    public function testGetMinimumInputSizeStopsResolving(): void
+    {
+        $this->assertSame(InputSizeConstraint::STOP_RESOLVING, (new AutoRotate())->getMinimumInputSize([], []));
+    }
+
+    /**
+     * @covers ::transform
+     */
+    public function testThrowsCustomExceptions(): void
+    {
+        $imagickException = new ImagickException('some error');
+        /** @var Imagick&MockObject */
+        $imagick = $this->createMock(Imagick::class);
+        $imagick
+            ->expects($this->once())
+            ->method('getImageOrientation')
+            ->willThrowException($imagickException);
+
+        $this->expectExceptionObject(new TransformationException('some error', Response::HTTP_BAD_REQUEST, $imagickException));
+
+        (new AutoRotate())
+            ->setImagick($imagick)
+            ->transform([]);
+    }
+
+    /**
+     * @covers ::transform
+     */
+    public function testThrowsCustomExceptionsOnPixelException(): void
+    {
+        $pixelException = new ImagickPixelException('some error');
+        /** @var Imagick&MockObject */
+        $imagick = $this->createMock(Imagick::class);
+        $imagick
+            ->expects($this->once())
+            ->method('getImageOrientation')
+            ->willThrowException($pixelException);
+
+        $this->expectExceptionObject(new TransformationException('some error', Response::HTTP_BAD_REQUEST, $pixelException));
+
+        (new AutoRotate())
+            ->setImagick($imagick)
+            ->transform([]);
+    }
+
+    /**
+     * @return array<array{imageOrientation:int,newOrientation:int,expectations:Closure}>
+     */
     public static function getTransformationData(): array
     {
         return [
             [
-                Imagick::ORIENTATION_TOPRIGHT,
-                Imagick::ORIENTATION_TOPLEFT,
-                function (Imagick&MockObject $imagick, Image&MockObject $image): void {
+                'imageOrientation' => Imagick::ORIENTATION_TOPRIGHT,
+                'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
+                'expectations' => function (Imagick&MockObject $imagick, Image&MockObject $image): void {
                     /** @var AutoRotateTest $this */
 
                     $imagick
@@ -56,9 +136,9 @@ class AutoRotateTest extends TransformationTests
                 },
             ],
             [
-                Imagick::ORIENTATION_BOTTOMRIGHT,
-                Imagick::ORIENTATION_TOPLEFT,
-                function (Imagick&MockObject $imagick, Image&MockObject $image): void {
+                'imageOrientation' => Imagick::ORIENTATION_BOTTOMRIGHT,
+                'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
+                'expectations' => function (Imagick&MockObject $imagick, Image&MockObject $image): void {
                     /** @var AutoRotateTest $this */
 
                     $imagick
@@ -70,9 +150,9 @@ class AutoRotateTest extends TransformationTests
                 },
             ],
             [
-                Imagick::ORIENTATION_BOTTOMLEFT,
-                Imagick::ORIENTATION_TOPLEFT,
-                function (Imagick&MockObject $imagick, Image&MockObject $image): void {
+                'imageOrientation' => Imagick::ORIENTATION_BOTTOMLEFT,
+                'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
+                'expectations' => function (Imagick&MockObject $imagick, Image&MockObject $image): void {
                     /** @var AutoRotateTest $this */
 
                     $imagick
@@ -84,9 +164,9 @@ class AutoRotateTest extends TransformationTests
                 },
             ],
             [
-                Imagick::ORIENTATION_LEFTTOP,
-                Imagick::ORIENTATION_TOPLEFT,
-                function (Imagick&MockObject $imagick, Image&MockObject $image): void {
+                'imageOrientation' => Imagick::ORIENTATION_LEFTTOP,
+                'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
+                'expectations' => function (Imagick&MockObject $imagick, Image&MockObject $image): void {
                     /** @var AutoRotateTest $this */
 
                     $imagick
@@ -113,9 +193,9 @@ class AutoRotateTest extends TransformationTests
                 },
             ],
             [
-                Imagick::ORIENTATION_RIGHTTOP,
-                Imagick::ORIENTATION_TOPLEFT,
-                function (Imagick&MockObject $imagick, Image&MockObject $image): void {
+                'imageOrientation' => Imagick::ORIENTATION_RIGHTTOP,
+                'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
+                'expectations' => function (Imagick&MockObject $imagick, Image&MockObject $image): void {
                     /** @var AutoRotateTest $this */
 
                     $imagick
@@ -142,9 +222,9 @@ class AutoRotateTest extends TransformationTests
                 },
             ],
             [
-                Imagick::ORIENTATION_RIGHTBOTTOM,
-                Imagick::ORIENTATION_TOPLEFT,
-                function (Imagick&MockObject $imagick, Image&MockObject $image): void {
+                'imageOrientation' => Imagick::ORIENTATION_RIGHTBOTTOM,
+                'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
+                'expectations' => function (Imagick&MockObject $imagick, Image&MockObject $image): void {
                     /** @var AutoRotateTest $this */
 
                     $imagick
@@ -171,9 +251,9 @@ class AutoRotateTest extends TransformationTests
                 },
             ],
             [
-                Imagick::ORIENTATION_LEFTBOTTOM,
-                Imagick::ORIENTATION_TOPLEFT,
-                function (Imagick&MockObject $imagick, Image&MockObject $image): void {
+                'imageOrientation' => Imagick::ORIENTATION_LEFTBOTTOM,
+                'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
+                'expectations' => function (Imagick&MockObject $imagick, Image&MockObject $image): void {
                     /** @var AutoRotateTest $this */
 
                     $imagick
@@ -200,76 +280,5 @@ class AutoRotateTest extends TransformationTests
                 },
             ],
         ];
-    }
-
-    /**
-     * @dataProvider getTransformationData
-     * @covers ::transform
-     */
-    public function testWillRotateWhenNeeded(int $imageOrientation, int $newOrientation, Closure $expectations): void
-    {
-        $imagick = $this->createConfiguredMock(Imagick::class, [
-            'getImageOrientation' => $imageOrientation,
-        ]);
-
-        $image = $this->createMock(Image::class);
-
-        $expectations->bindTo($this)($imagick, $image);
-
-        $imagick
-            ->expects($this->once())
-            ->method('setImageOrientation')
-            ->with($newOrientation);
-
-        (new AutoRotate())
-            ->setImage($image)
-            ->setImagick($imagick)
-            ->transform([]);
-    }
-
-    /**
-     * @covers ::getMinimumInputSize
-     */
-    public function testGetMinimumInputSizeStopsResolving(): void
-    {
-        $this->assertSame(InputSizeConstraint::STOP_RESOLVING, (new AutoRotate())->getMinimumInputSize([], []));
-    }
-
-    /**
-     * @covers ::transform
-     */
-    public function testThrowsCustomExceptions()
-    {
-        $imagickException = new ImagickException('some error');
-        $imagick = $this->createMock(Imagick::class);
-        $imagick
-            ->expects($this->once())
-            ->method('getImageOrientation')
-            ->willThrowException($imagickException);
-
-        $this->expectExceptionObject(new TransformationException('some error', Response::HTTP_BAD_REQUEST, $imagickException));
-
-        (new AutoRotate())
-            ->setImagick($imagick)
-            ->transform([]);
-    }
-
-    /**
-     * @covers ::transform
-     */
-    public function testThrowsCustomExceptionsOnPixelException()
-    {
-        $pixelException = new ImagickPixelException('some error');
-        $imagick = $this->createMock(Imagick::class);
-        $imagick
-            ->expects($this->once())
-            ->method('getImageOrientation')
-            ->willThrowException($pixelException);
-
-        $this->expectExceptionObject(new TransformationException('some error', Response::HTTP_BAD_REQUEST, $pixelException));
-
-        (new AutoRotate())
-            ->setImagick($imagick)
-            ->transform([]);
     }
 }

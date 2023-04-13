@@ -5,6 +5,7 @@ use Imbo\Behat\AdapterTest;
 use Imbo\Storage\Filesystem as StorageAdapter;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use SplFileInfo;
 
 class Filesystem implements AdapterTest
 {
@@ -39,6 +40,7 @@ class Filesystem implements AdapterTest
                 RecursiveIteratorIterator::CHILD_FIRST,
             );
 
+            /** @var SplFileInfo $file */
             foreach ($iterator as $file) {
                 $name = $file->getPathname();
 

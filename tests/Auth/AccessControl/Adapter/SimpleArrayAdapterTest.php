@@ -11,20 +11,6 @@ use PHPUnit\Framework\TestCase;
  */
 class SimpleArrayAdapterTest extends TestCase
 {
-    public function getAuthConfig(): array
-    {
-        $users = [
-            'publicKey1' => 'key1',
-            'publicKey2' => 'key2',
-        ];
-
-        return [
-            'no public keys exists' => [[], 'public', null],
-            'public key exists' => [$users, 'publicKey2', 'key2'],
-            'public key does not exist' => [$users, 'publicKey3', null],
-        ];
-    }
-
     /**
      * @covers ::__construct
      * @covers ::getExpandedAclList

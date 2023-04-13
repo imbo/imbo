@@ -57,8 +57,11 @@ jobs:
       - name: Check coding standard
         run: PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix --dry-run --diff
 
-      - name: Run static analysis
-        run: vendor/bin/psalm
+      - name: Run static analysis (src)
+        run: vendor/bin/psalm -c psalm-src.xml
+
+      - name: Run static analysis (tests)
+        run: vendor/bin/psalm -c psalm-tests.xml
 
       - name: Run unit tests using PHPUnit
         run: vendor/bin/phpunit

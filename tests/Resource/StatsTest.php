@@ -4,17 +4,18 @@ namespace Imbo\Resource;
 use Imbo\EventManager\EventInterface;
 use Imbo\EventManager\EventManager;
 use Imbo\Http\Response\Response;
-use Symfony\Component\HttpFoundation\HeaderBag;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
  * @coversDefaultClass Imbo\Resource\Stats
  */
 class StatsTest extends ResourceTests
 {
-    private $resource;
-    private $response;
-    private $eventManager;
-    private $event;
+    private Stats $resource;
+    private Response&MockObject $response;
+    private EventManager&MockObject $eventManager;
+    private EventInterface&MockObject $event;
 
     protected function getNewResource(): Stats
     {
@@ -38,7 +39,8 @@ class StatsTest extends ResourceTests
      */
     public function testTriggersTheCorrectEvent(): void
     {
-        $responseHeaders = $this->createMock(HeaderBag::class);
+        /** @var ResponseHeaderBag&MockObject */
+        $responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $responseHeaders
             ->expects($this->once())
             ->method('addCacheControlDirective')

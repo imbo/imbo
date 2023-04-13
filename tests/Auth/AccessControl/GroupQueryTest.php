@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
  */
 class GroupQueryTest extends TestCase
 {
-    private $query;
+    private GroupQuery $query;
 
     public function setUp(): void
     {

@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
  */
 class AccessRulesTest extends TestCase
 {
-    private $model;
+    private AccessRules $model;
 
     public function setUp(): void
     {

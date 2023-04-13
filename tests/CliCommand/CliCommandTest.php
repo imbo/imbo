@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace Imbo\CliCommand;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -8,7 +9,7 @@ use PHPUnit\Framework\TestCase;
  */
 class CliCommandTest extends TestCase
 {
-    private $command;
+    private CliCommand&MockObject $command;
 
     public function setUp(): void
     {

@@ -2,6 +2,7 @@
 namespace Imbo\EventManager;
 
 use PHPUnit\Framework\TestCase;
+use SplPriorityQueue;
 
 /**
  * @coversDefaultClass Imbo\EventManager\PriorityQueue
@@ -13,10 +14,11 @@ class PriorityQueueTest extends TestCase
      */
     public function testUsesAPredictableOrder(): void
     {
+        /** @var SplPriorityQueue<int,string> */
         $queue = new PriorityQueue();
 
         for ($i = 0; $i < 10; $i++) {
-            $queue->insert($i, 10);
+            $queue->insert((string) $i, 10);
         }
 
         $this->expectOutputString('0123456789');

@@ -6,18 +6,19 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Status as StatusModel;
 use Imbo\Storage\StorageInterface;
-use Symfony\Component\HttpFoundation\HeaderBag;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
  * @coversDefaultClass Imbo\Resource\Status
  */
 class StatusTest extends ResourceTests
 {
-    private $resource;
-    private $response;
-    private $database;
-    private $storage;
-    private $event;
+    private Status $resource;
+    private Response&MockObject $response;
+    private DatabaseInterface&MockObject $database;
+    private StorageInterface&MockObject $storage;
+    private EventInterface&MockObject $event;
 
     protected function getNewResource(): Status
     {
@@ -38,34 +39,6 @@ class StatusTest extends ResourceTests
         $this->resource = $this->getNewResource();
     }
 
-    public static function getStatuses(): array
-    {
-        return [
-            'no error' => [
-                true,
-                true,
-            ],
-            'database down' => [
-                false,
-                true,
-                Response::HTTP_SERVICE_UNAVAILABLE,
-                'Database error',
-            ],
-            'storage down' => [
-                true,
-                false,
-                Response::HTTP_SERVICE_UNAVAILABLE,
-                'Storage error',
-            ],
-            'both down' => [
-                false,
-                false,
-                Response::HTTP_SERVICE_UNAVAILABLE,
-                'Database and storage error',
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getStatuses
      * @covers ::get
@@ -81,7 +54,8 @@ class StatusTest extends ResourceTests
             ->method('getStatus')
             ->willReturn($storageStatus);
 
-        $responseHeaders = $this->createMock(HeaderBag::class);
+        /** @var ResponseHeaderBag&MockObject */
+        $responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $responseHeaders
             ->expects($this->once())
             ->method('addCacheControlDirective')
@@ -115,5 +89,36 @@ class StatusTest extends ResourceTests
             ->willReturnSelf();
 
         $this->resource->get($this->event);
+    }
+
+    /**
+     * @return array<string,array{databaseStatus:bool,storageStatus:bool,statusCode?:int,reasonPhrase?:string}>
+     */
+    public static function getStatuses(): array
+    {
+        return [
+            'no error' => [
+                'databaseStatus' => true,
+                'storageStatus' => true,
+            ],
+            'database down' => [
+                'databaseStatus' => false,
+                'storageStatus' => true,
+                'statusCode' => Response::HTTP_SERVICE_UNAVAILABLE,
+                'reasonPhrase' => 'Database error',
+            ],
+            'storage down' => [
+                'databaseStatus' => true,
+                'storageStatus' => false,
+                'statusCode' => Response::HTTP_SERVICE_UNAVAILABLE,
+                'reasonPhrase' => 'Storage error',
+            ],
+            'both down' => [
+                'databaseStatus' => false,
+                'storageStatus' => false,
+                'statusCode' => Response::HTTP_SERVICE_UNAVAILABLE,
+                'reasonPhrase' => 'Database and storage error',
+            ],
+        ];
     }
 }

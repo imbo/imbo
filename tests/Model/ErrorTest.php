@@ -6,6 +6,7 @@ use Imbo\Exception;
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -13,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ErrorTest extends TestCase
 {
-    private $model;
+    private Error $model;
 
     public function setUp(): void
     {
@@ -124,10 +125,10 @@ class ErrorTest extends TestCase
             'getImageIdentifier' => 'imageId',
         ]);
 
+        /** @var Request&MockObject */
         $request = $this->createConfiguredMock(Request::class, [
             'getImage' => $image,
         ]);
-
         $request->expects($this->never())->method('getImageIdentifier');
 
         $model = Error::createFromException($exception, $request);

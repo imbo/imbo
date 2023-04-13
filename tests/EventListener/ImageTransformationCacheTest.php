@@ -10,7 +10,6 @@ use Imbo\Model\Image;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\InputBag;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use TestFs\StreamWrapper as TestFs;
 
@@ -19,22 +18,19 @@ use TestFs\StreamWrapper as TestFs;
  */
 class ImageTransformationCacheTest extends ListenerTests
 {
-    private $listener;
-    private $event;
-    private $request;
-    private $response;
-    private $query;
-    private $user = 'user';
-    private $imageIdentifier = '7bf2e67f09de203da740a86cd37bbe8d';
-    private $responseHeaders;
-    private $requestHeaders;
+    private ImageTransformationCache $listener;
+    private Event&MockObject $event;
+    private Request&MockObject $request;
+    private Response&MockObject $response;
+    private string $user = 'user';
+    private string $imageIdentifier = '7bf2e67f09de203da740a86cd37bbe8d';
+    private ResponseHeaderBag&MockObject $responseHeaders;
+    private HeaderBag&MockObject $requestHeaders;
 
     public function setUp(): void
     {
         $this->responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $this->requestHeaders = $this->createMock(HeaderBag::class);
-        /** @var InputBag&MockObject */
-        $this->query = $this->createMock(ParameterBag::class);
 
         $this->response = $this->createMock(Response::class);
         $this->response->headers = $this->responseHeaders;
@@ -43,8 +39,8 @@ class ImageTransformationCacheTest extends ListenerTests
             'getUser' => $this->user,
             'getImageIdentifier' => $this->imageIdentifier,
         ]);
-        $this->request->query = $this->query;
         $this->request->headers = $this->requestHeaders;
+        $this->request->query = new InputBag();
 
         $this->event = $this->createConfiguredMock(Event::class, [
             'getRequest' => $this->request,
@@ -52,8 +48,6 @@ class ImageTransformationCacheTest extends ListenerTests
         ]);
 
         TestFs::register();
-        $this->cacheDir = TestFs::getDevice();
-
         $this->listener = new ImageTransformationCache(['path' => TestFs::url('cacheDir')]);
     }
 
@@ -81,6 +75,7 @@ class ImageTransformationCacheTest extends ListenerTests
             'headers' => $this->createMock(ResponseHeaderBag::class),
         ]);
 
+        $this->request->query = new InputBag(['t' => ['thumbnail']]);
         $this->request
             ->method('getExtension')
             ->willReturn('png');
@@ -89,11 +84,6 @@ class ImageTransformationCacheTest extends ListenerTests
             ->method('get')
             ->with('Accept', '*/*')
             ->willReturn('text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
-
-        $this->query
-            ->method('all')
-            ->with('t')
-            ->willReturn(['thumbnail']);
 
         $this->response
             ->expects($this->once())
@@ -125,6 +115,7 @@ class ImageTransformationCacheTest extends ListenerTests
      */
     public function testRemovesCorruptCachedDataOnCacheHit(): void
     {
+        $this->request->query = new InputBag(['t' => ['thumbnail']]);
         $this->request
             ->method('getExtension')
             ->willReturn('png');
@@ -134,12 +125,6 @@ class ImageTransformationCacheTest extends ListenerTests
             ->method('get')
             ->with('Accept', '*/*')
             ->willReturn('text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
-
-        $this->query
-            ->expects($this->once())
-            ->method('all')
-            ->with('t')
-            ->willReturn(['thumbnail']);
 
         $dir = TestFs::url('cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6');
         $file = 'bc6ffe312a5741a5705afe8639c08835';
@@ -220,6 +205,7 @@ class ImageTransformationCacheTest extends ListenerTests
         $this->listener->storeInCache($this->event);
         $this->assertTrue(is_file($cacheFile));
 
+        /** @var array{image:Image,headers:ResponseHeaderBag} */
         $data = unserialize(file_get_contents($cacheFile));
 
         $this->assertEquals($image, $data['image']);
@@ -240,6 +226,7 @@ class ImageTransformationCacheTest extends ListenerTests
             'headers' => $this->createMock(ResponseHeaderBag::class),
         ]);
 
+        $this->request->query = new InputBag(['t' => ['thumbnail']]);
         $this->request
             ->method('getExtension')
             ->willReturn('png');
@@ -248,11 +235,6 @@ class ImageTransformationCacheTest extends ListenerTests
             ->method('get')
             ->with('Accept', '*/*')
             ->willReturn('text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
-
-        $this->query
-            ->method('all')
-            ->with('t')
-            ->willReturn(['thumbnail']);
 
         $this->response
             ->expects($this->once())

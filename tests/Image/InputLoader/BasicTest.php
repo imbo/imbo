@@ -2,6 +2,7 @@
 namespace Imbo\Image\InputLoader;
 
 use Imagick;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -22,9 +23,6 @@ class BasicTest extends TestCase
     public function testReturnsSupportedMimeTypes(): void
     {
         $types = $this->loader->getSupportedMimeTypes();
-
-        $this->assertIsArray($types);
-
         $this->assertContains('image/png', array_keys($types));
         $this->assertContains('image/jpeg', array_keys($types));
         $this->assertContains('image/gif', array_keys($types));
@@ -38,6 +36,7 @@ class BasicTest extends TestCase
     {
         $blob = file_get_contents(FIXTURES_DIR . '/1024x256.png');
 
+        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())

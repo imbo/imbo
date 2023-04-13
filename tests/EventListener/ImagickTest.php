@@ -15,12 +15,12 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 class ImagickTest extends ListenerTests
 {
-    private $listener;
-    private $request;
-    private $response;
-    private $event;
-    private $transformationManager;
-    private $inputLoaderManager;
+    private Imagick $listener;
+    private Request&MockObject $request;
+    private Response&MockObject $response;
+    private EventInterface&MockObject $event;
+    private TransformationManager&MockObject $transformationManager;
+    private InputLoaderManager&MockObject $inputLoaderManager;
 
     public function setUp(): void
     {
@@ -163,14 +163,6 @@ class ImagickTest extends ListenerTests
         $this->listener->readImageBlob($this->event);
     }
 
-    public static function hasImageBeenTransformed(): array
-    {
-        return [
-            'has been transformed' => [true],
-            'has not been transformed' => [false],
-        ];
-    }
-
     /**
      * @dataProvider hasImageBeenTransformed
      * @covers ::updateModelBeforeStoring
@@ -178,10 +170,12 @@ class ImagickTest extends ListenerTests
      */
     public function testUpdatesModelBeforeStoring(bool $hasBeenTransformed): void
     {
+        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getHasBeenTransformed' => $hasBeenTransformed,
         ]);
 
+        /** @var I&MockObject */
         $imagick = $this->createMock(I::class);
 
         if ($hasBeenTransformed) {
@@ -219,10 +213,12 @@ class ImagickTest extends ListenerTests
      */
     public function testUpdatesModelBeforeSendingResponse(bool $hasBeenTransformed): void
     {
+        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getHasBeenTransformed' => $hasBeenTransformed,
         ]);
 
+        /** @var I&MockObject */
         $imagick = $this->createMock(I::class);
 
         if ($hasBeenTransformed) {
@@ -273,6 +269,7 @@ class ImagickTest extends ListenerTests
             ->method('setArgument')
             ->willReturnCallback(
                 static function (string $arg, int $value) use ($event): EventInterface&MockObject {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $arg, $value]) {
                         [0, 'ratio', 4],
@@ -287,6 +284,7 @@ class ImagickTest extends ListenerTests
             ->with($this->event)
             ->willReturn(['width' => 30, 'height' => 20, 'index' => 0]);
 
+        /** @var I&MockObject */
         $imagick = $this->createConfiguredMock(I::class, [
             'getImageGeometry' => ['width' => 32, 'height' => 32],
         ]);
@@ -309,5 +307,16 @@ class ImagickTest extends ListenerTests
         $this->listener
             ->setImagick($imagick)
             ->readImageBlob($this->event);
+    }
+
+    /**
+     * @return array<array{hasBeenTransformed:bool}>
+     */
+    public static function hasImageBeenTransformed(): array
+    {
+        return [
+            'has been transformed' => ['hasBeenTransformed' => true],
+            'has not been transformed' => ['hasBeenTransformed' => false],
+        ];
     }
 }

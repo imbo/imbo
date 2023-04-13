@@ -10,6 +10,7 @@ use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass Imbo\EventListener\ExifMetadata
@@ -26,82 +27,6 @@ class ExifMetadataTest extends ListenerTests
     protected function getListener(): ExifMetadata
     {
         return $this->listener;
-    }
-
-    public static function getFilterData(): array
-    {
-        $data = [
-            'date:create' => '2013-11-26T19:42:48+01:00',
-            'date:modify' => '2013-11-26T19:42:48+01:00',
-            'exif:Flash' => '16',
-            'exif:GPSAltitude' => '254/5',
-            'exif:GPSAltitudeRef' => '0',
-            'exif:GPSDateStamp' => '2012:06:09',
-            'exif:GPSInfo' => '730',
-            'exif:GPSLatitude' => '63/1, 40/1, 173857/3507',
-            'exif:GPSLatitudeRef' => 'N',
-            'exif:GPSLongitude' => '9/1, 5/1, 38109/12500',
-            'exif:GPSLongitudeRef' => 'E',
-            'exif:GPSProcessingMethod' => '65, 83, 67, 73, 73, 0, 0, 0',
-            'exif:GPSTimeStamp' => '17/1, 17/1, 51/1',
-            'exif:GPSVersionID' => '2, 2, 0, 0',
-            'exif:Make' => 'SAMSUNG',
-            'exif:Model' => 'GT-I9100',
-            'jpeg:colorspace' => '2',
-            'jpeg:sampling-factor' => '2x2,1x1,1x1',
-        ];
-
-        return [
-            'all values' => [
-                'data' => $data,
-                'tags' => ['*'],
-                'expectedData' => array_merge($data, [
-                    'gps:location' => [9.0841802, 63.68043730000316],
-                    'gps:altitude' => 50.8,
-                ]),
-
-            ],
-            'specific value' => [
-                'data' => $data,
-                'tags' => ['exif:Make'],
-                'expectedData' => [
-                    'exif:Make' => 'SAMSUNG',
-                ],
-            ],
-            'default' => [
-                'data' => $data,
-                'tags' => null,
-                'expectedData' => [
-                    'exif:Flash' => '16',
-                    'exif:GPSAltitude' => '254/5',
-                    'exif:GPSAltitudeRef' => '0',
-                    'exif:GPSDateStamp' => '2012:06:09',
-                    'exif:GPSInfo' => '730',
-                    'exif:GPSLatitude' => '63/1, 40/1, 173857/3507',
-                    'exif:GPSLatitudeRef' => 'N',
-                    'exif:GPSLongitude' => '9/1, 5/1, 38109/12500',
-                    'exif:GPSLongitudeRef' => 'E',
-                    'exif:GPSProcessingMethod' => '65, 83, 67, 73, 73, 0, 0, 0',
-                    'exif:GPSTimeStamp' => '17/1, 17/1, 51/1',
-                    'exif:GPSVersionID' => '2, 2, 0, 0',
-                    'exif:Make' => 'SAMSUNG',
-                    'exif:Model' => 'GT-I9100',
-                    'gps:location' => [9.0841802, 63.68043730000316],
-                    'gps:altitude' => 50.8,
-                ],
-            ],
-            'mixed' => [
-                'data' => $data,
-                'tags' => ['exif:Model', 'jpeg:*', 'date:*'],
-                'expectedData' => [
-                    'date:create' => '2013-11-26T19:42:48+01:00',
-                    'date:modify' => '2013-11-26T19:42:48+01:00',
-                    'exif:Model' => 'GT-I9100',
-                    'jpeg:colorspace' => '2',
-                    'jpeg:sampling-factor' => '2x2,1x1,1x1',
-                ],
-            ],
-        ];
     }
 
     /**
@@ -124,6 +49,7 @@ class ExifMetadataTest extends ListenerTests
             'getBlob' => $blob,
         ]);
 
+        /** @var Imagick&MockObject */
         $imagick = $this->createConfiguredMock(Imagick::class, [
             'getImageProperties' => $data,
         ]);
@@ -137,12 +63,14 @@ class ExifMetadataTest extends ListenerTests
             'getImage' => $image,
         ]);
 
+        /** @var DatabaseInterface&MockObject */
         $database = $this->createMock(DatabaseInterface::class);
         $database
             ->expects($this->once())
             ->method('updateMetadata')
             ->with($user, $imageIdentifier, $expectedData);
 
+        /** @var Event&MockObject */
         $event = $this->createMock(Event::class);
         $event
             ->expects($this->exactly(2))
@@ -164,6 +92,7 @@ class ExifMetadataTest extends ListenerTests
      */
     public function testWillDeleteImageWhenUpdatingMetadataFails(): void
     {
+        /** @var DatabaseInterface&MockObject */
         $database = $this->createMock(DatabaseInterface::class);
         $database
             ->expects($this->once())
@@ -281,6 +210,7 @@ class ExifMetadataTest extends ListenerTests
             'getRequest' => $request,
         ]);
 
+        /** @var array{"gps:location":array<double>,"gps:altitude":double} */
         $properties = $listener->populate($event);
 
         $this->assertEqualsWithDelta(9.0841802, $properties['gps:location'][0], 0.05);
@@ -303,6 +233,7 @@ class ExifMetadataTest extends ListenerTests
         $image->setBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));
         $image->setImageIdentifier($imageIdentifier);
 
+        /** @var Request&MockObject */
         $request = $this->createMock(Request::class);
         $request
             ->expects($this->exactly(2))
@@ -314,6 +245,7 @@ class ExifMetadataTest extends ListenerTests
             ->method('getUser')
             ->willReturn($user);
 
+        /** @var DatabaseInterface&MockObject */
         $database = $this->createMock(DatabaseInterface::class);
         $database
             ->expects($this->once())
@@ -323,6 +255,7 @@ class ExifMetadataTest extends ListenerTests
                 $this->arrayHasKey('gps:location'),
             );
 
+        /** @var EventInterface&MockObject */
         $event = $this->createMock(EventInterface::class);
         $event
             ->expects($this->exactly(2))
@@ -340,5 +273,84 @@ class ExifMetadataTest extends ListenerTests
         $this->assertSame('GT-I9100', $properties['exif:Model']);
 
         $listener->save($event);
+    }
+
+    /**
+     * @return array<array{data:array<string,string>,tags:?array,expectedData:array<string,string|double|array<double>>}>
+     */
+    public static function getFilterData(): array
+    {
+        $data = [
+            'date:create' => '2013-11-26T19:42:48+01:00',
+            'date:modify' => '2013-11-26T19:42:48+01:00',
+            'exif:Flash' => '16',
+            'exif:GPSAltitude' => '254/5',
+            'exif:GPSAltitudeRef' => '0',
+            'exif:GPSDateStamp' => '2012:06:09',
+            'exif:GPSInfo' => '730',
+            'exif:GPSLatitude' => '63/1, 40/1, 173857/3507',
+            'exif:GPSLatitudeRef' => 'N',
+            'exif:GPSLongitude' => '9/1, 5/1, 38109/12500',
+            'exif:GPSLongitudeRef' => 'E',
+            'exif:GPSProcessingMethod' => '65, 83, 67, 73, 73, 0, 0, 0',
+            'exif:GPSTimeStamp' => '17/1, 17/1, 51/1',
+            'exif:GPSVersionID' => '2, 2, 0, 0',
+            'exif:Make' => 'SAMSUNG',
+            'exif:Model' => 'GT-I9100',
+            'jpeg:colorspace' => '2',
+            'jpeg:sampling-factor' => '2x2,1x1,1x1',
+        ];
+
+        return [
+            'all values' => [
+                'data' => $data,
+                'tags' => ['*'],
+                'expectedData' => array_merge($data, [
+                    'gps:location' => [9.0841802, 63.68043730000316],
+                    'gps:altitude' => 50.8,
+                ]),
+
+            ],
+            'specific value' => [
+                'data' => $data,
+                'tags' => ['exif:Make'],
+                'expectedData' => [
+                    'exif:Make' => 'SAMSUNG',
+                ],
+            ],
+            'default' => [
+                'data' => $data,
+                'tags' => null,
+                'expectedData' => [
+                    'exif:Flash' => '16',
+                    'exif:GPSAltitude' => '254/5',
+                    'exif:GPSAltitudeRef' => '0',
+                    'exif:GPSDateStamp' => '2012:06:09',
+                    'exif:GPSInfo' => '730',
+                    'exif:GPSLatitude' => '63/1, 40/1, 173857/3507',
+                    'exif:GPSLatitudeRef' => 'N',
+                    'exif:GPSLongitude' => '9/1, 5/1, 38109/12500',
+                    'exif:GPSLongitudeRef' => 'E',
+                    'exif:GPSProcessingMethod' => '65, 83, 67, 73, 73, 0, 0, 0',
+                    'exif:GPSTimeStamp' => '17/1, 17/1, 51/1',
+                    'exif:GPSVersionID' => '2, 2, 0, 0',
+                    'exif:Make' => 'SAMSUNG',
+                    'exif:Model' => 'GT-I9100',
+                    'gps:location' => [9.0841802, 63.68043730000316],
+                    'gps:altitude' => 50.8,
+                ],
+            ],
+            'mixed' => [
+                'data' => $data,
+                'tags' => ['exif:Model', 'jpeg:*', 'date:*'],
+                'expectedData' => [
+                    'date:create' => '2013-11-26T19:42:48+01:00',
+                    'date:modify' => '2013-11-26T19:42:48+01:00',
+                    'exif:Model' => 'GT-I9100',
+                    'jpeg:colorspace' => '2',
+                    'jpeg:sampling-factor' => '2x2,1x1,1x1',
+                ],
+            ],
+        ];
     }
 }

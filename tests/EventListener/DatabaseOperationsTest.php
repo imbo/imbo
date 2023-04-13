@@ -13,22 +13,23 @@ use Imbo\Model\Metadata;
 use Imbo\Model\Stats;
 use Imbo\Model\User;
 use Imbo\Resource\Images\Query;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\HttpFoundation\InputBag;
 
 /**
  * @coversDefaultClass Imbo\EventListener\DatabaseOperations
  */
 class DatabaseOperationsTest extends ListenerTests
 {
-    private $listener;
-    private $event;
-    private $request;
-    private $response;
-    private $database;
-    private $user = 'user';
-    private $imageIdentifier = 'id';
-    private $image;
-    private $accessControl;
+    private DatabaseOperations $listener;
+    private EventInterface&MockObject $event;
+    private Request&MockObject $request;
+    private Response&MockObject $response;
+    private DatabaseInterface&MockObject $database;
+    private string $user = 'user';
+    private string $imageIdentifier = 'id';
+    private Image&MockObject $image;
+    private AdapterInterface&MockObject $accessControl;
 
     public function setUp(): void
     {
@@ -235,45 +236,16 @@ class DatabaseOperationsTest extends ListenerTests
 
         $date = new DateTime();
 
-        $query = $this->createMock(ParameterBag::class);
-        $query
-            ->method('has')
-            ->willReturnCallback(
-                static function (string $param): bool {
-                    static $i = 0;
-                    return match ([$i++, $param]) {
-                        [0, 'page'],
-                        [1, 'limit'],
-                        [2, 'metadata'],
-                        [3, 'from'],
-                        [4, 'to'],
-                        [5, 'sort'],
-                        [6, 'ids'],
-                        [7, 'checksums'],
-                        [8, 'originalChecksums'],
-                        [9, 'fields'] => true,
-                    };
-                },
-            );
-        $query
-            ->method('get')
-            ->willReturnCallback(
-                static function (string $param): int|array {
-                    static $i = 0;
-                    return match ([$i++, $param]) {
-                        [0, 'page'] => 1,
-                        [1, 'limit'] => 5,
-                        [2, 'from'] => 1355156488,
-                        [3, 'to'] => 1355176488,
-                        [4, 'sort'] => ['size:desc'],
-                        [5, 'ids'] => ['identifier1', 'identifier2', 'identifier3'],
-                        [6, 'checksums'] => ['checksum1', 'checksum2', 'checksum3'],
-                        [7, 'originalChecksums'] => ['checksum1', 'checksum2', 'checksum3'],
-                    };
-                },
-            );
-
-        $this->request->query = $query;
+        $this->request->query = new InputBag([
+            'page' => 1,
+            'limit' => 5,
+            'from' => 1355156488,
+            'to' => 1355176488,
+            'sort' => ['size:desc'],
+            'ids' => ['identifier1', 'identifier2', 'identifier3'],
+            'checksums' => ['checksum1', 'checksum2', 'checksum3'],
+            'originalChecksums' => ['checksum1', 'checksum2', 'checksum3'],
+        ]);
 
         $imagesQuery = $this->createMock(Query::class);
         $this->listener->setImagesQuery($imagesQuery);

@@ -8,6 +8,7 @@ use Imbo\Exception\ResourceException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Router\Route;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
@@ -15,12 +16,12 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  */
 class GlobalShortUrlTest extends ResourceTests
 {
-    private $resource;
-    private $request;
-    private $response;
-    private $database;
-    private $manager;
-    private $event;
+    private GlobalShortUrl $resource;
+    private Request&MockObject $request;
+    private Response&MockObject $response;
+    private DatabaseInterface&MockObject $database;
+    private EventManager&MockObject $manager;
+    private EventInterface&MockObject $event;
 
     protected function getNewResource(): GlobalShortUrl
     {
@@ -60,6 +61,7 @@ class GlobalShortUrlTest extends ResourceTests
             'accessToken' => 'some token',
         ];
 
+        /** @var Route&MockObject */
         $route = $this->createMock(Route::class);
         $route
             ->method('get')
@@ -71,6 +73,7 @@ class GlobalShortUrlTest extends ResourceTests
             ->with(
                 $this->callback(
                     static function (string $name): bool {
+                        /** @var int */
                         static $i = 0;
                         return match ([$i++, $name]) {
                             [0, 'user'],
@@ -81,6 +84,7 @@ class GlobalShortUrlTest extends ResourceTests
                 ),
                 $this->callback(
                     static function (string $value): bool {
+                        /** @var int */
                         static $i = 0;
                         return match ([$i++, $value]) {
                             [0, 'christer'],
@@ -112,6 +116,7 @@ class GlobalShortUrlTest extends ResourceTests
                 'query' => $query,
             ]);
 
+        /** @var ResponseHeaderBag&MockObject */
         $responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $responseHeaders
             ->expects($this->once())
@@ -133,6 +138,7 @@ class GlobalShortUrlTest extends ResourceTests
      */
     public function testRespondsWith404WhenShortUrlDoesNotExist(): void
     {
+        /** @var Route&MockObject */
         $route = $this->createMock(Route::class);
         $route
             ->expects($this->once())

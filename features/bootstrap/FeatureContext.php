@@ -6,7 +6,7 @@ use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
-use GuzzleHttp\ClientInterface;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Header;
 use GuzzleHttp\Psr7\Uri;
@@ -130,6 +130,11 @@ class FeatureContext extends ApiContext
     private static $storageTestConfig;
 
     /**
+     * Handler stack for the internal Guzzle client
+     */
+    private HandlerStack $handlerStack;
+
+    /**
      * Set up adapters for the suite
      *
      * @BeforeScenario
@@ -190,23 +195,25 @@ class FeatureContext extends ApiContext
      * - Set the request header that informs Imbo which class is responsible for configuring the
      *   database and storage adapters in the test
      *
-     * {@inheritdoc}
-     *
      * @throws RuntimeException
      */
-    public function setClient(ClientInterface $client, string $baseUri): self
+    public function initializeClient(array $config): static
     {
-        $handler = $client->getConfig('handler');
-        $handler->push(Middleware::history($this->history), self::MIDDLEWARE_HISTORY);
-        $handler->push(Middleware::mapRequest(function (RequestInterface $request) {
-            return $request
-                ->withHeader('X-Behat-Database-Test', self::$databaseTest)
-                ->withHeader('X-Behat-Storage-Test', self::$storageTest)
-                ->withHeader('X-Behat-Database-Test-Config', urlencode(json_encode(self::$databaseTestConfig)))
-                ->withHeader('X-Behat-Storage-Test-Config', urlencode(json_encode(self::$storageTestConfig)));
-        }), self::MIDDLEWARE_BEHAT_CONTEXT_CLASS);
-
-        return parent::setClient($client, $baseUri);
+        $this->handlerStack = $config['handler'] ?? HandlerStack::create();
+        $this->handlerStack->push(Middleware::history($this->history), self::MIDDLEWARE_HISTORY);
+        $this->handlerStack->push(
+            Middleware::mapRequest(
+                fn (RequestInterface $request): RequestInterface =>
+                    $request
+                        ->withHeader('X-Behat-Database-Test', self::$databaseTest)
+                        ->withHeader('X-Behat-Storage-Test', self::$storageTest)
+                        ->withHeader('X-Behat-Database-Test-Config', urlencode(json_encode(self::$databaseTestConfig)))
+                        ->withHeader('X-Behat-Storage-Test-Config', urlencode(json_encode(self::$storageTestConfig))),
+            ),
+            self::MIDDLEWARE_BEHAT_CONTEXT_CLASS,
+        );
+        $config['handler'] = $this->handlerStack;
+        return parent::initializeClient($config);
     }
 
     /**
@@ -216,20 +223,15 @@ class FeatureContext extends ApiContext
      * `Then the response body contains JSON:` step:
      *
      * - @isDate(): Check if a field that is supposed to represent a date is property formatted
-     *
-     * {@inheritdoc}
      */
-    public function setArrayContainsComparator(ArrayContainsComparator $comparator): self
+    public function setArrayContainsComparator(ArrayContainsComparator $comparator): static
     {
         $comparator->addFunction('isDate', [$this, 'isDate']);
 
         return parent::setArrayContainsComparator($comparator);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setRequestHeader($header, $value): self
+    public function setRequestHeader($header, $value): static
     {
         if ($value === 'current-timestamp') {
             $value = gmdate('Y-m-d\TH:i:s\Z');
@@ -349,7 +351,7 @@ class FeatureContext extends ApiContext
      *
      * @Given /^the (storage|database) is down$/
      */
-    public function forceAdapterFailure(string $adapter): self
+    public function forceAdapterFailure(string $adapter): static
     {
         if (!in_array($adapter, ['storage', 'database'])) {
             throw new InvalidArgumentException(sprintf('Invalid adapter: "%s".', $adapter));
@@ -404,9 +406,9 @@ class FeatureContext extends ApiContext
 
         $useHeaders = (bool) $useHeaders;
 
-        // Fetch the handler stack and push a signature function to it
-        $stack = $this->client->getConfig('handler');
-        $stack->unshift(Middleware::mapRequest(function (RequestInterface $request) use ($useHeaders, $stack) {
+        // Push a signature function to the handler stack
+        $stack = $this->handlerStack;
+        $stack->unshift(Middleware::mapRequest(function (RequestInterface $request) use ($useHeaders, $stack): RequestInterface {
             // Add public key as a query parameter if we're told not to use headers. We do this
             // before the signing below since this parameter needs to be a part of the data that
             // will be used for signing
@@ -487,9 +489,9 @@ class FeatureContext extends ApiContext
         // Set the token handler as active
         $this->accessTokenHandlerIsActive = true;
 
-        // Fetch the handler stack and push an access token function to it
-        $stack = $this->client->getConfig('handler');
-        $stack->unshift(Middleware::mapRequest(function (RequestInterface $request) use ($stack, $allRequests) {
+        // Push an access token function to the handler stack
+        $stack = $this->handlerStack;
+        $stack->unshift(Middleware::mapRequest(function (RequestInterface $request) use ($stack, $allRequests): RequestInterface {
             $uri = $request->getUri();
 
             // Set the public key and remove a possible accessToken query parameter
@@ -539,7 +541,7 @@ class FeatureContext extends ApiContext
      * @Given :imagePath exists for user :user
      * @Given :imagePath exists for user :user with the following metadata:
      */
-    public function addUserImageToImbo(string $imagePath, string $user, PyStringNode $metadata = null): self
+    public function addUserImageToImbo(string $imagePath, string $user, PyStringNode $metadata = null): static
     {
         if (!file_exists($imagePath)) {
             throw new InvalidArgumentException(sprintf('File does not exist: "%s".', $imagePath));

@@ -6,6 +6,7 @@ use ImagickException;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Strip
@@ -22,6 +23,7 @@ class StripTest extends TransformationTests
      */
     public function testStripMetadata(): void
     {
+        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -35,7 +37,7 @@ class StripTest extends TransformationTests
         $exifExists = false;
 
         foreach (array_keys($imagick->getImageProperties()) as $key) {
-            if (substr($key, 0, 5) === 'exif:') {
+            if (substr((string) $key, 0, 5) === 'exif:') {
                 $exifExists = true;
                 break;
             }
@@ -51,7 +53,7 @@ class StripTest extends TransformationTests
             ->transform([]);
 
         foreach (array_keys($imagick->getImageProperties()) as $key) {
-            $this->assertStringStartsNotWith('exif', $key);
+            $this->assertStringStartsNotWith('exif', (string) $key);
         }
     }
 
@@ -60,6 +62,7 @@ class StripTest extends TransformationTests
      */
     public function testThrowsCorrectExceptionWhenAnErrorOccurs(): void
     {
+        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
@@ -77,12 +80,14 @@ class StripTest extends TransformationTests
      */
     public function testReloadsImage(): void
     {
+        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
             ->method('setHasBeenTransformed')
             ->with(true);
 
+        /** @var Imagick&MockObject */
         $imagick = $this->createConfiguredMock(Imagick::class, [
             'getImageBlob' => 'foo',
         ]);

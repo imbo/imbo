@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
  */
 class StatusTest extends TestCase
 {
-    private $model;
+    private Status $model;
 
     public function setUp(): void
     {

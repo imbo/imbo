@@ -2,7 +2,7 @@
 <psalm
     hoistConstants="true"
     cacheDirectory=".psalm/cache"
-    errorLevel="7"
+    errorLevel="1"
     resolveFromConfigFile="true"
     findUnusedCode="false"
     findUnusedBaselineEntry="false"
@@ -15,12 +15,21 @@
     </stubs>
     <projectFiles>
         <directory name="features"/>
-        <directory name="src"/>
         <directory name="tests"/>
         <ignoreFiles>
             <directory name="vendor"/>
+            <directory name="features/bootstrap/imbo-configs"/>
+            <file name="features/bootstrap/FeatureContext.php"/>
         </ignoreFiles>
     </projectFiles>
+    <issueHandlers>
+        <MixedPropertyTypeCoercion>
+            <errorLevel type="suppress">
+                <file name="tests/Behat/FeatureContextTest.php" />
+                <referencedProperty name="Imbo\Behat\FeatureContextTest::$history" />
+            </errorLevel>
+        </MixedPropertyTypeCoercion>
+    </issueHandlers>
     <plugins>
         <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
     </plugins>

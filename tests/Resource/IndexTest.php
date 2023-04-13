@@ -5,6 +5,7 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
@@ -12,10 +13,10 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  */
 class IndexTest extends ResourceTests
 {
-    private $resource;
-    private $request;
-    private $response;
-    private $event;
+    private Index $resource;
+    private Request&MockObject $request;
+    private Response&MockObject $response;
+    private EventInterface&MockObject $event;
 
     protected function getNewResource(): Index
     {
@@ -26,7 +27,6 @@ class IndexTest extends ResourceTests
     {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
-        $this->responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $this->event = $this->createConfiguredMock(EventInterface::class, [
             'getRequest' => $this->request,
             'getResponse' => $this->response,
@@ -57,6 +57,7 @@ class IndexTest extends ResourceTests
             ->method('getConfig')
             ->willReturn(['indexRedirect' => null]);
 
+        /** @var ResponseHeaderBag&MockObject */
         $responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $responseHeaders
             ->expects($this->once())
@@ -79,6 +80,7 @@ class IndexTest extends ResourceTests
             ->method('getConfig')
             ->willReturn(['indexRedirect' => $url]);
 
+        /** @var ResponseHeaderBag&MockObject */
         $responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $responseHeaders
             ->expects($this->once())

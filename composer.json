@@ -36,7 +36,7 @@
   },
   "require-dev": {
     "christeredvartsen/testfs": "^0.4.0",
-    "imbo/behat-api-extension": "^4.0",
+    "imbo/behat-api-extension": "^5.0",
     "imbo/imbo-adapters-sdk": "dev-main",
     "imbo/imbo-coding-standard": "^2.0",
     "imbo/imbo-filesystem-adapters": "dev-main",
@@ -104,7 +104,10 @@
       "cd docs; make html"
     ],
     "cs": "php-cs-fixer fix --dry-run --diff",
-    "sa": "vendor/bin/psalm",
+    "sa": [
+      "vendor/bin/psalm -c psalm-src.xml",
+      "vendor/bin/psalm -c psalm-tests.xml"
+    ],
     "dev": [
       "mkdir -p build/logs",
       "php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &"

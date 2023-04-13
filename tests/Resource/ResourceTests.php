@@ -7,10 +7,8 @@ abstract class ResourceTests extends TestCase
 {
     /**
      * Return a resource that can be tested
-     *
-     * @return ResourceInterface
      */
-    abstract protected function getNewResource();
+    abstract protected function getNewResource(): ResourceInterface;
 
     /**
      * @covers ::getSubscribedEvents
@@ -26,20 +24,20 @@ abstract class ResourceTests extends TestCase
      */
     public function testReturnsTheCorrectAllowedMethods(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $resource = $this->getNewResource();
 
         // Translate the class name to an event name: Imbo\Resource\GlobalShortUrl => globalshorturl
-        $shortName = strtolower(substr(get_class($resource), strrpos(get_class($resource), '\\') + 1));
+        $shortName = strtolower(substr(get_class($resource), (int) strrpos(get_class($resource), '\\') + 1));
 
         $methods = $resource->getAllowedMethods();
         $definition = $resource::getSubscribedEvents();
 
-        $this->assertIsArray($definition);
-
         foreach ($methods as $method) {
             $expectedEventName = strtolower($shortName . '.' . $method);
 
-            foreach ($definition as $event => $callback) {
+            foreach (array_keys($definition) as $event) {
                 if ($event === $expectedEventName) {
                     continue 2;
                 }
@@ -52,12 +50,12 @@ abstract class ResourceTests extends TestCase
             ));
         }
 
-        foreach ($definition as $event => $callback) {
+        foreach (array_keys($definition) as $event) {
             if (strpos($event, $shortName) !== 0) {
                 continue;
             }
 
-            $expectedMethod = strtoupper(substr($event, strrpos($event, '.') + 1));
+            $expectedMethod = strtoupper(substr($event, (int) strrpos($event, '.') + 1));
 
             foreach ($methods as $method) {
                 if ($method === $expectedMethod) {

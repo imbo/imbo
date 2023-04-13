@@ -55,11 +55,13 @@ class Rotate extends Transformation implements InputSizeConstraint
             throw new TransformationException('Missing required parameter: angle', Response::HTTP_BAD_REQUEST);
         }
 
+        $angle = (int) $params['angle'];
+
         // If the angle of the rotation is dividable by 90, we can calculate the input
         // size for the transformation that follow. Otherwise, this will be hard, so we
         // return false to signal that we can't make any assumptions from this point on
-        if ($params['angle'] % 90 === 0) {
-            return ['rotation' => (int) $params['angle']];
+        if ($angle % 90 === 0) {
+            return ['rotation' => $angle];
         }
 
         return InputSizeConstraint::STOP_RESOLVING;

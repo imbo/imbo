@@ -11,7 +11,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class GeneratePrivateKeyTest extends TestCase
 {
-    private $command;
+    private GeneratePrivateKey $command;
 
     public function setUp(): void
     {

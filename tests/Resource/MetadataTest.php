@@ -10,19 +10,20 @@ use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
 use Imbo\Model\ModelInterface;
 use Imbo\Storage\StorageInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass Imbo\Resource\Metadata
  */
 class MetadataTest extends ResourceTests
 {
-    private $resource;
-    private $request;
-    private $response;
-    private $database;
-    private $storage;
-    private $manager;
-    private $event;
+    private Metadata $resource;
+    private Request&MockObject $request;
+    private Response&MockObject $response;
+    private DatabaseInterface&MockObject $database;
+    private StorageInterface&MockObject $storage;
+    private EventManager&MockObject $manager;
+    private EventInterface&MockObject $event;
 
     protected function getNewResource(): Metadata
     {
@@ -79,6 +80,7 @@ class MetadataTest extends ResourceTests
             ->method('trigger')
             ->willReturnCallback(
                 static function (string $event, array $params = []) use ($metadata, $manager) {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $event, $params]) {
                         [0, 'db.metadata.delete', []],
@@ -182,7 +184,7 @@ class MetadataTest extends ResourceTests
     /**
      * @covers ::validateMetadata
      */
-    public function testThrowsExceptionOnInvalidKeys()
+    public function testThrowsExceptionOnInvalidKeys(): void
     {
         $this->request
             ->expects($this->once())

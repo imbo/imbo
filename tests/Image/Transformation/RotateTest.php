@@ -3,6 +3,7 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Rotate
@@ -14,22 +15,14 @@ class RotateTest extends TransformationTests
         return new Rotate();
     }
 
-    public static function getRotateParams(): array
-    {
-        return [
-            '90 angle' => [90, 463, 665],
-            '180 angle' => [180, 665, 463],
-        ];
-    }
-
     /**
      * @dataProvider getRotateParams
      * @covers ::transform
      */
     public function testCanTransformImage(int $angle, int $width, int $height): void
     {
+        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
-
         $image
             ->expects($this->once())
             ->method('setWidth')
@@ -58,5 +51,24 @@ class RotateTest extends TransformationTests
                 'angle' => $angle,
                 'bg' => 'fff',
             ]);
+    }
+
+    /**
+     * @return array<string,array{angle:int,width:int,height:int}>
+     */
+    public static function getRotateParams(): array
+    {
+        return [
+            '90 angle' => [
+                'angle' => 90,
+                'width' => 463,
+                'height' => 665,
+            ],
+            '180 angle' => [
+                'angle' => 180,
+                'width' => 665,
+                'height' => 463,
+            ],
+        ];
     }
 }

@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  */
 class RequestTest extends TestCase
 {
-    private $request;
+    private Request $request;
 
     public function setUp(): void
     {
@@ -73,7 +73,6 @@ class RequestTest extends TestCase
 
         $request = new Request($query);
         $transformations = $request->getTransformations();
-        $this->assertIsArray($transformations);
         $this->assertSame(count($query['t']), count($transformations));
 
         $this->assertEquals(['color' => 'fff', 'width' => 2, 'height' => 2, 'mode' => 'inline'], $transformations[0]['params']);
@@ -145,47 +144,6 @@ class RequestTest extends TestCase
         $this->assertNull($this->request->getUser());
         $route->set('user', $user);
         $this->assertSame($user, $this->request->getUser());
-    }
-
-    public static function getUsers(): array
-    {
-        return [
-            'no user' => [
-                'routeUser' => null,
-                'queryUsers' => null,
-                'expectedUsers' => [],
-            ],
-            'user only in route' => [
-                'routeUser' => 'routeUser',
-                'queryUsers' => null,
-                'expectedUsers' => [
-                    'routeUser',
-                ],
-            ],
-            'user only in query' => [
-                'routeUser' => null,
-                'queryUsers' => [
-                    'user1',
-                    'user2',
-                ],
-                'expectedUsers' => [
-                    'user1',
-                    'user2',
-                ],
-            ],
-            'user in both route and query' => [
-                'routeUser' => 'routeUser',
-                'queryUsers' => [
-                    'user1',
-                    'user2',
-                ],
-                'expectedUsers' => [
-                    'routeUser',
-                    'user1',
-                    'user2',
-                ],
-            ],
-        ];
     }
 
     /**
@@ -311,33 +269,80 @@ class RequestTest extends TestCase
         $request->getTransformations();
     }
 
-    public static function getQueryStrings(): array
+    /**
+     * @dataProvider getQueryStrings
+     * @covers ::getRawUri
+     */
+    public function testGetRawUriDecodesUri(string $in, string $out): void
+    {
+        $request = new Request([], [], [], [], [], [
+            'SERVER_NAME' => 'imbo',
+            'SERVER_PORT' => 80,
+            'QUERY_STRING' => $in,
+        ]);
+
+        $uri = $request->getRawUri();
+        $this->assertSame($out, substr($uri, (int) strpos($uri, '?') + 1));
+    }
+
+    /**
+     * @return array<string,array{routeUser:?string,queryUsers:?array<string>,expectedUsers:array<string>}>
+     */
+    public static function getUsers(): array
     {
         return [
-            'transformation with params' => [
-                't[]=thumbnail:width=100',
-                't[]=thumbnail:width=100',
+            'no user' => [
+                'routeUser' => null,
+                'queryUsers' => null,
+                'expectedUsers' => [],
             ],
-            'transformation with params, encoded' => [
-                't%5B0%5D%3Dthumbnail%3Awidth%3D100',
-                't[0]=thumbnail:width=100',
+            'user only in route' => [
+                'routeUser' => 'routeUser',
+                'queryUsers' => null,
+                'expectedUsers' => [
+                    'routeUser',
+                ],
+            ],
+            'user only in query' => [
+                'routeUser' => null,
+                'queryUsers' => [
+                    'user1',
+                    'user2',
+                ],
+                'expectedUsers' => [
+                    'user1',
+                    'user2',
+                ],
+            ],
+            'user in both route and query' => [
+                'routeUser' => 'routeUser',
+                'queryUsers' => [
+                    'user1',
+                    'user2',
+                ],
+                'expectedUsers' => [
+                    'routeUser',
+                    'user1',
+                    'user2',
+                ],
             ],
         ];
     }
 
     /**
-     * @dataProvider getQueryStrings
-     * @covers ::getRawUri
+     * @return array<string,array{in:string,out:string}>
      */
-    public function testGetRawUriDecodesUri($queryString, $expectedQueryString): void
+    public static function getQueryStrings(): array
     {
-        $request = new Request([], [], [], [], [], [
-            'SERVER_NAME' => 'imbo',
-            'SERVER_PORT' => 80,
-            'QUERY_STRING' => $queryString,
-        ]);
-
-        $uri = $request->getRawUri();
-        $this->assertSame($expectedQueryString, substr($uri, strpos($uri, '?') + 1));
+        return [
+            'transformation with params' => [
+                'in' => 't[]=thumbnail:width=100',
+                'out' => 't[]=thumbnail:width=100',
+            ],
+            'transformation with params, encoded' => [
+                'in' => 't%5B0%5D%3Dthumbnail%3Awidth%3D100',
+                'out' => 't[0]=thumbnail:width=100',
+            ],
+        ];
     }
 }

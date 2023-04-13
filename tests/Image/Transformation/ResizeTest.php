@@ -3,6 +3,7 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass Imbo\Image\Transformation\Resize
@@ -14,40 +15,13 @@ class ResizeTest extends TransformationTests
         return new Resize();
     }
 
-    public static function getResizeParams(): array
-    {
-        return [
-            'only width' => [
-                'params'         => ['width' => 100],
-                'transformation' => true,
-                'resizedWidth'   => 100,
-                'resizedHeight'  => 70,
-            ],
-            'only height' => [
-                'params'         => ['height' => 100],
-                'transformation' => true,
-                'resizedWidth'   => 144,
-                'resizedHeight'  => 100,
-            ],
-            'width and height' => [
-                'params'         => ['width' => 100, 'height' => 200],
-                'transformation' => true,
-                'resizedWidth'   => 100,
-                'resizedHeight'  => 200,
-            ],
-            'params match image size' => [
-                'params'         => ['width' => 665, 'height' => 463],
-                'transformation' => false,
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getResizeParams
      * @covers ::transform
      */
     public function testCanTransformImage(array $params, bool $transformation, int $resizedWidth = null, int $resizedHeight = null): void
     {
+        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getWidth' => 665,
             'getHeight' => 463,
@@ -92,5 +66,36 @@ class ResizeTest extends TransformationTests
             ->setImage($image)
             ->setImagick($imagick)
             ->transform($params);
+    }
+
+    /**
+     * @return array<string,array{params:array<string,int>,transformation:bool,resizedWidth?:int,resizedHeight?:int}>
+     */
+    public static function getResizeParams(): array
+    {
+        return [
+            'only width' => [
+                'params'         => ['width' => 100],
+                'transformation' => true,
+                'resizedWidth'   => 100,
+                'resizedHeight'  => 70,
+            ],
+            'only height' => [
+                'params'         => ['height' => 100],
+                'transformation' => true,
+                'resizedWidth'   => 144,
+                'resizedHeight'  => 100,
+            ],
+            'width and height' => [
+                'params'         => ['width' => 100, 'height' => 200],
+                'transformation' => true,
+                'resizedWidth'   => 100,
+                'resizedHeight'  => 200,
+            ],
+            'params match image size' => [
+                'params'         => ['width' => 665, 'height' => 463],
+                'transformation' => false,
+            ],
+        ];
     }
 }

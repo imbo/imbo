@@ -12,6 +12,7 @@ use Imbo\Image\Identifier\Generator\GeneratorInterface;
 use Imbo\Model\ArrayModel;
 use Imbo\Model\Image;
 use Imbo\Storage\StorageInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
@@ -19,15 +20,15 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  */
 class ImagesTest extends ResourceTests
 {
-    private $resource;
-    private $request;
-    private $response;
-    private $database;
-    private $storage;
-    private $manager;
-    private $event;
-    private $imageIdentifierGenerator;
-    private $config;
+    private Images $resource;
+    private Request&MockObject $request;
+    private Response&MockObject $response;
+    private DatabaseInterface&MockObject $database;
+    private StorageInterface&MockObject $storage;
+    private EventManager&MockObject $manager;
+    private EventInterface&MockObject $event;
+    private GeneratorInterface&MockObject $imageIdentifierGenerator;
+    private array $config;
 
     protected function getNewResource(): Images
     {
@@ -75,6 +76,7 @@ class ImagesTest extends ResourceTests
             ->method('trigger')
             ->willReturnCallback(
                 static function (string $event, array $params = []) use ($manager) {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $event, $params]) {
                         [0, 'db.image.insert', ['updateIfDuplicate' => false]],
@@ -83,6 +85,7 @@ class ImagesTest extends ResourceTests
                 },
             );
 
+        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -112,6 +115,7 @@ class ImagesTest extends ResourceTests
             ->with('db.image.insert', ['updateIfDuplicate' => false])
             ->willThrowException(new DuplicateImageIdentifierException());
 
+        /** @var ResponseHeaderBag&MockObject */
         $headers = $this->createMock(ResponseHeaderBag::class);
         $headers
             ->expects($this->once())
@@ -162,6 +166,7 @@ class ImagesTest extends ResourceTests
             ->method('trigger')
             ->willReturnCallback(
                 static function (string $event, array $params = []) use ($manager) {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $event, $params]) {
                         [0, 'db.image.insert', ['updateIfDuplicate' => true]] => throw new DuplicateImageIdentifierException(),
@@ -172,6 +177,7 @@ class ImagesTest extends ResourceTests
                 },
             );
 
+        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getImageIdentifier' => 'some id',
         ]);

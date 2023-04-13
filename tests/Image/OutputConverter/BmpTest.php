@@ -6,6 +6,7 @@ use ImagickException;
 use Imbo\Exception\OutputConverterException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -26,8 +27,6 @@ class BmpTest extends TestCase
     public function testReturnsSupportedMimeTypes(): void
     {
         $types = $this->converter->getSupportedMimeTypes();
-
-        $this->assertIsArray($types);
         $this->assertContains('image/bmp', array_keys($types));
     }
 
@@ -39,12 +38,14 @@ class BmpTest extends TestCase
         $extension = 'bmp';
         $mimeType = 'image/bmp';
 
+        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
             ->method('setImageFormat')
             ->with($extension);
 
+        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -61,6 +62,7 @@ class BmpTest extends TestCase
     {
         $extension = 'bmp';
 
+        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())

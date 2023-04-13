@@ -9,7 +9,7 @@ abstract class AbstractQuery
     private int $limit = 20;
     private int $page = 1;
 
-    public function setLimit(int $limit): self
+    public function setLimit(int $limit): static
     {
         $this->limit = $limit;
         return $this;
@@ -20,7 +20,7 @@ abstract class AbstractQuery
         return $this->limit;
     }
 
-    public function setPage(int $page): self
+    public function setPage(int $page): static
     {
         $this->page = $page;
         return $this;

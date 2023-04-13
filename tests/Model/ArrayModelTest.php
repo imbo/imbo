@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ArrayModelTest extends TestCase
 {
-    private $model;
+    private ArrayModel $model;
 
     public function setUp(): void
     {

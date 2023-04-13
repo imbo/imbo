@@ -2,14 +2,13 @@
 namespace Imbo\EventListener;
 
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
-use Imbo\EventManager\Event;
+use Imbo\EventManager\EventInterface;
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\InputBag;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
@@ -17,23 +16,20 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  */
 class AuthenticateTest extends ListenerTests
 {
-    private $listener;
-    private $event;
-    private $accessControl;
-    private $request;
-    private $response;
-    private $query;
-    private $headers;
+    private Authenticate $listener;
+    private EventInterface&MockObject $event;
+    private AdapterInterface&MockObject $accessControl;
+    private Request&MockObject $request;
+    private Response&MockObject $response;
+    private HeaderBag&MockObject $headers;
 
     public function setUp(): void
     {
-        /** @var InputBag&MockObject */
-        $this->query = $this->createMock(ParameterBag::class);
         $this->headers = $this->createMock(HeaderBag::class);
         $this->accessControl = $this->createMock(AdapterInterface::class);
 
         $this->request = $this->createMock(Request::class);
-        $this->request->query = $this->query;
+        $this->request->query = new InputBag();
         $this->request->headers = $this->headers;
 
         $this->response = $this->createMock(Response::class);
@@ -49,9 +45,12 @@ class AuthenticateTest extends ListenerTests
         return $this->listener;
     }
 
-    protected function getEventMock($config = null): Event
+    /**
+     * @param ?array{authentication:array{protocol:string}} $config
+     */
+    protected function getEventMock(array $config = null): EventInterface&MockObject
     {
-        return $this->createConfiguredMock(Event::class, [
+        return $this->createConfiguredMock(EventInterface::class, [
             'getResponse' => $this->response,
             'getRequest' => $this->request,
             'getAccessControl' => $this->accessControl,
@@ -93,6 +92,7 @@ class AuthenticateTest extends ListenerTests
             ->method('has')
             ->willReturnCallback(
                 static function (string $header): bool {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $header]) {
                         [0, 'x-imbo-authenticate-timestamp'],
@@ -105,6 +105,7 @@ class AuthenticateTest extends ListenerTests
             ->method('get')
             ->willReturnCallback(
                 static function (string $header, ?string $value) {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $header, $value]) {
                         [0, 'x-imbo-authenticate-timestamp', null] => gmdate('Y-m-d\TH:i:s\Z'),
@@ -127,6 +128,7 @@ class AuthenticateTest extends ListenerTests
             ->method('has')
             ->willReturnCallback(
                 static function (string $header): bool {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $header]) {
                         [0, 'x-imbo-authenticate-timestamp'],
@@ -154,6 +156,7 @@ class AuthenticateTest extends ListenerTests
             ->method('has')
             ->willReturnCallback(
                 static function (string $header): bool {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $header]) {
                         [0, 'x-imbo-authenticate-timestamp'],
@@ -180,6 +183,7 @@ class AuthenticateTest extends ListenerTests
             ->method('has')
             ->willReturnCallback(
                 static function (string $header): bool {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $header]) {
                         [0, 'x-imbo-authenticate-timestamp'],
@@ -192,6 +196,7 @@ class AuthenticateTest extends ListenerTests
             ->method('get')
             ->willReturnCallback(
                 static function (string $header) {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $header]) {
                         [0, 'x-imbo-authenticate-timestamp'] => gmdate('Y-m-d\TH:i:s\Z'),
@@ -240,6 +245,7 @@ class AuthenticateTest extends ListenerTests
             ->method('has')
             ->willReturnCallback(
                 static function (string $header): bool {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $header]) {
                         [0, 'x-imbo-authenticate-timestamp'],
@@ -252,6 +258,7 @@ class AuthenticateTest extends ListenerTests
             ->method('get')
             ->willReturnCallback(
                 static function (string $header) use ($timestamp, $signature): string {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $header]) {
                         [0, 'x-imbo-authenticate-timestamp'] => $timestamp,
@@ -317,6 +324,7 @@ class AuthenticateTest extends ListenerTests
             ->method('get')
             ->willReturnCallback(
                 static function (string $header, string $value) use ($timestamp, $signature): string {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $header, $value]) {
                         [0, 'x-imbo-authenticate-timestamp', $timestamp] => $timestamp,
@@ -325,18 +333,10 @@ class AuthenticateTest extends ListenerTests
                 },
             );
 
-        $this->query
-            ->method('get')
-            ->willReturnCallback(
-                static function (string $header) use ($timestamp, $signature): string {
-                    static $i = 0;
-                    return match ([$i++, $header]) {
-                        [0, 'timestamp'] => $timestamp,
-                        [1, 'signature'] => $signature,
-                    };
-                },
-            );
-
+        $this->request->query = new InputBag([
+            'timestamp' => $timestamp,
+            'signature' => $signature,
+        ]);
         $this->request
             ->expects($this->once())
             ->method('getRawUri')
@@ -361,105 +361,6 @@ class AuthenticateTest extends ListenerTests
         $this->response->headers = $responseHeaders;
 
         $this->listener->authenticate($this->event);
-    }
-
-    public static function getRewrittenSignatureData(): array
-    {
-        return array_map(function ($dataSet) {
-            $httpMethod = 'PUT';
-            $publicKey = 'christer';
-            $privateKey = 'key';
-            $timestamp = gmdate('Y-m-d\TH:i:s\Z');
-            $data = sprintf('%s|%s|%s|%s', $httpMethod, $dataSet[0], $publicKey, $timestamp);
-            $signature = hash_hmac('sha256', $data, $privateKey);
-            return [
-                // Server-reported URL
-                $dataSet[1] . '?signature=' . $signature . '&timestamp=' . $timestamp,
-                // Imbo configured protocol
-                $dataSet[2],
-                // Expected auth URL header
-                $dataSet[3],
-                // Should match?
-                $dataSet[4],
-                // Signature
-                $signature,
-                // Timestamp
-                $timestamp,
-            ];
-        }, [
-            [
-                // URL used for signing on client side
-                'http://imbo/users/christer/images/image',
-                // URL reported by server (in case of misconfiguration/proxies etc)
-                'http://imbo/users/christer/images/image',
-                // Protocol configuration on Imbo
-                'http',
-                // Expected auth URL header (all attempted variants)
-                'http://imbo/users/christer/images/image',
-                // Should it match?
-                true,
-            ],
-            [
-                'http://imbo/users/christer/images/image',
-                'https://imbo/users/christer/images/image',
-                'http',
-                'http://imbo/users/christer/images/image',
-                true,
-            ],
-            [
-                'https://imbo/users/christer/images/image',
-                'http://imbo/users/christer/images/image',
-                'https',
-                'https://imbo/users/christer/images/image',
-                true,
-            ],
-            // URL gets rewritten to HTTPS, which doesn't match what was used for signing
-            [
-                'http://imbo/users/christer/images/image',
-                'http://imbo/users/christer/images/image',
-                'https',
-                'https://imbo/users/christer/images/image',
-                false,
-            ],
-            // If we allow both protocols, it shouldn't matter if its signed with HTTP or HTTPS
-            [
-                'http://imbo/users/christer/images/image',
-                'https://imbo/users/christer/images/image',
-                'both',
-                'http://imbo/users/christer/images/image, https://imbo/users/christer/images/image',
-                true,
-            ],
-            [
-                'https://imbo/users/christer/images/image',
-                'http://imbo/users/christer/images/image',
-                'both',
-                'http://imbo/users/christer/images/image, https://imbo/users/christer/images/image',
-                true,
-            ],
-            // Different URLs should always fail, obviously
-            [
-                'https://imbo/users/christer/images/someotherimage',
-                'http://imbo/users/christer/images/image',
-                'both',
-                'http://imbo/users/christer/images/image, https://imbo/users/christer/images/image',
-                false,
-            ],
-            // Different URLs should always fail, even when forced to http/https
-            [
-                'https://imbo/users/christer/images/someotherimage',
-                'http://imbo/users/christer/images/image',
-                'http',
-                'http://imbo/users/christer/images/image',
-                false,
-            ],
-            [
-                'http://imbo/users/christer/images/someotherimage',
-                'http://imbo/users/christer/images/image',
-                'https',
-                'https://imbo/users/christer/images/image',
-                false,
-            ],
-        ]);
     }
 
     /**
@@ -489,6 +390,7 @@ class AuthenticateTest extends ListenerTests
             ->method('get')
             ->willReturnCallback(
                 static function (string $header, string $value) use ($timestamp, $signature): string {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $header, $value]) {
                         [0, 'x-imbo-authenticate-timestamp', $timestamp] => $timestamp,
@@ -497,18 +399,10 @@ class AuthenticateTest extends ListenerTests
                 },
             );
 
-        $this->query
-            ->method('get')
-            ->willReturnCallback(
-                static function (string $param) use ($timestamp, $signature): string {
-                    static $i = 0;
-                    return match ([$i++, $param]) {
-                        [0, 'timestamp'] => $timestamp,
-                        [1, 'signature'] => $signature,
-                    };
-                },
-            );
-
+        $this->request->query = new InputBag([
+            'timestamp' => $timestamp,
+            'signature' => $signature,
+        ]);
         $this->request
             ->expects($this->once())
             ->method('getRawUri')
@@ -537,5 +431,104 @@ class AuthenticateTest extends ListenerTests
                 'protocol' => $protocol,
             ],
         ]));
+    }
+
+    /**
+     * @return array<array{serverUrl:string,protocol:string,authHeader:string,shouldMatch:bool,signature:string,timestamp:string}>
+     */
+    public static function getRewrittenSignatureData(): array
+    {
+        return array_map(
+            /**
+             * @param array{clientSideUrl:string,serverUrl:string,protocol:string,authHeader:string,shouldMatch:bool} $dataSet
+             * @return array{serverUrl:string,protocol:string,authHeader:string,shouldMatch:bool,signature:string,timestamp:string}
+             */
+            function (array $dataSet): array {
+                $httpMethod = 'PUT';
+                $publicKey = 'christer';
+                $privateKey = 'key';
+                $timestamp = gmdate('Y-m-d\TH:i:s\Z');
+                $data = sprintf('%s|%s|%s|%s', $httpMethod, $dataSet['clientSideUrl'], $publicKey, $timestamp);
+                $signature = hash_hmac('sha256', $data, $privateKey);
+
+                return [
+                    'serverUrl' => $dataSet['serverUrl'] . '?signature=' . $signature . '&timestamp=' . $timestamp,
+                    'protocol' => $dataSet['protocol'],
+                    'authHeader' => $dataSet['authHeader'],
+                    'shouldMatch' => $dataSet['shouldMatch'],
+                    'signature' => $signature,
+                    'timestamp' => $timestamp,
+                ];
+            },
+            [
+                [
+                    'clientSideUrl' => 'http://imbo/users/christer/images/image',
+                    'serverUrl' => 'http://imbo/users/christer/images/image',
+                    'protocol' => 'http',
+                    'authHeader' => 'http://imbo/users/christer/images/image',
+                    'shouldMatch' => true,
+                ],
+                [
+                    'clientSideUrl' => 'http://imbo/users/christer/images/image',
+                    'serverUrl' => 'https://imbo/users/christer/images/image',
+                    'protocol' => 'http',
+                    'authHeader' => 'http://imbo/users/christer/images/image',
+                    'shouldMatch' => true,
+                ],
+                [
+                    'clientSideUrl' => 'https://imbo/users/christer/images/image',
+                    'serverUrl' => 'http://imbo/users/christer/images/image',
+                    'protocol' => 'https',
+                    'authHeader' => 'https://imbo/users/christer/images/image',
+                    'shouldMatch' => true,
+                ],
+                // URL gets rewritten to HTTPS, which doesn't match what was used for signing
+                [
+                    'clientSideUrl' => 'http://imbo/users/christer/images/image',
+                    'serverUrl' => 'http://imbo/users/christer/images/image',
+                    'protocol' => 'https',
+                    'authHeader' => 'https://imbo/users/christer/images/image',
+                    'shouldMatch' => false,
+                ],
+                // If we allow both protocols, it shouldn't matter if its signed with HTTP or HTTPS
+                [
+                    'clientSideUrl' => 'http://imbo/users/christer/images/image',
+                    'serverUrl' => 'https://imbo/users/christer/images/image',
+                    'protocol' => 'both',
+                    'authHeader' => 'http://imbo/users/christer/images/image, https://imbo/users/christer/images/image',
+                    'shouldMatch' => true,
+                ],
+                [
+                    'clientSideUrl' => 'https://imbo/users/christer/images/image',
+                    'serverUrl' => 'http://imbo/users/christer/images/image',
+                    'protocol' => 'both',
+                    'authHeader' => 'http://imbo/users/christer/images/image, https://imbo/users/christer/images/image',
+                    'shouldMatch' => true,
+                ],
+                // Different URLs should always fail, obviously
+                [
+                    'clientSideUrl' => 'https://imbo/users/christer/images/someotherimage',
+                    'serverUrl' => 'http://imbo/users/christer/images/image',
+                    'protocol' => 'both',
+                    'authHeader' => 'http://imbo/users/christer/images/image, https://imbo/users/christer/images/image',
+                    'shouldMatch' => false,
+                ],
+                // Different URLs should always fail, even when forced to http/https
+                [
+                    'clientSideUrl' => 'https://imbo/users/christer/images/someotherimage',
+                    'serverUrl' => 'http://imbo/users/christer/images/image',
+                    'protocol' => 'http',
+                    'authHeader' => 'http://imbo/users/christer/images/image',
+                    'shouldMatch' => false,
+                ],
+                [
+                    'clientSideUrl' => 'http://imbo/users/christer/images/someotherimage',
+                    'serverUrl' => 'http://imbo/users/christer/images/image',
+                    'protocol' => 'https',
+                    'authHeader' => 'https://imbo/users/christer/images/image',
+                    'shouldMatch' => false,
+                ],
+            ],
+        );
     }
 }

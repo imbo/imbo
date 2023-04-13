@@ -7,15 +7,16 @@ use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Resource\Stats as StatsResource;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass Imbo\EventListener\StatsAccess
  */
 class StatsAccessTest extends ListenerTests
 {
-    private $listener;
-    private $event;
-    private $request;
+    private StatsAccess $listener;
+    private EventInterface&MockObject $event;
+    private Request&MockObject $request;
 
     public function setUp(): void
     {
@@ -45,87 +46,6 @@ class StatsAccessTest extends ListenerTests
             ->willReturn('1.2.3.4');
 
         $this->listener->checkAccess($this->event);
-    }
-
-    public static function getFilterData(): array
-    {
-        return [
-            'IPv4 in whitelist' => [
-                '127.0.0.1',
-                ['127.0.0.1'],
-                true,
-            ],
-            'IPv4 not in whitelist' => [
-                '127.0.0.2',
-                ['127.0.0.1'],
-                false,
-            ],
-            'IPv4 in whitelist range' => [
-                '192.168.1.10',
-                ['192.168.1.0/24'],
-                true,
-            ],
-            'IPv4 outside of whitelist range' => [
-                '192.168.1.64',
-                ['192.168.1.32/27'],
-                false,
-            ],
-            'IPv6 in whitelist (in short format)' => [
-                '2a00:1b60:1011:0000:0000:0000:0000:1338',
-                ['2a00:1b60:1011::1338'],
-                true,
-            ],
-            'IPv6 in whitelist (in full format)' => [
-                '2a00:1b60:1011:0000:0000:0000:0000:1338',
-                ['2a00:1b60:1011:0000:0000:0000:0000:1338'],
-                true,
-            ],
-            'IPv6 in whitelist range' => [
-                '2001:0db8:0000:0000:0000:0000:0000:0000',
-                ['2001:db8::/48'],
-                true,
-            ],
-            'IPv6 in whitelist range (3)' => [
-                '2001:0db8:0000:0000:0000:0000:0000:0000',
-                ['2001:db8::/47'],
-                true,
-            ],
-            'IPv6 in whitelist range (2)' => [
-                '2001:0db8:0000:0000:0000:0000:0000:0000',
-                ['2001:db8::/46'],
-                true,
-            ],
-            'IPv6 in whitelist range (1)' => [
-                '2001:0db8:0000:0000:0000:0000:0000:0000',
-                ['2001:db8::/45'],
-                true,
-            ],
-            'IPv6 outside of whitelist range' => [
-                '2001:0db9:0000:0000:0000:0000:0000:0000',
-                ['2001:db8::/48'],
-                false,
-            ],
-            'IPv6 in whitelist (in short format in both fields)' => [
-                '2a00:1b60:1011::1338',
-                ['2a00:1b60:1011::1338'],
-                true,
-            ],
-            'Blaclisted IPv4 client and both types in allow' => [
-                '1.2.3.4',
-                ['127.0.0.1', '::1'],
-                false,
-            ],
-            'Whitelitsed IPv6 client and both types in allow' => [
-                '::1',
-                ['127.0.0.1', '::1'],
-                true,
-            ],
-            'Wildcard allows all clients' => [
-                '::1',
-                ['*'],
-                true,
-            ],
-        ];
     }
 
     /**
@@ -194,5 +114,89 @@ class StatsAccessTest extends ListenerTests
 
         $this->expectOutputString('stats accessstats resource');
         $eventManager->trigger('stats.get');
+    }
+
+    /**
+     * @return array<array{clientIp:string,allow:array<string>,hasAccess:bool}>
+     */
+    public static function getFilterData(): array
+    {
+        return [
+            'IPv4 in whitelist' => [
+                'clientIp' => '127.0.0.1',
+                'allow' => ['127.0.0.1'],
+                'hasAccess' => true,
+            ],
+            'IPv4 not in whitelist' => [
+                'clientIp' => '127.0.0.2',
+                'allow' => ['127.0.0.1'],
+                'hasAccess' => false,
+            ],
+            'IPv4 in whitelist range' => [
+                'clientIp' => '192.168.1.10',
+                'allow' => ['192.168.1.0/24'],
+                'hasAccess' => true,
+            ],
+            'IPv4 outside of whitelist range' => [
+                'clientIp' => '192.168.1.64',
+                'allow' => ['192.168.1.32/27'],
+                'hasAccess' => false,
+            ],
+            'IPv6 in whitelist (in short format)' => [
+                'clientIp' => '2a00:1b60:1011:0000:0000:0000:0000:1338',
+                'allow' => ['2a00:1b60:1011::1338'],
+                'hasAccess' => true,
+            ],
+            'IPv6 in whitelist (in full format)' => [
+                'clientIp' => '2a00:1b60:1011:0000:0000:0000:0000:1338',
+                'allow' => ['2a00:1b60:1011:0000:0000:0000:0000:1338'],
+                'hasAccess' => true,
+            ],
+            'IPv6 in whitelist range' => [
+                'clientIp' => '2001:0db8:0000:0000:0000:0000:0000:0000',
+                'allow' => ['2001:db8::/48'],
+                'hasAccess' => true,
+            ],
+            'IPv6 in whitelist range (3)' => [
+                'clientIp' => '2001:0db8:0000:0000:0000:0000:0000:0000',
+                'allow' => ['2001:db8::/47'],
+                'hasAccess' => true,
+            ],
+            'IPv6 in whitelist range (2)' => [
+                'clientIp' => '2001:0db8:0000:0000:0000:0000:0000:0000',
+                'allow' => ['2001:db8::/46'],
+                'hasAccess' => true,
+            ],
+            'IPv6 in whitelist range (1)' => [
+                'clientIp' => '2001:0db8:0000:0000:0000:0000:0000:0000',
+                'allow' => ['2001:db8::/45'],
+                'hasAccess' => true,
+            ],
+            'IPv6 outside of whitelist range' => [
+                'clientIp' => '2001:0db9:0000:0000:0000:0000:0000:0000',
+                'allow' => ['2001:db8::/48'],
+                'hasAccess' => false,
+            ],
+            'IPv6 in whitelist (in short format in both fields)' => [
+                'clientIp' => '2a00:1b60:1011::1338',
+                'allow' => ['2a00:1b60:1011::1338'],
+                'hasAccess' => true,
+            ],
+            'Blaclisted IPv4 client and both types in allow' => [
+                'clientIp' => '1.2.3.4',
+                'allow' => ['127.0.0.1', '::1'],
+                'hasAccess' => false,
+            ],
+            'Whitelitsed IPv6 client and both types in allow' => [
+                'clientIp' => '::1',
+                'allow' => ['127.0.0.1', '::1'],
+                'hasAccess' => true,
+            ],
+            'Wildcard allows all clients' => [
+                'clientIp' => '::1',
+                'allow' => ['*'],
+                'hasAccess' => true,
+            ],
+        ];
     }
 }

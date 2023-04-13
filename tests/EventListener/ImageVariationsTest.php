@@ -22,7 +22,6 @@ use Imbo\Storage\StorageInterface as MainStorageInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use stdClass;
 use Symfony\Component\HttpFoundation\InputBag;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
@@ -31,23 +30,17 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 class ImageVariationsTest extends ListenerTests
 {
     private ImageVariations $listener;
-    private DatabaseInterface $db;
-    private StorageInterface $storage;
-    private EventInterface $event;
-    /** @var Request&MockObject */
-    private Request $request;
-    /** @var Response&MockObject */
-    private Response $response;
-    /** @var ResponseHeaderBag&MockObject */
-    private ResponseHeaderBag $responseHeaders;
-    private ParameterBag $query;
-    /** @var Image&MockObject */
-    private Image $imageModel;
-    private MainStorageInterface $imageStorage;
-    /** @var EventManager&MockObject */
-    private EventManager $eventManager;
-    /** @var TransformationManager&MockObject */
-    private TransformationManager $transformationManager;
+    private DatabaseInterface&MockObject $db;
+    private StorageInterface&MockObject $storage;
+    private EventInterface&MockObject $event;
+    private Request&MockObject $request;
+    private Response&MockObject $response;
+    private ResponseHeaderBag&MockObject $responseHeaders;
+    private InputBag $query;
+    private Image&MockObject $imageModel;
+    private MainStorageInterface&MockObject $imageStorage;
+    private EventManager&MockObject $eventManager;
+    private TransformationManager&MockObject $transformationManager;
     private string $user = 'user';
     private string $imageIdentifier = 'imgid';
 
@@ -80,12 +73,13 @@ class ImageVariationsTest extends ListenerTests
 
         $this->db         = $this->createMock(DatabaseInterface::class);
         $this->storage    = $this->createMock(StorageInterface::class);
-        /** @var InputBag&MockObject */
-        $this->query      = $this->createMock(ParameterBag::class);
+        $this->query      = new InputBag();
+        /** @var Image&MockObject */
         $this->imageModel = $this->createConfiguredMock(Image::class, [
             'getImageIdentifier' => $this->imageIdentifier,
         ]);
         $this->imageModel
+            ->expects($this->any())
             ->method('setWidth')
             ->willReturnSelf();
         $this->imageModel
@@ -545,6 +539,7 @@ class ImageVariationsTest extends ListenerTests
             ->method('trigger')
             ->willReturnCallback(
                 static function (string $transformation, array $params = []) use ($manager, $width, $variationWidth): EventManager&MockObject {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $transformation, $params]) {
                         [
@@ -736,6 +731,7 @@ class ImageVariationsTest extends ListenerTests
             ->method('storeImageVariation')
             ->willReturnCallback(
                 static function (string $user, string $imageIdentifier, string $contents, int $width): bool {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $user, $imageIdentifier, $contents, $width]) {
                         [0, 'user', 'imgid', 'some blob', 25],
@@ -748,6 +744,7 @@ class ImageVariationsTest extends ListenerTests
                 },
             );
 
+        /** @var Resize&MockObject */
         $transformation = $this->createMock(Resize::class);
         $transformation
             ->expects($this->exactly(6))
@@ -760,6 +757,7 @@ class ImageVariationsTest extends ListenerTests
             ->method('transform')
             ->with($this->callback(
                 static function (array $params): bool {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $params['width']]) {
                         [0, 25],
@@ -803,6 +801,7 @@ class ImageVariationsTest extends ListenerTests
             'lossless'  => true,
         ]);
 
+        /** @var Convert&MockObject */
         $convertTransformation = $this->createMock(Convert::class);
         $convertTransformation
             ->expects($this->once())
@@ -815,6 +814,7 @@ class ImageVariationsTest extends ListenerTests
             ->method('transform')
             ->with(['type' => 'png']);
 
+        /** @var Resize&MockObject */
         $resizeTransformation = $this->createMock(Resize::class);
         $resizeTransformation
             ->expects($this->once())
@@ -832,6 +832,7 @@ class ImageVariationsTest extends ListenerTests
             ->method('getTransformation')
             ->willReturnCallback(
                 static function (string $transformation) use ($convertTransformation, $resizeTransformation) {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $transformation]) {
                         [0, 'convert'] => $convertTransformation,
@@ -869,6 +870,7 @@ class ImageVariationsTest extends ListenerTests
             'scaleFactor' => .65,
         ]);
 
+        /** @var Resize&MockObject */
         $resize = $this->createMock(Resize::class);
         $resize
             ->expects($this->exactly(3))
@@ -896,6 +898,7 @@ class ImageVariationsTest extends ListenerTests
             ->method('storeImageVariation')
             ->willReturnCallback(
                 static function (string $user, string $imageIdentifier, string $contents, int $width): bool {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $user, $imageIdentifier, $contents, $width]) {
                         [0, 'user', 'imgid', 'image data', 865],
@@ -920,6 +923,7 @@ class ImageVariationsTest extends ListenerTests
             'scaleFactor' => .2,
         ]);
 
+        /** @var Resize&MockObject */
         $resize = $this->createMock(Resize::class);
         $resize
             ->method('setImage')
@@ -946,6 +950,7 @@ class ImageVariationsTest extends ListenerTests
             ->method('storeImageVariation')
             ->willReturnCallback(
                 static function (string $user, string $imageIdentifier, string $contents, int $width): bool {
+                    /** @var int */
                     static $i = 0;
                     return match ([$i++, $user, $imageIdentifier, $contents, $width]) {
                         [0, 'user', 'imgid', 'image data', 1337],
@@ -974,6 +979,7 @@ class ImageVariationsTest extends ListenerTests
             ->method('getBlob')
             ->willReturn('image data');
 
+        /** @var Transformation&MockObject */
         $transformation = $this->createMock(Transformation::class);
         $transformation
             ->expects($this->once())
@@ -1020,6 +1026,7 @@ class ImageVariationsTest extends ListenerTests
             ->method('storeImageVariation')
             ->willThrowException(new StorageException());
 
+        /** @var Transformation&MockObject */
         $transformation = $this->createConfiguredMock(Transformation::class, [
             'transform' => null,
         ]);
@@ -1063,6 +1070,7 @@ class ImageVariationsTest extends ListenerTests
             ->method('storeImageVariationMetadata')
             ->willThrowException(new DatabaseException());
 
+        /** @var Transformation&MockObject */
         $transformation = $this->createConfiguredMock(Transformation::class, [
             'transform' => null,
         ]);
@@ -1114,6 +1122,7 @@ class ImageVariationsTest extends ListenerTests
             ->with($this->user, )
             ->willThrowException(new DatabaseException());
 
+        /** @var Transformation&MockObject */
         $transformation = $this->createConfiguredMock(Transformation::class, [
             'transform' => null,
         ]);

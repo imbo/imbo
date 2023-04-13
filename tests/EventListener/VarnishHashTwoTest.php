@@ -5,6 +5,7 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
@@ -12,11 +13,11 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  */
 class VarnishHashTwoTest extends ListenerTests
 {
-    private $listener;
-    private $event;
-    private $request;
-    private $response;
-    private $responseHeaders;
+    private VarnishHashTwo $listener;
+    private EventInterface&MockObject $event;
+    private Request&MockObject $request;
+    private Response&MockObject $response;
+    private ResponseHeaderBag&MockObject $responseHeaders;
 
     public function setUp(): void
     {

@@ -7,18 +7,19 @@ use Imbo\EventManager\EventManager;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Storage\StorageInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass Imbo\Resource\User
  */
 class UserTest extends ResourceTests
 {
-    private $resource;
-    private $request;
-    private $response;
-    private $database;
-    private $storage;
-    private $event;
+    private User $resource;
+    private Request&MockObject $request;
+    private Response&MockObject $response;
+    private DatabaseInterface&MockObject $database;
+    private StorageInterface&MockObject $storage;
+    private EventInterface&MockObject $event;
 
     protected function getNewResource(): User
     {
@@ -46,6 +47,7 @@ class UserTest extends ResourceTests
      */
     public function testSupportsHttpGet(): void
     {
+        /** @var EventManager&MockObject */
         $manager = $this->createMock(EventManager::class);
         $manager
             ->expects($this->once())

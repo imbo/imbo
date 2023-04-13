@@ -6,6 +6,7 @@ use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
 use Imbo\Exception\RuntimeException;
 use Imbo\Resource;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -15,9 +16,9 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class AddPublicKeyTest extends TestCase
 {
-    private $application;
-    private $command;
-    private $adapter;
+    private Application $application;
+    private AddPublicKey $command;
+    private MutableAdapterInterface&MockObject $adapter;
 
     public function setUp(): void
     {
@@ -32,24 +33,6 @@ class AddPublicKeyTest extends TestCase
         $this->application->add($this->command);
     }
 
-    public static function getInvalidAccessControlConfig(): array
-    {
-        return [
-            [
-                ['accessControl' => new Exception()],
-                'Invalid access control adapter',
-            ],
-            [
-                ['accessControl' => fn (): Exception => new Exception()],
-                'Invalid access control adapter',
-            ],
-            [
-                ['accessControl' => AdapterInterface::class],
-                'The configured access control adapter is not mutable',
-            ],
-        ];
-    }
-
     /**
      * @dataProvider getInvalidAccessControlConfig
      * @covers ::getAclAdapter
@@ -57,7 +40,9 @@ class AddPublicKeyTest extends TestCase
     public function testThrowsWhenAccessControlIsNotValid(array $config, string $errorMessage): void
     {
         if (is_string($config['accessControl'])) {
-            $config['accessControl'] = $this->createMock($config['accessControl']);
+            /** @var class-string */
+            $impl = $config['accessControl'];
+            $config['accessControl'] = $this->createMock($impl);
         }
 
         $command = new AddPublicKey();
@@ -150,12 +135,17 @@ class AddPublicKeyTest extends TestCase
             ->expects($this->exactly(3))
             ->method('addAccessRule')
             ->with('foo', $this->callback(
+                /**
+                 * @param array{users:array<string>|string,resources:array} $accessRule
+                 */
                 static function (array $accessRule): bool {
+                    /** @var int */
                     static $i = 0;
                     switch ($i++) {
                         case 0: {
                             $diff = array_diff($accessRule['resources'], Resource::getReadOnlyResources());
                             return (
+                                is_array($accessRule['users']) &&
                                 count($accessRule['users']) === 2 &&
                                 in_array('espenh', $accessRule['users']) &&
                                 in_array('kribrabr', $accessRule['users']) &&
@@ -165,6 +155,7 @@ class AddPublicKeyTest extends TestCase
                         case 1: {
                             $diff = array_diff($accessRule['resources'], Resource::getReadWriteResources());
                             return (
+                                is_array($accessRule['users']) &&
                                 count($accessRule['users']) === 2 &&
                                 in_array('rexxars', $accessRule['users']) &&
                                 in_array('kbrabrand', $accessRule['users']) &&
@@ -174,11 +165,13 @@ class AddPublicKeyTest extends TestCase
                         case 2: {
                             $diff = array_diff($accessRule['resources'], Resource::getAllResources());
                             return (
+                                is_string($accessRule['users']) &&
                                 $accessRule['users'] === '*' &&
                                 empty($diff)
                             );
                         }
                     }
+                    return false;
                 },
             ));
 
@@ -214,13 +207,16 @@ class AddPublicKeyTest extends TestCase
         $this->adapter
             ->expects($this->once())
             ->method('addAccessRule')
-            ->with('foo', $this->callback(function ($rule) use ($allResources) {
-                return (
+            ->with('foo', $this->callback(
+                /**
+                 * @param array{users:string,resources:array} $rule
+                 */
+                fn (array $rule): bool => (
                     $rule['users'] === '*' &&
                     $rule['resources'][0] === $allResources[0] &&
                     $rule['resources'][1] === $allResources[5]
-                );
-            }));
+                ),
+            ));
 
         $this->adapter
             ->expects($this->once())
@@ -276,5 +272,26 @@ class AddPublicKeyTest extends TestCase
         $this->assertSame('Add a public key', $this->command->getDescription());
         $this->assertSame('add-public-key', $this->command->getName());
         $this->assertSame('Add a public key to the configured access control adapter', $this->command->getHelp());
+    }
+
+    /**
+     * @return array<array{config:array,errorMessage:string}>
+     */
+    public static function getInvalidAccessControlConfig(): array
+    {
+        return [
+            [
+                'config' => ['accessControl' => new Exception()],
+                'errorMessage' => 'Invalid access control adapter',
+            ],
+            [
+                'config' => ['accessControl' => fn (): Exception => new Exception()],
+                'errorMessage' => 'Invalid access control adapter',
+            ],
+            [
+                'config' => ['accessControl' => AdapterInterface::class],
+                'errorMessage' => 'The configured access control adapter is not mutable',
+            ],
+        ];
     }
 }
