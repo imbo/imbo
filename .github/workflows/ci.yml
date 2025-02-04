@@ -120,10 +120,9 @@ jobs:
         run: vendor/bin/behat --strict --suite=mongodb-gridfs
 
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: httpd-logs-mongodb-gridfs
-          path: build/logs/httpd-logs-mongodb-gridfs.log
+          path: build/logs/
 
   integration-tests-mongodb-filesystem:
     name: Integration tests (MongoDB / Filesystem)
@@ -179,10 +178,9 @@ jobs:
         run: vendor/bin/behat --strict --suite=mongodb-filesystem
 
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: httpd-logs-mongodb-filesystem
-          path: build/logs/httpd-logs-mongodb-filesystem.log
+          path: build/logs/
 
   integration-tests-sqlite-filesystem:
     name: Integration tests (SQLite / Filesystem)
@@ -241,10 +239,9 @@ jobs:
         run: vendor/bin/behat --strict --suite=sqlite-filesystem
 
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: httpd-logs-sqlite-filesystem
-          path: build/logs/httpd-logs-sqlite-filesystem.log
+          path: build/logs/
 
   integration-tests-mysql-filesystem:
     name: Integration tests (MySQL / Filesystem)
@@ -316,10 +313,9 @@ jobs:
         run: vendor/bin/behat --strict --suite=mysql-filesystem
 
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: httpd-logs-mysql-filesystem
-          path: build/logs/httpd-logs-mysql-filesystem.log
+          path: build/logs/
 
   integration-tests-postgresql-filesystem:
     name: Integration tests (PostgreSQL / Filesystem)
@@ -387,7 +383,6 @@ jobs:
         run: vendor/bin/behat --strict --suite=postgresql-filesystem
 
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: httpd-logs-postgresql-filesystem
-          path: build/logs/httpd-logs-postgresql-filesystem.log
+          path: build/logs/
