@@ -3,18 +3,15 @@ on: push
 jobs:
   unit-tests:
     name: Unit tests and QA
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
-        operating-system: ["ubuntu-24.04"]
-        php-versions: ["8.1", "8.2"]
-        mongodb-versions: ["5.0.2"]
-
-    runs-on: ${{ matrix.operating-system }}
+        php: ["8.1", "8.2"]
 
     services:
       mongodb:
-        image: mongo:${{ matrix.mongodb-versions }}
+        image: mongo:5.0.2
         ports:
           - 27017:27017
         env:
@@ -25,7 +22,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: ${{ matrix.php }}
           tools: php-cs-fixer
           extensions: imagick
 
@@ -68,18 +65,16 @@ jobs:
 
   integration-tests-mongodb-gridfs:
     name: Integration tests (MongoDB / GridFS)
+    runs-on: ubuntu-24.04
+
     strategy:
       fail-fast: false
       matrix:
-        operating-system: ["ubuntu-24.04"]
-        php-versions: ["8.1", "8.2"]
-        mongodb-versions: ["5.0.2"]
-
-    runs-on: ${{ matrix.operating-system }}
+        php: ["8.1", "8.2"]
 
     services:
       mongodb:
-        image: mongo:${{ matrix.mongodb-versions }}
+        image: mongo:5.0.2
         ports:
           - 27017:27017
         env:
@@ -90,7 +85,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: ${{ matrix.php }}
           extensions: imagick
 
       - uses: actions/checkout@v4
@@ -121,23 +116,21 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: httpd-logs-mongodb-gridfs
+          name: httpd-logs-mongodb-gridfs-php-${{ matrix.php }}
           path: build/logs/
 
   integration-tests-mongodb-filesystem:
     name: Integration tests (MongoDB / Filesystem)
+    runs-on: ubuntu-24.04
+
     strategy:
       fail-fast: false
       matrix:
-        operating-system: ["ubuntu-24.04"]
-        php-versions: ["8.1", "8.2"]
-        mongodb-versions: ["5.0.2"]
-
-    runs-on: ${{ matrix.operating-system }}
+        php: ["8.1", "8.2"]
 
     services:
       mongodb:
-        image: mongo:${{ matrix.mongodb-versions }}
+        image: mongo:5.0.2
         ports:
           - 27017:27017
         env:
@@ -148,7 +141,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: ${{ matrix.php }}
           extensions: imagick
 
       - uses: actions/checkout@v4
@@ -179,23 +172,21 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: httpd-logs-mongodb-filesystem
+          name: httpd-logs-mongodb-filesystem-php-${{ matrix.php }}
           path: build/logs/
 
   integration-tests-sqlite-filesystem:
     name: Integration tests (SQLite / Filesystem)
+    runs-on: ubuntu-24.04
+
     strategy:
       fail-fast: false
       matrix:
-        operating-system: ["ubuntu-24.04"]
-        php-versions: ["8.1", "8.2"]
-        mongodb-versions: ["5.0.2"]
-
-    runs-on: ${{ matrix.operating-system }}
+        php: ["8.1", "8.2"]
 
     services:
       mongodb:
-        image: mongo:${{ matrix.mongodb-versions }}
+        image: mongo:5.0.2
         ports:
           - 27017:27017
         env:
@@ -206,7 +197,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: ${{ matrix.php }}
           extensions: imagick
 
       - uses: actions/checkout@v4
@@ -240,25 +231,21 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: httpd-logs-sqlite-filesystem
+          name: httpd-logs-sqlite-filesystem-php-${{ matrix.php }}
           path: build/logs/
 
   integration-tests-mysql-filesystem:
     name: Integration tests (MySQL / Filesystem)
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
       matrix:
-        operating-system: ["ubuntu-24.04"]
-        php-versions: ["8.1", "8.2"]
-        mongodb-versions: ["5.0.2"]
-        mysql-versions: ["8.0.20"]
-
-    runs-on: ${{ matrix.operating-system }}
+        php: ["8.1", "8.2"]
 
     services:
       mongodb:
-        image: mongo:${{ matrix.mongodb-versions }}
+        image: mongo:5.0.2
         ports:
           - 27017:27017
         env:
@@ -266,7 +253,7 @@ jobs:
           MONGO_INITDB_ROOT_PASSWORD: password
 
       mysql:
-        image: mysql:${{ matrix.mysql-versions }}
+        image: mysql:8.0.20
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: imbo_test
@@ -280,7 +267,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: ${{ matrix.php }}
           extensions: imagick
 
       - uses: actions/checkout@v4
@@ -314,24 +301,21 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: httpd-logs-mysql-filesystem
+          name: httpd-logs-mysql-filesystem-php-${{ matrix.php }}
           path: build/logs/
 
   integration-tests-postgresql-filesystem:
     name: Integration tests (PostgreSQL / Filesystem)
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
       matrix:
-        operating-system: ["ubuntu-24.04"]
-        php-versions: ["8.1", "8.2"]
-        mongodb-versions: ["5.0.2"]
-
-    runs-on: ${{ matrix.operating-system }}
+        php: ["8.1", "8.2"]
 
     services:
       mongodb:
-        image: mongo:${{ matrix.mongodb-versions }}
+        image: mongo:5.0.2
         ports:
           - 27017:27017
         env:
@@ -350,7 +334,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: ${{ matrix.php }}
           extensions: imagick
 
       - uses: actions/checkout@v4
@@ -384,5 +368,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: httpd-logs-postgresql-filesystem
+          name: httpd-logs-postgresql-filesystem-php-${{ matrix.php }}
           path: build/logs/
