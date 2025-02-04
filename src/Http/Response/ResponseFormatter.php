@@ -271,8 +271,8 @@ class ResponseFormatter implements ListenerInterface
                 $outputConverterManager->supportsExtension($this->formatter)
             ) {
                 $outputConverterManager->convert($model, $this->formatter);
-            // for clarity - if we just have a requested compression / quality value, we still have to invoke the
-            // conversion / writer for the existing format
+                // for clarity - if we just have a requested compression / quality value, we still have to invoke the
+                // conversion / writer for the existing format
             } elseif (
                 $model->getOutputQualityCompression() &&
                 $outputConverterManager->supportsExtension($this->formatter)

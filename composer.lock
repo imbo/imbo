@@ -2805,16 +2805,16 @@
         },
         {
             "name": "imbo/imbo-coding-standard",
-            "version": "v2.0.6",
+            "version": "v2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-coding-standard.git",
-                "reference": "bc54ee087614756490832c2b560b61c6ed0412d2"
+                "reference": "bd277b3c7cfbd3295d98a9849616ebd8d796d7ad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-coding-standard/zipball/bc54ee087614756490832c2b560b61c6ed0412d2",
-                "reference": "bc54ee087614756490832c2b560b61c6ed0412d2",
+                "url": "https://api.github.com/repos/imbo/imbo-coding-standard/zipball/bd277b3c7cfbd3295d98a9849616ebd8d796d7ad",
+                "reference": "bd277b3c7cfbd3295d98a9849616ebd8d796d7ad",
                 "shasum": ""
             },
             "require": {
@@ -2851,9 +2851,9 @@
             ],
             "support": {
                 "issues": "https://github.com/imbo/imbo-coding-standard/issues",
-                "source": "https://github.com/imbo/imbo-coding-standard/tree/v2.0.6"
+                "source": "https://github.com/imbo/imbo-coding-standard/tree/v2.1.1"
             },
-            "time": "2023-04-09T09:26:13+00:00"
+            "time": "2023-07-03T18:44:31+00:00"
         },
         {
             "name": "imbo/imbo-filesystem-adapters",
