@@ -175,7 +175,7 @@ class ExifMetadata implements ListenerInterface
 
     protected function parseGpsCoordinate(string $coordinate, string $hemisphere): float
     {
-        $coordinates = explode(' ', $coordinate);
+        $coordinates = explode(',', str_replace(' ', '', $coordinate));
 
         for ($i = 0; $i < 3; $i++) {
             $part = explode('/', $coordinates[$i]);

@@ -153,8 +153,8 @@ class ExifMetadataTest extends ListenerTests
         $this->assertSame('SAMSUNG', $properties['exif:Make']);
         $this->assertSame('GT-I9100', $properties['exif:Model']);
         $this->assertSame('254/5', $properties['exif:GPSAltitude']);
-        $this->assertSame('63/1, 40/1, 173857/3507', $properties['exif:GPSLatitude']);
-        $this->assertSame('9/1, 5/1, 38109/12500', $properties['exif:GPSLongitude']);
+        $this->assertSame('63/1,40/1,173857/3507', $properties['exif:GPSLatitude']);
+        $this->assertSame('9/1,5/1,38109/12500', $properties['exif:GPSLongitude']);
     }
 
     /**
