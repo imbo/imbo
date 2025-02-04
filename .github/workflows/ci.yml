@@ -123,7 +123,7 @@ jobs:
         if: always()
         with:
           name: httpd-logs-mongodb-gridfs
-          path: build/logs
+          path: build/logs/httpd-logs-mongodb-gridfs.log
 
   integration-tests-mongodb-filesystem:
     name: Integration tests (MongoDB / Filesystem)
@@ -182,7 +182,7 @@ jobs:
         if: always()
         with:
           name: httpd-logs-mongodb-filesystem
-          path: build/logs
+          path: build/logs/httpd-logs-mongodb-filesystem.log
 
   integration-tests-sqlite-filesystem:
     name: Integration tests (SQLite / Filesystem)
@@ -244,7 +244,7 @@ jobs:
         if: always()
         with:
           name: httpd-logs-sqlite-filesystem
-          path: build/logs
+          path: build/logs/httpd-logs-sqlite-filesystem.log
 
   integration-tests-mysql-filesystem:
     name: Integration tests (MySQL / Filesystem)
@@ -319,7 +319,7 @@ jobs:
         if: always()
         with:
           name: httpd-logs-mysql-filesystem
-          path: build/logs
+          path: build/logs/httpd-logs-mysql-filesystem.log
 
   integration-tests-postgresql-filesystem:
     name: Integration tests (PostgreSQL / Filesystem)
@@ -390,4 +390,4 @@ jobs:
         if: always()
         with:
           name: httpd-logs-postgresql-filesystem
-          path: build/logs
+          path: build/logs/httpd-logs-postgresql-filesystem.log

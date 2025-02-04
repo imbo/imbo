@@ -19,8 +19,8 @@ Feature: Imbo provides an event listener for turning EXIF data into metadata
               "exif:Make": "SAMSUNG",
               "exif:Model": "GT-I9100",
               "exif:GPSAltitude": "254\/5",
-              "exif:GPSLatitude": "63\/1, 40\/1, 173857\/3507",
-              "exif:GPSLongitude": "9\/1, 5\/1, 38109\/12500",
+              "exif:GPSLatitude": "63\/1,40\/1,173857\/3507",
+              "exif:GPSLongitude": "9\/1,5\/1,38109\/12500",
               "gps:location[0]": "@regExp(/^9\\.0841802$/)",
               "gps:location[1]": "@regExp(/63\\.680437300003$/)",
               "gps:altitude": "@regExp(/^50\\.8$/)"
