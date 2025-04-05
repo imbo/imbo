@@ -7,13 +7,12 @@
     "image transformation",
     "image metadata"
   ],
-  "homepage": "http://imbo.io/",
+  "homepage": "https://imbo.io/",
   "license": "MIT",
   "authors": [
     {
       "name": "Christer Edvartsen",
       "email": "cogo@starzinger.net",
-      "role": "Project lead",
       "homepage": "https://github.com/christeredvartsen"
     },
     {
@@ -27,15 +26,16 @@
     "docs": "https://docs.imbo.io"
   },
   "require": {
-    "php": ">=8.1",
-    "ext-imagick": "^3.4",
+    "php": ">=8.3",
+    "ext-imagick": "^3.7",
     "guzzlehttp/psr7": "^2.0",
     "ramsey/uuid": "^4.2",
     "symfony/console": "^6.2",
     "symfony/http-foundation": "^6.2"
   },
   "require-dev": {
-    "christeredvartsen/testfs": "^0.4.0",
+    "christeredvartsen/testfs": "^0.5.0",
+    "friendsofphp/php-cs-fixer": "^3.75",
     "imbo/behat-api-extension": "^5.0",
     "imbo/imbo-adapters-sdk": "dev-main",
     "imbo/imbo-coding-standard": "^2.0",
@@ -44,10 +44,12 @@
     "imbo/imbo-mysql-adapters": "dev-main",
     "imbo/imbo-postgresql-adapters": "dev-main",
     "imbo/imbo-sqlite-adapters": "dev-main",
+    "phpstan/extension-installer": "^1.4",
+    "phpstan/phpstan": "^2.1",
+    "phpstan/phpstan-deprecation-rules": "^2.0",
+    "phpstan/phpstan-phpunit": "^2.0",
     "phpunit/phpunit": "^10.0",
-    "psalm/plugin-phpunit": "^0.18.4",
-    "symfony/var-dumper": "^6.2",
-    "vimeo/psalm": "^5.8"
+    "symfony/var-dumper": "^6.2"
   },
   "suggest": {
     "imbo/imbo-s3-adapters": "Enables usage of AWS S3 for storing images",
@@ -77,59 +79,59 @@
     "bin/imbo"
   ],
   "scripts": {
-    "test:phpunit": "vendor/bin/phpunit",
-    "test:phpunit:coverage": [
+    "test:unit": "vendor/bin/phpunit",
+    "test:unit:coverage": [
       "rm -rf build/coverage",
       "mkdir -p build/coverage",
-      "vendor/bin/phpunit --coverage-html build/coverage --coverage-text"
+      "vendor/bin/phpunit --coverage-html build/coverage"
     ],
-    "test:behat": [
-      "@test:behat:mongodb-gridfs",
-      "@test:behat:mongodb-filesystem",
-      "@test:behat:sqlite-filesystem",
-      "@test:behat:mysql-filesystem",
-      "@test:behat:postgresql-filesystem"
+    "test:integration": [
+      "@test:integration:mongodb-gridfs",
+      "@test:integration:mongodb-filesystem",
+      "@test:integration:sqlite-filesystem",
+      "@test:integration:mysql-filesystem",
+      "@test:integration:postgresql-filesystem"
     ],
-    "test:behat:mongodb-gridfs": "vendor/bin/behat --strict --suite=mongodb-gridfs",
-    "test:behat:mongodb-filesystem": "vendor/bin/behat --strict --suite=mongodb-filesystem",
-    "test:behat:sqlite-filesystem": "vendor/bin/behat --strict --suite=sqlite-filesystem",
-    "test:behat:mysql-filesystem": "vendor/bin/behat --strict --suite=mysql-filesystem",
-    "test:behat:postgresql-filesystem": "vendor/bin/behat --strict --suite=postgresql-filesystem",
+    "test:integration:mongodb-gridfs": "vendor/bin/behat --strict --suite=mongodb-gridfs",
+    "test:integration:mongodb-filesystem": "vendor/bin/behat --strict --suite=mongodb-filesystem",
+    "test:integration:sqlite-filesystem": "vendor/bin/behat --strict --suite=sqlite-filesystem",
+    "test:integration:mysql-filesystem": "vendor/bin/behat --strict --suite=mysql-filesystem",
+    "test:integration:postgresql-filesystem": "vendor/bin/behat --strict --suite=postgresql-filesystem",
     "test": [
-      "@test:phpunit",
-      "@test:behat"
+      "@test:unit",
+      "@test:integration"
     ],
     "docs": [
       "cd docs; make spelling",
       "cd docs; make html"
     ],
-    "cs": "php-cs-fixer fix --dry-run --diff",
-    "sa": [
-      "vendor/bin/psalm -c psalm-src.xml",
-      "vendor/bin/psalm -c psalm-tests.xml"
-    ],
+    "cs": "vendor/bin/php-cs-fixer fix --dry-run --diff",
+    "sa": "vendor/bin/phpstan analyse",
     "dev": [
       "mkdir -p build/logs",
-      "php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &"
+      "php -S localhost:8080 -t ./public features/bootstrap/router.php &> build/logs/httpd.log"
     ]
   },
   "scripts-descriptions": {
-    "test:phpunit": "Run unit tests using PHPUnit",
-    "test:phpunit:coverage": "Run unit tests using PHPUnit with code coverage enabled (requires Xdebug)",
-    "test:behat": "Run all Behat test suites",
-    "test:behat:mongodb-gridfs": "Run the MongoDB / GridFS Behat test suite",
-    "test:behat:mongodb-filesystem": "Run the MongoDB / Filesystem Behat test suite",
-    "test:behat:sqlite-filesystem": "Run the SQLite / Filesystem Behat test suite",
-    "test:behat:mysql-filesystem": "Run the MySQL / Filesystem Behat test suite",
-    "test:behat:postgresql-filesystem": "Run the PostgreSQL / Filesystem Behat test suite",
-    "test": "Run unit tests and all Behat test suites",
+    "test:unit": "Run unit tests",
+    "test:unit:coverage": "Run unit tests with code coverage enabled (requires Xdebug)",
+    "test:integration": "Run integration tests",
+    "test:integration:mongodb-gridfs": "Run the MongoDB / GridFS integration tests",
+    "test:integration:mongodb-filesystem": "Run the MongoDB / Filesystem integration tests",
+    "test:integration:sqlite-filesystem": "Run the SQLite / Filesystem integration tests",
+    "test:integration:mysql-filesystem": "Run the MySQL / Filesystem integration tests",
+    "test:integration:postgresql-filesystem": "Run the PostgreSQL / Filesystem integration tests",
+    "test": "Run unit tests and integration tests",
     "docs": "Generate docs",
     "cs": "Check coding standard against the official Imbo coding standard",
-    "sa": "Run static analysis using Psalm",
+    "sa": "Run static analysis",
     "dev": "Start development server"
   },
   "config": {
-    "sort-packages": true
+    "sort-packages": true,
+    "allow-plugins": {
+      "phpstan/extension-installer": true
+    }
   },
   "minimum-stability": "dev",
   "prefer-stable": true
