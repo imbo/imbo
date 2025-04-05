@@ -2061,7 +2061,7 @@ class FeatureContextTest extends TestCase
      * @dataProvider getDataForMatchingSeveralResponses
      * @covers ::assertLastResponsesMatch
      */
-    public function testCanMatchResponses(array $responses, TableNode $table): void
+    public function testCanMatchResponses(array $responses, TableNode $match): void
     {
         $this->mockHandler->append(...$responses);
 
@@ -2071,7 +2071,7 @@ class FeatureContextTest extends TestCase
 
         $this->assertSame(
             $this->context,
-            $this->context->assertLastResponsesMatch($table),
+            $this->context->assertLastResponsesMatch($match),
         );
     }
 
@@ -2079,7 +2079,7 @@ class FeatureContextTest extends TestCase
      * @dataProvider getDataForMatchingSeveralResponsesWhenFailing
      * @covers ::assertLastResponsesMatch
      */
-    public function testAssertLastResponsesMatchCanFail(array $responses, TableNode $table, string $exceptionMessage): void
+    public function testAssertLastResponsesMatchCanFail(array $responses, TableNode $match, string $exceptionMessage): void
     {
         $this->mockHandler->append(...$responses);
 
@@ -2090,7 +2090,7 @@ class FeatureContextTest extends TestCase
         $this->expectException(Assert\InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);
 
-        $this->context->assertLastResponsesMatch($table);
+        $this->context->assertLastResponsesMatch($match);
     }
 
     /**
@@ -2454,34 +2454,34 @@ class FeatureContextTest extends TestCase
     }
 
     /**
-     * @return array<array{orignalMethod:string,method:?string,expectedUrl:string,publicKey:?string,privateKey:?string}>
+     * @return array<array{originalMethod:string,method:?string,expectedUrl:string,publicKey:?string,privateKey:?string}>
      */
     public static function getDataForReplayingRequests(): array
     {
         return [
             'use original method' => [
-                'orignalMethod' => 'GET',
+                'originalMethod' => 'GET',
                 'method' => null,
                 'expectedUrl' => 'http://localhost:8080/path',
                 'publicKey' => null,
                 'privateKey' => null,
             ],
             'specify custom method' => [
-                'orignalMethod' => 'GET',
+                'originalMethod' => 'GET',
                 'method' => 'HEAD',
                 'expectedUrl' => 'http://localhost:8080/path',
                 'publicKey' => null,
                 'privateKey' => null,
             ],
             'specify custom method that the same as the original' => [
-                'orignalMethod' => 'DELETE',
+                'originalMethod' => 'DELETE',
                 'method' => 'DELETE',
                 'expectedUrl' => 'http://localhost:8080/path',
                 'publicKey' => null,
                 'privateKey' => null,
             ],
             'specify custom method and append access token' => [
-                'orignalMethod' => 'DELETE',
+                'originalMethod' => 'DELETE',
                 'method' => 'DELETE',
                 'expectedUrl' => 'http://localhost:8080/path?publicKey=key&accessToken=dd4217a681cf8abdcecdc68cf49630df1e57dc733735e902b8a69859e50797a8',
                 'publicKey' => 'key',
@@ -2676,7 +2676,7 @@ class FeatureContextTest extends TestCase
     }
 
     /**
-     * @return array<array{image:string,dimension:string,exceptionMessage:string}>
+     * @return array<array{imageData:string,dimension:string,exceptionMessage:string}>
      */
     public static function getDataForImageDimensionAssertion(): array
     {
@@ -2685,22 +2685,22 @@ class FeatureContextTest extends TestCase
 
         return [
             [
-                'image' => $image1,
+                'imageData' => $image1,
                 'dimension' => '123x456',
                 'exceptionMessage' => 'Incorrect image width, expected 123, got 599.',
             ],
             [
-                'image' => $image1,
+                'imageData' => $image1,
                 'dimension' => '599x456',
                 'exceptionMessage' => 'Incorrect image height, expected 456, got 417.',
             ],
             [
-                'image' => $image2,
+                'imageData' => $image2,
                 'dimension' => '123x456',
                 'exceptionMessage' => 'Incorrect image width, expected 123, got 539.',
             ],
             [
-                'image' => $image2,
+                'imageData' => $image2,
                 'dimension' => '539x123',
                 'exceptionMessage' => 'Incorrect image height, expected 123, got 375.',
             ],
