@@ -5,19 +5,14 @@ use Imbo\EventManager\Event;
 use Imbo\Exception\ResourceException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\EventListener\ImageTransformationLimiter
- */
+#[CoversClass(ImageTransformationLimiter::class)]
 class ImageTransformationLimiterTest extends TestCase
 {
-    /**
-     * @dataProvider getLimitAndTransformations
-     * @covers ::__construct
-     * @covers ::checkTransformationCount
-     * @covers ::setTransformationLimit
-     */
+    #[DataProvider('getLimitAndTransformations')]
     public function testLimitsTransformationCount(array $transformations, int $limit, ?string $exceptionMessage): void
     {
         $listener = new ImageTransformationLimiter(['limit' => $limit]);
@@ -43,12 +38,7 @@ class ImageTransformationLimiterTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider getLimits
-     * @covers ::__construct
-     * @covers ::getTransformationLimit
-     * @covers ::setTransformationLimit
-     */
+    #[DataProvider('getLimits')]
     public function testGetSetLimitCountTransformationCount(int $limit): void
     {
         $this->assertSame(

@@ -5,12 +5,11 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-/**
- * @coversDefaultClass Imbo\Resource\Index
- */
+#[CoversClass(Index::class)]
 class IndexTest extends ResourceTests
 {
     private Index $resource;
@@ -35,9 +34,6 @@ class IndexTest extends ResourceTests
         $this->resource = $this->getNewResource();
     }
 
-    /**
-     * @covers ::get
-     */
     public function testSupportsHttpGet(): void
     {
         $this->response
@@ -57,7 +53,6 @@ class IndexTest extends ResourceTests
             ->method('getConfig')
             ->willReturn(['indexRedirect' => null]);
 
-        /** @var ResponseHeaderBag&MockObject */
         $responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $responseHeaders
             ->expects($this->once())
@@ -69,9 +64,6 @@ class IndexTest extends ResourceTests
         $this->resource->get($this->event);
     }
 
-    /**
-     * @covers ::get
-     */
     public function testRedirectsIfConfigurationOptionHasBeenSet(): void
     {
         $url = 'http://imbo.io';
@@ -80,7 +72,6 @@ class IndexTest extends ResourceTests
             ->method('getConfig')
             ->willReturn(['indexRedirect' => $url]);
 
-        /** @var ResponseHeaderBag&MockObject */
         $responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $responseHeaders
             ->expects($this->once())

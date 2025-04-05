@@ -3,11 +3,10 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Canvas
- */
+#[CoversClass(Canvas::class)]
 class CanvasTest extends TransformationTests
 {
     protected function getTransformation(): Canvas
@@ -15,15 +14,11 @@ class CanvasTest extends TransformationTests
         return new Canvas();
     }
 
-    /**
-     * @dataProvider getCanvasParameters
-     * @covers ::transform
-     */
+    #[DataProvider('getCanvasParameters')]
     public function testTransformWithDifferentParameters(?int $width, ?int $height, string $mode, int $resultingWidth, int $resultingHeight): void
     {
         $blob = file_get_contents(FIXTURES_DIR . '/image.png');
 
-        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getBlob' => $blob,
             'getWidth' => 665,

@@ -7,11 +7,11 @@ use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Resource\Stats as StatsResource;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @coversDefaultClass Imbo\EventListener\StatsAccess
- */
+#[CoversClass(StatsAccess::class)]
 class StatsAccessTest extends ListenerTests
 {
     private StatsAccess $listener;
@@ -34,9 +34,6 @@ class StatsAccessTest extends ListenerTests
         return $this->listener;
     }
 
-    /**
-     * @covers ::checkAccess
-     */
     public function testDoesNotAllowAnyIpAddressPerDefault(): void
     {
         $this->expectExceptionObject(new RuntimeException('Access denied', Response::HTTP_FORBIDDEN));
@@ -48,20 +45,7 @@ class StatsAccessTest extends ListenerTests
         $this->listener->checkAccess($this->event);
     }
 
-    /**
-     * @dataProvider getFilterData
-     * @covers ::checkAccess
-     * @covers ::isIPv6
-     * @covers ::isIPv4
-     * @covers ::expandIPv6
-     * @covers ::isAllowed
-     * @covers ::cidrMatch
-     * @covers ::cidr6Match
-     * @covers ::cidr4Match
-     * @covers ::getBinaryMask
-     * @covers ::__construct
-     * @covers ::expandIPv6InFilters
-     */
+    #[DataProvider('getFilterData')]
     public function testCanUseDifferentFilters(string $clientIp, array $allow, bool $hasAccess): void
     {
         $this->request
@@ -82,7 +66,6 @@ class StatsAccessTest extends ListenerTests
 
     /**
      * @see https://github.com/imbo/imbo/issues/249
-     * @covers ::getSubscribedEvents
      */
     public function testListensToTheSameEventsAsTheStatsResource(): void
     {
@@ -95,7 +78,6 @@ class StatsAccessTest extends ListenerTests
 
     /**
      * @see https://github.com/imbo/imbo/issues/251
-     * @covers ::getSubscribedEvents
      */
     public function testHasHigherPriorityThanTheStatsResource(): void
     {

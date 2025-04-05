@@ -2,11 +2,10 @@
 namespace Imbo\Model;
 
 use DateTime;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Model\Image
- */
+#[CoversClass(Image::class)]
 class ImageTest extends TestCase
 {
     private Image $image;
@@ -16,10 +15,6 @@ class ImageTest extends TestCase
         $this->image = new Image();
     }
 
-    /**
-     * @covers ::setMetadata
-     * @covers ::getMetadata
-     */
     public function testCanSetAndGetMetadata(): void
     {
         $this->assertSame([], $this->image->getMetadata());
@@ -31,10 +26,6 @@ class ImageTest extends TestCase
         $this->assertSame($data, $this->image->getMetadata());
     }
 
-    /**
-     * @covers ::setMimeType
-     * @covers ::getMimeType
-     */
     public function testCanSetAndGetMimeType(): void
     {
         $mimeType = 'image/png';
@@ -42,23 +33,12 @@ class ImageTest extends TestCase
         $this->assertSame($mimeType, $this->image->getMimeType());
     }
 
-    /**
-     * @covers ::setMimeType
-     */
     public function testMimeTypeOverride(): void
     {
         $this->assertSame($this->image, $this->image->setMimeType('image/x-png'));
         $this->assertSame('image/png', $this->image->getMimeType());
     }
 
-    /**
-     * @covers ::setBlob
-     * @covers ::getBlob
-     * @covers ::getFilesize
-     * @covers ::setFilesize
-     * @covers ::getChecksum
-     * @covers ::setChecksum
-     */
     public function testCanSetAndGetBlob(): void
     {
         $blob = 'some string';
@@ -76,10 +56,6 @@ class ImageTest extends TestCase
         $this->assertSame($hash, $this->image->getChecksum());
     }
 
-    /**
-     * @covers ::setExtension
-     * @covers ::getExtension
-     */
     public function testCanSetAndGetExtension(): void
     {
         $extension = 'png';
@@ -87,10 +63,6 @@ class ImageTest extends TestCase
         $this->assertSame($extension, $this->image->getExtension());
     }
 
-    /**
-     * @covers ::setWidth
-     * @covers ::getWidth
-     */
     public function testCanSetAndGetWidth(): void
     {
         $width = 123;
@@ -98,10 +70,6 @@ class ImageTest extends TestCase
         $this->assertSame($width, $this->image->getWidth());
     }
 
-    /**
-     * @covers ::setHeight
-     * @covers ::getHeight
-     */
     public function testCanSetAndGetHeight(): void
     {
         $height = 234;
@@ -109,10 +77,6 @@ class ImageTest extends TestCase
         $this->assertSame($height, $this->image->getHeight());
     }
 
-    /**
-     * @covers ::setAddedDate
-     * @covers ::getAddedDate
-     */
     public function testCanSetAndGetTheAddedDate(): void
     {
         $date = $this->createMock(DateTime::class);
@@ -121,10 +85,6 @@ class ImageTest extends TestCase
         $this->assertSame($date, $this->image->getAddedDate());
     }
 
-    /**
-     * @covers ::setUpdatedDate
-     * @covers ::getUpdatedDate
-     */
     public function testCanSetAndGetTheUpdatedDate(): void
     {
         $date = $this->createMock(DateTime::class);
@@ -133,10 +93,6 @@ class ImageTest extends TestCase
         $this->assertSame($date, $this->image->getUpdatedDate());
     }
 
-    /**
-     * @covers ::setUser
-     * @covers ::getUser
-     */
     public function testCanSetAndGetTheUser(): void
     {
         $this->assertNull($this->image->getUser());
@@ -144,10 +100,6 @@ class ImageTest extends TestCase
         $this->assertSame('christer', $this->image->getUser());
     }
 
-    /**
-     * @covers ::setImageIdentifier
-     * @covers ::getImageIdentifier
-     */
     public function testCanSetAndGetTheImageIdentifier(): void
     {
         $this->assertNull($this->image->getImageIdentifier());
@@ -156,10 +108,6 @@ class ImageTest extends TestCase
     }
 
 
-    /**
-     * @covers ::getHasBeenTransformed
-     * @covers ::setHasBeenTransformed
-     */
     public function testCanUpdateTransformationFlag(): void
     {
         $this->assertFalse($this->image->getHasBeenTransformed());
@@ -169,10 +117,6 @@ class ImageTest extends TestCase
         $this->assertFalse($this->image->getHasBeenTransformed());
     }
 
-    /**
-     * @covers ::setOriginalChecksum
-     * @covers ::getOriginalChecksum
-     */
     public function testCanSetAndGetTheOriginalChecksum(): void
     {
         $checksum = md5(__FILE__);
@@ -180,10 +124,6 @@ class ImageTest extends TestCase
         $this->assertSame($checksum, $this->image->getOriginalChecksum());
     }
 
-    /**
-     * @covers ::setOutputQualityCompression
-     * @covers ::getOutputQualityCompression
-     */
     public function testCanSetAndGetOutputQualityCompression(): void
     {
         $compression = 50;
@@ -191,9 +131,6 @@ class ImageTest extends TestCase
         $this->assertSame($compression, $this->image->getOutputQualityCompression());
     }
 
-    /**
-     * @covers ::getData
-     */
     public function testGetData(): void
     {
         $metadata = [

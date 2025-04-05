@@ -6,14 +6,14 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-/**
- * @coversDefaultClass Imbo\EventListener\Authenticate
- */
+#[CoversClass(Authenticate::class)]
 class AuthenticateTest extends ListenerTests
 {
     private Authenticate $listener;
@@ -62,9 +62,6 @@ class AuthenticateTest extends ListenerTests
         ]);
     }
 
-    /**
-     * @covers ::authenticate
-     */
     public function testThrowsExceptionWhenAuthInfoIsMissing(): void
     {
         $this->headers
@@ -83,9 +80,6 @@ class AuthenticateTest extends ListenerTests
         $this->listener->authenticate($this->event);
     }
 
-    /**
-     * @covers ::authenticate
-     */
     public function testThrowsExceptionWhenSignatureIsMissing(): void
     {
         $this->headers
@@ -118,10 +112,6 @@ class AuthenticateTest extends ListenerTests
         $this->listener->authenticate($this->event);
     }
 
-    /**
-     * @covers ::authenticate
-     * @covers ::timestampIsValid
-     */
     public function testThrowsExceptionWhenTimestampIsInvalid(): void
     {
         $this->headers
@@ -146,10 +136,6 @@ class AuthenticateTest extends ListenerTests
         $this->listener->authenticate($this->event);
     }
 
-    /**
-     * @covers ::authenticate
-     * @covers ::timestampHasExpired
-     */
     public function testThrowsExceptionWhenTimestampHasExpired(): void
     {
         $this->headers
@@ -174,9 +160,6 @@ class AuthenticateTest extends ListenerTests
         $this->listener->authenticate($this->event);
     }
 
-    /**
-     * @covers ::authenticate
-     */
     public function testThrowsExceptionWhenSignatureDoesNotMatch(): void
     {
         $this->headers
@@ -220,12 +203,6 @@ class AuthenticateTest extends ListenerTests
         $this->listener->authenticate($this->event);
     }
 
-    /**
-     * @covers ::authenticate
-     * @covers ::signatureIsValid
-     * @covers ::timestampIsValid
-     * @covers ::timestampHasExpired
-     */
     public function testApprovesValidSignature(): void
     {
         $httpMethod = 'GET';
@@ -293,12 +270,6 @@ class AuthenticateTest extends ListenerTests
         $this->listener->authenticate($this->event);
     }
 
-    /**
-     * @covers ::authenticate
-     * @covers ::signatureIsValid
-     * @covers ::timestampIsValid
-     * @covers ::timestampHasExpired
-     */
     public function testApprovesValidSignatureWithAuthInfoFromQueryParameters(): void
     {
         $httpMethod = 'GET';
@@ -363,13 +334,7 @@ class AuthenticateTest extends ListenerTests
         $this->listener->authenticate($this->event);
     }
 
-    /**
-     * @dataProvider getRewrittenSignatureData
-     * @covers ::authenticate
-     * @covers ::signatureIsValid
-     * @covers ::timestampIsValid
-     * @covers ::timestampHasExpired
-     */
+    #[DataProvider('getRewrittenSignatureData')]
     public function testApprovesSignaturesWhenConfigurationForcesProtocol(string $serverUrl, string $protocol, string $authHeader, bool $shouldMatch, string $signature, string $timestamp): void
     {
         if (!$shouldMatch) {

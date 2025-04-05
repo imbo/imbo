@@ -1,17 +1,13 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventManager;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use SplPriorityQueue;
 
-/**
- * @coversDefaultClass Imbo\EventManager\PriorityQueue
- */
+#[CoversClass(PriorityQueue::class)]
 class PriorityQueueTest extends TestCase
 {
-    /**
-     * @covers ::insert
-     */
     public function testUsesAPredictableOrder(): void
     {
         /** @var SplPriorityQueue<int,string> */

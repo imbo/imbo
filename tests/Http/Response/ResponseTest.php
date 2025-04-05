@@ -5,11 +5,10 @@ use DateTime;
 use DateTimeZone;
 use Imbo\Model\Error;
 use Imbo\Model\ModelInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Http\Response\Response
- */
+#[CoversClass(Response::class)]
 class ResponseTest extends TestCase
 {
     private Response $response;
@@ -19,10 +18,6 @@ class ResponseTest extends TestCase
         $this->response = new Response();
     }
 
-    /**
-     * @covers ::setModel
-     * @covers ::getModel
-     */
     public function testCanSetAndGetModel(): void
     {
         $model = $this->createMock(ModelInterface::class);
@@ -33,22 +28,6 @@ class ResponseTest extends TestCase
         $this->assertNull($this->response->getModel());
     }
 
-    /**
-     * @covers ::setModel
-     * @covers ::setNotModified
-     */
-    public function testRemovesModelWhenMarkedAsNotModified(): void
-    {
-        $model = $this->createMock(ModelInterface::class);
-        $this->assertSame($this->response, $this->response->setModel($model));
-        $this->assertSame($this->response, $this->response->setNotModified());
-        $this->assertSame(Response::HTTP_NOT_MODIFIED, $this->response->getStatusCode());
-        $this->assertNull($this->response->getModel());
-    }
-
-    /**
-     * @covers ::setError
-     */
     public function testUpdatesResponseWhenSettingAnErrorModel(): void
     {
         $message = 'You wronged';

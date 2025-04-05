@@ -12,12 +12,11 @@ use Imbo\Image\Identifier\Generator\GeneratorInterface;
 use Imbo\Model\ArrayModel;
 use Imbo\Model\Image;
 use Imbo\Storage\StorageInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-/**
- * @coversDefaultClass Imbo\Resource\Images
- */
+#[CoversClass(Images::class)]
 class ImagesTest extends ResourceTests
 {
     private Images $resource;
@@ -57,9 +56,6 @@ class ImagesTest extends ResourceTests
         $this->resource = $this->getNewResource();
     }
 
-    /**
-     * @covers ::addImage
-     */
     public function testSupportsHttpPost(): void
     {
         $this->imageIdentifierGenerator
@@ -85,7 +81,6 @@ class ImagesTest extends ResourceTests
                 },
             );
 
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -104,9 +99,6 @@ class ImagesTest extends ResourceTests
         $this->resource->addImage($this->event);
     }
 
-    /**
-     * @covers ::addImage
-     */
     public function testThrowsExceptionWhenItFailsToGenerateUniqueImageIdentifier(): void
     {
         $this->manager
@@ -115,7 +107,6 @@ class ImagesTest extends ResourceTests
             ->with('db.image.insert', ['updateIfDuplicate' => false])
             ->willThrowException(new DuplicateImageIdentifierException());
 
-        /** @var ResponseHeaderBag&MockObject */
         $headers = $this->createMock(ResponseHeaderBag::class);
         $headers
             ->expects($this->once())
@@ -144,9 +135,6 @@ class ImagesTest extends ResourceTests
         $this->resource->addImage($this->event);
     }
 
-    /**
-     * @covers ::getImages
-     */
     public function testSupportsHttpGet(): void
     {
         $this->manager
@@ -156,9 +144,6 @@ class ImagesTest extends ResourceTests
         $this->resource->getImages($this->event);
     }
 
-    /**
-     * @covers ::addImage
-     */
     public function testAddImageWithCallableImageIdentifierGenerator(): void
     {
         $manager = $this->manager;
@@ -177,7 +162,6 @@ class ImagesTest extends ResourceTests
                 },
             );
 
-        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getImageIdentifier' => 'some id',
         ]);

@@ -8,11 +8,10 @@ use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Image\OutputConverterManager;
 use Imbo\Model\Image;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Convert
- */
+#[CoversClass(Convert::class)]
 class ConvertTest extends TransformationTests
 {
     protected function getTransformation(): Convert
@@ -20,12 +19,8 @@ class ConvertTest extends TransformationTests
         return new Convert();
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testCanConvertAnImage(): void
     {
-        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getExtension' => 'png',
         ]);
@@ -50,7 +45,6 @@ class ConvertTest extends TransformationTests
         $imagick = new Imagick();
         $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
 
-        /** @var OutputConverterManager&MockObject */
         $outputConverterManager = $this->createMock(OutputConverterManager::class);
         $outputConverterManager
             ->expects($this->any())
@@ -69,12 +63,8 @@ class ConvertTest extends TransformationTests
             ->transform(['type' => 'gif']);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testWillNotConvertImageIfNotNeeded(): void
     {
-        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getExtension' => 'png',
         ]);
@@ -85,22 +75,15 @@ class ConvertTest extends TransformationTests
             ->transform(['type' => 'png']);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testThrowsExceptionOnMissingType(): void
     {
         $this->expectExceptionObject(new TransformationException('Missing required parameter: type', Response::HTTP_BAD_REQUEST));
         (new Convert())->transform([]);
     }
 
-    /**
-     * @dataProvider getConvertParams
-     * @covers ::transform
-     */
+    #[DataProvider('getConvertParams')]
     public function testWillConvertImages(string $existingExtension, string $newType, string $newMimeType): void
     {
-        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getExtension' => $existingExtension,
         ]);
@@ -120,14 +103,12 @@ class ConvertTest extends TransformationTests
             ->with(true)
             ->willReturnSelf();
 
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
             ->method('setImageFormat')
             ->with($newType);
 
-        /** @var OutputConverterManager&MockObject */
         $converterManager = $this->createMock(OutputConverterManager::class);
         $converterManager
             ->expects($this->once())
@@ -146,16 +127,12 @@ class ConvertTest extends TransformationTests
             ->transform(['type' => $newType]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testThrowsExceptionOnImagickError(): void
     {
         $image = $this->createConfiguredMock(Image::class, [
             'getExtension' => 'png',
         ]);
 
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())

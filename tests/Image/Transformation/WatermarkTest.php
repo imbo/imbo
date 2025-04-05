@@ -9,11 +9,10 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use Imbo\Storage\StorageInterface;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Watermark
- */
+#[CoversClass(Watermark::class)]
 class WatermarkTest extends TransformationTests
 {
     private Watermark $transformation;
@@ -31,9 +30,6 @@ class WatermarkTest extends TransformationTests
         $this->transformation = new Watermark();
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformThrowsExceptionIfNoImageSpecified(): void
     {
         $image = $this->createMock(Image::class);
@@ -44,14 +40,10 @@ class WatermarkTest extends TransformationTests
         $this->transformation->setImage($image)->transform([]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testThrowsExceptionIfSpecifiedImageIsNotFound(): void
     {
         $e = new StorageException('File not found', Response::HTTP_NOT_FOUND);
 
-        /** @var StorageInterface&MockObject  */
         $storage = $this->createMock(StorageInterface::class);
         $storage
             ->expects($this->once())
@@ -80,13 +72,7 @@ class WatermarkTest extends TransformationTests
         $this->transformation->transform(['img' => 'foobar']);
     }
 
-    /**
-     * @dataProvider getParamsForWatermarks
-     * @covers ::transform
-     * @covers ::setDefaultImage
-     *
-     * @param array<string,array{x:int,y:int,color:array<int,int>}> $colors
-     */
+    #[DataProvider('getParamsForWatermarks')]
     public function testApplyToImageTopLeftWithOnlyWidthAndDefaultWatermark(array $params, array $colors): void
     {
         $blob = file_get_contents(FIXTURES_DIR . '/white.png');
@@ -106,7 +92,6 @@ class WatermarkTest extends TransformationTests
             $watermarkFixture = (string) $params['watermarkFixture'];
         }
 
-        /** @var StorageInterface&MockObject */
         $storage = $this->createMock(StorageInterface::class);
         $storage
             ->expects($this->once())
@@ -114,7 +99,6 @@ class WatermarkTest extends TransformationTests
             ->with('someUser', $expectedWatermark)
             ->willReturn(file_get_contents(FIXTURES_DIR . '/' . $watermarkFixture));
 
-        /** @var Request&MockObject */
         $request = $this->createMock(Request::class);
         $request
             ->expects($this->once())

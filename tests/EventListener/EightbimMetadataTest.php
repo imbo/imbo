@@ -9,11 +9,9 @@ use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @coversDefaultClass Imbo\EventListener\EightbimMetadata
- */
+#[CoversClass(EightbimMetadata::class)]
 class EightbimMetadataTest extends ListenerTests
 {
     protected EightbimMetadata $listener;
@@ -29,11 +27,6 @@ class EightbimMetadataTest extends ListenerTests
         return $this->listener;
     }
 
-    /**
-     * @covers ::setImagick
-     * @covers ::populate
-     * @covers ::save
-     */
     public function testCanExtractMetadata(): void
     {
         $user = 'user';
@@ -50,13 +43,11 @@ class EightbimMetadataTest extends ListenerTests
             'getImage' => $image,
         ]);
 
-        /** @var DatabaseInterface&MockObject */
         $database = $this->createMock(DatabaseInterface::class);
         $database->expects($this->once())->method('updateMetadata')->with($user, $imageIdentifier, [
             'paths' => ['House', 'Panda'],
         ]);
 
-        /** @var EventInterface&MockObject */
         $event = $this->createMock(EventInterface::class);
         $event
             ->expects($this->exactly(2))
@@ -74,12 +65,8 @@ class EightbimMetadataTest extends ListenerTests
         $this->listener->save($event);
     }
 
-    /**
-     * @covers ::save
-     */
     public function testReturnsEarlyOnMissingProperties(): void
     {
-        /** @var EventInterface&MockObject */
         $event = $this->createMock(EventInterface::class);
         $event
             ->expects($this->never())
@@ -91,9 +78,6 @@ class EightbimMetadataTest extends ListenerTests
         );
     }
 
-    /**
-     * @covers ::save
-     */
     public function testDeletesImageWhenStoringMetadataFails(): void
     {
         $user = 'user';
@@ -110,7 +94,6 @@ class EightbimMetadataTest extends ListenerTests
             'getImage' => $image,
         ]);
 
-        /** @var DatabaseInterface&MockObject */
         $database = $this->createMock(DatabaseInterface::class);
         $database
             ->expects($this->once())

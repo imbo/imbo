@@ -2,11 +2,10 @@
 namespace Imbo\Model;
 
 use DateTime;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Model\User
- */
+#[CoversClass(User::class)]
 class UserTest extends TestCase
 {
     private User $model;
@@ -16,10 +15,6 @@ class UserTest extends TestCase
         $this->model = new User();
     }
 
-    /**
-     * @covers ::getUserId
-     * @covers ::setUserId
-     */
     public function testCanSetAndGetUserId(): void
     {
         $this->assertNull($this->model->getUserId());
@@ -27,10 +22,6 @@ class UserTest extends TestCase
         $this->assertSame('key', $this->model->getUserId());
     }
 
-    /**
-     * @covers ::getNumImages
-     * @covers ::setNumImages
-     */
     public function testCanSetAndGetNumImages(): void
     {
         $this->assertNull($this->model->getNumImages());
@@ -38,10 +29,6 @@ class UserTest extends TestCase
         $this->assertSame(10, $this->model->getNumImages());
     }
 
-    /**
-     * @covers ::getLastModified
-     * @covers ::setLastModified
-     */
     public function testCanSetAndGetLastModified(): void
     {
         $date = new DateTime();
@@ -51,9 +38,6 @@ class UserTest extends TestCase
         $this->assertSame($date, $this->model->getLastModified());
     }
 
-    /**
-     * @covers ::getData
-     */
     public function testGetData(): void
     {
         $date = new DateTime();

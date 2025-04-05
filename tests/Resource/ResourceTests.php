@@ -10,18 +10,11 @@ abstract class ResourceTests extends TestCase
      */
     abstract protected function getNewResource(): ResourceInterface;
 
-    /**
-     * @covers ::getSubscribedEvents
-     */
     public function testReturnsCorrectEventSubscriptions(): void
     {
         $this->assertIsArray($this->getNewResource()::getSubscribedEvents());
     }
 
-    /**
-     * @covers ::getSubscribedEvents
-     * @covers ::getAllowedMethods
-     */
     public function testReturnsTheCorrectAllowedMethods(): void
     {
         $this->expectNotToPerformAssertions();

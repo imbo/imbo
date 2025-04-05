@@ -1,18 +1,14 @@
 <?php declare(strict_types=1);
 namespace Imbo\Exception;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Exception\RuntimeException
- */
+#[CoversClass(RuntimeException::class)]
 class RuntimeExceptionTest extends TestCase
 {
-    /**
-     * @dataProvider getErrorCodes
-     * @covers ::setImboErrorCode
-     * @covers ::getImboErrorCode
-     */
+    #[DataProvider('getErrorCodes')]
     public function testSetAndGetImboErrorCode(int $actual, int $expected): void
     {
         $exception = new RuntimeException();

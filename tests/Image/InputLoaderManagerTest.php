@@ -6,12 +6,11 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Response\Response;
 use Imbo\Image\InputLoader\Basic;
 use Imbo\Image\InputLoader\InputLoaderInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-/**
- * @coversDefaultClass Imbo\Image\InputLoaderManager
- */
+#[CoversClass(InputLoaderManager::class)]
 class InputLoaderManagerTest extends TestCase
 {
     private InputLoaderManager $manager;
@@ -21,9 +20,6 @@ class InputLoaderManagerTest extends TestCase
         $this->manager = new InputLoaderManager();
     }
 
-    /**
-     * @covers ::setImagick
-     */
     public function testCanSetImagickInstance(): void
     {
         $this->assertSame(
@@ -32,9 +28,6 @@ class InputLoaderManagerTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::addLoaders
-     */
     public function testThrowsExceptionWhenRegisteringWrongLoader(): void
     {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -45,9 +38,6 @@ class InputLoaderManagerTest extends TestCase
         $this->manager->addLoaders([new stdClass()]);
     }
 
-    /**
-     * @covers ::addLoaders
-     */
     public function testCanAddLoadersAsStrings(): void
     {
         $this->assertSame(
@@ -58,10 +48,6 @@ class InputLoaderManagerTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::registerLoader
-     * @covers ::getExtensionFromMimeType
-     */
     public function testCanGetExtensionFromMimeType(): void
     {
         $this->manager->addLoaders([
@@ -73,10 +59,6 @@ class InputLoaderManagerTest extends TestCase
         $this->assertSame('tif', $this->manager->getExtensionFromMimeType('image/tiff'));
     }
 
-    /**
-     * @covers ::registerLoader
-     * @covers ::load
-     */
     public function testCanRegisterAndUseLoaders(): void
     {
         $imagick = $this->createMock(Imagick::class);
@@ -118,9 +100,6 @@ class InputLoaderManagerTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::load
-     */
     public function testManagerReturnsFalseWhenNoLoaderManagesToLoadTheImage(): void
     {
         $loader = $this->createConfiguredMock(InputLoaderInterface::class, [
@@ -136,9 +115,6 @@ class InputLoaderManagerTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::load
-     */
     public function testManagerReturnsNullWhenNoLoadersExist(): void
     {
         $this->assertNull($this->manager->load('image/png', 'some data'));

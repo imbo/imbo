@@ -9,14 +9,14 @@ use Imbo\Exception\ConfigurationException;
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use stdClass;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-/**
- * @coversDefaultClass Imbo\EventListener\AccessToken
- */
+#[CoversClass(AccessToken::class)]
 class AccessTokenTest extends ListenerTests
 {
     private AccessToken $listener;
@@ -47,9 +47,6 @@ class AccessTokenTest extends ListenerTests
         return $this->listener;
     }
 
-    /**
-     * @covers ::checkAccessToken
-     */
     public function testRequestWithBogusAccessToken(): void
     {
         $this->request->query = new InputBag(['accessToken' => '/string']);
@@ -70,10 +67,6 @@ class AccessTokenTest extends ListenerTests
         $this->listener->checkAccessToken($this->event);
     }
 
-    /**
-     * @covers ::checkAccessToken
-     * @covers ::isWhitelisted
-     */
     public function testThrowsExceptionIfAnAccessTokenIsMissingFromTheRequestWhenNotWhitelisted(): void
     {
         $this->event
@@ -85,12 +78,7 @@ class AccessTokenTest extends ListenerTests
         $this->listener->checkAccessToken($this->event);
     }
 
-    /**
-     * @dataProvider getFilterData
-     * @covers ::__construct
-     * @covers ::checkAccessToken
-     * @covers ::isWhitelisted
-     */
+    #[DataProvider('getFilterData')]
     public function testSupportsFilters(array $filter, array $transformations, bool $whitelisted): void
     {
         $listener = new AccessToken($filter);
@@ -111,10 +99,7 @@ class AccessTokenTest extends ListenerTests
         $listener->checkAccessToken($this->event);
     }
 
-    /**
-     * @dataProvider getAccessTokens
-     * @covers ::checkAccessToken
-     */
+    #[DataProvider('getAccessTokens')]
     public function testThrowsExceptionOnIncorrectToken(string $url, string $token, string $privateKey, bool $correct): void
     {
         if (!$correct) {
@@ -145,9 +130,6 @@ class AccessTokenTest extends ListenerTests
         $this->listener->checkAccessToken($this->event);
     }
 
-    /**
-     * @covers ::checkAccessToken
-     */
     public function testWillSkipValidationWhenShortUrlHeaderIsPresent(): void
     {
         $this->responseHeaders
@@ -159,9 +141,6 @@ class AccessTokenTest extends ListenerTests
         $this->listener->checkAccessToken($this->event);
     }
 
-    /**
-     * @covers ::checkAccessToken
-     */
     public function testWillAcceptBothProtocolsIfConfiguredTo(): void
     {
         $privateKey = 'foobar';
@@ -203,9 +182,6 @@ class AccessTokenTest extends ListenerTests
         }
     }
 
-    /**
-     * @covers ::checkAccessToken
-     */
     public function testAccessTokenArgumentKey(): void
     {
         $url = 'http://imbo/users/christer';
@@ -240,13 +216,7 @@ class AccessTokenTest extends ListenerTests
         $listener->checkAccessToken($this->event);
     }
 
-    /**
-     * @dataProvider getAccessTokensForMultipleGenerator
-     * @covers ::checkAccessToken
-     * @covers ::getAlternativeURL
-     * @covers ::getUnescapedAlternativeURL
-     * @covers ::getEscapedAlternativeURL
-     */
+    #[DataProvider('getAccessTokensForMultipleGenerator')]
     public function testMultipleAccessTokensGenerator(string $url, string $token, string $privateKey, bool $correct, string $argumentKey): void
     {
         if (!$correct) {
@@ -290,9 +260,6 @@ class AccessTokenTest extends ListenerTests
         $listener->checkAccessToken($this->event);
     }
 
-    /**
-     * @covers ::__construct
-     */
     public function testConfigurationExceptionOnInvalidAccessTokenGenerator(): void
     {
         $this->expectExceptionObject(new ConfigurationException('Invalid accessTokenGenerator', Response::HTTP_INTERNAL_SERVER_ERROR));
@@ -300,10 +267,7 @@ class AccessTokenTest extends ListenerTests
         new AccessToken(['accessTokenGenerator' => new StdClass()]);
     }
 
-    /**
-     * @dataProvider getRewrittenAccessTokenData
-     * @covers ::checkAccessToken
-     */
+    #[DataProvider('getRewrittenAccessTokenData')]
     public function testWillRewriteIncomingUrlToConfiguredProtocol(string $accessToken, string $url, string $protocol, bool $correct): void
     {
         if (!$correct) {

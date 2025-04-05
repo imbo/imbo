@@ -2,12 +2,10 @@
 namespace Imbo\Image\InputLoader;
 
 use Imagick;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Image\InputLoader\Basic
- */
+#[CoversClass(Basic::class)]
 class BasicTest extends TestCase
 {
     private Basic $loader;
@@ -17,9 +15,6 @@ class BasicTest extends TestCase
         $this->loader = new Basic();
     }
 
-    /**
-     * @covers ::getSupportedMimeTypes
-     */
     public function testReturnsSupportedMimeTypes(): void
     {
         $types = $this->loader->getSupportedMimeTypes();
@@ -29,14 +24,10 @@ class BasicTest extends TestCase
         $this->assertContains('image/tiff', array_keys($types));
     }
 
-    /**
-     * @covers ::load
-     */
     public function testLoadsImage(): void
     {
         $blob = file_get_contents(FIXTURES_DIR . '/1024x256.png');
 
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())

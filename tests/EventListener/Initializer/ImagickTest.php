@@ -5,23 +5,16 @@ use Imagick;
 use Imbo\EventListener\Imagick as ImagickEventListener;
 use Imbo\EventListener\Initializer\Imagick as ImagickInitializer;
 use Imbo\Image\Transformation\Border;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\EventListener\Initializer\Imagick
- */
+#[CoversClass(ImagickInitializer::class)]
 class ImagickTest extends TestCase
 {
-    /**
-     * @covers ::initialize
-     */
     public function testInjectsImagickIntoEventListeners(): void
     {
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
 
-        /** @var ImagickEventListener&MockObject */
         $listener = $this->createMock(ImagickEventListener::class);
         $listener
             ->expects($this->once())
@@ -31,13 +24,8 @@ class ImagickTest extends TestCase
         (new ImagickInitializer($imagick))->initialize($listener);
     }
 
-    /**
-     * @covers ::__construct
-     * @covers ::initialize
-     */
     public function testCanCreateAnImagickInstanceByItself(): void
     {
-        /** @var Border&MockObject */
         $listener = $this->createMock(Border::class);
         $listener
             ->expects($this->once())

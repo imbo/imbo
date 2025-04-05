@@ -1,11 +1,10 @@
 <?php declare(strict_types=1);
 namespace Imbo\Model;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Model\Images
- */
+#[CoversClass(Images::class)]
 class ImagesTest extends TestCase
 {
     private Images $model;
@@ -15,10 +14,6 @@ class ImagesTest extends TestCase
         $this->model = new Images();
     }
 
-    /**
-     * @covers ::getImages
-     * @covers ::setImages
-     */
     public function testCanSetAndGetImages(): void
     {
         $images = [
@@ -31,10 +26,6 @@ class ImagesTest extends TestCase
         $this->assertSame($images, $this->model->getImages());
     }
 
-    /**
-     * @covers ::setFields
-     * @covers ::getFields
-     */
     public function testCanSetAndGetFields(): void
     {
         $this->assertSame([], $this->model->getFields());
@@ -42,10 +33,6 @@ class ImagesTest extends TestCase
         $this->assertSame(['width', 'height'], $this->model->getFields());
     }
 
-    /**
-     * @covers ::setHits
-     * @covers ::getHits
-     */
     public function testCanSetAndGetHits(): void
     {
         $this->assertSame(0, $this->model->getHits(), 'Default value has changed');
@@ -53,10 +40,6 @@ class ImagesTest extends TestCase
         $this->assertSame(10, $this->model->getHits());
     }
 
-    /**
-     * @covers ::setPage
-     * @covers ::getPage
-     */
     public function testCanSetAndGetPage(): void
     {
         $this->assertSame(1, $this->model->getPage(), 'Default value has changed');
@@ -64,10 +47,6 @@ class ImagesTest extends TestCase
         $this->assertSame(10, $this->model->getPage());
     }
 
-    /**
-     * @covers ::setLimit
-     * @covers ::getLimit
-     */
     public function testCanSetAndGetLimit(): void
     {
         $this->assertSame(20, $this->model->getLimit(), 'Default value has changed');
@@ -75,9 +54,6 @@ class ImagesTest extends TestCase
         $this->assertSame(10, $this->model->getLimit());
     }
 
-    /**
-     * @covers ::getCount
-     */
     public function testCanCountImages(): void
     {
         $this->assertSame(0, $this->model->getCount());
@@ -90,9 +66,6 @@ class ImagesTest extends TestCase
         $this->assertSame(3, $this->model->getCount());
     }
 
-    /**
-     * @covers ::getData
-     */
     public function testGetData(): void
     {
         $images = [

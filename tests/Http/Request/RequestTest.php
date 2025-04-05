@@ -5,11 +5,11 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use Imbo\Router\Route;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Http\Request\Request
- */
+#[CoversClass(Request::class)]
 class RequestTest extends TestCase
 {
     private Request $request;
@@ -19,17 +19,11 @@ class RequestTest extends TestCase
         $this->request = new Request();
     }
 
-    /**
-     * @covers ::getTransformations
-     */
     public function testGetTransformationsWithNoTransformationsPresent(): void
     {
         $this->assertEquals([], $this->request->getTransformations());
     }
 
-    /**
-     * @covers ::getTransformations
-     */
     public function testGetTransformationsWithCorrectOrder(): void
     {
         $query = [
@@ -45,9 +39,6 @@ class RequestTest extends TestCase
         $this->assertEquals('flipVertically', $transformations[1]['name']);
     }
 
-    /**
-     * @covers ::getTransformations
-     */
     public function testGetTransformations(): void
     {
         $query = [
@@ -73,7 +64,7 @@ class RequestTest extends TestCase
 
         $request = new Request($query);
         $transformations = $request->getTransformations();
-        $this->assertSame(count($query['t']), count($transformations));
+        $this->assertCount(count($query['t']), $transformations);
 
         $this->assertEquals(['color' => 'fff', 'width' => 2, 'height' => 2, 'mode' => 'inline'], $transformations[0]['params']);
         $this->assertEquals(['level' => '90'], $transformations[1]['params']);
@@ -98,9 +89,6 @@ class RequestTest extends TestCase
         ], $transformations[8]['params']);
     }
 
-    /**
-     * @covers ::getImageIdentifier
-     */
     public function testSetGetImageIdentifier(): void
     {
         $identifier = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
@@ -114,9 +102,6 @@ class RequestTest extends TestCase
         $this->assertSame($identifier, $this->request->getImageIdentifier());
     }
 
-    /**
-     * @covers ::getExtension
-     */
     public function testSetGetExtension(): void
     {
         $extension = 'jpg';
@@ -130,9 +115,6 @@ class RequestTest extends TestCase
         $this->assertSame($extension, $this->request->getExtension());
     }
 
-    /**
-     * @covers ::getUser
-     */
     public function testSetGetUser(): void
     {
         $user = 'christer';
@@ -146,10 +128,7 @@ class RequestTest extends TestCase
         $this->assertSame($user, $this->request->getUser());
     }
 
-    /**
-     * @dataProvider getUsers
-     * @covers ::getUsers
-     */
+    #[DataProvider('getUsers')]
     public function testGetUsers(?string $routeUser, ?array $queryUsers, array $expectedUsers): void
     {
         $route = new Route();
@@ -169,9 +148,6 @@ class RequestTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::getPublicKey
-     */
     public function testSetGetPublicKeyThroughRoute(): void
     {
         $pubkey = 'pubkey';
@@ -185,9 +161,6 @@ class RequestTest extends TestCase
         $this->assertSame($pubkey, $this->request->getPublicKey());
     }
 
-    /**
-     * @covers ::getPublicKey
-     */
     public function testSetGetPublicKeyThroughQuery(): void
     {
         $pubkey = 'pubkey';
@@ -197,9 +170,6 @@ class RequestTest extends TestCase
         $this->assertSame($pubkey, $this->request->getPublicKey());
     }
 
-    /**
-     * @covers ::getPublicKey
-     */
     public function testSetGetPublicKeyThroughHeader(): void
     {
         $pubkey = 'pubkey';
@@ -209,10 +179,6 @@ class RequestTest extends TestCase
         $this->assertSame($pubkey, $this->request->getPublicKey());
     }
 
-    /**
-     * @covers ::getImage
-     * @covers ::setImage
-     */
     public function testCanSetAndGetAnImage(): void
     {
         $image = $this->createMock(Image::class);
@@ -220,10 +186,6 @@ class RequestTest extends TestCase
         $this->assertSame($image, $this->request->getImage());
     }
 
-    /**
-     * @covers ::getRoute
-     * @covers ::setRoute
-     */
     public function testCanSetAndGetARoute(): void
     {
         $this->assertNull($this->request->getRoute());
@@ -232,9 +194,6 @@ class RequestTest extends TestCase
         $this->assertSame($route, $this->request->getRoute());
     }
 
-    /**
-     * @covers ::getTransformations
-     */
     public function testRequiresTransformationsToBeSpecifiedAsAnArray(): void
     {
         $request = new Request([
@@ -247,9 +206,6 @@ class RequestTest extends TestCase
         $request->getTransformations();
     }
 
-    /**
-     * @covers ::getTransformations
-     */
     public function testDoesNotGenerateWarningWhenTransformationIsNotAString(): void
     {
         $query = [
@@ -269,10 +225,7 @@ class RequestTest extends TestCase
         $request->getTransformations();
     }
 
-    /**
-     * @dataProvider getQueryStrings
-     * @covers ::getRawUri
-     */
+    #[DataProvider('getQueryStrings')]
     public function testGetRawUriDecodesUri(string $in, string $out): void
     {
         $request = new Request([], [], [], [], [], [

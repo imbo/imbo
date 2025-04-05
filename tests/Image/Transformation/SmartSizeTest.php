@@ -5,24 +5,17 @@ use Imagick;
 use Imbo\EventManager\Event;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\SmartSize
- */
+#[CoversClass(SmartSize::class)]
 class SmartSizeTest extends TestCase
 {
-    /**
-     * @dataProvider getSmartSizeArguments
-     * @covers ::transform
-     *
-     * @param array{width:int,height:int} $imageDimensions
-     */
+    #[DataProvider('getSmartSizeArguments')]
     public function testSmartSize(array $imageDimensions, array $params, array $cropParams): void
     {
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->any())
@@ -38,7 +31,6 @@ class SmartSizeTest extends TestCase
             ->setWidth($imageDimensions['width'])
             ->setHeight($imageDimensions['height']);
 
-        /** @var ResponseHeaderBag&MockObject */
         $headerBag = $this->createMock(ResponseHeaderBag::class);
         $headerBag->expects($this->once())->method('set')->with('X-Imbo-POIs-Used', 1);
 

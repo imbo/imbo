@@ -7,13 +7,13 @@ use Imbo\EventListener\ListenerInterface;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-/**
- * @coversDefaultClass Imbo\EventManager\EventManager
- */
+#[CoversClass(EventManager::class)]
 class EventManagerTest extends TestCase
 {
     private EventManager $manager;
@@ -28,11 +28,6 @@ class EventManagerTest extends TestCase
         $this->manager->setEventTemplate($this->event);
     }
 
-    /**
-     * @covers ::addEventHandler
-     * @covers ::addCallbacks
-     * @covers ::trigger
-     */
     public function testCanRegisterAndExecuteRegularCallbacksInAPrioritizedFashion(): void
     {
         $callback1 = function (EventInterface $event): void {
@@ -73,9 +68,6 @@ class EventManagerTest extends TestCase
             ->trigger('event4');
     }
 
-    /**
-     * @covers ::trigger
-     */
     public function testLetsListenerStopPropagation(): void
     {
         $callback1 = function (EventInterface $event): void {
@@ -114,9 +106,6 @@ class EventManagerTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::hasListenersForEvent
-     */
     public function testCanCheckIfTheManagerHasListenersForSpecificEvents(): void
     {
         $this->manager
@@ -128,12 +117,7 @@ class EventManagerTest extends TestCase
         $this->assertTrue($this->manager->hasListenersForEvent('event'));
     }
 
-    /**
-     * @dataProvider getUsers
-     * @covers ::hasListenersForEvent
-     * @covers ::triggersFor
-     * @covers ::trigger
-     */
+    #[DataProvider('getUsers')]
     public function testCanIncludeAndExcludeUsers(string $user, array $users, bool $willTrigger): void
     {
         $check = new stdClass();
@@ -159,9 +143,6 @@ class EventManagerTest extends TestCase
         $this->assertSame($willTrigger, $check->triggered);
     }
 
-    /**
-     * @covers ::trigger
-     */
     public function testCanAddExtraParametersToTheEvent(): void
     {
         $this->manager->addEventHandler('handler', function (EventInterface $event): void {
@@ -177,12 +158,6 @@ class EventManagerTest extends TestCase
         ]);
     }
 
-    /**
-     * @covers ::addInitializer
-     * @covers ::getInitializers
-     * @covers ::getHandlerInstance
-     * @covers ::trigger
-     */
     public function testCanInitializeListeners(): void
     {
         $this->manager
@@ -195,9 +170,6 @@ class EventManagerTest extends TestCase
         $this->assertSame([$i], $this->manager->getInitializers());
     }
 
-    /**
-     * @covers ::addCallbacks
-     */
     public function testThrowsExceptionsWhenInvalidHandlersAreAdded(): void
     {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -209,10 +181,6 @@ class EventManagerTest extends TestCase
         $this->manager->addCallbacks('someName', ['event' => $callback]);
     }
 
-    /**
-     * @covers ::addCallbacks
-     * @covers ::addEventHandler
-     */
     public function testCanAddMultipleHandlersAtOnce(): void
     {
         $this->manager
@@ -223,9 +191,6 @@ class EventManagerTest extends TestCase
         $this->manager->trigger('someEvent');
     }
 
-    /**
-     * @covers ::getHandlerInstance
-     */
     public function testCanInjectParamsInConstructor(): void
     {
         $this->manager
@@ -236,14 +201,7 @@ class EventManagerTest extends TestCase
         $this->manager->trigger('getParams');
     }
 
-    /**
-     * @dataProvider getWildcardListeners
-     * @covers ::getListenersForEvent
-     * @covers ::getEventNameParts
-     *
-     * @param array<array{callback:Closure,event:string,priority:int}> $listeners
-     * @param array<string> $events
-     */
+    #[DataProvider('getWildcardListeners')]
     public function testSupportsWildcardListeners(array $listeners, array $events, string $output): void
     {
         foreach ($listeners as $name => $listener) {
@@ -259,9 +217,6 @@ class EventManagerTest extends TestCase
         }
     }
 
-    /**
-     * @covers ::setEventTemplate
-     */
     public function testCanSetEventTemplate(): void
     {
         $this->expectOutputString('bar');

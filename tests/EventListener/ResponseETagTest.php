@@ -4,12 +4,11 @@ namespace Imbo\EventListener;
 use Imbo\EventManager\EventInterface;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
-/**
- * @coversDefaultClass Imbo\EventListener\ResponseETag
- */
+#[CoversClass(ResponseETag::class)]
 class ResponseETagTest extends ListenerTests
 {
     private ResponseETag $listener;
@@ -24,13 +23,9 @@ class ResponseETagTest extends ListenerTests
         return $this->listener;
     }
 
-    /**
-     * @dataProvider getTaintedHeaders
-     * @covers ::fixIfNoneMatchHeader
-     */
+    #[DataProvider('getTaintedHeaders')]
     public function testCanFixATaintedInNoneMatchHeader(string $incoming, string $real, bool $willFix): void
     {
-        /** @var HeaderBag&MockObject */
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
             ->expects($this->once())
@@ -52,7 +47,6 @@ class ResponseETagTest extends ListenerTests
         $request = $this->createMock(Request::class);
         $request->headers = $requestHeaders;
 
-        /** @var EventInterface&MockObject */
         $event = $this->createMock(EventInterface::class);
         $event
             ->expects($this->once())
@@ -62,20 +56,15 @@ class ResponseETagTest extends ListenerTests
         $this->listener->fixIfNoneMatchHeader($event);
     }
 
-    /**
-     * @dataProvider getRoutesForETags
-     * @covers ::setETag
-     */
+    #[DataProvider('getRoutesForETags')]
     public function testWillSetETagForSomeRoutes(string $route, bool $hasETag, bool $isOk = false, string $content = null): void
     {
-        /** @var Request&MockObject */
         $request = $this->createMock(Request::class);
         $request
             ->expects($this->once())
             ->method('getRoute')
             ->willReturn($route);
 
-        /** @var Response&MockObject */
         $response = $this->createMock(Response::class);
 
         if ($hasETag) {
@@ -101,7 +90,6 @@ class ResponseETagTest extends ListenerTests
                 ->method('isOk');
         }
 
-        /** @var EventInterface&MockObject */
         $event = $this->createMock(EventInterface::class);
         $event
             ->expects($this->once())

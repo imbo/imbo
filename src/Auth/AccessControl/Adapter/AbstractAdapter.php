@@ -66,6 +66,7 @@ abstract class AbstractAdapter implements AdapterInterface
             ),
         );
         $users = array_merge(...$userLists);
+        $userList = [];
 
         if ($this->hasAccess($publicKey, $resource, $publicKey)) {
             $userList[] = $publicKey;

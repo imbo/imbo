@@ -3,11 +3,11 @@ namespace Imbo\Model;
 
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Response\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Model\Stats
- */
+#[CoversClass(Stats::class)]
 class StatsTest extends TestCase
 {
     private Stats $model;
@@ -17,46 +17,27 @@ class StatsTest extends TestCase
         $this->model = new Stats();
     }
 
-    /**
-     * @dataProvider getNumUsers
-     * @covers ::setNumUsers
-     * @covers ::getNumUsers
-     */
+    #[DataProvider('getNumUsers')]
     public function testCanSetAndGetNumberOfUsers(int $users): void
     {
         $this->model->setNumUsers($users);
         $this->assertSame($users, $this->model->getNumUsers());
     }
 
-    /**
-     * @dataProvider getNumImages
-     * @covers ::setNumImages
-     * @covers ::getNumImages
-     */
+    #[DataProvider('getNumImages')]
     public function testCanSetAndGetAmountOfImages(int $images): void
     {
         $this->model->setNumImages($images);
         $this->assertSame($images, $this->model->getNumImages());
     }
 
-    /**
-     * @dataProvider getNumBytes
-     * @covers ::setNumBytes
-     * @covers ::getNumBytes
-     */
+    #[DataProvider('getNumBytes')]
     public function testCanSetAndGetAmountOfBytes(int $bytes): void
     {
         $this->model->setNumBytes($bytes);
         $this->assertSame($bytes, $this->model->getNumBytes());
     }
 
-    /**
-     * @covers ::getCustomStats
-     * @covers ::offsetExists
-     * @covers ::offsetSet
-     * @covers ::offsetGet
-     * @covers ::offsetUnset
-     */
     public function testSupportsCustomStats(): void
     {
         $this->assertSame([], $this->model->getCustomStats());
@@ -74,9 +55,6 @@ class StatsTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $this->model->getCustomStats());
     }
 
-    /**
-     * @covers ::offsetSet
-     */
     public function testThrowsExceptionWhenUsedAsArrayWithoutAKey(): void
     {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -86,9 +64,6 @@ class StatsTest extends TestCase
         $this->model[] = 'foobar';
     }
 
-    /**
-     * @covers ::getData
-     */
     public function testGetData(): void
     {
         $this->model

@@ -79,8 +79,8 @@ class Border extends Transformation implements InputSizeConstraint
      */
     private function expandImage($color, $borderWidth, $borderHeight)
     {
-        $this->imageWidth = $this->image->getWidth();
-        $this->imageHeight = $this->image->getHeight();
+        $imageWidth = $this->image->getWidth();
+        $imageHeight = $this->image->getHeight();
 
         $original = clone $this->imagick;
 
@@ -88,8 +88,8 @@ class Border extends Transformation implements InputSizeConstraint
         $this->imagick->clear();
 
         $this->imagick->newImage(
-            $this->imageWidth  + ($borderWidth  * 2),
-            $this->imageHeight + ($borderHeight * 2),
+            $imageWidth  + ($borderWidth  * 2),
+            $imageHeight + ($borderHeight * 2),
             $color,
         );
         $this->imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_OPAQUE);
@@ -112,8 +112,8 @@ class Border extends Transformation implements InputSizeConstraint
      */
     private function drawBorderInside($color, $borderWidth, $borderHeight)
     {
-        $this->imageWidth = $this->image->getWidth();
-        $this->imageHeight = $this->image->getHeight();
+        $imageWidth = $this->image->getWidth();
+        $imageHeight = $this->image->getHeight();
 
         $rect = new ImagickDraw();
         $rect->setStrokeColor($color);
@@ -121,16 +121,16 @@ class Border extends Transformation implements InputSizeConstraint
         $rect->setStrokeAntialias(false);
 
         // Left
-        $rect->rectangle(0, 0, $borderWidth - 1, $this->imageHeight);
+        $rect->rectangle(0, 0, $borderWidth - 1, $imageHeight);
 
         // Right
-        $rect->rectangle($this->imageWidth - $borderWidth, 0, $this->imageWidth, $this->imageHeight);
+        $rect->rectangle($imageWidth - $borderWidth, 0, $imageWidth, $imageHeight);
 
         // Top
-        $rect->rectangle(0, 0, $this->imageWidth, $borderHeight - 1);
+        $rect->rectangle(0, 0, $imageWidth, $borderHeight - 1);
 
         // Bottom
-        $rect->rectangle(0, $this->imageHeight - $borderHeight, $this->imageWidth, $this->imageHeight);
+        $rect->rectangle(0, $imageHeight - $borderHeight, $imageWidth, $imageHeight);
 
         // Draw the border
         $this->imagick->drawImage($rect);

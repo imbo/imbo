@@ -8,17 +8,12 @@ use Imbo\EventManager\Event;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\DrawPois
- */
+#[CoversClass(DrawPois::class)]
 class DrawPoisTest extends TestCase
 {
-    /**
-     * @covers ::transform
-     * @covers ::getPoisFromMetadata
-     */
     public function testDoesNotModifyImageIfNoPoisAreFound(): void
     {
         $database = $this->createConfiguredMock(DatabaseInterface::class, [
@@ -44,10 +39,6 @@ class DrawPoisTest extends TestCase
             ->transform([]);
     }
 
-    /**
-     * @covers ::transform
-     * @covers ::getPoisFromMetadata
-     */
     public function testDoesNotModifyImageIfNoPoiMetadataKeyIsNotAnArray(): void
     {
         $database = $this->createMock(DatabaseInterface::class);
@@ -76,9 +67,6 @@ class DrawPoisTest extends TestCase
             ->transform([]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testThrowsExceptionOnInvalidPoi(): void
     {
         $database = $this->createConfiguredMock(DatabaseInterface::class, [
@@ -109,9 +97,6 @@ class DrawPoisTest extends TestCase
             ->transform([]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testDrawsSameAmountOfTimesAsPoisArePresent(): void
     {
         $database = $this->createConfiguredMock(DatabaseInterface::class, [
@@ -168,9 +153,6 @@ class DrawPoisTest extends TestCase
             ->transform([]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testThrowsExceptionWhenImagickThrowsException(): void
     {
         $database = $this->createConfiguredMock(DatabaseInterface::class, [

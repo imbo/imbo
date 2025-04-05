@@ -3,16 +3,12 @@ namespace Imbo\Image\Identifier\Generator;
 
 use Imbo\Image\Identifier\Generator\Uuid as UuidGenerator;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Image\Identifier\Generator\Uuid
- */
+#[CoversClass(Uuid::class)]
 class UuidTest extends TestCase
 {
-    /**
-     * @covers ::generate
-     */
     public function testGeneratesUniqueUuidV4(): void
     {
         $image = $this->createMock(Image::class);
@@ -31,9 +27,9 @@ class UuidTest extends TestCase
             $generated[] = $imageIdentifier;
         }
 
-        $this->assertSame(
+        $this->assertCount(
             count($generated),
-            count(array_unique($generated)),
+            array_unique($generated),
             'Expected array to have unique values',
         );
     }

@@ -6,19 +6,13 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Groups;
 use Imbo\Resource;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Auth\AccessControl\Adapter\ArrayAdapter
- */
+#[CoversClass(ArrayAdapter::class)]
 class ArrayAdapterTest extends TestCase
 {
-    /**
-     * @covers ::__construct
-     * @covers ::validateAccessList
-     * @covers ::getUsersForResource
-     */
     public function testReturnsCorrectListOfAllowedUsersForResource(): void
     {
         $accessControl = new ArrayAdapter([
@@ -64,12 +58,6 @@ class ArrayAdapterTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::__construct
-     * @covers ::validateAccessList
-     * @covers ::getPrivateKey
-     * @covers ::getKeysFromAcl
-     */
     public function testGetPrivateKey(): void
     {
         $accessControl = new ArrayAdapter([
@@ -96,11 +84,6 @@ class ArrayAdapterTest extends TestCase
         $this->assertNull($accessControl->getPrivateKey('pubKey3'));
     }
 
-    /**
-     * @covers ::__construct
-     * @covers ::validateAccessList
-     * @covers ::hasAccess
-     */
     public function testCanReadResourcesFromGroups(): void
     {
         $acl = [
@@ -132,11 +115,6 @@ class ArrayAdapterTest extends TestCase
         $this->assertTrue($ac->hasAccess('pubkey', Resource::USER_GET, 'user1'));
     }
 
-    /**
-     * @covers ::__construct
-     * @covers ::validateAccessList
-     * @covers ::hasAccess
-     */
     public function testCanReadResourcesGrantedUsingWildcard(): void
     {
         $accessControl = new ArrayAdapter([
@@ -157,10 +135,6 @@ class ArrayAdapterTest extends TestCase
         $this->assertFalse($accessControl->hasAccess('pubkey', Resource::IMAGES_POST, 'user2'));
     }
 
-    /**
-     * @covers ::__construct
-     * @covers ::validateAccessList
-     */
     public function testThrowsErrorOnDuplicatePublicKey(): void
     {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -173,15 +147,11 @@ class ArrayAdapterTest extends TestCase
         ]);
     }
 
-    /**
-     * @dataProvider getGroupsData
-     * @covers ::getGroups
-     */
+    #[DataProvider('getGroupsData')]
     public function testCanGetGroups(array $groups, array $result, GroupQuery $query): void
     {
         $numGroups = count($groups);
 
-        /** @var Groups&MockObject */
         $model = $this->createMock(Groups::class);
         $model
             ->expects($this->once())
@@ -192,19 +162,13 @@ class ArrayAdapterTest extends TestCase
         $this->assertSame(array_values($result), array_values($adapter->getGroups($query, $model)));
     }
 
-    /**
-     * @dataProvider getGroupsForTest
-     * @covers ::groupExists
-     */
+    #[DataProvider('getGroupsForTest')]
     public function testCanCheckIfGroupExists(array $groups, string $group, bool $exists): void
     {
         $adapter = new ArrayAdapter([], $groups);
         $this->assertSame($exists, $adapter->groupExists($group));
     }
 
-    /**
-     * @covers ::publicKeyExists
-     */
     public function testPublicKeyExists(): void
     {
         $adapter = new ArrayAdapter([
@@ -231,39 +195,27 @@ class ArrayAdapterTest extends TestCase
         $this->assertFalse($adapter->publicKeyExists('pubKey3'));
     }
 
-    /**
-     * @dataProvider getAccessRules
-     * @covers ::getAccessRule
-     */
+    #[DataProvider('getAccessRules')]
     public function testGetAccessRule(array $acl, string $publicKey, int $ruleId, ?array $rule): void
     {
         $adapter = new ArrayAdapter($acl);
         $this->assertSame($rule, $adapter->getAccessRule($publicKey, $ruleId));
     }
 
-    /**
-     * @dataProvider getGroupForArrayAdapter
-     * @covers ::getGroup
-     */
+    #[DataProvider('getGroupForArrayAdapter')]
     public function testCanGetGroup(array $groups, string $group, ?array $result): void
     {
         $adapter = new ArrayAdapter([], $groups);
         $this->assertSame($result, $adapter->getGroup($group));
     }
 
-    /**
-     * @dataProvider getDataForAccessListTest
-     * @covers ::getAccessListForPublicKey
-     */
+    #[DataProvider('getDataForAccessListTest')]
     public function testCanGetAccessListForPublicKey(array $acl, string $publicKey, array $result): void
     {
         $adapter = new ArrayAdapter($acl, []);
         $this->assertSame($result, $adapter->getAccessListForPublicKey($publicKey));
     }
 
-    /**
-     * @covers ::hasAccess
-     */
     public function testThrowsExceptionWhenMissingUsersFromAcl(): void
     {
         $adapter = new ArrayAdapter([[
@@ -282,9 +234,6 @@ class ArrayAdapterTest extends TestCase
         $adapter->hasAccess('public-key', 'resource');
     }
 
-    /**
-     * @covers ::hasAccess
-     */
     public function testThrowsExceptionWhenGroupIsNotDefined(): void
     {
         $acl = [

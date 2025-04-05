@@ -5,12 +5,11 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-/**
- * @coversDefaultClass Imbo\EventListener\VarnishHashTwo
- */
+#[CoversClass(VarnishHashTwo::class)]
 class VarnishHashTwoTest extends ListenerTests
 {
     private VarnishHashTwo $listener;
@@ -40,9 +39,6 @@ class VarnishHashTwoTest extends ListenerTests
         return $this->listener;
     }
 
-    /**
-     * @covers ::addHeader
-     */
     public function testCanSendAHashTwoHeader(): void
     {
         $this->request
@@ -70,10 +66,6 @@ class VarnishHashTwoTest extends ListenerTests
         $this->listener->addHeader($this->event);
     }
 
-    /**
-     * @covers ::__construct
-     * @covers ::addHeader
-     */
     public function testCanSpecifyACustomHeaderName(): void
     {
         $listener = new VarnishHashTwo(['headerName' => 'X-CustomHeader']);

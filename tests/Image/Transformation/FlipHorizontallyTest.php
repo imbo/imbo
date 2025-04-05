@@ -3,10 +3,9 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\FlipHorizontally
- */
+#[CoversClass(FlipHorizontally::class)]
 class FlipHorizontallyTest extends TransformationTests
 {
     protected function getTransformation(): FlipHorizontally
@@ -14,9 +13,6 @@ class FlipHorizontallyTest extends TransformationTests
         return new FlipHorizontally();
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testCanFlipTheImage(): void
     {
         $image = $this->createMock(Image::class);

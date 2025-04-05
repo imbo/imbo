@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventManager;
 
-use Closure;
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
 use Imbo\Database\DatabaseInterface;
 use Imbo\Exception\InvalidArgumentException;
@@ -11,11 +10,11 @@ use Imbo\Image\InputLoaderManager;
 use Imbo\Image\OutputConverterManager;
 use Imbo\Image\TransformationManager;
 use Imbo\Storage\StorageInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\EventManager\Event
- */
+#[CoversClass(Event::class)]
 class EventTest extends TestCase
 {
     private Event $event;
@@ -25,38 +24,17 @@ class EventTest extends TestCase
         $this->event = new Event();
     }
 
-    /**
-     * @dataProvider getArguments
-     * @covers ::setArgument
-     * @covers ::getRequest
-     * @covers ::getResponse
-     * @covers ::getDatabase
-     * @covers ::getStorage
-     * @covers ::getAccessControl
-     * @covers ::getManager
-     * @covers ::getConfig
-     * @covers ::getHandler
-     * @covers ::getTransformationManager
-     * @covers ::getInputLoaderManager
-     * @covers ::getOutputConverterManager
-     */
+    #[DataProvider('getArguments')]
     public function testCanSetAndGetRequest(string $method, string $argument, mixed $value): void
     {
-        if ($value instanceof Closure) {
-            /** @var Closure */
-            $new = $value->bindTo($this);
-            /** @var mixed */
-            $value = $new();
+        if (is_string($value) && (class_exists($value) || interface_exists($value))) {
+            $value = $this->createMock($value);
         }
 
         $this->event->setArgument($argument, $value);
         $this->assertSame($value, $this->event->$method());
     }
 
-    /**
-     * @covers ::setName
-     * @covers ::getName
-     */
     public function testCanSetAndGetName(): void
     {
         $this->assertNull($this->event->getName());
@@ -64,10 +42,6 @@ class EventTest extends TestCase
         $this->assertSame('name', $this->event->getName());
     }
 
-    /**
-     * @covers ::stopPropagation
-     * @covers ::isPropagationStopped
-     */
     public function testCanStopPropagation(): void
     {
         $this->assertFalse($this->event->isPropagationStopped());
@@ -75,9 +49,6 @@ class EventTest extends TestCase
         $this->assertTrue($this->event->isPropagationStopped());
     }
 
-    /**
-     * @covers ::getArgument
-     */
     public function testThrowsExceptionWhenGettingArgumentThatDoesNotExist(): void
     {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -87,10 +58,6 @@ class EventTest extends TestCase
         $this->event->getArgument('foobar');
     }
 
-    /**
-     * @covers ::__construct
-     * @covers ::setArguments
-     */
     public function testCanSetArgumentsThroughConstructor(): void
     {
         $this->assertSame(
@@ -99,11 +66,6 @@ class EventTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::setArguments
-     * @covers ::getArgument
-     * @covers ::hasArgument
-     */
     public function testSetArgumentsOverridesAllArguments(): void
     {
         $this->assertFalse($this->event->hasArgument('foo'));
@@ -121,56 +83,51 @@ class EventTest extends TestCase
      */
     public static function getArguments(): array
     {
-        $mockCreator =
-            /** @param class-string $className */
-            fn (string $className): Closure =>
-                fn () => $this->createMock($className);
-
         return [
             'request' => [
                 'method' => 'getRequest',
                 'argument' => 'request',
-                'value' => $mockCreator(Request::class),
+                'value' => Request::class,
             ],
             'response' => [
                 'method' => 'getResponse',
                 'argument' => 'response',
-                'value' => $mockCreator(Response::class),
+                'value' => Response::class,
             ],
             'database' => [
                 'method' => 'getDatabase',
                 'argument' => 'database',
-                'value' => $mockCreator(DatabaseInterface::class),
+                'value' => DatabaseInterface::class,
             ],
             'storage' => [
                 'method' => 'getStorage',
                 'argument' => 'storage',
-                'value' => $mockCreator(StorageInterface::class),
+                'value' => StorageInterface::class,
             ],
             'accessControl' => [
                 'method' => 'getAccessControl',
                 'argument' => 'accessControl',
-                'value' => $mockCreator(AdapterInterface::class),
+                'value' => AdapterInterface::class,
             ],
             'manager' => [
                 'method' => 'getManager',
                 'argument' => 'manager',
-                'value' => $mockCreator(EventManager::class),
+                'value' => EventManager::class,
             ],
             'transformationManager' => [
                 'method' => 'getTransformationManager',
                 'argument' => 'transformationManager',
-                'value' => $mockCreator(TransformationManager::class),
+                'value' => TransformationManager::class,
             ],
             'inputLoaderManager' => [
                 'method' => 'getInputLoaderManager',
                 'argument' => 'inputLoaderManager',
-                'value' => $mockCreator(InputLoaderManager::class),
+                'value' => InputLoaderManager::class,
             ],
             'outputConverterManager' => [
                 'method' => 'getOutputConverterManager',
                 'argument' => 'outputConverterManager',
-                'value' => $mockCreator(OutputConverterManager::class),
+                'value' => OutputConverterManager::class,
             ],
             'config' => [
                 'method' => 'getConfig',

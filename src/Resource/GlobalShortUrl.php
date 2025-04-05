@@ -4,7 +4,7 @@ namespace Imbo\Resource;
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception\ResourceException;
 use Imbo\Http\Response\Response;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\InputBag;
 
 /**
  * Global short URL resource
@@ -45,7 +45,7 @@ class GlobalShortUrl implements ResourceInterface
         $route->set('imageIdentifier', $params['imageIdentifier']);
         $route->set('extension', $params['extension']);
 
-        $request->query = new ParameterBag($params['query']);
+        $request->query = new InputBag($params['query']);
         $event->getResponse()->headers->set('X-Imbo-ShortUrl', $request->getUri());
         $event->getManager()->trigger('image.get', ['skipAccessControl' => true]);
     }

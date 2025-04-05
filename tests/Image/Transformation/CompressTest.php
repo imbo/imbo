@@ -6,11 +6,9 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Compress
- */
+#[CoversClass(Compress::class)]
 class CompressTest extends TransformationTests
 {
     private Compress $transformation;
@@ -20,12 +18,8 @@ class CompressTest extends TransformationTests
         return new Compress();
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testCanTransformTheImage(): void
     {
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -50,9 +44,6 @@ class CompressTest extends TransformationTests
         $this->transformation = new Compress();
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testThrowsExceptionOnMissingLevelParameter(): void
     {
         $this->expectExceptionObject(new TransformationException(
@@ -62,9 +53,6 @@ class CompressTest extends TransformationTests
         $this->transformation->transform([]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testThrowsExceptionOnInvalidLevel(): void
     {
         $this->expectExceptionObject(new TransformationException(
@@ -74,12 +62,8 @@ class CompressTest extends TransformationTests
         $this->transformation->transform(['level' => 200]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testSetsOutputQualityCompression(): void
     {
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())

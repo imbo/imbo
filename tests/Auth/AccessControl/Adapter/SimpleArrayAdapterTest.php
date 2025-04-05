@@ -4,17 +4,12 @@ namespace Imbo\Auth\AccessControl\Adapter;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Response\Response;
 use Imbo\Resource;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Auth\AccessControl\Adapter\SimpleArrayAdapter
- */
+#[CoversClass(SimpleArrayAdapter::class)]
 class SimpleArrayAdapterTest extends TestCase
 {
-    /**
-     * @covers ::__construct
-     * @covers ::getExpandedAclList
-     */
     public function testThrowsOnMultiplePrivateKeysPerPublicKey(): void
     {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -26,10 +21,6 @@ class SimpleArrayAdapterTest extends TestCase
         ]);
     }
 
-    /**
-     * @covers ::__construct
-     * @covers ::getExpandedAclList
-     */
     public function testLegacyConfigKeysHaveWriteAccess(): void
     {
         $accessControl = new SimpleArrayAdapter([

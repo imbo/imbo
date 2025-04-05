@@ -3,10 +3,9 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Desaturate
- */
+#[CoversClass(Desaturate::class)]
 class DesaturateTest extends TransformationTests
 {
     protected function getTransformation(): Desaturate
@@ -14,9 +13,6 @@ class DesaturateTest extends TransformationTests
         return new Desaturate();
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testCanDesaturateImages(): void
     {
         $image = $this->createMock(Image::class);

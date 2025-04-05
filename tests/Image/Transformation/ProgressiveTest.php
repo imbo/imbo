@@ -3,10 +3,9 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Progressive
- */
+#[CoversClass(Progressive::class)]
 class ProgressiveTest extends TransformationTests
 {
     protected function getTransformation(): Progressive
@@ -14,9 +13,6 @@ class ProgressiveTest extends TransformationTests
         return new Progressive();
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testCanMakeTheImageProgressive(): void
     {
         $image = $this->createMock(Image::class);

@@ -49,7 +49,7 @@ class GeneratePrivateKey extends Command
             $data = openssl_random_pseudo_bytes(32, $strong);
         }
 
-        if (!$strong) {
+        if (!$strong || !isset($data)) {
             throw new RuntimeException('Could not generate private key');
         }
 

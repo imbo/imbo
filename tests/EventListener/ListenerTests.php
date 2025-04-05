@@ -7,9 +7,6 @@ abstract class ListenerTests extends TestCase
 {
     abstract protected function getListener(): ListenerInterface;
 
-    /**
-     * @covers ::getSubscribedEvents
-     */
     public function testReturnsCorrectEventSubscriptions(): void
     {
         $listener = $this->getListener();

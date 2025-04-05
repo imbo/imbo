@@ -14,15 +14,15 @@ use Imbo\Model\Image;
 use Imbo\Model\ModelInterface;
 use Imbo\Model\Stats;
 use Imbo\Router\Route;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-/**
- * @coversDefaultClass Imbo\Http\Response\ResponseFormatter
- */
+#[CoversClass(ResponseFormatter::class)]
 class ResponseFormatterTest extends TestCase
 {
     private ResponseFormatter $responseFormatter;
@@ -48,10 +48,25 @@ class ResponseFormatterTest extends TestCase
             'getExtensionToMimetypeMap' => array_flip($defaultSupported),
             'getSupportedMimetypes' => array_keys($defaultSupported),
             'getSupportedExtensions' => array_values($defaultSupported),
-            'supportsExtension' => $this->returnCallback(fn (?string $ext): bool => null !== $ext && in_array($ext, $defaultSupported)),
-            'getMimetypeFromExtension' => $this->returnCallback(fn (string $ext): ?string => array_search($ext, $defaultSupported) ?: null),
-            'getExtensionFromMimetype' => $this->returnCallback(fn (string $ext): ?string => isset($defaultSupported[$ext]) ? $defaultSupported[$ext] : null),
         ]);
+        $this->outputConverterManager
+            ->expects($this->any())
+            ->method('supportsExtension')
+            ->willReturnCallback(
+                fn (?string $ext): bool => null !== $ext && in_array($ext, $defaultSupported),
+            );
+        $this->outputConverterManager
+            ->expects($this->any())
+            ->method('getMimetypeFromExtension')
+            ->willReturnCallback(
+                fn (string $ext): ?string => array_search($ext, $defaultSupported) ?: null,
+            );
+        $this->outputConverterManager
+            ->expects($this->any())
+            ->method('getExtensionFromMimetype')
+            ->willReturnCallback(
+                fn (string $ext): ?string => isset($defaultSupported[$ext]) ? $defaultSupported[$ext] : null,
+            );
 
         $this->transformationManager = $this->createConfiguredMock(TransformationManager::class, [
             'hasAppliedTransformations' => true,
@@ -77,18 +92,12 @@ class ResponseFormatterTest extends TestCase
         $this->responseFormatter->setFormatter('format');
     }
 
-    /**
-     * @covers ::getSubscribedEvents
-     */
     public function testReturnsACorrectEventSubscription(): void
     {
         $class = get_class($this->responseFormatter);
         $this->assertIsArray($class::getSubscribedEvents());
     }
 
-    /**
-     * @covers ::format
-     */
     public function testReturnWhenStatusCodeIs204(): void
     {
         $this->response
@@ -103,9 +112,6 @@ class ResponseFormatterTest extends TestCase
         $this->responseFormatter->format($this->event);
     }
 
-    /**
-     * @covers ::format
-     */
     public function testReturnWhenThereIsNoModel(): void
     {
         $this->response
@@ -125,10 +131,7 @@ class ResponseFormatterTest extends TestCase
         $this->responseFormatter->format($this->event);
     }
 
-    /**
-     * @dataProvider getJsonpTriggers
-     * @covers ::format
-     */
+    #[DataProvider('getJsonpTriggers')]
     public function testCanWrapJsonDataInSpecifiedCallback(string $param, string $callback, bool $valid = true): void
     {
         $json = '{"key":"value"}';
@@ -157,15 +160,15 @@ class ResponseFormatterTest extends TestCase
             ->method('getMethod')
             ->willReturn('GET');
 
-        /** @var ResponseHeaderBag&MockObject */
-        $this->response->headers = $this->createMock(ResponseHeaderBag::class);
-        $this->response->headers
+        $headers = $this->createMock(ResponseHeaderBag::class);
+        $headers
             ->expects($this->once())
             ->method('add')
             ->with([
                 'Content-Type' => 'application/json',
                 'Content-Length' => strlen($expectedContent),
             ]);
+        $this->response->headers = $headers;
 
         $this->response
             ->expects($this->once())
@@ -185,10 +188,6 @@ class ResponseFormatterTest extends TestCase
         $this->responseFormatter->format($this->event);
     }
 
-    /**
-     * @covers ::setFormatter
-     * @covers ::getFormatter
-     */
     public function testCanSetAndGetTheFormatter(): void
     {
         $formatter = 'some formatter';
@@ -196,9 +195,6 @@ class ResponseFormatterTest extends TestCase
         $this->assertSame($formatter, $this->responseFormatter->getFormatter());
     }
 
-    /**
-     * @covers ::negotiate
-     */
     public function testDoesNotDoContentNegotiationWhenTheRequestedPathIncludesAnExtension(): void
     {
         $this->request
@@ -221,9 +217,6 @@ class ResponseFormatterTest extends TestCase
         $this->assertSame('json', $this->responseFormatter->getFormatter());
     }
 
-    /**
-     * @covers ::format
-     */
     public function testDoesNotSetResponseContentWhenHttpMethodIsHead(): void
     {
         $this->response
@@ -265,9 +258,6 @@ class ResponseFormatterTest extends TestCase
         $this->responseFormatter->format($this->event);
     }
 
-    /**
-     * @covers ::negotiate
-     */
     public function testThrowsAnExceptionInStrictModeWhenTheUserAgentDoesNotSupportAnyOfImbosMediaTypes(): void
     {
         $this->contentNegotiation
@@ -285,7 +275,6 @@ class ResponseFormatterTest extends TestCase
             ->method('getModel')
             ->willReturn($this->createMock(Image::class));
 
-        /** @var HeaderBag&MockObject */
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
             ->expects($this->once())
@@ -299,9 +288,6 @@ class ResponseFormatterTest extends TestCase
         $this->responseFormatter->negotiate($this->event);
     }
 
-    /**
-     * @covers ::negotiate
-     */
     public function testUsesDefaultMediaTypeInNonStrictModeWhenTheUserAgentDoesNotSupportAnyMediaTypes(): void
     {
         $this->event
@@ -310,7 +296,6 @@ class ResponseFormatterTest extends TestCase
             ->with('noStrict')
             ->willReturn(true);
 
-        /** @var HeaderBag&MockObject */
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
             ->expects($this->once())
@@ -339,12 +324,8 @@ class ResponseFormatterTest extends TestCase
         $this->assertSame('json', $this->responseFormatter->getFormatter());
     }
 
-    /**
-     * @covers ::negotiate
-     */
     public function testPicksThePrioritizedMediaTypeIfMoreThanOneWithSameQualityAreSupportedByTheUserAgent(): void
     {
-        /** @var HeaderBag&MockObject */
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
             ->expects($this->once())
@@ -373,10 +354,7 @@ class ResponseFormatterTest extends TestCase
         $this->assertSame('json', $this->responseFormatter->getFormatter());
     }
 
-    /**
-     * @dataProvider getOriginalMimeTypes
-     * @covers ::negotiate
-     */
+    #[DataProvider('getOriginalMimeTypes')]
     public function testUsesTheOriginalMimeTypeOfTheImageIfTheClientHasNoPreference(string $originalMimeType, string $expectedFormatter): void
     {
         // Use a real object since the code we are testing uses get_class(), which won't work as
@@ -385,7 +363,6 @@ class ResponseFormatterTest extends TestCase
         $image->setMimeType($originalMimeType);
         $image->setExtension($expectedFormatter);
 
-        /** @var HeaderBag&MockObject */
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
             ->expects($this->once())
@@ -414,10 +391,7 @@ class ResponseFormatterTest extends TestCase
         $this->assertSame($expectedFormatter, $this->responseFormatter->getFormatter());
     }
 
-    /**
-     * @dataProvider getOriginalMimeTypes
-     * @covers ::negotiate
-     */
+    #[DataProvider('getOriginalMimeTypes')]
     public function testUsesTheOriginalMimeTypeOfTheImageIfConfigDisablesContentNegotiationForImages(string $originalMimeType, string $expectedFormatter): void
     {
         // Use a real object since the code we are testing uses get_class(), which won't work as
@@ -453,22 +427,20 @@ class ResponseFormatterTest extends TestCase
         $this->assertSame($expectedFormatter, $this->responseFormatter->getFormatter());
     }
 
-    /**
-     * @dataProvider getImageResources
-     * @covers ::negotiate
-     */
+    #[DataProvider('getImageResources')]
     public function testForcesContentNegotiationOnErrorModelsWhenResourceIsAnImage(string $routeName): void
     {
         $route = new Route();
         $route->setName($routeName);
 
-        /** @var HeaderBag&MockObject */
-        $this->request->headers = $this->createMock(HeaderBag::class);
-        $this->request->headers
+        $headers = $this->createMock(HeaderBag::class);
+        $headers
             ->expects($this->once())
             ->method('get')
             ->with('Accept', '*/*')
             ->willReturn('*/*');
+
+        $this->request->headers = $headers;
 
         $this->request
             ->expects($this->once())
@@ -499,9 +471,6 @@ class ResponseFormatterTest extends TestCase
         $this->assertSame('json', $this->responseFormatter->getFormatter());
     }
 
-    /**
-     * @covers ::negotiate
-     */
     public function testDoesNotForceContentNegotiationOnErrorModelsWhenResourceIsNotAnImage(): void
     {
         $route = new Route();
@@ -530,12 +499,8 @@ class ResponseFormatterTest extends TestCase
         $this->assertSame('json', $this->responseFormatter->getFormatter());
     }
 
-    /**
-     * @covers ::format
-     */
     public function testTriggersAConversionTransformationIfNeededWhenTheModelIsAnImage(): void
     {
-        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getMimeType' => 'image/jpeg',
         ]);
@@ -552,7 +517,6 @@ class ResponseFormatterTest extends TestCase
         $this->response->headers = $this->createMock(ResponseHeaderBag::class);
         $this->responseFormatter->setFormatter('png');
 
-        /** @var EventManager&MockObject */
         $eventManager = $this->createMock(EventManager::class);
         $eventManager
             ->method('trigger')
@@ -570,9 +534,6 @@ class ResponseFormatterTest extends TestCase
         $this->responseFormatter->format($this->event);
     }
 
-    /**
-     * @covers ::format
-     */
     public function testDoesNotTriggerAnImageConversionWhenTheImageHasTheCorrectMimeType(): void
     {
         $image = $this->createConfiguredMock(Image::class, [
@@ -588,7 +549,6 @@ class ResponseFormatterTest extends TestCase
         $this->response->headers = $this->createMock(ResponseHeaderBag::class);
         $this->responseFormatter->setFormatter('jpg');
 
-        /** @var EventManager&MockObject */
         $eventManager = $this->createMock(EventManager::class);
         $eventManager
             ->expects($this->once())

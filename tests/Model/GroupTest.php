@@ -1,11 +1,10 @@
 <?php declare(strict_types=1);
 namespace Imbo\Model;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Model\Group
- */
+#[CoversClass(Group::class)]
 class GroupTest extends TestCase
 {
     private Group $model;
@@ -15,10 +14,6 @@ class GroupTest extends TestCase
         $this->model = new Group();
     }
 
-    /**
-     * @covers ::getName
-     * @covers ::setName
-     */
     public function testSetAndGetName(): void
     {
         $this->assertNull($this->model->getName());
@@ -26,10 +21,6 @@ class GroupTest extends TestCase
         $this->assertSame('name', $this->model->getName());
     }
 
-    /**
-     * @covers ::getResources
-     * @covers ::setResources
-     */
     public function testSetAndGetResources(): void
     {
         $this->assertSame([], $this->model->getResources());
@@ -37,9 +28,6 @@ class GroupTest extends TestCase
         $this->assertSame(['image.get', 'image.head'], $this->model->getResources());
     }
 
-    /**
-     * @covers ::getData
-     */
     public function testGetData(): void
     {
         $this->model

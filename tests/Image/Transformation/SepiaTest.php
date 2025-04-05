@@ -3,10 +3,9 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Sepia
- */
+#[CoversClass(Sepia::class)]
 class SepiaTest extends TransformationTests
 {
     protected function getTransformation(): Sepia
@@ -14,9 +13,6 @@ class SepiaTest extends TransformationTests
         return new Sepia();
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testCanTransformImageWithoutParams(): void
     {
         $image = $this->createMock(Image::class);
@@ -34,9 +30,6 @@ class SepiaTest extends TransformationTests
             ->transform([]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testCanTransformImageWithParams(): void
     {
         $image = $this->createMock(Image::class);
