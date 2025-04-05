@@ -4,12 +4,11 @@ namespace Imbo\Resource;
 use Imbo\EventManager\EventInterface;
 use Imbo\EventManager\EventManager;
 use Imbo\Http\Response\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-/**
- * @coversDefaultClass Imbo\Resource\Stats
- */
+#[CoversClass(Stats::class)]
 class StatsTest extends ResourceTests
 {
     private Stats $resource;
@@ -34,9 +33,6 @@ class StatsTest extends ResourceTests
         $this->resource = $this->getNewResource();
     }
 
-    /**
-     * @covers ::get
-     */
     public function testTriggersTheCorrectEvent(): void
     {
         /** @var ResponseHeaderBag&MockObject */

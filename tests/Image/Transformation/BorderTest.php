@@ -3,11 +3,11 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Border
- */
+#[CoversClass(Border::class)]
 class BorderTest extends TransformationTests
 {
     protected function getTransformation(): Border
@@ -15,10 +15,7 @@ class BorderTest extends TransformationTests
         return new Border();
     }
 
-    /**
-     * @dataProvider getBorderParams
-     * @covers ::transform
-     */
+    #[DataProvider('getBorderParams')]
     public function testTransformationSupportsDifferentModes(int $expectedWidth, int $expectedHeight, int $borderWidth, int $borderHeight, string $borderMode): void
     {
         /** @var Image&MockObject */

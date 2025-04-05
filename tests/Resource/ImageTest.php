@@ -9,12 +9,11 @@ use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
 use Imbo\Model\Image as ImageModel;
 use Imbo\Storage\StorageInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-/**
- * @coversDefaultClass Imbo\Resource\Image
- */
+#[CoversClass(Image::class)]
 class ImageTest extends ResourceTests
 {
     private Image $resource;
@@ -48,9 +47,6 @@ class ImageTest extends ResourceTests
         $this->resource = $this->getNewResource();
     }
 
-    /**
-     * @covers ::deleteImage
-     */
     public function testSupportsHttpDelete(): void
     {
         $this->manager
@@ -79,9 +75,6 @@ class ImageTest extends ResourceTests
         $this->resource->deleteImage($this->event);
     }
 
-    /**
-     * @covers ::getImage
-     */
     public function testSupportsHttpGet(): void
     {
         $user = 'christer';

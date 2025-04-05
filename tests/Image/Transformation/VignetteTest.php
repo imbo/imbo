@@ -3,10 +3,9 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Vignette
- */
+#[CoversClass(Vignette::class)]
 class VignetteTest extends TransformationTests
 {
     protected function getTransformation(): Vignette
@@ -14,9 +13,6 @@ class VignetteTest extends TransformationTests
         return new Vignette();
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testCanVignetteImages(): void
     {
         $image = $this->createConfiguredMock(Image::class, [

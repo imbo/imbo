@@ -9,11 +9,11 @@ use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Image\InputSizeConstraint;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\AutoRotate
- */
+#[CoversClass(AutoRotate::class)]
 class AutoRotateTest extends TransformationTests
 {
     protected function getTransformation(): AutoRotate
@@ -21,9 +21,6 @@ class AutoRotateTest extends TransformationTests
         return new AutoRotate();
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testWillNotUpdateTheImageWhenNotNeeded(): void
     {
         /** @var Imagick&MockObject */
@@ -39,10 +36,7 @@ class AutoRotateTest extends TransformationTests
             ->transform([]);
     }
 
-    /**
-     * @dataProvider getTransformationData
-     * @covers ::transform
-     */
+    #[DataProvider('getTransformationData')]
     public function testWillRotateWhenNeeded(int $imageOrientation, int $newOrientation, Closure $expectations): void
     {
         /** @var Imagick&MockObject */
@@ -67,17 +61,11 @@ class AutoRotateTest extends TransformationTests
             ->transform([]);
     }
 
-    /**
-     * @covers ::getMinimumInputSize
-     */
     public function testGetMinimumInputSizeStopsResolving(): void
     {
         $this->assertSame(InputSizeConstraint::STOP_RESOLVING, (new AutoRotate())->getMinimumInputSize([], []));
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testThrowsCustomExceptions(): void
     {
         $imagickException = new ImagickException('some error');
@@ -95,9 +83,6 @@ class AutoRotateTest extends TransformationTests
             ->transform([]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testThrowsCustomExceptionsOnPixelException(): void
     {
         $pixelException = new ImagickPixelException('some error');

@@ -3,11 +3,11 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Histogram
- */
+#[CoversClass(Histogram::class)]
 class HistogramTest extends TransformationTests
 {
     protected function getTransformation(): Histogram
@@ -15,10 +15,7 @@ class HistogramTest extends TransformationTests
         return new Histogram();
     }
 
-    /**
-     * @dataProvider getHistogramParameters
-     * @covers ::transform
-     */
+    #[DataProvider('getHistogramParameters')]
     public function testTransformWithDifferentParameters(int $scale, int $resultingWidth): void
     {
         $blob = file_get_contents(FIXTURES_DIR . '/512x512.png');

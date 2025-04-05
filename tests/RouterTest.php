@@ -4,17 +4,14 @@ namespace Imbo;
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Router
- */
+#[CoversClass(Router::class)]
 class RouterTest extends TestCase
 {
-    /**
-     * @covers ::route
-     */
     public function testCanBeATeaPot(): void
     {
         $request = $this->createConfiguredMock(Request::class, [
@@ -25,9 +22,6 @@ class RouterTest extends TestCase
         (new Router())->route($request);
     }
 
-    /**
-     * @covers ::route
-     */
     public function testThrowsExceptionOnUnsupportedHttpMethod(): void
     {
         $request = $this->createConfiguredMock(Request::class, [
@@ -38,10 +32,7 @@ class RouterTest extends TestCase
         (new Router())->route($request);
     }
 
-    /**
-     * @dataProvider getInvalidRoutes
-     * @covers ::route
-     */
+    #[DataProvider('getInvalidRoutes')]
     public function testThrowsExceptionWhenNoRouteMatches(string $route): void
     {
         $request = $this->createConfiguredMock(Request::class, [
@@ -53,10 +44,7 @@ class RouterTest extends TestCase
         (new Router())->route($request);
     }
 
-    /**
-     * @dataProvider getValidRoutes
-     * @covers ::route
-     */
+    #[DataProvider('getValidRoutes')]
     public function testCanMatchValidRoutes(string $route, string $resource, ?string $user = null, ?string $imageIdentifier = null, ?string $extension = null): void
     {
         /** @var Request&MockObject */
@@ -80,10 +68,6 @@ class RouterTest extends TestCase
         $this->assertSame($resource, (string) $route);
     }
 
-    /**
-     * @covers ::route
-     * @covers ::__construct
-     */
     public function testCanMatchCustomRoute(): void
     {
         /** @var Request&MockObject */

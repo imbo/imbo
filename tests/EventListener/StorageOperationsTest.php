@@ -10,11 +10,10 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use Imbo\Storage\StorageInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @coversDefaultClass Imbo\EventListener\StorageOperations
- */
+#[CoversClass(StorageOperations::class)]
 class StorageOperationsTest extends ListenerTests
 {
     private StorageOperations $listener;
@@ -47,9 +46,6 @@ class StorageOperationsTest extends ListenerTests
         return $this->listener;
     }
 
-    /**
-     * @covers ::deleteImage
-     */
     public function testCanDeleteAnImage(): void
     {
         $this->storage
@@ -60,9 +56,6 @@ class StorageOperationsTest extends ListenerTests
         $this->listener->deleteImage($this->event);
     }
 
-    /**
-     * @covers ::loadImage
-     */
     public function testCanLoadImage(): void
     {
         $date = new DateTime();
@@ -110,9 +103,6 @@ class StorageOperationsTest extends ListenerTests
         $this->listener->loadImage($this->event);
     }
 
-    /**
-     * @covers ::loadImage
-     */
     public function testExceptionIfLoadImageFails(): void
     {
         $this->storage
@@ -125,9 +115,6 @@ class StorageOperationsTest extends ListenerTests
         $this->listener->loadImage($this->event);
     }
 
-    /**
-     * @covers ::insertImage
-     */
     public function testCanInsertImage(): void
     {
         $image = $this->createConfiguredMock(Image::class, [
@@ -158,9 +145,6 @@ class StorageOperationsTest extends ListenerTests
         $this->listener->insertImage($this->event);
     }
 
-    /**
-     * @covers ::insertImage
-     */
     public function testCanInsertImageThatAlreadyExists(): void
     {
         $image = $this->createConfiguredMock(Image::class, [
@@ -191,9 +175,6 @@ class StorageOperationsTest extends ListenerTests
         $this->listener->insertImage($this->event);
     }
 
-    /**
-     * @covers ::insertImage
-     */
     public function testWillDeleteImageFromDatabaseAndThrowExceptionWhenStoringFails(): void
     {
         $image = $this->createConfiguredMock(Image::class, [

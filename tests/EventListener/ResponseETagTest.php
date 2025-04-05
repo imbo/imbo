@@ -4,12 +4,12 @@ namespace Imbo\EventListener;
 use Imbo\EventManager\EventInterface;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
-/**
- * @coversDefaultClass Imbo\EventListener\ResponseETag
- */
+#[CoversClass(ResponseETag::class)]
 class ResponseETagTest extends ListenerTests
 {
     private ResponseETag $listener;
@@ -24,10 +24,7 @@ class ResponseETagTest extends ListenerTests
         return $this->listener;
     }
 
-    /**
-     * @dataProvider getTaintedHeaders
-     * @covers ::fixIfNoneMatchHeader
-     */
+    #[DataProvider('getTaintedHeaders')]
     public function testCanFixATaintedInNoneMatchHeader(string $incoming, string $real, bool $willFix): void
     {
         /** @var HeaderBag&MockObject */
@@ -62,10 +59,7 @@ class ResponseETagTest extends ListenerTests
         $this->listener->fixIfNoneMatchHeader($event);
     }
 
-    /**
-     * @dataProvider getRoutesForETags
-     * @covers ::setETag
-     */
+    #[DataProvider('getRoutesForETags')]
     public function testWillSetETagForSomeRoutes(string $route, bool $hasETag, bool $isOk = false, string $content = null): void
     {
         /** @var Request&MockObject */

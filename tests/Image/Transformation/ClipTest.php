@@ -9,12 +9,11 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Clip
- */
+#[CoversClass(Clip::class)]
 class ClipTest extends TestCase
 {
     private Image&MockObject $image;
@@ -55,9 +54,6 @@ class ClipTest extends TestCase
         $this->transformation->setImagick($this->imagick);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testExceptionIfMissingNamedPath(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -66,9 +62,6 @@ class ClipTest extends TestCase
         $this->transformation->transform(['path' => 'foo']);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testNoExceptionIfMissingNamedPathButIgnoreSet(): void
     {
         $this->assertNull(
@@ -80,9 +73,6 @@ class ClipTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformationHappensWithMatchingPath(): void
     {
         $this->image
@@ -93,9 +83,6 @@ class ClipTest extends TestCase
         $this->transformation->transform(['path' => 'Panda']);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformationHappensWithoutExplicitPath(): void
     {
         $this->image
@@ -106,9 +93,6 @@ class ClipTest extends TestCase
         $this->transformation->transform([]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformationDoesntHappenWhenNoPathIsPresent(): void
     {
         $this->imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.jpg'));
@@ -119,9 +103,6 @@ class ClipTest extends TestCase
         $this->transformation->transform([]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testWillResetAlphaChannelWhenTheImageDoesNotHaveAClippingPath(): void
     {
         /** @var Imagick&MockObject */
@@ -153,9 +134,6 @@ class ClipTest extends TestCase
             ->transform([]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testThrowsExceptionWhenImagickFailsWithAFatalError(): void
     {
         /** @var Imagick&MockObject */

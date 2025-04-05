@@ -6,12 +6,12 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Status as StatusModel;
 use Imbo\Storage\StorageInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-/**
- * @coversDefaultClass Imbo\Resource\Status
- */
+#[CoversClass(Status::class)]
 class StatusTest extends ResourceTests
 {
     private Status $resource;
@@ -39,10 +39,7 @@ class StatusTest extends ResourceTests
         $this->resource = $this->getNewResource();
     }
 
-    /**
-     * @dataProvider getStatuses
-     * @covers ::get
-     */
+    #[DataProvider('getStatuses')]
     public function testSetsCorrectStatusCodeAndErrorMessage(bool $databaseStatus, bool $storageStatus, ?int $statusCode = 0, ?string $reasonPhrase = ''): void
     {
         $this->database

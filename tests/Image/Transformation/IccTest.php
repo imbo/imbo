@@ -8,17 +8,13 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Icc
- */
+#[CoversClass(Icc::class)]
 class IccTest extends TestCase
 {
-    /**
-     * @covers ::transform
-     */
     public function testExceptionWithoutProfiles(): void
     {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -29,9 +25,6 @@ class IccTest extends TestCase
         (new Icc([]))->transform([]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testExceptionWithInvalidName(): void
     {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -42,9 +35,6 @@ class IccTest extends TestCase
         (new Icc([]))->transform(['profile' => 'foo']);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformationHappensWithMatchingName(): void
     {
         /** @var Image&MockObject */
@@ -71,10 +61,6 @@ class IccTest extends TestCase
             ->transform(['profile' => 'foo']);
     }
 
-    /**
-     * @covers ::__construct
-     * @covers ::transform
-     */
     public function testTransformationHappensWithDefaultKey(): void
     {
         /** @var Image&MockObject */
@@ -101,10 +87,6 @@ class IccTest extends TestCase
             ->transform([]);
     }
 
-    /**
-     * @covers ::__construct
-     * @covers ::transform
-     */
     public function testThrowsExceptionWhenImagickFailsWithAFatalError(): void
     {
         /** @var Imagick&MockObject */
@@ -123,9 +105,6 @@ class IccTest extends TestCase
             ->transform([]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testThrowsExceptionWhenInvalidPathIsUsed(): void
     {
         $path = DATA_DIR . '/foo/bar.icc';
@@ -141,9 +120,6 @@ class IccTest extends TestCase
         (new Icc(['default' => $path]))->transform([]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testStripProfileOnMismatch(): void
     {
         /** @var Image&MockObject */
@@ -179,9 +155,6 @@ class IccTest extends TestCase
             ->transform([]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testThrowsExceptionWhenApplyingStrippedProfileFails(): void
     {
         $expectedProfile = file_get_contents(DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc');

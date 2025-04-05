@@ -6,11 +6,10 @@ use ImagickException;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Strip
- */
+#[CoversClass(Strip::class)]
 class StripTest extends TransformationTests
 {
     protected function getTransformation(): Strip
@@ -18,9 +17,6 @@ class StripTest extends TransformationTests
         return new Strip();
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testStripMetadata(): void
     {
         /** @var Image&MockObject */
@@ -57,9 +53,6 @@ class StripTest extends TransformationTests
         }
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testThrowsCorrectExceptionWhenAnErrorOccurs(): void
     {
         /** @var Imagick&MockObject */
@@ -75,9 +68,6 @@ class StripTest extends TransformationTests
             ->transform([]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testReloadsImage(): void
     {
         /** @var Image&MockObject */

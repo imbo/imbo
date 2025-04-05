@@ -3,11 +3,11 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Rotate
- */
+#[CoversClass(Rotate::class)]
 class RotateTest extends TransformationTests
 {
     protected function getTransformation(): Rotate
@@ -15,10 +15,7 @@ class RotateTest extends TransformationTests
         return new Rotate();
     }
 
-    /**
-     * @dataProvider getRotateParams
-     * @covers ::transform
-     */
+    #[DataProvider('getRotateParams')]
     public function testCanTransformImage(int $angle, int $width, int $height): void
     {
         /** @var Image&MockObject */

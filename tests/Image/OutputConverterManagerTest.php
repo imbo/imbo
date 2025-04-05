@@ -9,13 +9,12 @@ use Imbo\Image\OutputConverter\Bmp;
 use Imbo\Image\OutputConverter\OutputConverterInterface;
 use Imbo\Image\OutputConverter\Webp;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-/**
- * @coversDefaultClass Imbo\Image\OutputConverterManager
- */
+#[CoversClass(OutputConverterManager::class)]
 class OutputConverterManagerTest extends TestCase
 {
     private OutputConverterManager $manager;
@@ -25,17 +24,11 @@ class OutputConverterManagerTest extends TestCase
         $this->manager = new OutputConverterManager();
     }
 
-    /**
-     * @covers ::setImagick
-     */
     public function testCanSetImagickInstance(): void
     {
         $this->assertSame($this->manager, $this->manager->setImagick($this->createMock(Imagick::class)));
     }
 
-    /**
-     * @covers ::addConverters
-     */
     public function testThrowsExceptionWhenRegisteringWrongConverter(): void
     {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -46,9 +39,6 @@ class OutputConverterManagerTest extends TestCase
     }
 
 
-    /**
-     * @covers ::addConverters
-     */
     public function testCanAddConvertersAsStrings(): void
     {
         $this->assertSame($this->manager, $this->manager->addConverters([
@@ -58,16 +48,6 @@ class OutputConverterManagerTest extends TestCase
         ]));
     }
 
-    /**
-     * @covers ::getSupportedExtensions
-     * @covers ::getSupportedMimeTypes
-     * @covers ::getMimeTypeFromExtension
-     * @covers ::getExtensionFromMimeType
-     * @covers ::getMimeTypeToExtensionMap
-     * @covers ::getExtensionToMimeTypeMap
-     * @covers ::supportsExtension
-     * @covers ::registerConverter
-     */
     public function testCanRegisterConverters(): void
     {
         // Assert that everything is empty from the start
@@ -167,11 +147,6 @@ class OutputConverterManagerTest extends TestCase
         }
     }
 
-    /**
-     * @covers ::convert
-     * @covers ::supportsExtension
-     * @covers ::getMimeTypeFromExtension
-     */
     public function testCanConvertImages(): void
     {
         $mime = 'image/png';
@@ -207,10 +182,6 @@ class OutputConverterManagerTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::convert
-     * @covers ::supportsExtension
-     */
     public function testCanConvertImageUsingMimeType(): void
     {
         $mime = 'image/jpeg';
@@ -246,9 +217,6 @@ class OutputConverterManagerTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::convert
-     */
     public function testReturnsNullWhenImageCantBeConverted(): void
     {
         $converter = $this->createConfiguredMock(OutputConverterInterface::class, [

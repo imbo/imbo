@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 namespace Imbo\Http;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Http\ContentNegotiation
- */
+#[CoversClass(ContentNegotiation::class)]
 class ContentNegotiationTest extends TestCase
 {
     private ContentNegotiation $cn;
@@ -15,20 +15,13 @@ class ContentNegotiationTest extends TestCase
         $this->cn = new ContentNegotiation();
     }
 
-    /**
-     * @dataProvider getIsAcceptableData
-     * @covers ::isAcceptable
-     */
+    #[DataProvider('getIsAcceptableData')]
     public function testCanCheckIfAMimeTypeIsAcceptable(string $mimeType, array $acceptable, float|bool $result): void
     {
         $this->assertSame($result, $this->cn->isAcceptable($mimeType, $acceptable));
     }
 
-    /**
-     * @dataProvider getMimeTypes
-     * @covers ::bestMatch
-     * @covers ::isAcceptable
-     */
+    #[DataProvider('getMimeTypes')]
     public function testCanPickTheBestMatchFromASetOfMimeTypes(array $mimeTypes, array $acceptable, string|bool $result): void
     {
         $this->assertSame($result, $this->cn->bestMatch($mimeTypes, $acceptable));

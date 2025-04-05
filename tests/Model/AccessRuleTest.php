@@ -1,11 +1,10 @@
 <?php declare(strict_types=1);
 namespace Imbo\Model;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Model\AccessRule
- */
+#[CoversClass(AccessRule::class)]
 class AccessRuleTest extends TestCase
 {
     private AccessRule $model;
@@ -15,10 +14,6 @@ class AccessRuleTest extends TestCase
         $this->model = new AccessRule();
     }
 
-    /**
-     * @covers ::getId
-     * @covers ::setId
-     */
     public function testSetAndGetId(): void
     {
         $this->assertNull($this->model->getId());
@@ -26,10 +21,6 @@ class AccessRuleTest extends TestCase
         $this->assertSame(1, $this->model->getId());
     }
 
-    /**
-     * @covers ::getGroup
-     * @covers ::setGroup
-     */
     public function testSetAndGetGroup(): void
     {
         $this->assertNull($this->model->getGroup());
@@ -37,10 +28,6 @@ class AccessRuleTest extends TestCase
         $this->assertSame('name', $this->model->getGroup());
     }
 
-    /**
-     * @covers ::getResources
-     * @covers ::setResources
-     */
     public function testSetAndGetResources(): void
     {
         $this->assertSame([], $this->model->getResources());
@@ -48,10 +35,6 @@ class AccessRuleTest extends TestCase
         $this->assertSame(['r1', 'r2'], $this->model->getResources());
     }
 
-    /**
-     * @covers ::getUsers
-     * @covers ::setUsers
-     */
     public function testSetAndGetUsers(): void
     {
         $this->assertSame([], $this->model->getUsers());
@@ -59,9 +42,6 @@ class AccessRuleTest extends TestCase
         $this->assertSame(['u1', 'u2'], $this->model->getUsers());
     }
 
-    /**
-     * @covers ::getData
-     */
     public function testGetData(): void
     {
         $this->model

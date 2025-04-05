@@ -8,12 +8,11 @@ use Imbo\Exception\ResourceException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Router\Route;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-/**
- * @coversDefaultClass Imbo\Resource\GlobalShortUrl
- */
+#[CoversClass(GlobalShortUrl::class)]
 class GlobalShortUrlTest extends ResourceTests
 {
     private GlobalShortUrl $resource;
@@ -45,9 +44,6 @@ class GlobalShortUrlTest extends ResourceTests
         $this->resource = $this->getNewResource();
     }
 
-    /**
-     * @covers ::getImage
-     */
     public function testCanTriggerAnImageGetEventWhenRequestedWithAValidShortUrl(): void
     {
         $id = 'aaaaaaa';
@@ -133,9 +129,6 @@ class GlobalShortUrlTest extends ResourceTests
         $this->resource->getImage($this->event);
     }
 
-    /**
-     * @covers ::getImage
-     */
     public function testRespondsWith404WhenShortUrlDoesNotExist(): void
     {
         /** @var Route&MockObject */

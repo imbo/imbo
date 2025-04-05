@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 namespace Imbo\Helpers;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Helpers\Urls
- */
+#[CoversClass(Urls::class)]
 class UrlsTest extends TestCase
 {
     private Urls $helper;
@@ -15,10 +15,7 @@ class UrlsTest extends TestCase
         $this->helper = new Urls();
     }
 
-    /**
-     * @dataProvider getUrls
-     * @covers ::buildFromParseUrlParts
-     */
+    #[DataProvider('getUrls')]
     public function testCanBuildFromParts(string $url): void
     {
         $this->assertSame($url, $this->helper->buildFromParseUrlParts(parse_url($url)));

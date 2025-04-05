@@ -6,14 +6,14 @@ use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
 use Imbo\Exception\RuntimeException;
 use Imbo\Resource;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
-/**
- * @coversDefaultClass Imbo\CliCommand\AddPublicKey
- */
+#[CoversClass(AddPublicKey::class)]
 class AddPublicKeyTest extends TestCase
 {
     private Application $application;
@@ -33,10 +33,7 @@ class AddPublicKeyTest extends TestCase
         $this->application->add($this->command);
     }
 
-    /**
-     * @dataProvider getInvalidAccessControlConfig
-     * @covers ::getAclAdapter
-     */
+    #[DataProvider('getInvalidAccessControlConfig')]
     public function testThrowsWhenAccessControlIsNotValid(array $config, string $errorMessage): void
     {
         if (is_string($config['accessControl'])) {
@@ -53,10 +50,6 @@ class AddPublicKeyTest extends TestCase
         $commandTester->execute(['publicKey' => 'foo']);
     }
 
-    /**
-     * @covers ::execute
-     * @covers ::getAclAdapter
-     */
     public function testThrowsOnDuplicatePublicKeyName(): void
     {
         $this->adapter
@@ -70,10 +63,6 @@ class AddPublicKeyTest extends TestCase
         $commandTester->execute(['publicKey' => 'foo']);
     }
 
-    /**
-     * @covers ::execute
-     * @covers ::askForPrivateKey
-     */
     public function testWillAskForPrivateKeyIfNotSpecified(): void
     {
         $this->adapter
@@ -91,9 +80,6 @@ class AddPublicKeyTest extends TestCase
         $commandTester->execute(['publicKey' => 'foo']);
     }
 
-    /**
-     * @covers ::askForUsers
-     */
     public function testWillNotAcceptEmptyUserSpecification(): void
     {
         $commandTester = new CommandTester($this->command);
@@ -107,10 +93,6 @@ class AddPublicKeyTest extends TestCase
         $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
     }
 
-    /**
-     * @covers ::askForResources
-     * @covers ::askForCustomResources
-     */
     public function testWillNotAcceptEmptyCustomResourceSpecification(): void
     {
         $commandTester = new CommandTester($this->command);
@@ -123,12 +105,6 @@ class AddPublicKeyTest extends TestCase
         $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
     }
 
-    /**
-     * @covers ::execute
-     * @covers ::askForAnotherAclRule
-     * @covers ::askForResources
-     * @covers ::askForUsers
-     */
     public function testContinuesAskingForAclRulesIfUserSaysThereAreMoreRulesToAdd(): void
     {
         $this->adapter
@@ -192,13 +168,6 @@ class AddPublicKeyTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::execute
-     * @covers ::askForAnotherAclRule
-     * @covers ::askForResources
-     * @covers ::askForUsers
-     * @covers ::askForSpecificResources
-     */
     public function testPromptsForListOfSpecificResourcesIfOptionIsSelected(): void
     {
         $allResources = Resource::getAllResources();
@@ -228,11 +197,6 @@ class AddPublicKeyTest extends TestCase
         $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
     }
 
-    /**
-     * @covers ::execute
-     * @covers ::askForAnotherAclRule
-     * @covers ::askForCustomResources
-     */
     public function testPromtpsForListOfCustomResourcesIfOptionIsSelected(): void
     {
         $allResources = Resource::getAllResources();
@@ -264,9 +228,6 @@ class AddPublicKeyTest extends TestCase
         $commandTester->execute(['publicKey' => 'foo', 'privateKey' => 'bar']);
     }
 
-    /**
-     * @covers ::__construct
-     */
     public function testConfiguresCommand(): void
     {
         $this->assertSame('Add a public key', $this->command->getDescription());

@@ -1,11 +1,10 @@
 <?php declare(strict_types=1);
 namespace Imbo\Model;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Model\Groups
- */
+#[CoversClass(Groups::class)]
 class GroupsTest extends TestCase
 {
     private Groups $model;
@@ -15,10 +14,6 @@ class GroupsTest extends TestCase
         $this->model = new Groups();
     }
 
-    /**
-     * @covers ::getGroups
-     * @covers ::setGroups
-     */
     public function testSetAndGetGroups(): void
     {
         $this->assertSame([], $this->model->getGroups());
@@ -26,10 +21,6 @@ class GroupsTest extends TestCase
         $this->assertSame(['group' => [], 'group2' => []], $this->model->getGroups());
     }
 
-    /**
-     * @covers ::setHits
-     * @covers ::getHits
-     */
     public function testCanSetAndGetHits(): void
     {
         $this->assertNull($this->model->getHits());
@@ -37,10 +28,6 @@ class GroupsTest extends TestCase
         $this->assertSame(10, $this->model->getHits());
     }
 
-    /**
-     * @covers ::setPage
-     * @covers ::getPage
-     */
     public function testCanSetAndGetPage(): void
     {
         $this->assertNull($this->model->getPage());
@@ -48,10 +35,6 @@ class GroupsTest extends TestCase
         $this->assertSame(10, $this->model->getPage());
     }
 
-    /**
-     * @covers ::setLimit
-     * @covers ::getLimit
-     */
     public function testCanSetAndGetLimit(): void
     {
         $this->assertNull($this->model->getLimit());
@@ -59,9 +42,6 @@ class GroupsTest extends TestCase
         $this->assertSame(10, $this->model->getLimit());
     }
 
-    /**
-     * @covers ::getCount
-     */
     public function testCanCountImages(): void
     {
         $this->assertSame(0, $this->model->getCount());
@@ -69,9 +49,6 @@ class GroupsTest extends TestCase
         $this->assertSame(2, $this->model->getCount());
     }
 
-    /**
-     * @covers ::getData
-     */
     public function testGetData(): void
     {
         $this->model

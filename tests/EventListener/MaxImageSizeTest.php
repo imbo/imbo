@@ -6,11 +6,11 @@ use Imbo\Http\Request\Request;
 use Imbo\Image\Transformation\MaxSize;
 use Imbo\Image\TransformationManager;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @coversDefaultClass Imbo\EventListener\MaxImageSize
- */
+#[CoversClass(MaxImageSize::class)]
 class MaxImageSizeTest extends ListenerTests
 {
     private MaxImageSize $listener;
@@ -25,10 +25,7 @@ class MaxImageSizeTest extends ListenerTests
         return $this->listener;
     }
 
-    /**
-     * @dataProvider getImageDimensions
-     * @covers ::enforceMaxSize
-     */
+    #[DataProvider('getImageDimensions')]
     public function testWillTriggerTransformationWhenImageIsAboveTheLimits(int $imageWidth, int $imageHeight, int $maxWidth, int $maxHeight, bool $willTrigger): void
     {
         /** @var Image&MockObject */

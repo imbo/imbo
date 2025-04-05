@@ -2,11 +2,10 @@
 namespace Imbo\Model;
 
 use DateTime;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Model\Status
- */
+#[CoversClass(Status::class)]
 class StatusTest extends TestCase
 {
     private Status $model;
@@ -16,10 +15,6 @@ class StatusTest extends TestCase
         $this->model = new Status();
     }
 
-    /**
-     * @covers ::getDate
-     * @covers ::setDate
-     */
     public function testCanSetAndGetDate(): void
     {
         $date = new DateTime();
@@ -29,10 +24,6 @@ class StatusTest extends TestCase
         $this->assertSame($date, $this->model->getDate());
     }
 
-    /**
-     * @covers ::getDatabaseStatus
-     * @covers ::setDatabaseStatus
-     */
     public function testCanSetAndGetDatabaseStatus(): void
     {
         $this->assertNull($this->model->getDatabaseStatus());
@@ -40,10 +31,6 @@ class StatusTest extends TestCase
         $this->assertTrue($this->model->getDatabaseStatus());
     }
 
-    /**
-     * @covers ::getStorageStatus
-     * @covers ::setStorageStatus
-     */
     public function testCanSetAndGetStorageStatus(): void
     {
         $this->assertNull($this->model->getStorageStatus());
@@ -51,9 +38,6 @@ class StatusTest extends TestCase
         $this->assertTrue($this->model->getStorageStatus());
     }
 
-    /**
-     * @covers ::getData
-     */
     public function testGetData(): void
     {
         $date = new DateTime();

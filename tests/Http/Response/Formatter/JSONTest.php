@@ -16,12 +16,13 @@ use Imbo\Model\Metadata;
 use Imbo\Model\Stats;
 use Imbo\Model\Status;
 use Imbo\Model\User;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Http\Response\Formatter\JSON
- */
+#[CoversClass(JSON::class)]
+#[CoversClass(Formatter::class)]
 class JSONTest extends TestCase
 {
     private JSON $formatter;
@@ -33,19 +34,11 @@ class JSONTest extends TestCase
         $this->formatter = new JSON($this->dateFormatter);
     }
 
-    /**
-     * @covers ::getContentType
-     */
     public function testReturnsCurrectContentType(): void
     {
         $this->assertSame('application/json', $this->formatter->getContentType());
     }
 
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatError
-     * @covers ::encode
-     */
     public function testCanFormatAnErrorModel(): void
     {
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
@@ -76,9 +69,6 @@ class JSONTest extends TestCase
         $this->assertSame('identifier', $data['imageIdentifier']);
     }
 
-    /**
-     * @covers ::formatError
-     */
     public function testCanFormatAnErrorModelWhenNoImageIdentifierExists(): void
     {
         $date = new DateTime();
@@ -95,10 +85,6 @@ class JSONTest extends TestCase
         $this->assertArrayNotHasKey('imageIdentifier', $data);
     }
 
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatStatus
-     */
     public function testCanFormatAStatusModel(): void
     {
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
@@ -125,10 +111,6 @@ class JSONTest extends TestCase
         $this->assertFalse($data['storage']);
     }
 
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatUser
-     */
     public function testCanFormatAUserModel(): void
     {
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
@@ -155,10 +137,6 @@ class JSONTest extends TestCase
         $this->assertSame(123, $data['numImages']);
     }
 
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatImages
-     */
     public function testCanFormatAnImagesModel(): void
     {
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
@@ -252,10 +230,6 @@ class JSONTest extends TestCase
         $this->assertSame($metadata, $image['metadata']);
     }
 
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatImages
-     */
     public function testCanFormatAnImagesModelWithNoMetadataSet(): void
     {
         $image = $this->createConfiguredMock(Image::class, [
@@ -282,10 +256,6 @@ class JSONTest extends TestCase
         $this->assertSame([], $image['metadata']);
     }
 
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatImages
-     */
     public function testCanFormatAnImagesModelWithNoMetadata(): void
     {
         $image = $this->createConfiguredMock(Image::class, [
@@ -312,10 +282,6 @@ class JSONTest extends TestCase
         $this->assertEmpty($image['metadata']);
     }
 
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatImages
-     */
     public function testCanFormatAnImagesModelWithNoImages(): void
     {
         /** @var Images&MockObject */
@@ -332,10 +298,6 @@ class JSONTest extends TestCase
         $this->assertCount(0, $data['images']);
     }
 
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatImages
-     */
     public function testCanFormatAnImagesModelWithSomefields(): void
     {
         $image = $this->createConfiguredMock(Image::class, [
@@ -371,10 +333,6 @@ class JSONTest extends TestCase
         $this->assertSameSize($fields, $image, 'Image array has to many keys');
     }
 
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatMetadataModel
-     */
     public function testCanFormatAMetadataModel(): void
     {
         $metadata = [
@@ -392,10 +350,6 @@ class JSONTest extends TestCase
         $this->assertSame($data, $metadata);
     }
 
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatMetadataModel
-     */
     public function testCanFormatAMetadataModelWithNoMetadata(): void
     {
         $model = $this->createConfiguredMock(Metadata::class, [
@@ -408,10 +362,6 @@ class JSONTest extends TestCase
         $this->assertSame([], $data);
     }
 
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatArrayModel
-     */
     public function testCanFormatAnArrayModel(): void
     {
         $data = [
@@ -432,10 +382,6 @@ class JSONTest extends TestCase
         $this->assertSame(json_decode($json, true), $data);
     }
 
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatArrayModel
-     */
     public function testCanFormatAnEmptyArrayModel(): void
     {
         $model = $this->createConfiguredMock(ArrayModel::class, [
@@ -448,10 +394,6 @@ class JSONTest extends TestCase
         $this->assertSame([], $data);
     }
 
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatGroups
-     */
     public function testCanFormatGroupsModel(): void
     {
         $groups = ['group', 'othergroup'];
@@ -471,10 +413,6 @@ class JSONTest extends TestCase
         $this->assertSame('{"search":{"hits":2,"page":1,"limit":5,"count":2},"groups":["group","othergroup"]}', $this->formatter->format($model));
     }
 
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatGroup
-     */
     public function testCanFormatAGroupModel(): void
     {
         $name = 'group';
@@ -491,10 +429,6 @@ class JSONTest extends TestCase
         $this->assertSame('{"name":"group","resources":["user.get","user.head"]}', $this->formatter->format($model));
     }
 
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatAccessRule
-     */
     public function testCanFormatAnAccessRuleModelWithGroup(): void
     {
         $id = 1;
@@ -510,10 +444,6 @@ class JSONTest extends TestCase
         $this->assertSame('{"id":1,"users":["user1","user2"],"group":"group"}', $this->formatter->format($model));
     }
 
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatAccessRule
-     */
     public function testCanFormatAnAccessRuleModelWithResource(): void
     {
         $id = 1;
@@ -529,10 +459,6 @@ class JSONTest extends TestCase
         $this->assertSame('{"id":1,"users":["user1","user2"],"resources":["resource1","resource2"]}', $this->formatter->format($model));
     }
 
-    /**
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatAccessRules
-     */
     public function testCanFormatAccessRulesModel(): void
     {
         $rules = [
@@ -554,11 +480,7 @@ class JSONTest extends TestCase
         $this->assertSame('[{"id":1,"group":"group","users":["user1","user2"]},{"id":2,"resources":["image.get","image.head"],"users":["user3","user4"]}]', $this->formatter->format($model));
     }
 
-    /**
-     * @dataProvider getStats
-     * @covers Imbo\Http\Response\Formatter\Formatter::format
-     * @covers ::formatStats
-     */
+    #[DataProvider('getStats')]
     public function testCanFormatAStatsModel(int $images, int $users, int $bytes, array $customStats, string $expectedJson): void
     {
         $model = $this->createConfiguredMock(Stats::class, [

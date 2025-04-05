@@ -3,10 +3,9 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Transverse
- */
+#[CoversClass(Transverse::class)]
 class TransverseTest extends TransformationTests
 {
     protected function getTransformation(): Transverse
@@ -14,9 +13,6 @@ class TransverseTest extends TransformationTests
         return new Transverse();
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testCanTransformImage(): void
     {
         $image = $this->createMock(Image::class);

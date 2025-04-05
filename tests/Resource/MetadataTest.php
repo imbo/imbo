@@ -10,11 +10,10 @@ use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
 use Imbo\Model\ModelInterface;
 use Imbo\Storage\StorageInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @coversDefaultClass Imbo\Resource\Metadata
- */
+#[CoversClass(Metadata::class)]
 class MetadataTest extends ResourceTests
 {
     private Metadata $resource;
@@ -48,9 +47,6 @@ class MetadataTest extends ResourceTests
         $this->resource = $this->getNewResource();
     }
 
-    /**
-     * @covers ::delete
-     */
     public function testSupportsHttpDelete(): void
     {
         $this->manager
@@ -65,9 +61,6 @@ class MetadataTest extends ResourceTests
         $this->resource->delete($this->event);
     }
 
-    /**
-     * @covers ::put
-     */
     public function testSupportsHttpPut(): void
     {
         $metadata = ['foo' => 'bar'];
@@ -96,9 +89,6 @@ class MetadataTest extends ResourceTests
         $this->resource->put($this->event);
     }
 
-    /**
-     * @covers ::post
-     */
     public function testSupportsHttpPost(): void
     {
         $metadata = ['foo' => 'bar'];
@@ -131,9 +121,6 @@ class MetadataTest extends ResourceTests
         $this->resource->post($this->event);
     }
 
-    /**
-     * @covers ::get
-     */
     public function testSupportsHttpGet(): void
     {
         $this->manager
@@ -143,9 +130,6 @@ class MetadataTest extends ResourceTests
         $this->resource->get($this->event);
     }
 
-    /**
-     * @covers ::validateMetadata
-     */
     public function testThrowsExceptionWhenValidatingMissingJsonData(): void
     {
         $this->request
@@ -156,9 +140,6 @@ class MetadataTest extends ResourceTests
         $this->resource->validateMetadata($this->event);
     }
 
-    /**
-     * @covers ::validateMetadata
-     */
     public function testThrowsExceptionWhenValidatingInvalidJsonData(): void
     {
         $this->request
@@ -169,9 +150,6 @@ class MetadataTest extends ResourceTests
         $this->resource->validateMetadata($this->event);
     }
 
-    /**
-     * @covers ::validateMetadata
-     */
     public function testAllowsValidJsonData(): void
     {
         $this->request
@@ -181,9 +159,6 @@ class MetadataTest extends ResourceTests
         $this->resource->validateMetadata($this->event);
     }
 
-    /**
-     * @covers ::validateMetadata
-     */
     public function testThrowsExceptionOnInvalidKeys(): void
     {
         $this->request

@@ -3,11 +3,11 @@ namespace Imbo\Resource\Images;
 
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Response\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Resource\Images\Query
- */
+#[CoversClass(Query::class)]
 class QueryTest extends TestCase
 {
     private Query $query;
@@ -17,10 +17,6 @@ class QueryTest extends TestCase
         $this->query = new Query();
     }
 
-    /**
-     * @covers ::setPage
-     * @covers ::getPage
-     */
     public function testPage(): void
     {
         $value = 2;
@@ -29,10 +25,6 @@ class QueryTest extends TestCase
         $this->assertSame($value, $this->query->getPage());
     }
 
-    /**
-     * @covers ::setLimit
-     * @covers ::getLimit
-     */
     public function testLimit(): void
     {
         $value = 30;
@@ -41,10 +33,6 @@ class QueryTest extends TestCase
         $this->assertSame($value, $this->query->getLimit());
     }
 
-    /**
-     * @covers ::setReturnMetadata
-     * @covers ::getReturnMetadata
-     */
     public function testReturnMetadata(): void
     {
         $this->assertFalse($this->query->getReturnMetadata());
@@ -52,10 +40,6 @@ class QueryTest extends TestCase
         $this->assertTrue($this->query->getReturnMetadata());
     }
 
-    /**
-     * @covers ::setFrom
-     * @covers ::getFrom
-     */
     public function testFrom(): void
     {
         $value = 123123123;
@@ -64,10 +48,6 @@ class QueryTest extends TestCase
         $this->assertSame($value, $this->query->getFrom());
     }
 
-    /**
-     * @covers ::setTo
-     * @covers ::getTo
-     */
     public function testTo(): void
     {
         $value = 123123123;
@@ -76,10 +56,6 @@ class QueryTest extends TestCase
         $this->assertSame($value, $this->query->getTo());
     }
 
-    /**
-     * @covers ::setImageIdentifiers
-     * @covers ::getImageIdentifiers
-     */
     public function testImageIdentifiers(): void
     {
         $value = ['id1', 'id2'];
@@ -88,10 +64,6 @@ class QueryTest extends TestCase
         $this->assertSame($value, $this->query->getImageIdentifiers());
     }
 
-    /**
-     * @covers ::setChecksums
-     * @covers ::getChecksums
-     */
     public function testChecksums(): void
     {
         $value = ['sum1', 'sum2'];
@@ -100,10 +72,6 @@ class QueryTest extends TestCase
         $this->assertSame($value, $this->query->getChecksums());
     }
 
-    /**
-     * @covers ::setOriginalChecksums
-     * @covers ::getOriginalChecksums
-     */
     public function testOriginalChecksums(): void
     {
         $value = ['sum1', 'sum2'];
@@ -112,14 +80,7 @@ class QueryTest extends TestCase
         $this->assertSame($value, $this->query->getOriginalChecksums());
     }
 
-    /**
-     * @dataProvider getSortData
-     * @covers ::setSort
-     * @covers ::getSort
-     *
-     * @param array<string> $value
-     * @param array<array{field:string,sort:string}> $formatted
-     */
+    #[DataProvider('getSortData')]
     public function testSort(array $value, array $formatted): void
     {
         $this->assertSame([], $this->query->getSort());
@@ -127,18 +88,12 @@ class QueryTest extends TestCase
         $this->assertSame($formatted, $this->query->getSort());
     }
 
-    /**
-     * @covers ::setSort
-     */
     public function testSortThrowsExceptionOnInvalidSortValues(): void
     {
         $this->expectExceptionObject(new RuntimeException('Invalid sort value: field:foo', Response::HTTP_BAD_REQUEST));
         $this->query->setSort(['field:foo']);
     }
 
-    /**
-     * @covers ::setSort
-     */
     public function testSortThrowsExceptionWhenTheStortStringIsBadlyFormatted(): void
     {
         $this->expectExceptionObject(new RuntimeException('Badly formatted sort', Response::HTTP_BAD_REQUEST));

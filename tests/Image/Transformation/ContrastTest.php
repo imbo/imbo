@@ -5,20 +5,19 @@ use Imagick;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Contrast
- */
+#[CoversClass(Contrast::class)]
 class ContrastTest extends TestCase
 {
     /**
-     * @dataProvider getContrastParams
-     * @covers ::transform
      * @todo Rewrite test when we can get the call to Imagick::getQuantumRange() out of the
      *       Transformation class
      */
+    #[DataProvider('getContrastParams')]
     public function testSetsTheCorrectContrast(array $params, bool $shouldTransform): void
     {
         /** @var Image&MockObject */
@@ -45,7 +44,6 @@ class ContrastTest extends TestCase
     }
 
     /**
-     * @covers ::transform
      * @todo Rewrite test when we can get the call to Imagick::getQuantumRange() out of the
      *       Transformation class
      */

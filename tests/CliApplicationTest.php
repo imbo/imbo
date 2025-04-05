@@ -1,17 +1,13 @@
 <?php declare(strict_types=1);
 namespace Imbo;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
-/**
- * @coversDefaultClass Imbo\CliApplication
- */
+#[CoversClass(CliApplication::class)]
 class CliApplicationTest extends TestCase
 {
-    /**
-     * @covers ::__construct
-     */
     public function testAddsCommands(): void
     {
         $application = new CliApplication();

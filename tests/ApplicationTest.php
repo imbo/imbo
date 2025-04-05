@@ -9,13 +9,12 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Resource\ResourceInterface;
 use Imbo\Storage\StorageInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-/**
- * @coversDefaultClass Imbo\Application
- */
+#[CoversClass(Application::class)]
 class ApplicationTest extends TestCase
 {
     private function runImbo(array $config): void
@@ -23,9 +22,6 @@ class ApplicationTest extends TestCase
         (new Application($config))->run();
     }
 
-    /**
-     * @covers ::run
-     */
     public function testThrowsExceptionWhenConfigurationHasInvalidDatabaseAdapter(): void
     {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid database adapter', Response::HTTP_INTERNAL_SERVER_ERROR));
@@ -35,9 +31,6 @@ class ApplicationTest extends TestCase
         ]);
     }
 
-    /**
-     * @covers ::run
-     */
     public function testThrowsExceptionWhenConfigurationHasInvalidStorageAdapter(): void
     {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid storage adapter', Response::HTTP_INTERNAL_SERVER_ERROR));
@@ -48,9 +41,6 @@ class ApplicationTest extends TestCase
         ]);
     }
 
-    /**
-     * @covers ::run
-     */
     public function testThrowsExceptionWhenConfigurationHasInvalidAccessControlAdapter(): void
     {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid access control adapter', Response::HTTP_INTERNAL_SERVER_ERROR));
@@ -63,9 +53,6 @@ class ApplicationTest extends TestCase
         ]);
     }
 
-    /**
-     * @covers ::run
-     */
     public function testApplicationSetsTrustedProxies(): void
     {
         $this->expectOutputRegex('|^{.*}$|');
@@ -86,9 +73,6 @@ class ApplicationTest extends TestCase
         $this->assertSame(['10.0.0.77'], Request::getTrustedProxies());
     }
 
-    /**
-     * @covers ::run
-     */
     public function testApplicationPassesRequestAndResponseToCallbacks(): void
     {
         // We just want to swallow the output, since we're testing it explicitly below.
@@ -114,18 +98,12 @@ class ApplicationTest extends TestCase
         $this->runImbo(array_merge($default, $test));
     }
 
-    /**
-     * @covers ::run
-     */
     public function testCanRunWithDefaultConfiguration(): void
     {
         $this->expectOutputRegex('|^{.*}$|');
         $this->runImbo($this->getDefaultConfig());
     }
 
-    /**
-     * @covers ::run
-     */
     public function testThrowsExceptionIfTransformationsIsSetAndIsNotAnArray(): void
     {
         $config = $this->getDefaultConfig();

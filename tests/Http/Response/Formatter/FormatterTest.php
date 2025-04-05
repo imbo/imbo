@@ -5,16 +5,12 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Helpers\DateFormatter;
 use Imbo\Http\Response\Response;
 use Imbo\Model\ModelInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Http\Response\Formatter\Formatter
- */
+#[CoversClass(Formatter::class)]
 class FormatterTest extends TestCase
 {
-    /**
-     * @covers ::format
-     */
     public function testThrowsExceptionWhenModelIsNotSupported(): void
     {
         $formatter = new JSON($this->createMock(DateFormatter::class));

@@ -7,13 +7,13 @@ use Imbo\EventManager\EventManager;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Router\Route;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-/**
- * @coversDefaultClass Imbo\EventListener\Cors
- */
+#[CoversClass(Cors::class)]
 class CorsTest extends ListenerTests
 {
     private Cors $listener;
@@ -50,10 +50,6 @@ class CorsTest extends ListenerTests
         return $this->listener;
     }
 
-    /**
-     * @covers ::__construct
-     * @covers ::getAllowedOrigins
-     */
     public function testCleansUpOrigins(): void
     {
         $listener = new Cors([
@@ -77,10 +73,6 @@ class CorsTest extends ListenerTests
         $this->assertCount(2, $allowed);
     }
 
-    /**
-     * @covers ::options
-     * @covers ::originIsAllowed
-     */
     public function testDoesNotAddHeadersWhenOriginIsDisallowedAndHttpMethodIsOptions(): void
     {
         /** @var ResponseHeaderBag&MockObject */
@@ -93,10 +85,6 @@ class CorsTest extends ListenerTests
         $this->listener->options($this->event);
     }
 
-    /**
-     * @covers ::invoke
-     * @covers ::originIsAllowed
-     */
     public function testDoesNotAddHeadersWhenOriginIsDisallowedAndHttpMethodIsOtherThanOptions(): void
     {
         $this->event
@@ -105,10 +93,6 @@ class CorsTest extends ListenerTests
         $this->listener->invoke($this->event);
     }
 
-    /**
-     * @covers ::invoke
-     * @covers ::originIsAllowed
-     */
     public function testAddsHeadersIfWildcardOriginIsDefined(): void
     {
         $listener = new Cors([
@@ -139,10 +123,6 @@ class CorsTest extends ListenerTests
         $listener->invoke($this->event);
     }
 
-    /**
-     * @covers ::invoke
-     * @covers ::originIsAllowed
-     */
     public function testAddsHeadersIfOriginIsDefinedAndAllowed(): void
     {
         $listener = new Cors([
@@ -173,10 +153,6 @@ class CorsTest extends ListenerTests
         $listener->invoke($this->event);
     }
 
-    /**
-     * @covers ::invoke
-     * @covers ::setExposedHeaders
-     */
     public function testIncludesAllImboHeadersAsExposedHeaders(): void
     {
         $listener = new Cors([
@@ -225,9 +201,6 @@ class CorsTest extends ListenerTests
         $listener->setExposedHeaders($this->event);
     }
 
-    /**
-     * @covers ::setExposedHeaders
-     */
     public function testDoesNotAddExposeHeadersHeaderWhenOriginIsInvalid(): void
     {
         $listener = new Cors([]);
@@ -242,9 +215,6 @@ class CorsTest extends ListenerTests
         $listener->setExposedHeaders($this->event);
     }
 
-    /**
-     * @covers ::options
-     */
     public function testSetsCorrectResposeHeadersOnOptionsRequestWhenOriginIsAllowed(): void
     {
         $listener = new Cors([
@@ -303,18 +273,12 @@ class CorsTest extends ListenerTests
         $listener->options($this->event);
     }
 
-    /**
-     * @covers ::getSubscribedEvents
-     */
     public function testReturnsSubscribedEvents(): void
     {
         $className = get_class($this->listener);
         $this->assertIsArray($className::getSubscribedEvents());
     }
 
-    /**
-     * @covers ::invoke
-     */
     public function testDoesNotAddAccessControlHeadersWhenOriginIsNotAllowed(): void
     {
         $route = $this->createConfiguredMock(Route::class, [
@@ -355,10 +319,7 @@ class CorsTest extends ListenerTests
         $listener->invoke($event);
     }
 
-    /**
-     * @dataProvider getAllowedMethodsParams
-     * @covers ::subscribe
-     */
+    #[DataProvider('getAllowedMethodsParams')]
     public function testWillSubscribeToTheCorrectEventsBasedOnParams(array $params, array $events): void
     {
         $listener = new Cors($params);
@@ -389,9 +350,6 @@ class CorsTest extends ListenerTests
         $listener->subscribe($event);
     }
 
-    /**
-     * @covers ::invoke
-     */
     public function testAddsVaryHeaderContainingOriginRegardlessOfAllowedStatus(): void
     {
         $this->request

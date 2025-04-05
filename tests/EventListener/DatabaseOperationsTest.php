@@ -13,12 +13,11 @@ use Imbo\Model\Metadata;
 use Imbo\Model\Stats;
 use Imbo\Model\User;
 use Imbo\Resource\Images\Query;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\InputBag;
 
-/**
- * @coversDefaultClass Imbo\EventListener\DatabaseOperations
- */
+#[CoversClass(DatabaseOperations::class)]
 class DatabaseOperationsTest extends ListenerTests
 {
     private DatabaseOperations $listener;
@@ -57,9 +56,6 @@ class DatabaseOperationsTest extends ListenerTests
         return $this->listener;
     }
 
-    /**
-     * @covers ::insertImage
-     */
     public function testCanInsertImage(): void
     {
         $this->image
@@ -79,9 +75,6 @@ class DatabaseOperationsTest extends ListenerTests
         $this->listener->insertImage($this->event);
     }
 
-    /**
-     * @covers ::deleteImage
-     */
     public function testCanDeleteImage(): void
     {
         $this->database
@@ -92,9 +85,6 @@ class DatabaseOperationsTest extends ListenerTests
         $this->listener->deleteImage($this->event);
     }
 
-    /**
-     * @covers ::loadImage
-     */
     public function testCanLoadImage(): void
     {
         $this->response
@@ -110,9 +100,6 @@ class DatabaseOperationsTest extends ListenerTests
         $this->listener->loadImage($this->event);
     }
 
-    /**
-     * @covers ::deleteMetadata
-     */
     public function testCanDeleteMetadata(): void
     {
         $this->database
@@ -128,9 +115,6 @@ class DatabaseOperationsTest extends ListenerTests
         $this->listener->deleteMetadata($this->event);
     }
 
-    /**
-     * @covers ::updateMetadata
-     */
     public function testCanUpdateMetadata(): void
     {
         $this->event
@@ -152,9 +136,6 @@ class DatabaseOperationsTest extends ListenerTests
         $this->listener->updateMetadata($this->event);
     }
 
-    /**
-     * @covers ::loadMetadata
-     */
     public function testCanLoadMetadata(): void
     {
         $date = new DateTime();
@@ -184,9 +165,6 @@ class DatabaseOperationsTest extends ListenerTests
         $this->listener->loadMetadata($this->event);
     }
 
-    /**
-     * @covers ::loadImages
-     */
     public function testCanLoadImages(): void
     {
         $images = [
@@ -277,9 +255,6 @@ class DatabaseOperationsTest extends ListenerTests
     }
 
 
-    /**
-     * @covers ::loadUser
-     */
     public function testCanLoadUser(): void
     {
         $date = new DateTime();
@@ -309,9 +284,6 @@ class DatabaseOperationsTest extends ListenerTests
         $this->listener->loadUser($this->event);
     }
 
-    /**
-     * @covers ::loadStats
-     */
     public function testCanLoadStats(): void
     {
         $this->database
@@ -331,10 +303,6 @@ class DatabaseOperationsTest extends ListenerTests
         $this->listener->loadStats($this->event);
     }
 
-    /**
-     * @covers ::getImagesQuery
-     * @covers ::setImagesQuery
-     */
     public function testCanCreateItsOwnImagesQuery(): void
     {
         $this->assertInstanceOf(Query::class, $this->listener->getImagesQuery());

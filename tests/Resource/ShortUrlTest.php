@@ -8,11 +8,10 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
 use Imbo\Router\Route;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @coversDefaultClass Imbo\Resource\ShortUrl
- */
+#[CoversClass(ShortUrl::class)]
 class ShortUrlTest extends ResourceTests
 {
     private Request&MockObject $request;
@@ -43,9 +42,6 @@ class ShortUrlTest extends ResourceTests
         ]);
     }
 
-    /**
-     * @covers ::deleteShortUrl
-     */
     public function testThrowsAnExceptionWhenTheShortUrlDoesNotExistWhenDeleting(): void
     {
         $this->route
@@ -63,9 +59,6 @@ class ShortUrlTest extends ResourceTests
         $this->getNewResource()->deleteShortUrl($this->event);
     }
 
-    /**
-     * @covers ::deleteShortUrl
-     */
     public function testThrowsAnExceptionWhenUserOrImageIdentifierDoesNotMatchWhenDeleting(): void
     {
         $this->route
@@ -86,9 +79,6 @@ class ShortUrlTest extends ResourceTests
         $this->getNewResource()->deleteShortUrl($this->event);
     }
 
-    /**
-     * @covers ::deleteShortUrl
-     */
     public function testCanDeleteAShortUrl(): void
     {
         $this->route
@@ -116,9 +106,6 @@ class ShortUrlTest extends ResourceTests
         $this->getNewResource()->deleteShortUrl($this->event);
     }
 
-    /**
-     * @covers ::getShortUrl
-     */
     public function testThrowsAnExceptionWhenTheShortUrlDoesNotExistWhenGetting(): void
     {
         $this->route
@@ -136,9 +123,6 @@ class ShortUrlTest extends ResourceTests
         $this->getNewResource()->getShortUrl($this->event);
     }
 
-    /**
-     * @covers ::getShortUrl
-     */
     public function testThrowsAnExceptionWhenUserOrImageIdentifierDoesNotMatchWhenGetting(): void
     {
         $this->route
@@ -159,9 +143,6 @@ class ShortUrlTest extends ResourceTests
         $this->getNewResource()->getShortUrl($this->event);
     }
 
-    /**
-     * @covers ::getShortUrl
-     */
     public function testCanGetAShortUrl(): void
     {
         $this->route

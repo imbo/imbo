@@ -5,12 +5,11 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-/**
- * @coversDefaultClass Imbo\EventListener\ResponseSender
- */
+#[CoversClass(ResponseSender::class)]
 class ResponseSenderTest extends ListenerTests
 {
     private ResponseSender $listener;
@@ -25,9 +24,6 @@ class ResponseSenderTest extends ListenerTests
         return $this->listener;
     }
 
-    /**
-     * @covers ::send
-     */
     public function testCanSendTheResponse(): void
     {
         /** @var Image&MockObject */
@@ -70,9 +66,6 @@ class ResponseSenderTest extends ListenerTests
         $this->listener->send($event);
     }
 
-    /**
-     * @covers ::send
-     */
     public function testCanSendTheResponseAndInjectTheCorrectImageIdentifier(): void
     {
         /** @var Request&MockObject */

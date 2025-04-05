@@ -1,11 +1,10 @@
 <?php declare(strict_types=1);
 namespace Imbo\Model;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Model\AccessRules
- */
+#[CoversClass(AccessRules::class)]
 class AccessRulesTest extends TestCase
 {
     private AccessRules $model;
@@ -15,11 +14,6 @@ class AccessRulesTest extends TestCase
         $this->model = new AccessRules();
     }
 
-    /**
-     * @covers ::getRules
-     * @covers ::setRules
-     * @covers ::getData
-     */
     public function testSetAndGetId(): void
     {
         $rules = [

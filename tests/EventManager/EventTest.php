@@ -11,11 +11,11 @@ use Imbo\Image\InputLoaderManager;
 use Imbo\Image\OutputConverterManager;
 use Imbo\Image\TransformationManager;
 use Imbo\Storage\StorageInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\EventManager\Event
- */
+#[CoversClass(Event::class)]
 class EventTest extends TestCase
 {
     private Event $event;
@@ -25,21 +25,7 @@ class EventTest extends TestCase
         $this->event = new Event();
     }
 
-    /**
-     * @dataProvider getArguments
-     * @covers ::setArgument
-     * @covers ::getRequest
-     * @covers ::getResponse
-     * @covers ::getDatabase
-     * @covers ::getStorage
-     * @covers ::getAccessControl
-     * @covers ::getManager
-     * @covers ::getConfig
-     * @covers ::getHandler
-     * @covers ::getTransformationManager
-     * @covers ::getInputLoaderManager
-     * @covers ::getOutputConverterManager
-     */
+    #[DataProvider('getArguments')]
     public function testCanSetAndGetRequest(string $method, string $argument, mixed $value): void
     {
         if ($value instanceof Closure) {
@@ -53,10 +39,6 @@ class EventTest extends TestCase
         $this->assertSame($value, $this->event->$method());
     }
 
-    /**
-     * @covers ::setName
-     * @covers ::getName
-     */
     public function testCanSetAndGetName(): void
     {
         $this->assertNull($this->event->getName());
@@ -64,10 +46,6 @@ class EventTest extends TestCase
         $this->assertSame('name', $this->event->getName());
     }
 
-    /**
-     * @covers ::stopPropagation
-     * @covers ::isPropagationStopped
-     */
     public function testCanStopPropagation(): void
     {
         $this->assertFalse($this->event->isPropagationStopped());
@@ -75,9 +53,6 @@ class EventTest extends TestCase
         $this->assertTrue($this->event->isPropagationStopped());
     }
 
-    /**
-     * @covers ::getArgument
-     */
     public function testThrowsExceptionWhenGettingArgumentThatDoesNotExist(): void
     {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -87,10 +62,6 @@ class EventTest extends TestCase
         $this->event->getArgument('foobar');
     }
 
-    /**
-     * @covers ::__construct
-     * @covers ::setArguments
-     */
     public function testCanSetArgumentsThroughConstructor(): void
     {
         $this->assertSame(
@@ -99,11 +70,6 @@ class EventTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::setArguments
-     * @covers ::getArgument
-     * @covers ::hasArgument
-     */
     public function testSetArgumentsOverridesAllArguments(): void
     {
         $this->assertFalse($this->event->hasArgument('foo'));

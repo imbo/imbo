@@ -6,11 +6,11 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Crop
- */
+#[CoversClass(Crop::class)]
 class CropTest extends TransformationTests
 {
     protected function getTransformation(): Crop
@@ -18,10 +18,7 @@ class CropTest extends TransformationTests
         return new Crop();
     }
 
-    /**
-     * @dataProvider getCropParams
-     * @covers ::transform
-     */
+    #[DataProvider('getCropParams')]
     public function testCanCropImages(array $params, int $endWidth, int $endHeight, bool $transformed): void
     {
         /** @var Image&MockObject */
@@ -61,9 +58,6 @@ class CropTest extends TransformationTests
             ->transform($params);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testThrowsExceptionWhenWidthIsMissing(): void
     {
         $transformation = new Crop();
@@ -75,9 +69,6 @@ class CropTest extends TransformationTests
         $transformation->transform(['height' => 123]);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testThrowsExceptionWhenHeightIsMissing(): void
     {
         $transformation = new Crop();
@@ -89,10 +80,7 @@ class CropTest extends TransformationTests
         $transformation->transform(['width' => 123]);
     }
 
-    /**
-     * @dataProvider getImageParams
-     * @covers ::transform
-     */
+    #[DataProvider('getImageParams')]
     public function testUsesAllParams(array $params, int $originalWidth, int $originalHeight, int $width, int $height, int $x, int $y, bool $shouldCrop): void
     {
         /** @var Imagick&MockObject */
@@ -136,10 +124,7 @@ class CropTest extends TransformationTests
             ->transform($params);
     }
 
-    /**
-     * @dataProvider getInvalidImageParams
-     * @covers ::transform
-     */
+    #[DataProvider('getInvalidImageParams')]
     public function testThrowsOnInvalidCropParams(array $params, int $originalWidth, int $originalHeight, ?string $errRegex = null): void
     {
         /** @var Imagick&MockObject */

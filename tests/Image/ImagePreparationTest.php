@@ -10,13 +10,12 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Image\Identifier\Generator\GeneratorInterface;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-/**
- * @coversDefaultClass Imbo\Image\ImagePreparation
- */
+#[CoversClass(ImagePreparation::class)]
 class ImagePreparationTest extends TestCase
 {
     private ImagePreparation $prepare;
@@ -59,18 +58,12 @@ class ImagePreparationTest extends TestCase
         $this->prepare = new ImagePreparation();
     }
 
-    /**
-     * @covers ::getSubscribedEvents
-     */
     public function testReturnsACorrectDefinition(): void
     {
         $class = get_class($this->prepare);
         $this->assertIsArray($class::getSubscribedEvents());
     }
 
-    /**
-     * @covers ::prepareImage
-     */
     public function testThrowsExceptionWhenNoImageIsAttached(): void
     {
         $this->request
@@ -82,9 +75,6 @@ class ImagePreparationTest extends TestCase
         $this->prepare->prepareImage($this->event);
     }
 
-    /**
-     * @covers ::prepareImage
-     */
     public function testThrowsExceptionWhenImageTypeIsNotSupported(): void
     {
         $this->request
@@ -101,9 +91,6 @@ class ImagePreparationTest extends TestCase
         $this->prepare->prepareImage($this->event);
     }
 
-    /**
-     * @covers ::prepareImage
-     */
     public function testThrowsExceptionWhenImageIsBroken(): void
     {
         $filePath = FIXTURES_DIR . '/broken-image.jpg';
@@ -128,9 +115,6 @@ class ImagePreparationTest extends TestCase
         $this->prepare->prepareImage($this->event);
     }
 
-    /**
-     * @covers ::prepareImage
-     */
     public function testThrowsExceptionWhenImageIsSlightlyBroken(): void
     {
         $filePath = FIXTURES_DIR . '/slightly-broken-image.png';
@@ -149,9 +133,6 @@ class ImagePreparationTest extends TestCase
         $this->prepare->prepareImage($this->event);
     }
 
-    /**
-     * @covers ::prepareImage
-     */
     public function testPopulatesRequestWhenImageIsValid(): void
     {
         $imagePath = FIXTURES_DIR . '/image.png';

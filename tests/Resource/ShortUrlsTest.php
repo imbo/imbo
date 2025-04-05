@@ -8,11 +8,11 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Image\OutputConverterManager;
 use Imbo\Model\ArrayModel;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @coversDefaultClass Imbo\Resource\ShortUrls
- */
+#[CoversClass(ShortUrls::class)]
 class ShortUrlsTest extends ResourceTests
 {
     private Request&MockObject $request;
@@ -34,9 +34,13 @@ class ShortUrlsTest extends ResourceTests
         ]);
         $this->response = $this->createMock(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);
-        $this->outputConverterManager = $this->createConfiguredMock(OutputConverterManager::class, [
-            'supportsExtension' => $this->returnCallback(fn (string $ext): bool => $ext === 'gif'),
-        ]);
+        $this->outputConverterManager = $this->createMock(OutputConverterManager::class);
+        $this->outputConverterManager
+            ->expects($this->any())
+            ->method('supportsExtension')
+            ->willReturnCallback(
+                fn (string $ext): bool => $ext === 'gif'
+            );
 
         $this->event = $this->createConfiguredMock(EventInterface::class, [
             'getRequest' => $this->request,
@@ -46,9 +50,6 @@ class ShortUrlsTest extends ResourceTests
         ]);
     }
 
-    /**
-     * @covers ::createShortUrl
-     */
     public function testWillThrowAnExceptionWhenRequestBodyIsEmpty(): void
     {
         $this->request
@@ -59,9 +60,6 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    /**
-     * @covers ::createShortUrl
-     */
     public function testWillThrowAnExceptionWhenRequestBodyIsInvalid(): void
     {
         $this->request
@@ -72,9 +70,6 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    /**
-     * @covers ::createShortUrl
-     */
     public function testWillThrowAnExceptionWhenUserMissing(): void
     {
         $this->request
@@ -85,9 +80,6 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    /**
-     * @covers ::createShortUrl
-     */
     public function testWillThrowAnExceptionWhenUserDoesNotMatch(): void
     {
         $this->request
@@ -98,9 +90,6 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    /**
-     * @covers ::createShortUrl
-     */
     public function testWillThrowAnExceptionWhenImageIdentifierIsMissing(): void
     {
         $this->request
@@ -111,9 +100,6 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    /**
-     * @covers ::createShortUrl
-     */
     public function testWillThrowAnExceptionWhenImageIdentifierDoesNotMatch(): void
     {
         $this->request
@@ -124,9 +110,6 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    /**
-     * @covers ::createShortUrl
-     */
     public function testWillThrowAnExceptionWhenExtensionIsNotRecognized(): void
     {
         $this->request
@@ -141,11 +124,7 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    /**
-     * @dataProvider createShortUrlParams
-     * @covers ::createShortUrl
-     * @covers ::getShortUrlId
-     */
+    #[DataProvider('createShortUrlParams')]
     public function testCanCreateShortUrls(?string $extension = null, ?string $queryString = null, array $transformations = []): void
     {
         $query = $transformations ? ['t' => $transformations] : [];
@@ -192,9 +171,6 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    /**
-     * @covers ::createShortUrl
-     */
     public function testWillReturn200OKIfTheShortUrlAlreadyExists(): void
     {
         $this->request
@@ -234,9 +210,6 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    /**
-     * @covers ::createShortUrl
-     */
     public function testWillGenerateANewIdIfTheGeneratedOneExists(): void
     {
         $this->request
@@ -278,9 +251,6 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
-    /**
-     * @covers ::deleteImageShortUrls
-     */
     public function testWillNotAddAModelIfTheEventIsNotAShortUrlsEvent(): void
     {
         $this->database
@@ -298,9 +268,6 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->deleteImageShortUrls($this->event);
     }
 
-    /**
-     * @covers ::deleteImageShortUrls
-     */
     public function testWillAddAModelIfTheEventIsAShortUrlsEvent(): void
     {
         $this->database
@@ -319,9 +286,6 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->deleteImageShortUrls($this->event);
     }
 
-    /**
-     * @covers ::createShortUrl
-     */
     public function testCanNotAddShortUrlWhenImageDoesNotExist(): void
     {
         $this->request

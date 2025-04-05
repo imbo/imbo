@@ -6,11 +6,11 @@ use ImagickException;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Modulate
- */
+#[CoversClass(Modulate::class)]
 class ModulateTest extends TransformationTests
 {
     protected function getTransformation(): Modulate
@@ -18,10 +18,7 @@ class ModulateTest extends TransformationTests
         return new Modulate();
     }
 
-    /**
-     * @dataProvider getModulateParamsForTransformation
-     * @covers ::transform
-     */
+    #[DataProvider('getModulateParamsForTransformation')]
     public function testCanModulateImages(array $params): void
     {
         /** @var Image&MockObject */
@@ -41,10 +38,7 @@ class ModulateTest extends TransformationTests
             ->transform($params);
     }
 
-    /**
-     * @dataProvider getModulateParams
-     * @covers ::transform
-     */
+    #[DataProvider('getModulateParams')]
     public function testUsesDefaultValuesWhenParametersAreNotSpecified(array $params, int $brightness, int $saturation, int $hue): void
     {
         /** @var Imagick&MockObject */
@@ -67,9 +61,6 @@ class ModulateTest extends TransformationTests
             ->transform($params);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testThrowsException(): void
     {
         /** @var Imagick&MockObject */

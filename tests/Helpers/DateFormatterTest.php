@@ -2,11 +2,11 @@
 namespace Imbo\Helpers;
 
 use DateTime;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Helpers\DateFormatter
- */
+#[CoversClass(DateFormatter::class)]
 class DateFormatterTest extends TestCase
 {
     private DateFormatter $helper;
@@ -16,10 +16,7 @@ class DateFormatterTest extends TestCase
         $this->helper = new DateFormatter();
     }
 
-    /**
-     * @dataProvider getDates
-     * @covers ::formatDate
-     */
+    #[DataProvider('getDates')]
     public function testCanFormatADateTimeInstance(DateTime $datetime, string $expected): void
     {
         $this->assertSame($expected, $this->helper->formatDate($datetime));

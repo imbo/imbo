@@ -6,12 +6,11 @@ use ImagickException;
 use Imbo\Exception\OutputConverterException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\Image\OutputConverter\Webp
- */
+#[CoversClass(Webp::class)]
 class WebpTest extends TestCase
 {
     private Webp $converter;
@@ -21,18 +20,12 @@ class WebpTest extends TestCase
         $this->converter = new Webp();
     }
 
-    /**
-     * @covers ::getSupportedMimeTypes
-     */
     public function testReturnsSupportedMimeTypes(): void
     {
         $types = $this->converter->getSupportedMimeTypes();
         $this->assertContains('image/webp', array_keys($types));
     }
 
-    /**
-     * @covers ::convert
-     */
     public function testCanConvertImage(): void
     {
         $extension = 'webp';
@@ -55,9 +48,6 @@ class WebpTest extends TestCase
         $this->assertNull($this->converter->convert($imagick, $image, $extension, $mimeType));
     }
 
-    /**
-     * @covers ::convert
-     */
     public function testThrowsExceptionOnImagickFailure(): void
     {
         $extension = 'webp';

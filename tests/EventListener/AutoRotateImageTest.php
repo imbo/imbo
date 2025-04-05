@@ -6,12 +6,11 @@ use Imbo\Http\Request\Request;
 use Imbo\Image\Transformation\AutoRotate;
 use Imbo\Image\TransformationManager;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass Imbo\EventListener\AutoRotateImage
- */
+#[CoversClass(AutoRotateImage::class)]
 class AutoRotateImageTest extends TestCase
 {
     private AutoRotateImage $listener;
@@ -21,9 +20,6 @@ class AutoRotateImageTest extends TestCase
         $this->listener = new AutoRotateImage();
     }
 
-    /**
-     * @covers ::getSubscribedEvents
-     */
     public function testReturnsCorrectSubscriptionData(): void
     {
         $className = get_class($this->listener);
@@ -32,9 +28,6 @@ class AutoRotateImageTest extends TestCase
         $this->assertTrue(isset($events['images.post']['autoRotate']));
     }
 
-    /**
-     * @covers ::autoRotate
-     */
     public function testTriggersTransformationForRotating(): void
     {
         $image = $this->createMock(Image::class);

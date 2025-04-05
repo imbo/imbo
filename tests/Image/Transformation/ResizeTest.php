@@ -3,11 +3,11 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Resize
- */
+#[CoversClass(Resize::class)]
 class ResizeTest extends TransformationTests
 {
     protected function getTransformation(): Resize
@@ -15,10 +15,7 @@ class ResizeTest extends TransformationTests
         return new Resize();
     }
 
-    /**
-     * @dataProvider getResizeParams
-     * @covers ::transform
-     */
+    #[DataProvider('getResizeParams')]
     public function testCanTransformImage(array $params, bool $transformation, int $resizedWidth = null, int $resizedHeight = null): void
     {
         /** @var Image&MockObject */

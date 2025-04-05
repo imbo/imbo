@@ -3,11 +3,11 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @coversDefaultClass Imbo\Image\Transformation\Thumbnail
- */
+#[CoversClass(Thumbnail::class)]
 class ThumbnailTest extends TransformationTests
 {
     protected function getTransformation(): Thumbnail
@@ -15,10 +15,7 @@ class ThumbnailTest extends TransformationTests
         return new Thumbnail();
     }
 
-    /**
-     * @dataProvider getThumbnailParams
-     * @covers ::transform
-     */
+    #[DataProvider('getThumbnailParams')]
     public function testCanTransformImage(array $params, int $width, int $height, int $diff = 0): void
     {
         /** @var Image&MockObject */

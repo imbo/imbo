@@ -9,11 +9,10 @@ use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 
-/**
- * @coversDefaultClass Imbo\EventListener\EightbimMetadata
- */
+#[CoversClass(EightbimMetadata::class)]
 class EightbimMetadataTest extends ListenerTests
 {
     protected EightbimMetadata $listener;
@@ -29,11 +28,6 @@ class EightbimMetadataTest extends ListenerTests
         return $this->listener;
     }
 
-    /**
-     * @covers ::setImagick
-     * @covers ::populate
-     * @covers ::save
-     */
     public function testCanExtractMetadata(): void
     {
         $user = 'user';
@@ -74,9 +68,6 @@ class EightbimMetadataTest extends ListenerTests
         $this->listener->save($event);
     }
 
-    /**
-     * @covers ::save
-     */
     public function testReturnsEarlyOnMissingProperties(): void
     {
         /** @var EventInterface&MockObject */
@@ -91,9 +82,6 @@ class EightbimMetadataTest extends ListenerTests
         );
     }
 
-    /**
-     * @covers ::save
-     */
     public function testDeletesImageWhenStoringMetadataFails(): void
     {
         $user = 'user';
