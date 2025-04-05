@@ -5,7 +5,6 @@ use Imagick;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(Canvas::class)]
 class CanvasTest extends TransformationTests
@@ -20,7 +19,6 @@ class CanvasTest extends TransformationTests
     {
         $blob = file_get_contents(FIXTURES_DIR . '/image.png');
 
-        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getBlob' => $blob,
             'getWidth' => 665,

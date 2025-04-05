@@ -81,7 +81,6 @@ class ImagesTest extends ResourceTests
                 },
             );
 
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -108,7 +107,6 @@ class ImagesTest extends ResourceTests
             ->with('db.image.insert', ['updateIfDuplicate' => false])
             ->willThrowException(new DuplicateImageIdentifierException());
 
-        /** @var ResponseHeaderBag&MockObject */
         $headers = $this->createMock(ResponseHeaderBag::class);
         $headers
             ->expects($this->once())
@@ -164,7 +162,6 @@ class ImagesTest extends ResourceTests
                 },
             );
 
-        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getImageIdentifier' => 'some id',
         ]);

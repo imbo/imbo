@@ -3,7 +3,6 @@ namespace Imbo\Image\InputLoader;
 
 use Imagick;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Basic::class)]
@@ -29,7 +28,6 @@ class BasicTest extends TestCase
     {
         $blob = file_get_contents(FIXTURES_DIR . '/1024x256.png');
 
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())

@@ -76,7 +76,6 @@ class StorageOperationsTest extends ListenerTests
             ->with($date)
             ->willReturnSelf();
 
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -88,7 +87,6 @@ class StorageOperationsTest extends ListenerTests
             ->method('getModel')
             ->willReturn($image);
 
-        /** @var EventManager&MockObject */
         $eventManager = $this->createMock(EventManager::class);
         $eventManager
             ->expects($this->once())
@@ -195,7 +193,6 @@ class StorageOperationsTest extends ListenerTests
                 new StorageException('Could not store image', Response::HTTP_INTERNAL_SERVER_ERROR),
             );
 
-        /** @var DatabaseInterface&MockObject */
         $database = $this->createMock(DatabaseInterface::class);
         $database
             ->expects($this->once())

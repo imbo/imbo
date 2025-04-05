@@ -7,7 +7,6 @@ use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(Compress::class)]
 class CompressTest extends TransformationTests
@@ -21,7 +20,6 @@ class CompressTest extends TransformationTests
 
     public function testCanTransformTheImage(): void
     {
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -66,7 +64,6 @@ class CompressTest extends TransformationTests
 
     public function testSetsOutputQualityCompression(): void
     {
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())

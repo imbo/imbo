@@ -9,7 +9,6 @@ use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Icc::class)]
@@ -37,7 +36,6 @@ class IccTest extends TestCase
 
     public function testTransformationHappensWithMatchingName(): void
     {
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -46,7 +44,6 @@ class IccTest extends TestCase
 
         $profilePath = DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc';
 
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
@@ -63,7 +60,6 @@ class IccTest extends TestCase
 
     public function testTransformationHappensWithDefaultKey(): void
     {
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -72,7 +68,6 @@ class IccTest extends TestCase
 
         $profilePath = DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc';
 
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
@@ -89,7 +84,6 @@ class IccTest extends TestCase
 
     public function testThrowsExceptionWhenImagickFailsWithAFatalError(): void
     {
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
@@ -122,7 +116,6 @@ class IccTest extends TestCase
 
     public function testStripProfileOnMismatch(): void
     {
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -131,7 +124,6 @@ class IccTest extends TestCase
 
         $expectedProfile = file_get_contents(DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc');
 
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->method('profileImage')
@@ -160,7 +152,6 @@ class IccTest extends TestCase
         $expectedProfile = file_get_contents(DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc');
         $e = new ImagickException('error #2');
 
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->method('profileImage')

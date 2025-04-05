@@ -7,7 +7,6 @@ use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Error::class)]
@@ -95,7 +94,6 @@ class ErrorTest extends TestCase
             'getImageIdentifier' => 'imageId',
         ]);
 
-        /** @var Request&MockObject */
         $request = $this->createConfiguredMock(Request::class, [
             'getImage' => $image,
         ]);

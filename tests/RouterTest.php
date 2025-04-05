@@ -6,7 +6,6 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Router::class)]
@@ -47,7 +46,6 @@ class RouterTest extends TestCase
     #[DataProvider('getValidRoutes')]
     public function testCanMatchValidRoutes(string $route, string $resource, ?string $user = null, ?string $imageIdentifier = null, ?string $extension = null): void
     {
-        /** @var Request&MockObject */
         $request = $this->createPartialMock(Request::class, ['getPathInfo', 'getMethod']);
         $request
             ->expects($this->once())
@@ -70,7 +68,6 @@ class RouterTest extends TestCase
 
     public function testCanMatchCustomRoute(): void
     {
-        /** @var Request&MockObject */
         $request = $this->createPartialMock(Request::class, ['getPathInfo', 'getMethod']);
         $request
             ->expects($this->once())

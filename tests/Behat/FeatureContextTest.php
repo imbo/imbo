@@ -20,7 +20,6 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
@@ -67,7 +66,6 @@ class FeatureContextTest extends TestCase
 
     public function testCanSetAnApiClient(): void
     {
-        /** @var HandlerStack&MockObject */
         $handlerStack = $this->createMock(HandlerStack::class);
         $handlerStack
             ->expects($this->exactly(2))
@@ -80,7 +78,6 @@ class FeatureContextTest extends TestCase
 
     public function testAttachesComparatorFunctions(): void
     {
-        /** @var ArrayContainsComparator&MockObject */
         $comparator = $this->createMock(ArrayContainsComparator::class);
         $comparator
             ->expects($this->once())

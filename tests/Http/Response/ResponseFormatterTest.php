@@ -160,15 +160,15 @@ class ResponseFormatterTest extends TestCase
             ->method('getMethod')
             ->willReturn('GET');
 
-        /** @var ResponseHeaderBag&MockObject */
-        $this->response->headers = $this->createMock(ResponseHeaderBag::class);
-        $this->response->headers
+        $headers = $this->createMock(ResponseHeaderBag::class);
+        $headers
             ->expects($this->once())
             ->method('add')
             ->with([
                 'Content-Type' => 'application/json',
                 'Content-Length' => strlen($expectedContent),
             ]);
+        $this->response->headers = $headers;
 
         $this->response
             ->expects($this->once())
@@ -275,7 +275,6 @@ class ResponseFormatterTest extends TestCase
             ->method('getModel')
             ->willReturn($this->createMock(Image::class));
 
-        /** @var HeaderBag&MockObject */
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
             ->expects($this->once())
@@ -297,7 +296,6 @@ class ResponseFormatterTest extends TestCase
             ->with('noStrict')
             ->willReturn(true);
 
-        /** @var HeaderBag&MockObject */
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
             ->expects($this->once())
@@ -328,7 +326,6 @@ class ResponseFormatterTest extends TestCase
 
     public function testPicksThePrioritizedMediaTypeIfMoreThanOneWithSameQualityAreSupportedByTheUserAgent(): void
     {
-        /** @var HeaderBag&MockObject */
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
             ->expects($this->once())
@@ -366,7 +363,6 @@ class ResponseFormatterTest extends TestCase
         $image->setMimeType($originalMimeType);
         $image->setExtension($expectedFormatter);
 
-        /** @var HeaderBag&MockObject */
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
             ->expects($this->once())
@@ -437,13 +433,14 @@ class ResponseFormatterTest extends TestCase
         $route = new Route();
         $route->setName($routeName);
 
-        /** @var HeaderBag&MockObject */
-        $this->request->headers = $this->createMock(HeaderBag::class);
-        $this->request->headers
+        $headers = $this->createMock(HeaderBag::class);
+        $headers
             ->expects($this->once())
             ->method('get')
             ->with('Accept', '*/*')
             ->willReturn('*/*');
+
+        $this->request->headers = $headers;
 
         $this->request
             ->expects($this->once())
@@ -504,7 +501,6 @@ class ResponseFormatterTest extends TestCase
 
     public function testTriggersAConversionTransformationIfNeededWhenTheModelIsAnImage(): void
     {
-        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getMimeType' => 'image/jpeg',
         ]);
@@ -521,7 +517,6 @@ class ResponseFormatterTest extends TestCase
         $this->response->headers = $this->createMock(ResponseHeaderBag::class);
         $this->responseFormatter->setFormatter('png');
 
-        /** @var EventManager&MockObject */
         $eventManager = $this->createMock(EventManager::class);
         $eventManager
             ->method('trigger')
@@ -554,7 +549,6 @@ class ResponseFormatterTest extends TestCase
         $this->response->headers = $this->createMock(ResponseHeaderBag::class);
         $this->responseFormatter->setFormatter('jpg');
 
-        /** @var EventManager&MockObject */
         $eventManager = $this->createMock(EventManager::class);
         $eventManager
             ->expects($this->once())

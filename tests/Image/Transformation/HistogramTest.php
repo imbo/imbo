@@ -5,7 +5,6 @@ use Imagick;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(Histogram::class)]
 class HistogramTest extends TransformationTests
@@ -20,7 +19,6 @@ class HistogramTest extends TransformationTests
     {
         $blob = file_get_contents(FIXTURES_DIR . '/512x512.png');
 
-        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getBlob' => $blob,
             'getWidth' => 512,

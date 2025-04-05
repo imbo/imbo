@@ -7,7 +7,6 @@ use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(Strip::class)]
 class StripTest extends TransformationTests
@@ -19,7 +18,6 @@ class StripTest extends TransformationTests
 
     public function testStripMetadata(): void
     {
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -55,7 +53,6 @@ class StripTest extends TransformationTests
 
     public function testThrowsCorrectExceptionWhenAnErrorOccurs(): void
     {
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
@@ -70,14 +67,12 @@ class StripTest extends TransformationTests
 
     public function testReloadsImage(): void
     {
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
             ->method('setHasBeenTransformed')
             ->with(true);
 
-        /** @var Imagick&MockObject */
         $imagick = $this->createConfiguredMock(Imagick::class, [
             'getImageBlob' => 'foo',
         ]);

@@ -5,7 +5,6 @@ use Imagick;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(MaxSize::class)]
 class MaxSizeTest extends TransformationTests
@@ -18,7 +17,6 @@ class MaxSizeTest extends TransformationTests
     #[DataProvider('getMaxSizeParams')]
     public function testCanTransformImages(string $file, array $params, int $width, int $height, ?int $transformedWidth, ?int $transformedHeight, ?bool $transformation = true): void
     {
-        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getWidth' => $width,
             'getHeight' => $height,

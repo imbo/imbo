@@ -7,7 +7,6 @@ use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Contrast::class)]
@@ -20,7 +19,6 @@ class ContrastTest extends TestCase
     #[DataProvider('getContrastParams')]
     public function testSetsTheCorrectContrast(array $params, bool $shouldTransform): void
     {
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
 
         $imagick = new Imagick();

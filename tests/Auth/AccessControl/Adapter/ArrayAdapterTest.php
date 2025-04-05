@@ -8,7 +8,6 @@ use Imbo\Model\Groups;
 use Imbo\Resource;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ArrayAdapter::class)]
@@ -153,7 +152,6 @@ class ArrayAdapterTest extends TestCase
     {
         $numGroups = count($groups);
 
-        /** @var Groups&MockObject */
         $model = $this->createMock(Groups::class);
         $model
             ->expects($this->once())

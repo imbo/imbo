@@ -8,7 +8,6 @@ use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(Modulate::class)]
 class ModulateTest extends TransformationTests
@@ -21,7 +20,6 @@ class ModulateTest extends TransformationTests
     #[DataProvider('getModulateParamsForTransformation')]
     public function testCanModulateImages(array $params): void
     {
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -41,14 +39,12 @@ class ModulateTest extends TransformationTests
     #[DataProvider('getModulateParams')]
     public function testUsesDefaultValuesWhenParametersAreNotSpecified(array $params, int $brightness, int $saturation, int $hue): void
     {
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
             ->method('modulateImage')
             ->with($brightness, $saturation, $hue);
 
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -63,7 +59,6 @@ class ModulateTest extends TransformationTests
 
     public function testThrowsException(): void
     {
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())

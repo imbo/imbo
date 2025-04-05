@@ -8,7 +8,6 @@ use Imbo\Image\TransformationManager;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(MaxImageSize::class)]
 class MaxImageSizeTest extends ListenerTests
@@ -28,7 +27,6 @@ class MaxImageSizeTest extends ListenerTests
     #[DataProvider('getImageDimensions')]
     public function testWillTriggerTransformationWhenImageIsAboveTheLimits(int $imageWidth, int $imageHeight, int $maxWidth, int $maxHeight, bool $willTrigger): void
     {
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -40,14 +38,12 @@ class MaxImageSizeTest extends ListenerTests
             ->method('getHeight')
             ->willReturn($imageHeight);
 
-        /** @var Request&MockObject */
         $request = $this->createMock(Request::class);
         $request
             ->expects($this->once())
             ->method('getImage')
             ->willReturn($image);
 
-        /** @var EventInterface&MockObject */
         $event = $this->createMock(EventInterface::class);
         $event
             ->expects($this->once())
@@ -55,7 +51,6 @@ class MaxImageSizeTest extends ListenerTests
             ->willReturn($request);
 
         if ($willTrigger) {
-            /** @var MaxSize&MockObject */
             $maxSize = $this->createMock(MaxSize::class);
             $maxSize
                 ->expects($this->once())
@@ -67,7 +62,6 @@ class MaxImageSizeTest extends ListenerTests
                 ->method('transform')
                 ->with(['width' => $maxWidth, 'height' => $maxHeight]);
 
-            /** @var TransformationManager&MockObject */
             $transformationManager = $this->createMock(TransformationManager::class);
             $transformationManager
                 ->expects($this->once())

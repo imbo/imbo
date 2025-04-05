@@ -53,7 +53,6 @@ class IndexTest extends ResourceTests
             ->method('getConfig')
             ->willReturn(['indexRedirect' => null]);
 
-        /** @var ResponseHeaderBag&MockObject */
         $responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $responseHeaders
             ->expects($this->once())
@@ -73,7 +72,6 @@ class IndexTest extends ResourceTests
             ->method('getConfig')
             ->willReturn(['indexRedirect' => $url]);
 
-        /** @var ResponseHeaderBag&MockObject */
         $responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $responseHeaders
             ->expects($this->once())

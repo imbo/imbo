@@ -10,7 +10,6 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(EightbimMetadata::class)]
 class EightbimMetadataTest extends ListenerTests
@@ -44,13 +43,11 @@ class EightbimMetadataTest extends ListenerTests
             'getImage' => $image,
         ]);
 
-        /** @var DatabaseInterface&MockObject */
         $database = $this->createMock(DatabaseInterface::class);
         $database->expects($this->once())->method('updateMetadata')->with($user, $imageIdentifier, [
             'paths' => ['House', 'Panda'],
         ]);
 
-        /** @var EventInterface&MockObject */
         $event = $this->createMock(EventInterface::class);
         $event
             ->expects($this->exactly(2))
@@ -70,7 +67,6 @@ class EightbimMetadataTest extends ListenerTests
 
     public function testReturnsEarlyOnMissingProperties(): void
     {
-        /** @var EventInterface&MockObject */
         $event = $this->createMock(EventInterface::class);
         $event
             ->expects($this->never())
@@ -98,7 +94,6 @@ class EightbimMetadataTest extends ListenerTests
             'getImage' => $image,
         ]);
 
-        /** @var DatabaseInterface&MockObject */
         $database = $this->createMock(DatabaseInterface::class);
         $database
             ->expects($this->once())

@@ -5,7 +5,6 @@ use Imagick;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(Resize::class)]
 class ResizeTest extends TransformationTests
@@ -18,7 +17,6 @@ class ResizeTest extends TransformationTests
     #[DataProvider('getResizeParams')]
     public function testCanTransformImage(array $params, bool $transformation, int $resizedWidth = null, int $resizedHeight = null): void
     {
-        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getWidth' => 665,
             'getHeight' => 463,

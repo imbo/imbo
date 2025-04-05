@@ -10,7 +10,6 @@ use Imbo\Image\OutputConverter\OutputConverterInterface;
 use Imbo\Image\OutputConverter\Webp;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -154,14 +153,12 @@ class OutputConverterManagerTest extends TestCase
 
         $imagick = $this->createMock(Imagick::class);
 
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
             ->method('setMimeType')
             ->with($mime);
 
-        /** @var OutputConverterInterface&MockObject */
         $converter = $this->createConfiguredMock(OutputConverterInterface::class, [
             'getSupportedMimeTypes' => [
                 $mime => $extension,
@@ -189,14 +186,12 @@ class OutputConverterManagerTest extends TestCase
 
         $imagick = $this->createMock(Imagick::class);
 
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
             ->method('setMimeType')
             ->with($mime);
 
-        /** @var OutputConverterInterface&MockObject */
         $converter = $this->createConfiguredMock(OutputConverterInterface::class, [
             'getSupportedMimeTypes' => [
                 $mime => $extension,

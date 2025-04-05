@@ -154,12 +154,10 @@ class ImagickTest extends ListenerTests
     #[DataProvider('hasImageBeenTransformed')]
     public function testUpdatesModelBeforeStoring(bool $hasBeenTransformed): void
     {
-        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getHasBeenTransformed' => $hasBeenTransformed,
         ]);
 
-        /** @var I&MockObject */
         $imagick = $this->createMock(I::class);
 
         if ($hasBeenTransformed) {
@@ -193,12 +191,10 @@ class ImagickTest extends ListenerTests
     #[DataProvider('hasImageBeenTransformed')]
     public function testUpdatesModelBeforeSendingResponse(bool $hasBeenTransformed): void
     {
-        /** @var Image&MockObject */
         $image = $this->createConfiguredMock(Image::class, [
             'getHasBeenTransformed' => $hasBeenTransformed,
         ]);
 
-        /** @var I&MockObject */
         $imagick = $this->createMock(I::class);
 
         if ($hasBeenTransformed) {
@@ -261,7 +257,6 @@ class ImagickTest extends ListenerTests
             ->with($this->event)
             ->willReturn(['width' => 30, 'height' => 20, 'index' => 0]);
 
-        /** @var I&MockObject */
         $imagick = $this->createConfiguredMock(I::class, [
             'getImageGeometry' => ['width' => 32, 'height' => 32],
         ]);

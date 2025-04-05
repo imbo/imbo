@@ -80,7 +80,6 @@ class ImageTest extends ResourceTests
         $user = 'christer';
         $imageIdentifier = 'imageIdentifier';
 
-        /** @var ResponseHeaderBag&MockObject */
         $responseHeaders = $this->createMock(ResponseHeaderBag::class);
 
         $this->request

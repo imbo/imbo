@@ -51,7 +51,6 @@ class StatusTest extends ResourceTests
             ->method('getStatus')
             ->willReturn($storageStatus);
 
-        /** @var ResponseHeaderBag&MockObject */
         $responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $responseHeaders
             ->expects($this->once())

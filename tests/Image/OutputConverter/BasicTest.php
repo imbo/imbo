@@ -7,7 +7,6 @@ use Imbo\Exception\OutputConverterException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Basic::class)]
@@ -33,14 +32,12 @@ class BasicTest extends TestCase
         $extension = 'png';
         $mimeType = 'image/png';
 
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
             ->method('setImageFormat')
             ->with($extension);
 
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -54,7 +51,6 @@ class BasicTest extends TestCase
     {
         $extension = 'png';
 
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())

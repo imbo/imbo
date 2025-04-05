@@ -57,7 +57,6 @@ class GlobalShortUrlTest extends ResourceTests
             'accessToken' => 'some token',
         ];
 
-        /** @var Route&MockObject */
         $route = $this->createMock(Route::class);
         $route
             ->method('get')
@@ -112,7 +111,6 @@ class GlobalShortUrlTest extends ResourceTests
                 'query' => $query,
             ]);
 
-        /** @var ResponseHeaderBag&MockObject */
         $responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $responseHeaders
             ->expects($this->once())
@@ -131,7 +129,6 @@ class GlobalShortUrlTest extends ResourceTests
 
     public function testRespondsWith404WhenShortUrlDoesNotExist(): void
     {
-        /** @var Route&MockObject */
         $route = $this->createMock(Route::class);
         $route
             ->expects($this->once())

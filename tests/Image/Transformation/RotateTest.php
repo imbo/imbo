@@ -5,7 +5,6 @@ use Imagick;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(Rotate::class)]
 class RotateTest extends TransformationTests
@@ -18,7 +17,6 @@ class RotateTest extends TransformationTests
     #[DataProvider('getRotateParams')]
     public function testCanTransformImage(int $angle, int $width, int $height): void
     {
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())

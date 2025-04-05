@@ -35,7 +35,6 @@ class StatsTest extends ResourceTests
 
     public function testTriggersTheCorrectEvent(): void
     {
-        /** @var ResponseHeaderBag&MockObject */
         $responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $responseHeaders
             ->expects($this->once())

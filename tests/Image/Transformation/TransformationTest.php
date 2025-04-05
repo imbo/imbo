@@ -5,7 +5,6 @@ use Imagick;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Transformation::class)]
@@ -21,12 +20,10 @@ class TransformationTest extends TestCase
     #[DataProvider('getColors')]
     public function testCanFormatColors(string $color, string $expected): void
     {
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image->expects($this->once())->method('setWidth')->willReturnSelf();
         $image->expects($this->once())->method('setHeight')->willReturnSelf();
 
-        /** @var Imagick&MockObject */
         $imagick = $this->createConfiguredMock(Imagick::class, [
             'getImageGeometry' => [
                 'width'  => 100,

@@ -7,7 +7,6 @@ use Imbo\Image\Transformation\AutoRotate;
 use Imbo\Image\TransformationManager;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(AutoRotateImage::class)]
@@ -36,7 +35,6 @@ class AutoRotateImageTest extends TestCase
             'getImage' => $image,
         ]);
 
-        /** @var AutoRotate&MockObject */
         $autoRotate = $this->createMock(AutoRotate::class);
         $autoRotate
             ->expects($this->once())
@@ -48,7 +46,6 @@ class AutoRotateImageTest extends TestCase
             ->method('transform')
             ->with([]);
 
-        /** @var TransformationManager&MockObject */
         $transformationManager = $this->createMock(TransformationManager::class);
         $transformationManager
             ->expects($this->once())

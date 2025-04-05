@@ -12,7 +12,6 @@ use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(ExifMetadata::class)]
 class ExifMetadataTest extends ListenerTests
@@ -41,7 +40,6 @@ class ExifMetadataTest extends ListenerTests
             'getBlob' => $blob,
         ]);
 
-        /** @var Imagick&MockObject */
         $imagick = $this->createConfiguredMock(Imagick::class, [
             'getImageProperties' => $data,
         ]);
@@ -55,14 +53,12 @@ class ExifMetadataTest extends ListenerTests
             'getImage' => $image,
         ]);
 
-        /** @var DatabaseInterface&MockObject */
         $database = $this->createMock(DatabaseInterface::class);
         $database
             ->expects($this->once())
             ->method('updateMetadata')
             ->with($user, $imageIdentifier, $expectedData);
 
-        /** @var Event&MockObject */
         $event = $this->createMock(Event::class);
         $event
             ->expects($this->exactly(2))
@@ -81,7 +77,6 @@ class ExifMetadataTest extends ListenerTests
 
     public function testWillDeleteImageWhenUpdatingMetadataFails(): void
     {
-        /** @var DatabaseInterface&MockObject */
         $database = $this->createMock(DatabaseInterface::class);
         $database
             ->expects($this->once())
@@ -199,7 +194,6 @@ class ExifMetadataTest extends ListenerTests
         $image->setBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));
         $image->setImageIdentifier($imageIdentifier);
 
-        /** @var Request&MockObject */
         $request = $this->createMock(Request::class);
         $request
             ->expects($this->exactly(2))
@@ -211,7 +205,6 @@ class ExifMetadataTest extends ListenerTests
             ->method('getUser')
             ->willReturn($user);
 
-        /** @var DatabaseInterface&MockObject */
         $database = $this->createMock(DatabaseInterface::class);
         $database
             ->expects($this->once())
@@ -221,7 +214,6 @@ class ExifMetadataTest extends ListenerTests
                 $this->arrayHasKey('gps:location'),
             );
 
-        /** @var EventInterface&MockObject */
         $event = $this->createMock(EventInterface::class);
         $event
             ->expects($this->exactly(2))

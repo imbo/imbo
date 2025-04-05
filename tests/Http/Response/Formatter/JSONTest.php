@@ -239,7 +239,6 @@ class JSONTest extends TestCase
         ]);
 
         $images = [$image];
-        /** @var Images&MockObject */
         $model = $this->createMock(Images::class);
         $model
             ->expects($this->once())
@@ -265,7 +264,6 @@ class JSONTest extends TestCase
         ]);
 
         $images = [$image];
-        /** @var Images&MockObject */
         $model = $this->createMock(Images::class);
         $model
             ->expects($this->once())
@@ -284,7 +282,6 @@ class JSONTest extends TestCase
 
     public function testCanFormatAnImagesModelWithNoImages(): void
     {
-        /** @var Images&MockObject */
         $model = $this->createMock(Images::class);
         $model
             ->expects($this->once())
@@ -306,7 +303,6 @@ class JSONTest extends TestCase
         ]);
 
         $images = [$image];
-        /** @var Images&MockObject */
         $model = $this->createMock(Images::class);
         $model
             ->expects($this->once())

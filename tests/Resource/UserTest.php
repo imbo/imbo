@@ -43,7 +43,6 @@ class UserTest extends ResourceTests
 
     public function testSupportsHttpGet(): void
     {
-        /** @var EventManager&MockObject */
         $manager = $this->createMock(EventManager::class);
         $manager
             ->expects($this->once())

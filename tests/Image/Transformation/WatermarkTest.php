@@ -11,7 +11,6 @@ use Imbo\Model\Image;
 use Imbo\Storage\StorageInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(Watermark::class)]
 class WatermarkTest extends TransformationTests
@@ -45,7 +44,6 @@ class WatermarkTest extends TransformationTests
     {
         $e = new StorageException('File not found', Response::HTTP_NOT_FOUND);
 
-        /** @var StorageInterface&MockObject  */
         $storage = $this->createMock(StorageInterface::class);
         $storage
             ->expects($this->once())
@@ -94,7 +92,6 @@ class WatermarkTest extends TransformationTests
             $watermarkFixture = (string) $params['watermarkFixture'];
         }
 
-        /** @var StorageInterface&MockObject */
         $storage = $this->createMock(StorageInterface::class);
         $storage
             ->expects($this->once())
@@ -102,7 +99,6 @@ class WatermarkTest extends TransformationTests
             ->with('someUser', $expectedWatermark)
             ->willReturn(file_get_contents(FIXTURES_DIR . '/' . $watermarkFixture));
 
-        /** @var Request&MockObject */
         $request = $this->createMock(Request::class);
         $request
             ->expects($this->once())

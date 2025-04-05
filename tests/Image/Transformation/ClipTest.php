@@ -33,7 +33,6 @@ class ClipTest extends TestCase
             'getUser'            => $user,
         ]);
 
-        /** @var DatabaseInterface&MockObject */
         $database = $this->createMock(DatabaseInterface::class);
         $database
             ->method('getMetadata')
@@ -105,7 +104,6 @@ class ClipTest extends TestCase
 
     public function testWillResetAlphaChannelWhenTheImageDoesNotHaveAClippingPath(): void
     {
-        /** @var Imagick&MockObject */
         $imagick = $this->createConfiguredMock(Imagick::class, [
             'getImageAlphaChannel' => true,
         ]);
@@ -136,7 +134,6 @@ class ClipTest extends TestCase
 
     public function testThrowsExceptionWhenImagickFailsWithAFatalError(): void
     {
-        /** @var Imagick&MockObject */
         $imagick = $this->createConfiguredMock(Imagick::class, [
             'getImageAlphaChannel' => true,
         ]);

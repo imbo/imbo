@@ -7,7 +7,6 @@ use Imbo\Exception\OutputConverterException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Webp::class)]
@@ -31,14 +30,12 @@ class WebpTest extends TestCase
         $extension = 'webp';
         $mimeType = 'image/webp';
 
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
             ->method('setImageFormat')
             ->with($extension);
 
-        /** @var Image&MockObject */
         $image = $this->createMock(Image::class);
         $image
             ->expects($this->once())
@@ -52,7 +49,6 @@ class WebpTest extends TestCase
     {
         $extension = 'webp';
 
-        /** @var Imagick&MockObject */
         $imagick = $this->createMock(Imagick::class);
         $imagick
             ->expects($this->once())
