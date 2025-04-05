@@ -1,7 +1,7 @@
 Requirements
 ============
 
-Imbo requires a web server (for instance `Apache`_, `Nginx`_ or `Lighttpd`_) running PHP >= 5.6 and the `Imagick PECL extension`_ extension for PHP (with at least ImageMagick 6.3.8).
+Imbo requires a web server (for instance `Apache`_, `Nginx`_ or `Lighttpd`_) running PHP >= 8.3 and the `Imagick PECL extension`_ extension for PHP.
 
 You will also need a backend for storing image information, like for instance `MongoDB`_ or `MySQL`_. If you want to use MongoDB as a database and/or `GridFS`_ for storage, you will need to install the `MongoDB PECL extension`_ and the `MongoDB PHP library`_, and if you want to use a :abbr:`RDBMS (Relational Database Management System)` like MySQL, you will need to install the `Doctrine Database Abstraction Layer`_.
 

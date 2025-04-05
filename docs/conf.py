@@ -13,7 +13,6 @@
 
 import sys, os
 from datetime import date
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -27,10 +26,7 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-if on_rtd:
-    extensions = ['sphinxcontrib.phpdomain']
-else:
-    extensions = ['sphinxcontrib.phpdomain', 'sphinxcontrib.spelling']
+extensions = ['sphinxcontrib.phpdomain', 'sphinxcontrib.spelling', 'sphinx_rtd_theme']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -86,7 +82,7 @@ exclude_patterns = ['_build']
 #show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-# pygments_style = 'sphinx'
+pygments_style = 'sphinx'
 
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
@@ -96,7 +92,7 @@ exclude_patterns = ['_build']
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
