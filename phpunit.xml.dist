@@ -5,16 +5,16 @@
   bootstrap="tests/bootstrap.php"
   executionOrder="depends,defects"
   beStrictAboutOutputDuringTests="true"
-  cacheDirectory=".phpunit.cache"
   requireCoverageMetadata="true"
-  beStrictAboutCoverageMetadata="false"
+  displayDetailsOnTestsThatTriggerDeprecations="true"
+  displayDetailsOnPhpunitDeprecations="true"
 >
-  <coverage>
+  <source>
     <include>
       <directory suffix=".php">src</directory>
       <file>features/bootstrap/FeatureContext.php</file>
     </include>
-  </coverage>
+  </source>
   <testsuites>
     <testsuite name="imbo-unit">
       <directory suffix="Test.php">tests</directory>
