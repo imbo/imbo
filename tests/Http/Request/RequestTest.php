@@ -64,7 +64,7 @@ class RequestTest extends TestCase
 
         $request = new Request($query);
         $transformations = $request->getTransformations();
-        $this->assertSame(count($query['t']), count($transformations));
+        $this->assertCount(count($query['t']), $transformations);
 
         $this->assertEquals(['color' => 'fff', 'width' => 2, 'height' => 2, 'mode' => 'inline'], $transformations[0]['params']);
         $this->assertEquals(['level' => '90'], $transformations[1]['params']);

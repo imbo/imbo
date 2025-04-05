@@ -23,13 +23,6 @@ class Response extends SymfonyResponse
         return $this;
     }
 
-    public function setNotModified(): static
-    {
-        parent::setNotModified();
-        $this->setModel(null);
-        return $this;
-    }
-
     public function setError(Error $error): self
     {
         $errorMessage = $error->getErrorMessage();

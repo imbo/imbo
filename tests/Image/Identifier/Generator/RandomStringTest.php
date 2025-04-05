@@ -28,9 +28,9 @@ class RandomStringTest extends TestCase
             $generated[] = $imageIdentifier;
         }
 
-        $this->assertSame(
+        $this->assertCount(
             count($generated),
-            count(array_unique($generated)),
+            array_unique($generated),
             'Expected array to have unique values',
         );
     }

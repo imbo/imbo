@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventManager;
 
-use Closure;
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
 use Imbo\Database\DatabaseInterface;
 use Imbo\Exception\InvalidArgumentException;
@@ -28,11 +27,8 @@ class EventTest extends TestCase
     #[DataProvider('getArguments')]
     public function testCanSetAndGetRequest(string $method, string $argument, mixed $value): void
     {
-        if ($value instanceof Closure) {
-            /** @var Closure */
-            $new = $value->bindTo($this);
-            /** @var mixed */
-            $value = $new();
+        if (is_string($value) && (class_exists($value) || interface_exists($value))) {
+            $value = $this->createMock($value);
         }
 
         $this->event->setArgument($argument, $value);
@@ -87,56 +83,51 @@ class EventTest extends TestCase
      */
     public static function getArguments(): array
     {
-        $mockCreator =
-            /** @param class-string $className */
-            fn (string $className): Closure =>
-                fn () => $this->createMock($className);
-
         return [
             'request' => [
                 'method' => 'getRequest',
                 'argument' => 'request',
-                'value' => $mockCreator(Request::class),
+                'value' => Request::class,
             ],
             'response' => [
                 'method' => 'getResponse',
                 'argument' => 'response',
-                'value' => $mockCreator(Response::class),
+                'value' => Response::class,
             ],
             'database' => [
                 'method' => 'getDatabase',
                 'argument' => 'database',
-                'value' => $mockCreator(DatabaseInterface::class),
+                'value' => DatabaseInterface::class,
             ],
             'storage' => [
                 'method' => 'getStorage',
                 'argument' => 'storage',
-                'value' => $mockCreator(StorageInterface::class),
+                'value' => StorageInterface::class,
             ],
             'accessControl' => [
                 'method' => 'getAccessControl',
                 'argument' => 'accessControl',
-                'value' => $mockCreator(AdapterInterface::class),
+                'value' => AdapterInterface::class,
             ],
             'manager' => [
                 'method' => 'getManager',
                 'argument' => 'manager',
-                'value' => $mockCreator(EventManager::class),
+                'value' => EventManager::class,
             ],
             'transformationManager' => [
                 'method' => 'getTransformationManager',
                 'argument' => 'transformationManager',
-                'value' => $mockCreator(TransformationManager::class),
+                'value' => TransformationManager::class,
             ],
             'inputLoaderManager' => [
                 'method' => 'getInputLoaderManager',
                 'argument' => 'inputLoaderManager',
-                'value' => $mockCreator(InputLoaderManager::class),
+                'value' => InputLoaderManager::class,
             ],
             'outputConverterManager' => [
                 'method' => 'getOutputConverterManager',
                 'argument' => 'outputConverterManager',
-                'value' => $mockCreator(OutputConverterManager::class),
+                'value' => OutputConverterManager::class,
             ],
             'config' => [
                 'method' => 'getConfig',

@@ -86,7 +86,7 @@ class Imagick implements ListenerInterface, ImagickAware
 
         // If we have specified a size hint, check if we have a different input size
         // than the original and set the ratio as an argument for any other listeners
-        if (isset($inputSize)) {
+        if (isset($inputSize) && isset($minSize)) {
             $newSize = $this->imagick->getImageGeometry();
             $ratio = $image->getWidth() / $newSize['width'];
             $event->setArgument('ratio', $ratio);

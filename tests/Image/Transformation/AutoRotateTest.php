@@ -12,6 +12,7 @@ use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 
 #[CoversClass(AutoRotate::class)]
 class AutoRotateTest extends TransformationTests
@@ -107,10 +108,10 @@ class AutoRotateTest extends TransformationTests
                 'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
                 'expectations' => function (Imagick&MockObject $imagick): void {
                     $imagick
-                        ->expects($this->once())
+                        ->expects(new InvokedCount(1))
                         ->method('flopImage');
                     $imagick
-                        ->expects($this->never())
+                        ->expects(new InvokedCount(0))
                         ->method('flipImage');
                 },
             ],
@@ -119,10 +120,10 @@ class AutoRotateTest extends TransformationTests
                 'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
                 'expectations' => function (Imagick&MockObject $imagick): void {
                     $imagick
-                        ->expects($this->never())
+                        ->expects(new InvokedCount(0))
                         ->method('flopImage');
                     $imagick
-                        ->expects($this->never())
+                        ->expects(new InvokedCount(0))
                         ->method('flipImage');
                 },
             ],
@@ -131,10 +132,10 @@ class AutoRotateTest extends TransformationTests
                 'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
                 'expectations' => function (Imagick&MockObject $imagick): void {
                     $imagick
-                        ->expects($this->never())
+                        ->expects(new InvokedCount(0))
                         ->method('flopImage');
                     $imagick
-                        ->expects($this->once())
+                        ->expects(new InvokedCount(1))
                         ->method('flipImage');
                 },
             ],
@@ -143,23 +144,23 @@ class AutoRotateTest extends TransformationTests
                 'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
                 'expectations' => function (Imagick&MockObject $imagick, Image&MockObject $image): void {
                     $imagick
-                        ->expects($this->once())
+                        ->expects(new InvokedCount(1))
                         ->method('flopImage');
                     $imagick
-                        ->expects($this->never())
+                        ->expects(new InvokedCount(0))
                         ->method('flipImage');
                     $imagick
-                        ->expects($this->once())
+                        ->expects(new InvokedCount(1))
                         ->method('getImageGeometry')
                         ->willReturn(['width' => 200, 'height' => 150]);
 
                     $image
-                        ->expects($this->once())
+                        ->expects(new InvokedCount(1))
                         ->method('setWidth')
                         ->with(200)
                         ->willReturnSelf();
                     $image
-                        ->expects($this->once())
+                        ->expects(new InvokedCount(1))
                         ->method('setHeight')
                         ->with(150)
                         ->willReturnSelf();
@@ -170,23 +171,23 @@ class AutoRotateTest extends TransformationTests
                 'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
                 'expectations' => function (Imagick&MockObject $imagick, Image&MockObject $image): void {
                     $imagick
-                        ->expects($this->never())
+                        ->expects(new InvokedCount(0))
                         ->method('flopImage');
                     $imagick
-                        ->expects($this->never())
+                        ->expects(new InvokedCount(0))
                         ->method('flipImage');
                     $imagick
-                        ->expects($this->once())
+                        ->expects(new InvokedCount(1))
                         ->method('getImageGeometry')
                         ->willReturn(['width' => 200, 'height' => 150]);
 
                     $image
-                        ->expects($this->once())
+                        ->expects(new InvokedCount(1))
                         ->method('setWidth')
                         ->with(200)
                         ->willReturnSelf();
                     $image
-                        ->expects($this->once())
+                        ->expects(new InvokedCount(1))
                         ->method('setHeight')
                         ->with(150)
                         ->willReturnSelf();
@@ -197,23 +198,23 @@ class AutoRotateTest extends TransformationTests
                 'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
                 'expectations' => function (Imagick&MockObject $imagick, Image&MockObject $image): void {
                     $imagick
-                        ->expects($this->never())
+                        ->expects(new InvokedCount(0))
                         ->method('flopImage');
                     $imagick
-                        ->expects($this->once())
+                        ->expects(new InvokedCount(1))
                         ->method('flipImage');
                     $imagick
-                        ->expects($this->once())
+                        ->expects(new InvokedCount(1))
                         ->method('getImageGeometry')
                         ->willReturn(['width' => 200, 'height' => 150]);
 
                     $image
-                        ->expects($this->once())
+                        ->expects(new InvokedCount(1))
                         ->method('setWidth')
                         ->with(200)
                         ->willReturnSelf();
                     $image
-                        ->expects($this->once())
+                        ->expects(new InvokedCount(1))
                         ->method('setHeight')
                         ->with(150)
                         ->willReturnSelf();
@@ -224,23 +225,23 @@ class AutoRotateTest extends TransformationTests
                 'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
                 'expectations' => function (Imagick&MockObject $imagick, Image&MockObject $image): void {
                     $imagick
-                        ->expects($this->never())
+                        ->expects(new InvokedCount(0))
                         ->method('flopImage');
                     $imagick
-                        ->expects($this->never())
+                        ->expects(new InvokedCount(0))
                         ->method('flipImage');
                     $imagick
-                        ->expects($this->once())
+                        ->expects(new InvokedCount(1))
                         ->method('getImageGeometry')
                         ->willReturn(['width' => 200, 'height' => 150]);
 
                     $image
-                        ->expects($this->once())
+                        ->expects(new InvokedCount(1))
                         ->method('setWidth')
                         ->with(200)
                         ->willReturnSelf();
                     $image
-                        ->expects($this->once())
+                        ->expects(new InvokedCount(1))
                         ->method('setHeight')
                         ->with(150)
                         ->willReturnSelf();

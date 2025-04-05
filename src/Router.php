@@ -82,6 +82,7 @@ class Router
 
         $path = $request->getPathInfo();
         $matches = [];
+        $resourceName = '';
 
         foreach ($this->routes as $resourceName => $route) {
             if (preg_match($route, $path, $matches)) {
@@ -89,7 +90,7 @@ class Router
             }
         }
 
-        if ([] === $matches) {
+        if ([] === $matches || '' === $resourceName) {
             throw new RuntimeException('Not Found', Response::HTTP_NOT_FOUND);
         }
 

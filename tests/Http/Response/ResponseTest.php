@@ -28,15 +28,6 @@ class ResponseTest extends TestCase
         $this->assertNull($this->response->getModel());
     }
 
-    public function testRemovesModelWhenMarkedAsNotModified(): void
-    {
-        $model = $this->createMock(ModelInterface::class);
-        $this->assertSame($this->response, $this->response->setModel($model));
-        $this->assertSame($this->response, $this->response->setNotModified());
-        $this->assertSame(Response::HTTP_NOT_MODIFIED, $this->response->getStatusCode());
-        $this->assertNull($this->response->getModel());
-    }
-
     public function testUpdatesResponseWhenSettingAnErrorModel(): void
     {
         $message = 'You wronged';

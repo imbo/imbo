@@ -8,7 +8,7 @@ use Imbo\Image\Transformation\Border;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Imagick::class)]
+#[CoversClass(ImagickInitializer::class)]
 class ImagickTest extends TestCase
 {
     public function testInjectsImagickIntoEventListeners(): void
