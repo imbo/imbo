@@ -106,6 +106,7 @@
       "cd docs; make html"
     ],
     "cs": "vendor/bin/php-cs-fixer fix --dry-run --diff",
+    "cs:fix": "vendor/bin/php-cs-fixer fix --diff",
     "sa": "vendor/bin/phpstan analyse",
     "dev": [
       "mkdir -p build/logs",

@@ -53,19 +53,19 @@ class ResponseFormatterTest extends TestCase
             ->expects($this->any())
             ->method('supportsExtension')
             ->willReturnCallback(
-                fn (?string $ext): bool => null !== $ext && in_array($ext, $defaultSupported)
+                fn (?string $ext): bool => null !== $ext && in_array($ext, $defaultSupported),
             );
         $this->outputConverterManager
             ->expects($this->any())
             ->method('getMimetypeFromExtension')
             ->willReturnCallback(
-                fn (string $ext): ?string => array_search($ext, $defaultSupported) ?: null
+                fn (string $ext): ?string => array_search($ext, $defaultSupported) ?: null,
             );
         $this->outputConverterManager
             ->expects($this->any())
             ->method('getExtensionFromMimetype')
             ->willReturnCallback(
-                fn (string $ext): ?string => isset($defaultSupported[$ext]) ? $defaultSupported[$ext] : null
+                fn (string $ext): ?string => isset($defaultSupported[$ext]) ? $defaultSupported[$ext] : null,
             );
 
         $this->transformationManager = $this->createConfiguredMock(TransformationManager::class, [
