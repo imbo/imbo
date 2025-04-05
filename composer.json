@@ -110,7 +110,7 @@
     "sa": "vendor/bin/phpstan analyse",
     "dev": [
       "mkdir -p build/logs",
-      "php -S localhost:8080 -t ./public features/bootstrap/router.php &> build/logs/httpd.log"
+      "php -S localhost:8080 -t ./public features/bootstrap/router.php"
     ]
   },
   "scripts-descriptions": {
@@ -125,10 +125,12 @@
     "test": "Run unit tests and integration tests",
     "docs": "Generate docs",
     "cs": "Check coding standard against the official Imbo coding standard",
+    "cs:fix": "Check and fix coding standard issues against the official Imbo coding standard",
     "sa": "Run static analysis",
     "dev": "Start development server"
   },
   "config": {
+    "process-timeout": 0,
     "sort-packages": true,
     "allow-plugins": {
       "phpstan/extension-installer": true

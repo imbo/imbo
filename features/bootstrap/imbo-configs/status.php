@@ -4,16 +4,21 @@ namespace Imbo\Behat;
 use Imbo\Database\DatabaseInterface;
 use Imbo\Http\Request\Request;
 use Imbo\Storage\StorageInterface;
-use PHPUnit\Framework\MockObject\Generator;
-
-$generator = new Generator();
+use PHPUnit\Framework\MockObject\Generator\Generator;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Set a database and storage adapter that has some behaviour determined via request headers
  */
 return [
-    'database' => function (Request $request) use ($generator): DatabaseInterface {
-        $adapter = $generator->getMock(DatabaseInterface::class);
+    'database' => function (Request $request): DatabaseInterface {
+        /** @var DatabaseInterface&MockObject */
+        $adapter = (new Generator())->testDouble(
+            DatabaseInterface::class,
+            true,
+            callOriginalConstructor: false,
+            callOriginalClone: false,
+        );
         $adapter
             ->method('getStatus')
             ->willReturn(!$request->headers->has('x-imbo-status-database-failure'));
@@ -21,8 +26,14 @@ return [
         return $adapter;
     },
 
-    'storage' => function (Request $request) use ($generator): StorageInterface {
-        $adapter = $generator->getMock(StorageInterface::class);
+    'storage' => function (Request $request): StorageInterface {
+        /** @var StorageInterface&MockObject */
+        $adapter = (new Generator())->testDouble(
+            StorageInterface::class,
+            true,
+            callOriginalConstructor: false,
+            callOriginalClone: false,
+        );
         $adapter
             ->method('getStatus')
             ->willReturn(!$request->headers->has('x-imbo-status-storage-failure'));

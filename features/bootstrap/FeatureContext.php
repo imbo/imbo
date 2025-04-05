@@ -699,6 +699,8 @@ class FeatureContext extends ApiContext
                 $mongoDB->$collection->insertMany($data);
             }
         }
+
+        return $this;
     }
 
     /**
@@ -1431,7 +1433,7 @@ class FeatureContext extends ApiContext
         }
 
         $cacheControl = array_fill_keys(
-            Header::normalize($response->getHeaderLine('Cache-Control')),
+            Header::splitList($response->getHeaderLine('Cache-Control')),
             true,
         );
 
