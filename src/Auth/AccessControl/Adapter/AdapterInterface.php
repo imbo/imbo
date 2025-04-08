@@ -84,5 +84,5 @@ interface AdapterInterface
      * @param int|string $accessRuleId Access rule id
      * @return array{id:int|string,users:array<string>,resources:array<string>,group?:string} Access rule
      */
-    public function getAccessRule(string $publicKey, $accessRuleId): ?array;
+    public function getAccessRule(string $publicKey, int|string $accessRuleId): ?array;
 }

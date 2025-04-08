@@ -82,7 +82,7 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface
         return $accessList;
     }
 
-    public function getAccessRule(string $publicKey, $accessRuleId): ?array
+    public function getAccessRule(string $publicKey, int|string $accessRuleId): ?array
     {
         foreach ($this->getAccessListForPublicKey($publicKey) as $rule) {
             if ($rule['id'] == $accessRuleId) {

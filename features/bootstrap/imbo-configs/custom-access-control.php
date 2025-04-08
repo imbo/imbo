@@ -48,7 +48,7 @@ class StaticAccessControl extends AbstractAdapter implements AdapterInterface
         return [];
     }
 
-    public function getAccessRule(string $publicKey, $accessRuleId): ?array
+    public function getAccessRule(string $publicKey, int|string $accessRuleId): ?array
     {
         return null;
     }
