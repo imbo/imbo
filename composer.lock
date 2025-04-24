@@ -1428,16 +1428,16 @@
         },
         {
             "name": "behat/behat",
-            "version": "v3.20.0",
+            "version": "v3.21.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Behat/Behat.git",
-                "reference": "edb265a32329d514e3a5ec44924646e0e02d95ee"
+                "reference": "315970f1f0c7c65e50aac87494575cfb9c6aa9e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Behat/Behat/zipball/edb265a32329d514e3a5ec44924646e0e02d95ee",
-                "reference": "edb265a32329d514e3a5ec44924646e0e02d95ee",
+                "url": "https://api.github.com/repos/Behat/Behat/zipball/315970f1f0c7c65e50aac87494575cfb9c6aa9e3",
+                "reference": "315970f1f0c7c65e50aac87494575cfb9c6aa9e3",
                 "shasum": ""
             },
             "require": {
@@ -1446,7 +1446,7 @@
                 "composer-runtime-api": "^2.2",
                 "composer/xdebug-handler": "^3.0",
                 "ext-mbstring": "*",
-                "nikic/php-parser": "^5.0",
+                "nikic/php-parser": "^5.2",
                 "php": "8.1.* || 8.2.* || 8.3.* || 8.4.* ",
                 "psr/container": "^1.0 || ^2.0",
                 "symfony/config": "^5.4 || ^6.4 || ^7.0",
@@ -1515,9 +1515,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Behat/Behat/issues",
-                "source": "https://github.com/Behat/Behat/tree/v3.20.0"
+                "source": "https://github.com/Behat/Behat/tree/v3.21.1"
             },
-            "time": "2025-04-02T14:51:45+00:00"
+            "time": "2025-04-22T17:38:51+00:00"
         },
         {
             "name": "behat/gherkin",
@@ -2090,16 +2090,16 @@
         },
         {
             "name": "firebase/php-jwt",
-            "version": "v6.11.0",
+            "version": "v6.11.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/firebase/php-jwt.git",
-                "reference": "8f718f4dfc9c5d5f0c994cdfd103921b43592712"
+                "reference": "d1e91ecf8c598d073d0995afa8cd5c75c6e19e66"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/8f718f4dfc9c5d5f0c994cdfd103921b43592712",
-                "reference": "8f718f4dfc9c5d5f0c994cdfd103921b43592712",
+                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/d1e91ecf8c598d073d0995afa8cd5c75c6e19e66",
+                "reference": "d1e91ecf8c598d073d0995afa8cd5c75c6e19e66",
                 "shasum": ""
             },
             "require": {
@@ -2147,9 +2147,9 @@
             ],
             "support": {
                 "issues": "https://github.com/firebase/php-jwt/issues",
-                "source": "https://github.com/firebase/php-jwt/tree/v6.11.0"
+                "source": "https://github.com/firebase/php-jwt/tree/v6.11.1"
             },
-            "time": "2025-01-23T05:11:06+00:00"
+            "time": "2025-04-09T20:32:01+00:00"
         },
         {
             "name": "friendsofphp/php-cs-fixer",
@@ -2541,12 +2541,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-adapters-sdk.git",
-                "reference": "397ac06ce6f21346f2f1d9b1854afd8542745566"
+                "reference": "8244379155c20855f4e75f1b418b885c0a95dd5e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-adapters-sdk/zipball/397ac06ce6f21346f2f1d9b1854afd8542745566",
-                "reference": "397ac06ce6f21346f2f1d9b1854afd8542745566",
+                "url": "https://api.github.com/repos/imbo/imbo-adapters-sdk/zipball/8244379155c20855f4e75f1b418b885c0a95dd5e",
+                "reference": "8244379155c20855f4e75f1b418b885c0a95dd5e",
                 "shasum": ""
             },
             "require": {
@@ -2592,7 +2592,7 @@
                 "issues": "https://github.com/imbo/imbo-adapters-sdk/issues",
                 "source": "https://github.com/imbo/imbo-adapters-sdk/tree/main"
             },
-            "time": "2025-02-23T16:17:52+00:00"
+            "time": "2025-04-24T08:31:47+00:00"
         },
         {
             "name": "imbo/imbo-coding-standard",
@@ -2713,24 +2713,24 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-mongodb-adapters.git",
-                "reference": "38268c28fe50ab638fea9ea230ac82f30fcf7e41"
+                "reference": "11c86692de4d03b952a484055052902fa6d4195a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-mongodb-adapters/zipball/38268c28fe50ab638fea9ea230ac82f30fcf7e41",
-                "reference": "38268c28fe50ab638fea9ea230ac82f30fcf7e41",
+                "url": "https://api.github.com/repos/imbo/imbo-mongodb-adapters/zipball/11c86692de4d03b952a484055052902fa6d4195a",
+                "reference": "11c86692de4d03b952a484055052902fa6d4195a",
                 "shasum": ""
             },
             "require": {
-                "ext-mongodb": "^1.21",
-                "mongodb/mongodb": "^1.21",
+                "ext-mongodb": "^2.0",
+                "mongodb/mongodb": "^2.0",
                 "php": ">=8.3"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.75",
                 "imbo/imbo": "dev-main",
                 "imbo/imbo-adapters-sdk": "dev-main",
-                "imbo/imbo-coding-standard": "^2.0",
+                "imbo/imbo-coding-standard": "dev-main",
                 "phpstan/extension-installer": "^1.4",
                 "phpstan/phpstan": "^2.1",
                 "phpstan/phpstan-deprecation-rules": "^2.0",
@@ -2769,7 +2769,7 @@
                 "issues": "https://github.com/imbo/imbo-mongodb-adapters/issues",
                 "source": "https://github.com/imbo/imbo-mongodb-adapters/tree/main"
             },
-            "time": "2025-04-04T06:27:26+00:00"
+            "time": "2025-04-24T08:40:48+00:00"
         },
         {
             "name": "imbo/imbo-mysql-adapters",
@@ -3019,21 +3019,21 @@
         },
         {
             "name": "mongodb/mongodb",
-            "version": "1.21.1",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mongodb/mongo-php-library.git",
-                "reference": "37bc8df3a67ddf8380704a5ba5dbd00e92ec1f6a"
+                "reference": "04cd7edc6a28950e3fab6eccb2869d72a0541232"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mongodb/mongo-php-library/zipball/37bc8df3a67ddf8380704a5ba5dbd00e92ec1f6a",
-                "reference": "37bc8df3a67ddf8380704a5ba5dbd00e92ec1f6a",
+                "url": "https://api.github.com/repos/mongodb/mongo-php-library/zipball/04cd7edc6a28950e3fab6eccb2869d72a0541232",
+                "reference": "04cd7edc6a28950e3fab6eccb2869d72a0541232",
                 "shasum": ""
             },
             "require": {
                 "composer-runtime-api": "^2.0",
-                "ext-mongodb": "^1.21.0",
+                "ext-mongodb": "^2.0",
                 "php": "^8.1",
                 "psr/log": "^1.1.4|^2|^3"
             },
@@ -3089,9 +3089,9 @@
             ],
             "support": {
                 "issues": "https://github.com/mongodb/mongo-php-library/issues",
-                "source": "https://github.com/mongodb/mongo-php-library/tree/1.21.1"
+                "source": "https://github.com/mongodb/mongo-php-library/tree/2.0.0"
             },
-            "time": "2025-02-28T17:24:20+00:00"
+            "time": "2025-04-10T08:34:11+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -3379,16 +3379,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.1.11",
+            "version": "2.1.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "8ca5f79a8f63c49b2359065832a654e1ec70ac30"
+                "reference": "96dde49e967c0c22812bcfa7bda4ff82c09f3b0c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/8ca5f79a8f63c49b2359065832a654e1ec70ac30",
-                "reference": "8ca5f79a8f63c49b2359065832a654e1ec70ac30",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/96dde49e967c0c22812bcfa7bda4ff82c09f3b0c",
+                "reference": "96dde49e967c0c22812bcfa7bda4ff82c09f3b0c",
                 "shasum": ""
             },
             "require": {
@@ -3433,7 +3433,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-03-24T13:45:00+00:00"
+            "time": "2025-04-16T13:19:18+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
@@ -3859,16 +3859,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "12.1.0",
+            "version": "12.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "c433e7972440e1370a26879bb54c359f8898aa3a"
+                "reference": "72ca50e817dd7d65356c16772c30f06c01a6fae2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c433e7972440e1370a26879bb54c359f8898aa3a",
-                "reference": "c433e7972440e1370a26879bb54c359f8898aa3a",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/72ca50e817dd7d65356c16772c30f06c01a6fae2",
+                "reference": "72ca50e817dd7d65356c16772c30f06c01a6fae2",
                 "shasum": ""
             },
             "require": {
@@ -3936,7 +3936,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.1.0"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.1.3"
             },
             "funding": [
                 {
@@ -3948,11 +3948,19 @@
                     "type": "github"
                 },
                 {
+                    "url": "https://liberapay.com/sebastianbergmann",
+                    "type": "liberapay"
+                },
+                {
+                    "url": "https://thanks.dev/u/gh/sebastianbergmann",
+                    "type": "thanks_dev"
+                },
+                {
                     "url": "https://tidelift.com/funding/github/packagist/phpunit/phpunit",
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-04-04T04:10:58+00:00"
+            "time": "2025-04-22T06:11:09+00:00"
         },
         {
             "name": "psr/event-dispatcher",
