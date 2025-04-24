@@ -73,7 +73,7 @@ interface AdapterInterface
      * Get the access control list for a given public key
      *
      * @param string $publicKey
-     * @return array<array{id:int|string,users:array<string>,resources:array<string>,group?:string}>
+     * @return array<array{id:int|string,users:'*'|array<string>,resources:array<string>,group?:string}>
      */
     public function getAccessListForPublicKey(string $publicKey): array;
 
@@ -82,7 +82,7 @@ interface AdapterInterface
      *
      * @param string $publicKey    Public key to add access rule to
      * @param int|string $accessRuleId Access rule id
-     * @return array{id:int|string,users:array<string>,resources:array<string>,group?:string} Access rule
+     * @return array{id:int|string,users:'*'|array<string>,resources:array<string>,group?:string} Access rule
      */
     public function getAccessRule(string $publicKey, int|string $accessRuleId): ?array;
 }
