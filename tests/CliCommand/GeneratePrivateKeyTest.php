@@ -17,7 +17,7 @@ class GeneratePrivateKeyTest extends TestCase
         $this->command = new GeneratePrivateKey();
 
         $application = new Application();
-        $application->add($this->command);
+        $application->addCommand($this->command);
     }
 
     public function testCanGenerateAPrivateKey(): void

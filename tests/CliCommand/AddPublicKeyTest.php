@@ -31,7 +31,7 @@ class AddPublicKeyTest extends TestCase
         ]);
 
         $this->application = new Application();
-        $this->application->add($this->command);
+        $this->application->addCommand($this->command);
     }
 
     #[DataProvider('getInvalidAccessControlConfig')]
