@@ -14,10 +14,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 class UserTest extends ResourceTests
 {
     private User $resource;
-    private Request&MockObject $request;
-    private Response&MockObject $response;
-    private DatabaseInterface&MockObject $database;
-    private StorageInterface&MockObject $storage;
     private EventInterface&MockObject $event;
 
     protected function getNewResource(): User
@@ -27,15 +23,11 @@ class UserTest extends ResourceTests
 
     public function setUp(): void
     {
-        $this->request = $this->createMock(Request::class);
-        $this->response = $this->createMock(Response::class);
-        $this->database = $this->createMock(DatabaseInterface::class);
-        $this->storage = $this->createMock(StorageInterface::class);
         $this->event = $this->createConfiguredMock(EventInterface::class, [
-            'getRequest'  => $this->request,
-            'getResponse' => $this->response,
-            'getDatabase' => $this->database,
-            'getStorage'  => $this->storage,
+            'getRequest'  => $this->createStub(Request::class),
+            'getResponse' => $this->createStub(Response::class),
+            'getDatabase' => $this->createStub(DatabaseInterface::class),
+            'getStorage'  => $this->createStub(StorageInterface::class),
         ]);
 
         $this->resource = $this->getNewResource();

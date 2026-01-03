@@ -6,6 +6,7 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -17,10 +18,10 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 class AuthenticateTest extends ListenerTests
 {
     private Authenticate $listener;
-    private EventInterface&MockObject $event;
+    private EventInterface $event;
     private AdapterInterface&MockObject $accessControl;
     private Request&MockObject $request;
-    private Response&MockObject $response;
+    private Response $response;
     private HeaderBag&MockObject $headers;
 
     public function setUp(): void
@@ -32,10 +33,10 @@ class AuthenticateTest extends ListenerTests
         $this->request->query = new InputBag();
         $this->request->headers = $this->headers;
 
-        $this->response = $this->createMock(Response::class);
-        $this->response->headers = $this->createMock(ResponseHeaderBag::class);
+        $this->response = $this->createStub(Response::class);
+        $this->response->headers = $this->createStub(ResponseHeaderBag::class);
 
-        $this->event = $this->getEventMock();
+        $this->event = $this->getEventStub();
 
         $this->listener = new Authenticate();
     }
@@ -48,9 +49,9 @@ class AuthenticateTest extends ListenerTests
     /**
      * @param ?array{authentication:array{protocol:string}} $config
      */
-    protected function getEventMock(array $config = null): EventInterface&MockObject
+    protected function getEventStub(array $config = null): EventInterface
     {
-        return $this->createConfiguredMock(EventInterface::class, [
+        return $this->createConfiguredStub(EventInterface::class, [
             'getResponse' => $this->response,
             'getRequest' => $this->request,
             'getAccessControl' => $this->accessControl,
@@ -62,6 +63,7 @@ class AuthenticateTest extends ListenerTests
         ]);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsExceptionWhenAuthInfoIsMissing(): void
     {
         $this->headers
@@ -80,6 +82,7 @@ class AuthenticateTest extends ListenerTests
         $this->listener->authenticate($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsExceptionWhenSignatureIsMissing(): void
     {
         $this->headers
@@ -112,6 +115,7 @@ class AuthenticateTest extends ListenerTests
         $this->listener->authenticate($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsExceptionWhenTimestampIsInvalid(): void
     {
         $this->headers
@@ -136,6 +140,7 @@ class AuthenticateTest extends ListenerTests
         $this->listener->authenticate($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsExceptionWhenTimestampHasExpired(): void
     {
         $this->headers
@@ -160,6 +165,7 @@ class AuthenticateTest extends ListenerTests
         $this->listener->authenticate($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsExceptionWhenSignatureDoesNotMatch(): void
     {
         $this->headers
@@ -203,6 +209,7 @@ class AuthenticateTest extends ListenerTests
         $this->listener->authenticate($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testApprovesValidSignature(): void
     {
         $httpMethod = 'GET';
@@ -270,6 +277,7 @@ class AuthenticateTest extends ListenerTests
         $this->listener->authenticate($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testApprovesValidSignatureWithAuthInfoFromQueryParameters(): void
     {
         $httpMethod = 'GET';
@@ -335,6 +343,7 @@ class AuthenticateTest extends ListenerTests
     }
 
     #[DataProvider('getRewrittenSignatureData')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testApprovesSignaturesWhenConfigurationForcesProtocol(string $serverUrl, string $protocol, string $authHeader, bool $shouldMatch, string $signature, string $timestamp): void
     {
         if (!$shouldMatch) {
@@ -391,7 +400,7 @@ class AuthenticateTest extends ListenerTests
 
         $this->response->headers = $responseHeaders;
 
-        $this->listener->authenticate($this->getEventMock([
+        $this->listener->authenticate($this->getEventStub([
             'authentication' => [
                 'protocol' => $protocol,
             ],

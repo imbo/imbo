@@ -1790,14 +1790,14 @@ class FeatureContextTest extends TestCase
     #[DataProvider('getSuiteSettings')]
     public function testSetupAdaptersThrowsExceptionOnInvalidClassNames(array $settings, string $expectedExceptionMessage): void
     {
-        $suite = $this->createConfiguredMock(Suite::class, ['getSettings' => $settings]);
-        $environment = $this->createConfiguredMock(Environment::class, ['getSuite' => $suite]);
+        $suite = $this->createConfiguredStub(Suite::class, ['getSettings' => $settings]);
+        $environment = $this->createConfiguredStub(Environment::class, ['getSuite' => $suite]);
 
         $this->expectExceptionObject(new InvalidArgumentException($expectedExceptionMessage));
         FeatureContext::setUpAdapters(new BeforeScenarioScope(
             $environment,
-            $this->createMock(FeatureNode::class),
-            $this->createMock(ScenarioInterface::class),
+            $this->createStub(FeatureNode::class),
+            $this->createStub(ScenarioInterface::class),
         ));
     }
 

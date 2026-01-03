@@ -20,7 +20,7 @@ class ResponseTest extends TestCase
 
     public function testCanSetAndGetModel(): void
     {
-        $model = $this->createMock(ModelInterface::class);
+        $model = $this->createStub(ModelInterface::class);
         $this->assertNull($this->response->getModel());
         $this->assertSame($this->response, $this->response->setModel($model));
         $this->assertSame($model, $this->response->getModel());
@@ -35,7 +35,7 @@ class ResponseTest extends TestCase
         $imboErrorCode = '123';
         $date = new DateTime('@1361614522', new DateTimeZone('UTC'));
 
-        $error = $this->createConfiguredMock(Error::class, [
+        $error = $this->createConfiguredStub(Error::class, [
             'getHttpCode' => $code,
             'getImboErrorCode' => (int) $imboErrorCode,
             'getErrorMessage' => $message,

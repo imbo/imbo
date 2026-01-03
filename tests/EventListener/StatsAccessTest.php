@@ -7,6 +7,7 @@ use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Resource\Stats as StatsResource;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -15,14 +16,14 @@ use PHPUnit\Framework\MockObject\MockObject;
 class StatsAccessTest extends ListenerTests
 {
     private StatsAccess $listener;
-    private EventInterface&MockObject $event;
+    private EventInterface $event;
     private Request&MockObject $request;
 
     public function setUp(): void
     {
         $this->request = $this->createMock(Request::class);
 
-        $this->event = $this->createConfiguredMock(EventInterface::class, [
+        $this->event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $this->request,
         ]);
 
@@ -67,6 +68,7 @@ class StatsAccessTest extends ListenerTests
     /**
      * @see https://github.com/imbo/imbo/issues/249
      */
+    #[AllowMockObjectsWithoutExpectations]
     public function testListensToTheSameEventsAsTheStatsResource(): void
     {
         $this->assertSame(
@@ -79,11 +81,12 @@ class StatsAccessTest extends ListenerTests
     /**
      * @see https://github.com/imbo/imbo/issues/251
      */
+    #[AllowMockObjectsWithoutExpectations]
     public function testHasHigherPriorityThanTheStatsResource(): void
     {
         $eventManager = (new EventManager())
-            ->setEventTemplate($this->createConfiguredMock(EventInterface::class, [
-                'getRequest' => $this->createMock(Request::class),
+            ->setEventTemplate($this->createConfiguredStub(EventInterface::class, [
+                'getRequest' => $this->createStub(Request::class),
             ]))
             ->addEventHandler('statsAccess', function () {
                 echo 'stats access';

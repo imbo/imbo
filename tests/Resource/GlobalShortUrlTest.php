@@ -8,6 +8,7 @@ use Imbo\Exception\ResourceException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Router\Route;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -17,10 +18,10 @@ class GlobalShortUrlTest extends ResourceTests
 {
     private GlobalShortUrl $resource;
     private Request&MockObject $request;
-    private Response&MockObject $response;
+    private Response $response;
     private DatabaseInterface&MockObject $database;
     private EventManager&MockObject $manager;
-    private EventInterface&MockObject $event;
+    private EventInterface $event;
 
     protected function getNewResource(): GlobalShortUrl
     {
@@ -30,11 +31,11 @@ class GlobalShortUrlTest extends ResourceTests
     public function setUp(): void
     {
         $this->request = $this->createMock(Request::class);
-        $this->response = $this->createMock(Response::class);
+        $this->response = $this->createStub(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);
         $this->manager = $this->createMock(EventManager::class);
 
-        $this->event = $this->createConfiguredMock(EventInterface::class, [
+        $this->event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $this->request,
             'getResponse' => $this->response,
             'getDatabase' => $this->database,
@@ -59,6 +60,7 @@ class GlobalShortUrlTest extends ResourceTests
 
         $route = $this->createMock(Route::class);
         $route
+            ->expects($this->once())
             ->method('get')
             ->with('shortUrlId')
             ->willReturn($id);
@@ -127,6 +129,7 @@ class GlobalShortUrlTest extends ResourceTests
         $this->resource->getImage($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testRespondsWith404WhenShortUrlDoesNotExist(): void
     {
         $route = $this->createMock(Route::class);

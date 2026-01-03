@@ -13,8 +13,8 @@ class FormatterTest extends TestCase
 {
     public function testThrowsExceptionWhenModelIsNotSupported(): void
     {
-        $formatter = new JSON($this->createMock(DateFormatter::class));
+        $formatter = new JSON($this->createStub(DateFormatter::class));
         $this->expectExceptionObject(new InvalidArgumentException('Unsupported model type', Response::HTTP_INTERNAL_SERVER_ERROR));
-        $formatter->format($this->createMock(ModelInterface::class));
+        $formatter->format($this->createStub(ModelInterface::class));
     }
 }

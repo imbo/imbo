@@ -16,9 +16,8 @@ class SmartSizeTest extends TestCase
     #[DataProvider('getSmartSizeArguments')]
     public function testSmartSize(array $imageDimensions, array $params, array $cropParams): void
     {
-        $imagick = $this->createMock(Imagick::class);
+        $imagick = $this->createStub(Imagick::class);
         $imagick
-            ->expects($this->any())
             ->method('cropImage')
             ->with(
                 $cropParams['width'],
@@ -32,12 +31,15 @@ class SmartSizeTest extends TestCase
             ->setHeight($imageDimensions['height']);
 
         $headerBag = $this->createMock(ResponseHeaderBag::class);
-        $headerBag->expects($this->once())->method('set')->with('X-Imbo-POIs-Used', 1);
+        $headerBag
+            ->expects($this->once())
+            ->method('set')
+            ->with('X-Imbo-POIs-Used', 1);
 
         $response = new Response();
         $response->headers = $headerBag;
 
-        $event = $this->createConfiguredMock(Event::class, [
+        $event = $this->createConfiguredStub(Event::class, [
             'getResponse' => $response,
         ]);
 

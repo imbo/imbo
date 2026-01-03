@@ -8,6 +8,7 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Image\OutputConverterManager;
 use Imbo\Model\ArrayModel;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -36,7 +37,6 @@ class ShortUrlsTest extends ResourceTests
         $this->database = $this->createMock(DatabaseInterface::class);
         $this->outputConverterManager = $this->createMock(OutputConverterManager::class);
         $this->outputConverterManager
-            ->expects($this->any())
             ->method('supportsExtension')
             ->willReturnCallback(
                 fn (string $ext): bool => $ext === 'gif',
@@ -50,6 +50,7 @@ class ShortUrlsTest extends ResourceTests
         ]);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWillThrowAnExceptionWhenRequestBodyIsEmpty(): void
     {
         $this->request
@@ -60,6 +61,7 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWillThrowAnExceptionWhenRequestBodyIsInvalid(): void
     {
         $this->request
@@ -70,6 +72,7 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWillThrowAnExceptionWhenUserMissing(): void
     {
         $this->request
@@ -80,6 +83,7 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWillThrowAnExceptionWhenUserDoesNotMatch(): void
     {
         $this->request
@@ -90,6 +94,7 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWillThrowAnExceptionWhenImageIdentifierIsMissing(): void
     {
         $this->request
@@ -100,6 +105,7 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWillThrowAnExceptionWhenImageIdentifierDoesNotMatch(): void
     {
         $this->request
@@ -110,6 +116,7 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWillThrowAnExceptionWhenExtensionIsNotRecognized(): void
     {
         $this->request
@@ -117,7 +124,7 @@ class ShortUrlsTest extends ResourceTests
             ->method('getContent')
             ->willReturn('{"user": "user", "imageIdentifier": "id", "extension": "foo"}');
         $this->outputConverterManager
-            ->expects($this->any())
+            ->expects($this->once())
             ->method('supportsExtension')
             ->willReturn(false);
         $this->expectExceptionObject(new InvalidArgumentException('Extension provided is not a recognized format', Response::HTTP_BAD_REQUEST));
@@ -125,6 +132,7 @@ class ShortUrlsTest extends ResourceTests
     }
 
     #[DataProvider('createShortUrlParams')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanCreateShortUrls(?string $extension = null, ?string $queryString = null, array $transformations = []): void
     {
         $query = $transformations ? ['t' => $transformations] : [];
@@ -171,6 +179,7 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWillReturn200OKIfTheShortUrlAlreadyExists(): void
     {
         $this->request
@@ -210,6 +219,7 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWillGenerateANewIdIfTheGeneratedOneExists(): void
     {
         $this->request
@@ -251,6 +261,7 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->createShortUrl($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWillNotAddAModelIfTheEventIsNotAShortUrlsEvent(): void
     {
         $this->database
@@ -268,6 +279,7 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->deleteImageShortUrls($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWillAddAModelIfTheEventIsAShortUrlsEvent(): void
     {
         $this->database
@@ -286,6 +298,7 @@ class ShortUrlsTest extends ResourceTests
         $this->getNewResource()->deleteImageShortUrls($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanNotAddShortUrlWhenImageDoesNotExist(): void
     {
         $this->request

@@ -13,7 +13,7 @@ class ImagickTest extends TestCase
 {
     public function testInjectsImagickIntoEventListeners(): void
     {
-        $imagick = $this->createMock(Imagick::class);
+        $imagick = $this->createStub(Imagick::class);
 
         $listener = $this->createMock(ImagickEventListener::class);
         $listener

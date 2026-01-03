@@ -9,6 +9,7 @@ use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Image\InputSizeConstraint;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -37,6 +38,7 @@ class AutoRotateTest extends TransformationTests
     }
 
     #[DataProvider('getTransformationData')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testWillRotateWhenNeeded(int $imageOrientation, int $newOrientation, Closure $expectations): void
     {
         $imagick = $this->createConfiguredMock(Imagick::class, [

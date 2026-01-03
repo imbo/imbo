@@ -8,6 +8,7 @@ use Imbo\Http\Response\Response;
 use Imbo\Image\InputLoaderManager;
 use Imbo\Image\TransformationManager;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -43,9 +44,10 @@ class ImagickTest extends ListenerTests
         return $this->listener;
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testFetchesImageFromRequest(): void
     {
-        $image = $this->createConfiguredMock(Image::class, [
+        $image = $this->createConfiguredStub(Image::class, [
             'getBlob' => 'image',
             'getMimeType' => 'image/jpeg',
         ]);
@@ -77,9 +79,10 @@ class ImagickTest extends ListenerTests
         $this->listener->readImageBlob($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testFetchesImageFromResponse(): void
     {
-        $image = $this->createConfiguredMock(Image::class, [
+        $image = $this->createConfiguredStub(Image::class, [
             'getBlob' => 'image',
             'getMimeType' => 'image/jpeg',
         ]);
@@ -111,9 +114,10 @@ class ImagickTest extends ListenerTests
         $this->listener->readImageBlob($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testFetchesImageFromEvent(): void
     {
-        $image = $this->createConfiguredMock(Image::class, [
+        $image = $this->createConfiguredStub(Image::class, [
             'getBlob' => 'image',
             'getMimeType' => 'image/png',
         ]);
@@ -152,6 +156,7 @@ class ImagickTest extends ListenerTests
     }
 
     #[DataProvider('hasImageBeenTransformed')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testUpdatesModelBeforeStoring(bool $hasBeenTransformed): void
     {
         $image = $this->createConfiguredMock(Image::class, [
@@ -189,6 +194,7 @@ class ImagickTest extends ListenerTests
     }
 
     #[DataProvider('hasImageBeenTransformed')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testUpdatesModelBeforeSendingResponse(bool $hasBeenTransformed): void
     {
         $image = $this->createConfiguredMock(Image::class, [
@@ -226,6 +232,7 @@ class ImagickTest extends ListenerTests
             ->updateModel($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanOptimizeImage(): void
     {
         $this->event
@@ -265,7 +272,7 @@ class ImagickTest extends ListenerTests
             ->method('setOption')
             ->with('jpeg:size', '30x20');
 
-        $image = $this->createConfiguredMock(Image::class, [
+        $image = $this->createConfiguredStub(Image::class, [
             'getWidth' => 128,
             'getMimeType' => 'image/jpeg',
             'getBlob' => 'blob',

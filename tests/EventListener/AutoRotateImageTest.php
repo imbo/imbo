@@ -29,9 +29,9 @@ class AutoRotateImageTest extends TestCase
 
     public function testTriggersTransformationForRotating(): void
     {
-        $image = $this->createMock(Image::class);
+        $image = $this->createStub(Image::class);
 
-        $request = $this->createConfiguredMock(Request::class, [
+        $request = $this->createConfiguredStub(Request::class, [
             'getImage' => $image,
         ]);
 
@@ -53,7 +53,7 @@ class AutoRotateImageTest extends TestCase
             ->with('autoRotate')
             ->willReturn($autoRotate);
 
-        $event = $this->createConfiguredMock(EventInterface::class, [
+        $event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $request,
             'getTransformationManager' => $transformationManager,
         ]);

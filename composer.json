@@ -28,17 +28,17 @@
   "require": {
     "php": ">=8.3",
     "ext-imagick": "^3.7",
-    "guzzlehttp/psr7": "^2.0",
-    "ramsey/uuid": "^4.2",
-    "symfony/console": "^7.2",
-    "symfony/http-foundation": "^7.2"
+    "guzzlehttp/psr7": "^2.8",
+    "ramsey/uuid": "^4.9",
+    "symfony/console": "^7.4",
+    "symfony/http-foundation": "^7.4"
   },
   "require-dev": {
-    "christeredvartsen/testfs": "^0.5.0",
-    "friendsofphp/php-cs-fixer": "^3.75",
+    "christeredvartsen/testfs": "^0.6",
+    "friendsofphp/php-cs-fixer": "^3.92",
     "imbo/behat-api-extension": "^6.0",
     "imbo/imbo-adapters-sdk": "dev-main",
-    "imbo/imbo-coding-standard": "^2.0",
+    "imbo/imbo-coding-standard": "^2.1",
     "imbo/imbo-filesystem-adapters": "dev-main",
     "imbo/imbo-mongodb-adapters": "dev-main",
     "imbo/imbo-mysql-adapters": "dev-main",
@@ -48,8 +48,8 @@
     "phpstan/phpstan": "^2.1",
     "phpstan/phpstan-deprecation-rules": "^2.0",
     "phpstan/phpstan-phpunit": "^2.0",
-    "phpunit/phpunit": "^12.1",
-    "symfony/var-dumper": "^7.2"
+    "phpunit/phpunit": "^12.5",
+    "symfony/var-dumper": "^7.4"
   },
   "suggest": {
     "imbo/imbo-s3-adapters": "Enables usage of AWS S3 for storing images",
@@ -105,7 +105,7 @@
       "cd docs; make spelling",
       "cd docs; make html"
     ],
-    "cs": "vendor/bin/php-cs-fixer fix --dry-run --diff",
+    "cs": "vendor/bin/php-cs-fixer check --diff",
     "cs:fix": "vendor/bin/php-cs-fixer fix --diff",
     "sa": "vendor/bin/phpstan analyse",
     "dev": [

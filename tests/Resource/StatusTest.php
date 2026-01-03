@@ -18,7 +18,7 @@ class StatusTest extends ResourceTests
     private Response&MockObject $response;
     private DatabaseInterface&MockObject $database;
     private StorageInterface&MockObject $storage;
-    private EventInterface&MockObject $event;
+    private EventInterface $event;
 
     protected function getNewResource(): Status
     {
@@ -30,7 +30,7 @@ class StatusTest extends ResourceTests
         $this->response = $this->createMock(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);
         $this->storage = $this->createMock(StorageInterface::class);
-        $this->event = $this->createConfiguredMock(EventInterface::class, [
+        $this->event = $this->createConfiguredStub(EventInterface::class, [
             'getResponse' => $this->response,
             'getDatabase' => $this->database,
             'getStorage'  => $this->storage,

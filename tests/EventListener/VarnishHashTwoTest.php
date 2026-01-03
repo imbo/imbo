@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 class VarnishHashTwoTest extends ListenerTests
 {
     private VarnishHashTwo $listener;
-    private EventInterface&MockObject $event;
+    private EventInterface $event;
     private Request&MockObject $request;
     private Response&MockObject $response;
     private ResponseHeaderBag&MockObject $responseHeaders;
@@ -26,7 +26,7 @@ class VarnishHashTwoTest extends ListenerTests
         $this->response = $this->createMock(Response::class);
         $this->response->headers = $this->responseHeaders;
 
-        $this->event = $this->createConfiguredMock(EventInterface::class, [
+        $this->event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $this->request,
             'getResponse' => $this->response,
         ]);
@@ -46,7 +46,7 @@ class VarnishHashTwoTest extends ListenerTests
             ->method('getUser')
             ->willReturn('user');
 
-        $image = $this->createConfiguredMock(Image::class, [
+        $image = $this->createConfiguredStub(Image::class, [
             'getImageIdentifier' => 'id',
         ]);
 
@@ -75,7 +75,7 @@ class VarnishHashTwoTest extends ListenerTests
             ->method('getUser')
             ->willReturn('user');
 
-        $image = $this->createConfiguredMock(Image::class, [
+        $image = $this->createConfiguredStub(Image::class, [
             'getImageIdentifier' => 'id',
         ]);
 

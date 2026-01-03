@@ -6,6 +6,7 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -50,7 +51,7 @@ class CropTest extends TransformationTests
         $imagick->readImageBlob($blob);
 
         $this->getTransformation()
-            ->setEvent($this->createMock(EventInterface::class))
+            ->setEvent($this->createStub(EventInterface::class))
             ->setImagick($imagick)
             ->setImage($image)
             ->transform($params);
@@ -59,7 +60,7 @@ class CropTest extends TransformationTests
     public function testThrowsExceptionWhenWidthIsMissing(): void
     {
         $transformation = new Crop();
-        $transformation->setImage($this->createMock(Image::class));
+        $transformation->setImage($this->createStub(Image::class));
         $this->expectExceptionObject(new TransformationException(
             'Missing required parameter: width',
             Response::HTTP_BAD_REQUEST,
@@ -70,7 +71,7 @@ class CropTest extends TransformationTests
     public function testThrowsExceptionWhenHeightIsMissing(): void
     {
         $transformation = new Crop();
-        $transformation->setImage($this->createMock(Image::class));
+        $transformation->setImage($this->createStub(Image::class));
         $this->expectExceptionObject(new TransformationException(
             'Missing required parameter: height',
             Response::HTTP_BAD_REQUEST,
@@ -79,6 +80,7 @@ class CropTest extends TransformationTests
     }
 
     #[DataProvider('getImageParams')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testUsesAllParams(array $params, int $originalWidth, int $originalHeight, int $width, int $height, int $x, int $y, bool $shouldCrop): void
     {
         $imagick = $this->createMock(Imagick::class);
@@ -121,6 +123,7 @@ class CropTest extends TransformationTests
     }
 
     #[DataProvider('getInvalidImageParams')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsOnInvalidCropParams(array $params, int $originalWidth, int $originalHeight, ?string $errRegex = null): void
     {
         $imagick = $this->createMock(Imagick::class);

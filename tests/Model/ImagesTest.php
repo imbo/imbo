@@ -17,9 +17,9 @@ class ImagesTest extends TestCase
     public function testCanSetAndGetImages(): void
     {
         $images = [
-            $this->createMock(Image::class),
-            $this->createMock(Image::class),
-            $this->createMock(Image::class),
+            $this->createStub(Image::class),
+            $this->createStub(Image::class),
+            $this->createStub(Image::class),
         ];
         $this->assertSame([], $this->model->getImages());
         $this->assertSame($this->model, $this->model->setImages($images));
@@ -58,9 +58,9 @@ class ImagesTest extends TestCase
     {
         $this->assertSame(0, $this->model->getCount());
         $images = [
-            $this->createMock(Image::class),
-            $this->createMock(Image::class),
-            $this->createMock(Image::class),
+            $this->createStub(Image::class),
+            $this->createStub(Image::class),
+            $this->createStub(Image::class),
         ];
         $this->model->setImages($images);
         $this->assertSame(3, $this->model->getCount());
@@ -69,9 +69,9 @@ class ImagesTest extends TestCase
     public function testGetData(): void
     {
         $images = [
-            $this->createMock(Image::class),
-            $this->createMock(Image::class),
-            $this->createMock(Image::class),
+            $this->createStub(Image::class),
+            $this->createStub(Image::class),
+            $this->createStub(Image::class),
         ];
         $fields = ['width', 'height'];
 

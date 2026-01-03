@@ -1,5 +1,14 @@
-name: CI build
-on: push
+name: CI
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
 jobs:
   unit-tests:
     name: Unit tests and QA
@@ -7,67 +16,43 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ["8.3"]
-
+        php:
+          - "8.3"
     services:
       mongodb:
-        image: mongo
+        image: mongo:5.0.2
         ports:
           - 27017:27017
         env:
           MONGO_INITDB_ROOT_USERNAME: admin
           MONGO_INITDB_ROOT_PASSWORD: password
-
     steps:
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@v6
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           extensions: imagick
-
-      - name: Dump version information
-        run: |
-          php -v
-          php -i
-          php -m
-          php -r "var_dump(Imagick::queryFonts());"
-
-      - uses: actions/checkout@v4
-
-      - name: Get Composer Cache Directory
-        id: composer-cache-dir
+      - id: composer-cache-dir
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v4
+      - id: composer-cache
+        uses: actions/cache@v5
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
-            ${{ runner.os }}-composer-
-
-      - name: Install dependencies
-        run: composer install
-
-      - name: Check coding standard
-        run: PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix --dry-run --diff
-
-      - name: Run static analysis
-        run: vendor/bin/phpstan analyse
-
-      - name: Run unit tests
-        run: vendor/bin/phpunit
-
+            ${{ runner.os }}-php-${{ matrix.php }}-composer-
+      - run: composer install
+      - run: vendor/bin/phpstan analyse
+      - run: vendor/bin/phpunit
+      - run: PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer check --diff
   integration-tests-mongodb-gridfs:
     name: Integration tests (MongoDB / GridFS)
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
-        php: ["8.3"]
-
+        php:
+          - "8.3"
     services:
       mongodb:
         image: mongo:5.0.2
@@ -76,54 +61,38 @@ jobs:
         env:
           MONGO_INITDB_ROOT_USERNAME: admin
           MONGO_INITDB_ROOT_PASSWORD: password
-
     steps:
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@v6
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           extensions: imagick
-
-      - uses: actions/checkout@v4
-
-      - name: Get Composer Cache Directory
-        id: composer-cache-dir
+      - id: composer-cache-dir
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v4
+      - id: composer-cache
+        uses: actions/cache@v5
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
-            ${{ runner.os }}-composer-
-
-      - name: Install dependencies
-        run: composer install
-
-      - name: Start PHP web server
-        run: |
+            ${{ runner.os }}-php-${{ matrix.php }}-composer-
+      - run: composer install
+      - run: |
           mkdir -p build/logs
           php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &
-
-      - name: Run integration tests
-        run: vendor/bin/behat --strict --suite=mongodb-gridfs
-
-      - uses: actions/upload-artifact@v4
+      - run: vendor/bin/behat --strict --suite=mongodb-gridfs
+      - uses: actions/upload-artifact@v6
         with:
           name: httpd-logs-mongodb-gridfs-php-${{ matrix.php }}
           path: build/logs/
-
   integration-tests-mongodb-filesystem:
     name: Integration tests (MongoDB / Filesystem)
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
-        php: ["8.3"]
-
+        php:
+          - "8.3"
     services:
       mongodb:
         image: mongo:5.0.2
@@ -132,54 +101,38 @@ jobs:
         env:
           MONGO_INITDB_ROOT_USERNAME: admin
           MONGO_INITDB_ROOT_PASSWORD: password
-
     steps:
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@v6
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           extensions: imagick
-
-      - uses: actions/checkout@v4
-
-      - name: Get Composer Cache Directory
-        id: composer-cache-dir
+      - id: composer-cache-dir
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v4
+      - id: composer-cache
+        uses: actions/cache@v5
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
-            ${{ runner.os }}-composer-
-
-      - name: Install dependencies
-        run: composer install
-
-      - name: Start PHP web server
-        run: |
+            ${{ runner.os }}-php-${{ matrix.php }}-composer-
+      - run: composer install
+      - run: |
           mkdir -p build/logs
           php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &
-
-      - name: Run integration tests
-        run: vendor/bin/behat --strict --suite=mongodb-filesystem
-
-      - uses: actions/upload-artifact@v4
+      - run: vendor/bin/behat --strict --suite=mongodb-filesystem
+      - uses: actions/upload-artifact@v6
         with:
           name: httpd-logs-mongodb-filesystem-php-${{ matrix.php }}
           path: build/logs/
-
   integration-tests-sqlite-filesystem:
     name: Integration tests (SQLite / Filesystem)
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
-        php: ["8.3"]
-
+        php:
+          - "8.3"
     services:
       mongodb:
         image: mongo:5.0.2
@@ -188,57 +141,39 @@ jobs:
         env:
           MONGO_INITDB_ROOT_USERNAME: admin
           MONGO_INITDB_ROOT_PASSWORD: password
-
     steps:
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@v6
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           extensions: imagick
-
-      - uses: actions/checkout@v4
-
-      - name: Get Composer Cache Directory
-        id: composer-cache-dir
+      - id: composer-cache-dir
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v4
+      - id: composer-cache
+        uses: actions/cache@v5
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
-            ${{ runner.os }}-composer-
-
-      - name: Install dependencies
-        run: composer install
-
-      - name: Create tables
-        run: sqlite3 /tmp/imbo-sqlite-integration-test.sq3 < ./vendor/imbo/imbo-sqlite-adapters/setup/000-imbo.sql
-
-      - name: Start PHP web server
-        run: |
+            ${{ runner.os }}-php-${{ matrix.php }}-composer-
+      - run: composer install
+      - run: sqlite3 /tmp/imbo-sqlite-integration-test.sq3 < ./vendor/imbo/imbo-sqlite-adapters/setup/000-imbo.sql
+      - run: |
           mkdir -p build/logs
           php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &
-
-      - name: Run integration tests
-        run: vendor/bin/behat --strict --suite=sqlite-filesystem
-
-      - uses: actions/upload-artifact@v4
+      - run: vendor/bin/behat --strict --suite=sqlite-filesystem
+      - uses: actions/upload-artifact@v5
         with:
           name: httpd-logs-sqlite-filesystem-php-${{ matrix.php }}
           path: build/logs/
-
   integration-tests-mysql-filesystem:
     name: Integration tests (MySQL / Filesystem)
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
-        php: ["8.3"]
-
+        php:
+          - "8.3"
     services:
       mongodb:
         image: mongo:5.0.2
@@ -247,7 +182,6 @@ jobs:
         env:
           MONGO_INITDB_ROOT_USERNAME: admin
           MONGO_INITDB_ROOT_PASSWORD: password
-
       mysql:
         image: mysql:8.0.20
         env:
@@ -258,57 +192,39 @@ jobs:
         ports:
           - 3333:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
     steps:
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@v6
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           extensions: imagick
-
-      - uses: actions/checkout@v4
-
-      - name: Get Composer Cache Directory
-        id: composer-cache-dir
+      - id: composer-cache-dir
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v4
+      - id: composer-cache
+        uses: actions/cache@v5
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
-            ${{ runner.os }}-composer-
-
-      - name: Install dependencies
-        run: composer install
-
-      - name: Create database tables
-        run: mysql -uimbo_test -pimbo_test -h127.0.0.1 -P3333 imbo_test < ./vendor/imbo/imbo-mysql-adapters/setup/000-imbo.sql
-
-      - name: Start PHP web server
-        run: |
+            ${{ runner.os }}-php-${{ matrix.php }}-composer-
+      - run: composer install
+      - run: mysql -uimbo_test -pimbo_test -h127.0.0.1 -P3333 imbo_test < ./vendor/imbo/imbo-mysql-adapters/setup/000-imbo.sql
+      - run: |
           mkdir -p build/logs
           php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &
-
-      - name: Run integration tests
-        run: vendor/bin/behat --strict --suite=mysql-filesystem
-
-      - uses: actions/upload-artifact@v4
+      - run: vendor/bin/behat --strict --suite=mysql-filesystem
+      - uses: actions/upload-artifact@v5
         with:
           name: httpd-logs-mysql-filesystem-php-${{ matrix.php }}
           path: build/logs/
-
   integration-tests-postgresql-filesystem:
     name: Integration tests (PostgreSQL / Filesystem)
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
-        php: ["8.3"]
-
+        php:
+          - "8.3"
     services:
       mongodb:
         image: mongo:5.0.2
@@ -317,7 +233,6 @@ jobs:
         env:
           MONGO_INITDB_ROOT_USERNAME: admin
           MONGO_INITDB_ROOT_PASSWORD: password
-
       postgreql:
         image: postgres
         env:
@@ -325,44 +240,28 @@ jobs:
           POSTGRES_PASSWORD: imbo_test
         ports:
           - 5555:5432
-
     steps:
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@v6
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           extensions: imagick
-
-      - uses: actions/checkout@v4
-
-      - name: Get Composer Cache Directory
-        id: composer-cache-dir
+      - id: composer-cache-dir
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v4
+      - id: composer-cache
+        uses: actions/cache@v5
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
-            ${{ runner.os }}-composer-
-
-      - name: Install dependencies
-        run: composer install
-
-      - name: Create database tables
-        run: psql postgresql://imbo_test:imbo_test@127.0.0.1:5555/imbo_test -f ./vendor/imbo/imbo-postgresql-adapters/setup/000-imbo.sql
-
-      - name: Start PHP web server
-        run: |
+            ${{ runner.os }}-php-${{ matrix.php }}-composer-
+      - run: composer install
+      - run: psql postgresql://imbo_test:imbo_test@127.0.0.1:5555/imbo_test -f ./vendor/imbo/imbo-postgresql-adapters/setup/000-imbo.sql
+      - run: |
           mkdir -p build/logs
           php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &
-
-      - name: Run integration tests
-        run: vendor/bin/behat --strict --suite=postgresql-filesystem
-
-      - uses: actions/upload-artifact@v4
+      - run: vendor/bin/behat --strict --suite=postgresql-filesystem
+      - uses: actions/upload-artifact@v5
         with:
           name: httpd-logs-postgresql-filesystem-php-${{ matrix.php }}
           path: build/logs/

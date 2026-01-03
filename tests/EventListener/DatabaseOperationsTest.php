@@ -13,6 +13,7 @@ use Imbo\Model\Metadata;
 use Imbo\Model\Stats;
 use Imbo\Model\User;
 use Imbo\Resource\Images\Query;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -28,13 +29,13 @@ class DatabaseOperationsTest extends ListenerTests
     private string $user = 'user';
     private string $imageIdentifier = 'id';
     private Image&MockObject $image;
-    private AdapterInterface&MockObject $accessControl;
+    private AdapterInterface $accessControl;
 
     public function setUp(): void
     {
         $this->response = $this->createMock(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);
-        $this->accessControl = $this->createMock(AdapterInterface::class);
+        $this->accessControl = $this->createStub(AdapterInterface::class);
         $this->image = $this->createMock(Image::class);
         $this->request = $this->createConfiguredMock(Request::class, [
             'getUser' => $this->user,
@@ -56,6 +57,7 @@ class DatabaseOperationsTest extends ListenerTests
         return $this->listener;
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanInsertImage(): void
     {
         $this->image
@@ -75,6 +77,7 @@ class DatabaseOperationsTest extends ListenerTests
         $this->listener->insertImage($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanDeleteImage(): void
     {
         $this->database
@@ -85,6 +88,7 @@ class DatabaseOperationsTest extends ListenerTests
         $this->listener->deleteImage($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanLoadImage(): void
     {
         $this->response
@@ -100,6 +104,7 @@ class DatabaseOperationsTest extends ListenerTests
         $this->listener->loadImage($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanDeleteMetadata(): void
     {
         $this->database
@@ -115,6 +120,7 @@ class DatabaseOperationsTest extends ListenerTests
         $this->listener->deleteMetadata($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanUpdateMetadata(): void
     {
         $this->event
@@ -136,6 +142,7 @@ class DatabaseOperationsTest extends ListenerTests
         $this->listener->updateMetadata($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanLoadMetadata(): void
     {
         $date = new DateTime();
@@ -165,6 +172,7 @@ class DatabaseOperationsTest extends ListenerTests
         $this->listener->loadMetadata($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanLoadImages(): void
     {
         $images = [
@@ -254,7 +262,7 @@ class DatabaseOperationsTest extends ListenerTests
         $this->listener->loadImages($this->event);
     }
 
-
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanLoadUser(): void
     {
         $date = new DateTime();
@@ -284,6 +292,7 @@ class DatabaseOperationsTest extends ListenerTests
         $this->listener->loadUser($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanLoadStats(): void
     {
         $this->database
@@ -303,6 +312,7 @@ class DatabaseOperationsTest extends ListenerTests
         $this->listener->loadStats($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanCreateItsOwnImagesQuery(): void
     {
         $this->assertInstanceOf(Query::class, $this->listener->getImagesQuery());

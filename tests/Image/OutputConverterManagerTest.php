@@ -25,7 +25,7 @@ class OutputConverterManagerTest extends TestCase
 
     public function testCanSetImagickInstance(): void
     {
-        $this->assertSame($this->manager, $this->manager->setImagick($this->createMock(Imagick::class)));
+        $this->assertSame($this->manager, $this->manager->setImagick($this->createStub(Imagick::class)));
     }
 
     public function testThrowsExceptionWhenRegisteringWrongConverter(): void
@@ -79,13 +79,13 @@ class OutputConverterManagerTest extends TestCase
             'Did not expect to support given extension',
         );
 
-        $converter1 = $this->createConfiguredMock(OutputConverterInterface::class, [
+        $converter1 = $this->createConfiguredStub(OutputConverterInterface::class, [
             'getSupportedMimeTypes' => [
                 'image/png' => 'png',
                 'image/jpeg' => ['jpg', 'jpeg'],
             ],
         ]);
-        $converter2 = $this->createConfiguredMock(OutputConverterInterface::class, [
+        $converter2 = $this->createConfiguredStub(OutputConverterInterface::class, [
             'getSupportedMimeTypes' => [
                 'image/gif' => 'gif',
                 'image/png' => ['png'],
@@ -151,7 +151,7 @@ class OutputConverterManagerTest extends TestCase
         $mime = 'image/png';
         $extension = 'png';
 
-        $imagick = $this->createMock(Imagick::class);
+        $imagick = $this->createStub(Imagick::class);
 
         $image = $this->createMock(Image::class);
         $image
@@ -184,7 +184,7 @@ class OutputConverterManagerTest extends TestCase
         $mime = 'image/jpeg';
         $extension = 'jpg';
 
-        $imagick = $this->createMock(Imagick::class);
+        $imagick = $this->createStub(Imagick::class);
 
         $image = $this->createMock(Image::class);
         $image
@@ -214,7 +214,7 @@ class OutputConverterManagerTest extends TestCase
 
     public function testReturnsNullWhenImageCantBeConverted(): void
     {
-        $converter = $this->createConfiguredMock(OutputConverterInterface::class, [
+        $converter = $this->createConfiguredStub(OutputConverterInterface::class, [
             'getSupportedMimeTypes' => [
                 'image/png' => 'png',
                 'image/jpeg' => 'jpg',
@@ -225,9 +225,9 @@ class OutputConverterManagerTest extends TestCase
 
         $this->assertNull(
             $this->manager
-                ->setImagick($this->createMock(Imagick::class))
+                ->setImagick($this->createStub(Imagick::class))
                 ->registerConverter($converter)
-                ->convert($this->createMock(Image::class), 'png', 'image/png'),
+                ->convert($this->createStub(Image::class), 'png', 'image/png'),
         );
     }
 }

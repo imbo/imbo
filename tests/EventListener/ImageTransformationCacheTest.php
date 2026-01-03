@@ -7,6 +7,7 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Error;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\HeaderBag;
@@ -60,12 +61,13 @@ class ImageTransformationCacheTest extends ListenerTests
         return $this->listener;
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testChangesTheImageInstanceOnCacheHit(): void
     {
-        $imageFromCache = $this->createMock(Image::class);
+        $imageFromCache = $this->createStub(Image::class);
         $cachedData = serialize([
             'image' => $imageFromCache,
-            'headers' => $this->createMock(ResponseHeaderBag::class),
+            'headers' => $this->createStub(ResponseHeaderBag::class),
         ]);
 
         $this->request->query = new InputBag(['t' => ['thumbnail']]);
@@ -100,6 +102,7 @@ class ImageTransformationCacheTest extends ListenerTests
         $this->assertInstanceOf(ResponseHeaderBag::class, $this->response->headers);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testRemovesCorruptCachedDataOnCacheHit(): void
     {
         $this->request->query = new InputBag(['t' => ['thumbnail']]);
@@ -126,6 +129,7 @@ class ImageTransformationCacheTest extends ListenerTests
         $this->assertFalse(file_exists($fullPath));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testAddsCorrectResponseHeaderOnCacheMiss(): void
     {
         $this->requestHeaders
@@ -142,12 +146,13 @@ class ImageTransformationCacheTest extends ListenerTests
         $this->listener->loadFromCache($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testDoesNotStoreNonImageModelsInTheCache(): void
     {
         $this->response
             ->expects($this->once())
             ->method('getModel')
-            ->willReturn($this->createMock(Error::class));
+            ->willReturn($this->createStub(Error::class));
 
         $this->request
             ->expects($this->never())
@@ -156,14 +161,15 @@ class ImageTransformationCacheTest extends ListenerTests
         $this->listener->storeInCache($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testStoresImageInCache(): void
     {
-        $image = $this->createMock(Image::class);
+        $image = $this->createStub(Image::class);
 
         $this->response
             ->expects($this->once())
             ->method('getModel')
-            ->willReturn($this->createMock(Image::class));
+            ->willReturn($this->createStub(Image::class));
 
         $this->requestHeaders
             ->expects($this->once())
@@ -184,12 +190,13 @@ class ImageTransformationCacheTest extends ListenerTests
         $this->assertEquals($this->responseHeaders, $data['headers']);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testDoesNotStoreIfCachedVersionAlreadyExists(): void
     {
-        $imageFromCache = $this->createMock(Image::class);
+        $imageFromCache = $this->createStub(Image::class);
         $cachedData = serialize([
             'image' => $imageFromCache,
-            'headers' => $this->createMock(ResponseHeaderBag::class),
+            'headers' => $this->createStub(ResponseHeaderBag::class),
         ]);
 
         $this->request->query = new InputBag(['t' => ['thumbnail']]);
@@ -211,7 +218,7 @@ class ImageTransformationCacheTest extends ListenerTests
         $this->response
             ->expects($this->once())
             ->method('getModel')
-            ->willReturn($this->createMock(Image::class));
+            ->willReturn($this->createStub(Image::class));
 
         $this->event
             ->expects($this->once())
@@ -237,6 +244,7 @@ class ImageTransformationCacheTest extends ListenerTests
         $this->assertEquals('foobar', file_get_contents($fullPath));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanDeleteAllImageVariationsFromCache(): void
     {
         $cachedFiles = [
@@ -261,6 +269,7 @@ class ImageTransformationCacheTest extends ListenerTests
         $this->assertTrue(is_dir(TestFs::url('cacheDir/u/s/e/user/7/b/f')), 'Expected directory to exist');
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsAnExceptionWhenPathIsMissingFromTheParameters(): void
     {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -270,6 +279,7 @@ class ImageTransformationCacheTest extends ListenerTests
         new ImageTransformationCache([]);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsExceptionWhenCacheDirIsNotWritable(): void
     {
         $dir = TestFs::url('unwritableDir');
@@ -282,6 +292,7 @@ class ImageTransformationCacheTest extends ListenerTests
         new ImageTransformationCache(['path' => $dir]);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testDoesNotTriggerWarningIfCachePathDoesNotExistAndParentIsWritable(): void
     {
         $this->assertNotNull(

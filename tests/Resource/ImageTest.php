@@ -11,6 +11,7 @@ use Imbo\Model\Image as ImageModel;
 use Imbo\Storage\StorageInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 #[CoversClass(Image::class)]
@@ -19,10 +20,8 @@ class ImageTest extends ResourceTests
     private Image $resource;
     private Request&MockObject $request;
     private Response&MockObject $response;
-    private DatabaseInterface&MockObject $database;
-    private StorageInterface&MockObject $storage;
-    private EventManager&MockObject $manager;
-    private EventInterface&MockObject $event;
+    private EventManager&Stub $manager;
+    private EventInterface $event;
 
     protected function getNewResource(): Image
     {
@@ -33,14 +32,12 @@ class ImageTest extends ResourceTests
     {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
-        $this->database = $this->createMock(DatabaseInterface::class);
-        $this->storage = $this->createMock(StorageInterface::class);
-        $this->manager = $this->createMock(EventManager::class);
-        $this->event = $this->createConfiguredMock(EventInterface::class, [
+        $this->manager = $this->createStub(EventManager::class);
+        $this->event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $this->request,
             'getResponse' => $this->response,
-            'getDatabase' => $this->database,
-            'getStorage' => $this->storage,
+            'getDatabase' => $this->createStub(DatabaseInterface::class),
+            'getStorage' => $this->createStub(StorageInterface::class),
             'getManager' => $this->manager,
         ]);
 

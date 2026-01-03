@@ -181,7 +181,7 @@ class RequestTest extends TestCase
 
     public function testCanSetAndGetAnImage(): void
     {
-        $image = $this->createMock(Image::class);
+        $image = $this->createStub(Image::class);
         $this->assertSame($this->request, $this->request->setImage($image));
         $this->assertSame($image, $this->request->getImage());
     }
@@ -189,7 +189,7 @@ class RequestTest extends TestCase
     public function testCanSetAndGetARoute(): void
     {
         $this->assertNull($this->request->getRoute());
-        $route = $this->createMock(Route::class);
+        $route = $this->createStub(Route::class);
         $this->assertSame($this->request, $this->request->setRoute($route));
         $this->assertSame($route, $this->request->getRoute());
     }

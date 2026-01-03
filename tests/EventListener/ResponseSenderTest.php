@@ -54,7 +54,7 @@ class ResponseSenderTest extends ListenerTests
             ->with('X-Imbo-ImageIdentifier', 'checksum');
         $response->headers = $headers;
 
-        $event = $this->createConfiguredMock(EventInterface::class, [
+        $event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $request,
             'getResponse' => $response,
         ]);
@@ -87,7 +87,7 @@ class ResponseSenderTest extends ListenerTests
             ->with('X-Imbo-ImageIdentifier', 'checksum');
         $response->headers = $headers;
 
-        $event = $this->createConfiguredMock(EventInterface::class, [
+        $event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $request,
             'getResponse' => $response,
         ]);

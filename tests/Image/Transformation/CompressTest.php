@@ -26,7 +26,7 @@ class CompressTest extends TransformationTests
             ->method('setOutputQualityCompression')
             ->with(50);
 
-        $event = $this->createMock(EventInterface::class);
+        $event = $this->createStub(EventInterface::class);
 
         $imagick = new Imagick();
         $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));

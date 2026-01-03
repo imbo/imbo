@@ -10,6 +10,7 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Image\Identifier\Generator\GeneratorInterface;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -20,44 +21,36 @@ class ImagePreparationTest extends TestCase
 {
     private ImagePreparation $prepare;
     private Request&MockObject $request;
-    private Response&MockObject $response;
-    private EventInterface&MockObject $event;
+    private EventInterface $event;
     private array $config;
-    private DatabaseInterface&MockObject $database;
-    private ResponseHeaderBag&MockObject $headers;
-    private GeneratorInterface&MockObject $imageIdentifierGenerator;
-    private InputLoaderManager&MockObject $inputLoaderManager;
-    private OutputConverterManager&MockObject $outputConverterManager;
+    private InputLoaderManager $inputLoaderManager;
     private Closure $imagickLoader;
 
     public function setUp(): void
     {
         $this->request = $this->createMock(Request::class);
-        $this->database = $this->createMock(DatabaseInterface::class);
-        $this->headers = $this->createMock(ResponseHeaderBag::class);
-        $this->response = $this->createMock(Response::class);
-        $this->response->headers = $this->headers;
-        $this->inputLoaderManager = $this->createMock(InputLoaderManager::class);
+        $response = $this->createStub(Response::class);
+        $response->headers = $this->createStub(ResponseHeaderBag::class);
+        $this->inputLoaderManager = $this->createStub(InputLoaderManager::class);
         $this->imagickLoader = function (string $mime, string $data): Imagick {
             $imagick = new Imagick();
             $imagick->readImageBlob($data);
             return $imagick;
         };
-        $this->outputConverterManager = $this->createMock(OutputConverterManager::class);
-        $this->imageIdentifierGenerator = $this->createMock(GeneratorInterface::class);
-        $this->config = ['imageIdentifierGenerator' => $this->imageIdentifierGenerator];
-        $this->event = $this->createConfiguredMock(EventInterface::class, [
+        $this->config = ['imageIdentifierGenerator' => $this->createStub(GeneratorInterface::class)];
+        $this->event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $this->request,
-            'getResponse' => $this->response,
+            'getResponse' => $response,
             'getConfig' => $this->config,
-            'getDatabase' => $this->database,
+            'getDatabase' => $this->createStub(DatabaseInterface::class),
             'getInputLoaderManager' => $this->inputLoaderManager,
-            'getOutputConverterManager' => $this->outputConverterManager,
+            'getOutputConverterManager' => $this->createStub(OutputConverterManager::class),
         ]);
 
         $this->prepare = new ImagePreparation();
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testReturnsACorrectDefinition(): void
     {
         $class = get_class($this->prepare);
@@ -83,7 +76,6 @@ class ImagePreparationTest extends TestCase
             ->willReturn(file_get_contents(__FILE__));
 
         $this->inputLoaderManager
-            ->expects($this->any())
             ->method('load')
             ->willReturn(null);
 
@@ -96,12 +88,10 @@ class ImagePreparationTest extends TestCase
         $filePath = FIXTURES_DIR . '/broken-image.jpg';
 
         $this->inputLoaderManager
-            ->expects($this->any())
             ->method('load')
             ->willReturnCallback($this->imagickLoader);
 
         $this->inputLoaderManager
-            ->expects($this->any())
             ->method('getExtensionFromMimetype')
             ->with('image/jpeg')
             ->willReturn('jpg');
@@ -120,7 +110,6 @@ class ImagePreparationTest extends TestCase
         $filePath = FIXTURES_DIR . '/slightly-broken-image.png';
 
         $this->inputLoaderManager
-            ->expects($this->any())
             ->method('load')
             ->willReturnCallback($this->imagickLoader);
 
@@ -133,18 +122,17 @@ class ImagePreparationTest extends TestCase
         $this->prepare->prepareImage($this->event);
     }
 
+
     public function testPopulatesRequestWhenImageIsValid(): void
     {
         $imagePath = FIXTURES_DIR . '/image.png';
         $imageData = file_get_contents($imagePath);
 
         $this->inputLoaderManager
-            ->expects($this->any())
             ->method('load')
             ->willReturnCallback($this->imagickLoader);
 
         $this->inputLoaderManager
-            ->expects($this->any())
             ->method('getExtensionFromMimetype')
             ->with('image/png')
             ->willReturn('png');

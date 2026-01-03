@@ -44,7 +44,7 @@ class ResponseETagTest extends ListenerTests
                 ->method('set');
         }
 
-        $request = $this->createMock(Request::class);
+        $request = $this->createStub(Request::class);
         $request->headers = $requestHeaders;
 
         $event = $this->createMock(EventInterface::class);

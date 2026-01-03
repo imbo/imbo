@@ -24,7 +24,7 @@ class InputLoaderManagerTest extends TestCase
     {
         $this->assertSame(
             $this->manager,
-            $this->manager->setImagick($this->createMock(Imagick::class)),
+            $this->manager->setImagick($this->createStub(Imagick::class)),
         );
     }
 
@@ -61,7 +61,7 @@ class InputLoaderManagerTest extends TestCase
 
     public function testCanRegisterAndUseLoaders(): void
     {
-        $imagick = $this->createMock(Imagick::class);
+        $imagick = $this->createStub(Imagick::class);
         $mime = 'image/png';
         $blob = 'some data';
 
@@ -102,14 +102,14 @@ class InputLoaderManagerTest extends TestCase
 
     public function testManagerReturnsFalseWhenNoLoaderManagesToLoadTheImage(): void
     {
-        $loader = $this->createConfiguredMock(InputLoaderInterface::class, [
+        $loader = $this->createConfiguredStub(InputLoaderInterface::class, [
             'getSupportedMimeTypes' => ['image/png' => 'png'],
             'load' => false,
         ]);
 
         $this->assertFalse(
             $this->manager
-                ->setImagick($this->createMock(Imagick::class))
+                ->setImagick($this->createStub(Imagick::class))
                 ->registerLoader($loader)
                 ->load('image/png', 'some data'),
         );

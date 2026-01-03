@@ -7,6 +7,7 @@ use Imbo\EventListener\ListenerInterface;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -28,6 +29,7 @@ class EventManagerTest extends TestCase
         $this->manager->setEventTemplate($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanRegisterAndExecuteRegularCallbacksInAPrioritizedFashion(): void
     {
         $callback1 = function (EventInterface $event): void {
@@ -68,6 +70,7 @@ class EventManagerTest extends TestCase
             ->trigger('event4');
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testLetsListenerStopPropagation(): void
     {
         $callback1 = function (EventInterface $event): void {
@@ -106,6 +109,7 @@ class EventManagerTest extends TestCase
         );
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanCheckIfTheManagerHasListenersForSpecificEvents(): void
     {
         $this->manager
@@ -118,6 +122,7 @@ class EventManagerTest extends TestCase
     }
 
     #[DataProvider('getUsers')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanIncludeAndExcludeUsers(string $user, array $users, bool $willTrigger): void
     {
         $check = new stdClass();
@@ -143,6 +148,7 @@ class EventManagerTest extends TestCase
         $this->assertSame($willTrigger, $check->triggered);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanAddExtraParametersToTheEvent(): void
     {
         $this->manager->addEventHandler('handler', function (EventInterface $event): void {
@@ -158,6 +164,7 @@ class EventManagerTest extends TestCase
         ]);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanInitializeListeners(): void
     {
         $this->manager
@@ -170,6 +177,7 @@ class EventManagerTest extends TestCase
         $this->assertSame([$i], $this->manager->getInitializers());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsExceptionsWhenInvalidHandlersAreAdded(): void
     {
         $this->expectExceptionObject(new InvalidArgumentException(
@@ -181,6 +189,7 @@ class EventManagerTest extends TestCase
         $this->manager->addCallbacks('someName', ['event' => $callback]);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanAddMultipleHandlersAtOnce(): void
     {
         $this->manager
@@ -191,6 +200,7 @@ class EventManagerTest extends TestCase
         $this->manager->trigger('someEvent');
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanInjectParamsInConstructor(): void
     {
         $this->manager
@@ -202,6 +212,7 @@ class EventManagerTest extends TestCase
     }
 
     #[DataProvider('getWildcardListeners')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testSupportsWildcardListeners(array $listeners, array $events, string $output): void
     {
         foreach ($listeners as $name => $listener) {
@@ -217,11 +228,12 @@ class EventManagerTest extends TestCase
         }
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanSetEventTemplate(): void
     {
         $this->expectOutputString('bar');
         (new EventManager())
-            ->setEventTemplate(new Event(['foo' => 'bar', 'request' => $this->createMock(Request::class)]))
+            ->setEventTemplate(new Event(['foo' => 'bar', 'request' => $this->createStub(Request::class)]))
             ->addEventHandler('handler', function (EventInterface $event): void {
                 echo (string) $event->getArgument('foo');
             })

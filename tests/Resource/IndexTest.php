@@ -7,15 +7,15 @@ use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 #[CoversClass(Index::class)]
 class IndexTest extends ResourceTests
 {
     private Index $resource;
-    private Request&MockObject $request;
     private Response&MockObject $response;
-    private EventInterface&MockObject $event;
+    private EventInterface&Stub $event;
 
     protected function getNewResource(): Index
     {
@@ -24,10 +24,9 @@ class IndexTest extends ResourceTests
 
     public function setUp(): void
     {
-        $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
-        $this->event = $this->createConfiguredMock(EventInterface::class, [
-            'getRequest' => $this->request,
+        $this->event = $this->createConfiguredStub(EventInterface::class, [
+            'getRequest' => $this->createStub(Request::class),
             'getResponse' => $this->response,
         ]);
 
@@ -49,7 +48,6 @@ class IndexTest extends ResourceTests
             ->expects($this->once())
             ->method('setPrivate');
         $this->event
-            ->expects($this->any())
             ->method('getConfig')
             ->willReturn(['indexRedirect' => null]);
 
@@ -68,7 +66,6 @@ class IndexTest extends ResourceTests
     {
         $url = 'http://imbo.io';
         $this->event
-            ->expects($this->any())
             ->method('getConfig')
             ->willReturn(['indexRedirect' => $url]);
 

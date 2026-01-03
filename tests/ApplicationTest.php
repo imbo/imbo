@@ -10,7 +10,6 @@ use Imbo\Http\Response\Response;
 use Imbo\Resource\ResourceInterface;
 use Imbo\Storage\StorageInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -35,7 +34,7 @@ class ApplicationTest extends TestCase
     {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid storage adapter', Response::HTTP_INTERNAL_SERVER_ERROR));
         $this->runImbo([
-            'database' => $this->createMock(DatabaseInterface::class),
+            'database' => $this->createStub(DatabaseInterface::class),
             'storage' => fn () => new stdClass(),
             'trustedProxies' => [],
         ]);
@@ -45,8 +44,8 @@ class ApplicationTest extends TestCase
     {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid access control adapter', Response::HTTP_INTERNAL_SERVER_ERROR));
         $this->runImbo([
-            'database' => $this->createMock(DatabaseInterface::class),
-            'storage' => $this->createMock(StorageInterface::class),
+            'database' => $this->createStub(DatabaseInterface::class),
+            'storage' => $this->createStub(StorageInterface::class),
             'routes' => [],
             'trustedProxies' => [],
             'accessControl' => fn () => new stdClass(),
@@ -59,9 +58,9 @@ class ApplicationTest extends TestCase
 
         $this->assertEmpty(Request::getTrustedProxies());
         $this->runImbo([
-            'database' => $this->createMock(DatabaseInterface::class),
-            'storage' => $this->createMock(StorageInterface::class),
-            'accessControl' => $this->createMock(AdapterInterface::class),
+            'database' => $this->createStub(DatabaseInterface::class),
+            'storage' => $this->createStub(StorageInterface::class),
+            'accessControl' => $this->createStub(AdapterInterface::class),
             'eventListenerInitializers' => [],
             'eventListeners' => [],
             'contentNegotiateImages' => false,
@@ -81,9 +80,9 @@ class ApplicationTest extends TestCase
         /** @var array */
         $default = require __DIR__ . '/../config/config.default.php';
         $test = [
-            'database' => fn (Request $request, Response $response): DatabaseInterface&MockObject => $this->createMock(DatabaseInterface::class),
-            'storage' => fn (Request $request, Response $response): StorageInterface&MockObject => $this->createMock(StorageInterface::class),
-            'accessControl' => fn (Request $request, Response $response): AdapterInterface&MockObject => $this->createMock(AdapterInterface::class),
+            'database' => fn (Request $request, Response $response): DatabaseInterface => $this->createStub(DatabaseInterface::class),
+            'storage' => fn (Request $request, Response $response): StorageInterface => $this->createStub(StorageInterface::class),
+            'accessControl' => fn (Request $request, Response $response): AdapterInterface => $this->createStub(AdapterInterface::class),
             'eventListeners' => [
                 'test' => fn (Request $request, Response $response): TestListener => new TestListener(),
                 'testSubelement' => [
@@ -124,9 +123,9 @@ class ApplicationTest extends TestCase
         return array_replace_recursive(
             $defaultConfig,
             [
-                'accessControl' => $this->createMock(AdapterInterface::class),
-                'database' => $this->createMock(DatabaseInterface::class),
-                'storage' => $this->createMock(StorageInterface::class),
+                'accessControl' => $this->createStub(AdapterInterface::class),
+                'database' => $this->createStub(DatabaseInterface::class),
+                'storage' => $this->createStub(StorageInterface::class),
             ],
         );
     }

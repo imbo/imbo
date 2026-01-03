@@ -11,7 +11,7 @@ class UuidTest extends TestCase
 {
     public function testGeneratesUniqueUuidV4(): void
     {
-        $image = $this->createMock(Image::class);
+        $image = $this->createStub(Image::class);
         $generator = new UuidGenerator();
         $generated = [];
 

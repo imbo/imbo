@@ -13,7 +13,7 @@ class RouterTest extends TestCase
 {
     public function testCanBeATeaPot(): void
     {
-        $request = $this->createConfiguredMock(Request::class, [
+        $request = $this->createConfiguredStub(Request::class, [
             'getMethod' => 'BREW',
         ]);
         $this->expectExceptionObject(new RuntimeException('I\'m a teapot', Response::HTTP_I_AM_A_TEAPOT));
@@ -23,7 +23,7 @@ class RouterTest extends TestCase
 
     public function testThrowsExceptionOnUnsupportedHttpMethod(): void
     {
-        $request = $this->createConfiguredMock(Request::class, [
+        $request = $this->createConfiguredStub(Request::class, [
             'getMethod' => 'TRACE',
         ]);
         $this->expectExceptionObject(new RuntimeException('Unsupported HTTP method', Response::HTTP_NOT_IMPLEMENTED));
@@ -34,7 +34,7 @@ class RouterTest extends TestCase
     #[DataProvider('getInvalidRoutes')]
     public function testThrowsExceptionWhenNoRouteMatches(string $route): void
     {
-        $request = $this->createConfiguredMock(Request::class, [
+        $request = $this->createConfiguredStub(Request::class, [
             'getMethod'   => 'GET',
             'getPathInfo' => $route,
         ]);

@@ -9,6 +9,7 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -33,7 +34,7 @@ class ClipTest extends TestCase
             'getUser'            => $user,
         ]);
 
-        $database = $this->createMock(DatabaseInterface::class);
+        $database = $this->createStub(DatabaseInterface::class);
         $database
             ->method('getMetadata')
             ->with($user, $imageIdentifier)
@@ -41,7 +42,7 @@ class ClipTest extends TestCase
                 'paths' => ['House', 'Panda'],
             ]);
 
-        $event = $this->createConfiguredMock(Event::class, [
+        $event = $this->createConfiguredStub(Event::class, [
             'getDatabase' => $database,
         ]);
 
@@ -53,6 +54,7 @@ class ClipTest extends TestCase
         $this->transformation->setImagick($this->imagick);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testExceptionIfMissingNamedPath(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -61,6 +63,7 @@ class ClipTest extends TestCase
         $this->transformation->transform(['path' => 'foo']);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testNoExceptionIfMissingNamedPathButIgnoreSet(): void
     {
         $this->assertNull(
@@ -102,6 +105,7 @@ class ClipTest extends TestCase
         $this->transformation->transform([]);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWillResetAlphaChannelWhenTheImageDoesNotHaveAClippingPath(): void
     {
         $imagick = $this->createConfiguredMock(Imagick::class, [
@@ -132,6 +136,7 @@ class ClipTest extends TestCase
             ->transform([]);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsExceptionWhenImagickFailsWithAFatalError(): void
     {
         $imagick = $this->createConfiguredMock(Imagick::class, [

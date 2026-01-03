@@ -6,7 +6,6 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\InputBag;
 
@@ -15,10 +14,10 @@ class TransformationManagerTest extends TestCase
 {
     protected TransformationManager $manager;
     protected Request $request;
-    protected Response&MockObject $response;
-    protected EventInterface&MockObject $event;
+    protected Response $response;
+    protected EventInterface $event;
     protected InputBag $query;
-    protected Image&MockObject $image;
+    protected Image $image;
     private array $config;
 
     public function setUp(): void
@@ -31,16 +30,16 @@ class TransformationManagerTest extends TestCase
         $this->request = new Request();
         $this->request->query = $this->query;
 
-        $this->image = $this->createConfiguredMock(Image::class, [
+        $this->image = $this->createConfiguredStub(Image::class, [
             'getWidth' => 1600,
             'getHeight' => 900,
         ]);
 
-        $this->response = $this->createConfiguredMock(Response::class, [
+        $this->response = $this->createConfiguredStub(Response::class, [
             'getModel' => $this->image,
         ]);
 
-        $this->event = $this->createConfiguredMock(EventInterface::class, [
+        $this->event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $this->request,
             'getResponse' => $this->response,
         ]);

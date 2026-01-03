@@ -28,7 +28,7 @@ class EventTest extends TestCase
     public function testCanSetAndGetRequest(string $method, string $argument, mixed $value): void
     {
         if (is_string($value) && (class_exists($value) || interface_exists($value))) {
-            $value = $this->createMock($value);
+            $value = $this->createStub($value);
         }
 
         $this->event->setArgument($argument, $value);

@@ -17,11 +17,11 @@ class ImageTransformationLimiterTest extends TestCase
     {
         $listener = new ImageTransformationLimiter(['limit' => $limit]);
 
-        $request = $this->createConfiguredMock(Request::class, [
+        $request = $this->createConfiguredStub(Request::class, [
             'getTransformations' => $transformations,
         ]);
 
-        $event = $this->createConfiguredMock(Event::class, [
+        $event = $this->createConfiguredStub(Event::class, [
             'getRequest' => $request,
         ]);
 

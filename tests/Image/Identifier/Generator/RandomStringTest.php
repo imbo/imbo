@@ -12,7 +12,7 @@ class RandomStringTest extends TestCase
     {
         $stringLength = 15;
 
-        $image = $this->createMock(Image::class);
+        $image = $this->createStub(Image::class);
         $generator = new RandomString($stringLength);
         $generated = [];
 

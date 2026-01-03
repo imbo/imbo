@@ -12,8 +12,10 @@ use Imbo\Image\Identifier\Generator\GeneratorInterface;
 use Imbo\Model\ArrayModel;
 use Imbo\Model\Image;
 use Imbo\Storage\StorageInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 #[CoversClass(Images::class)]
@@ -22,11 +24,11 @@ class ImagesTest extends ResourceTests
     private Images $resource;
     private Request&MockObject $request;
     private Response&MockObject $response;
-    private DatabaseInterface&MockObject $database;
-    private StorageInterface&MockObject $storage;
+    private DatabaseInterface $database;
+    private StorageInterface $storage;
     private EventManager&MockObject $manager;
-    private EventInterface&MockObject $event;
-    private GeneratorInterface&MockObject $imageIdentifierGenerator;
+    private EventInterface $event;
+    private GeneratorInterface&Stub $imageIdentifierGenerator;
     private array $config;
 
     protected function getNewResource(): Images
@@ -38,13 +40,13 @@ class ImagesTest extends ResourceTests
     {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
-        $this->database = $this->createMock(DatabaseInterface::class);
-        $this->storage = $this->createMock(StorageInterface::class);
+        $this->database = $this->createStub(DatabaseInterface::class);
+        $this->storage = $this->createStub(StorageInterface::class);
         $this->manager = $this->createMock(EventManager::class);
-        $this->imageIdentifierGenerator = $this->createMock(GeneratorInterface::class);
+        $this->imageIdentifierGenerator = $this->createStub(GeneratorInterface::class);
         $this->config = ['imageIdentifierGenerator' => $this->imageIdentifierGenerator];
 
-        $this->event = $this->createConfiguredMock(EventInterface::class, [
+        $this->event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $this->request,
             'getResponse' => $this->response,
             'getDatabase' => $this->database,
@@ -56,14 +58,13 @@ class ImagesTest extends ResourceTests
         $this->resource = $this->getNewResource();
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testSupportsHttpPost(): void
     {
         $this->imageIdentifierGenerator
-            ->expects($this->any())
             ->method('isDeterministic')
             ->willReturn(false);
         $this->imageIdentifierGenerator
-            ->expects($this->any())
             ->method('generate')
             ->willReturn('id');
 
@@ -99,10 +100,10 @@ class ImagesTest extends ResourceTests
         $this->resource->addImage($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsExceptionWhenItFailsToGenerateUniqueImageIdentifier(): void
     {
         $this->manager
-            ->expects($this->any())
             ->method('trigger')
             ->with('db.image.insert', ['updateIfDuplicate' => false])
             ->willThrowException(new DuplicateImageIdentifierException());
@@ -115,14 +116,12 @@ class ImagesTest extends ResourceTests
 
         $this->response->headers = $headers;
 
-        $image = $this->createMock(Image::class);
+        $image = $this->createStub(Image::class);
 
         $this->imageIdentifierGenerator
-            ->expects($this->any())
             ->method('isDeterministic')
             ->willReturn(false);
         $this->imageIdentifierGenerator
-            ->expects($this->any())
             ->method('generate')
             ->willReturn('foo');
 
@@ -135,6 +134,7 @@ class ImagesTest extends ResourceTests
         $this->resource->addImage($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testSupportsHttpGet(): void
     {
         $this->manager
@@ -144,6 +144,7 @@ class ImagesTest extends ResourceTests
         $this->resource->getImages($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testAddImageWithCallableImageIdentifierGenerator(): void
     {
         $manager = $this->manager;
@@ -179,7 +180,7 @@ class ImagesTest extends ResourceTests
             ->method('setModel')
             ->with($this->isInstanceOf(ArrayModel::class));
 
-        $event = $this->createConfiguredMock(EventInterface::class, [
+        $event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $this->request,
             'getResponse' => $this->response,
             'getDatabase' => $this->database,

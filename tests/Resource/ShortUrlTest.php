@@ -8,17 +8,18 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
 use Imbo\Router\Route;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(ShortUrl::class)]
 class ShortUrlTest extends ResourceTests
 {
-    private Request&MockObject $request;
+    private Request $request;
     private Route&MockObject $route;
     private Response&MockObject $response;
     private DatabaseInterface&MockObject $database;
-    private EventInterface&MockObject $event;
+    private EventInterface $event;
 
     protected function getNewResource(): ShortUrl
     {
@@ -28,20 +29,21 @@ class ShortUrlTest extends ResourceTests
     public function setUp(): void
     {
         $this->route = $this->createMock(Route::class);
-        $this->request = $this->createConfiguredMock(Request::class, [
+        $this->request = $this->createConfiguredStub(Request::class, [
             'getRoute' => $this->route,
             'getUser' => 'user',
             'getImageIdentifier' => 'id',
         ]);
         $this->response = $this->createMock(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);
-        $this->event = $this->createConfiguredMock(EventInterface::class, [
+        $this->event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $this->request,
             'getResponse' => $this->response,
             'getDatabase' => $this->database,
         ]);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsAnExceptionWhenTheShortUrlDoesNotExistWhenDeleting(): void
     {
         $this->route
@@ -59,6 +61,7 @@ class ShortUrlTest extends ResourceTests
         $this->getNewResource()->deleteShortUrl($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsAnExceptionWhenUserOrImageIdentifierDoesNotMatchWhenDeleting(): void
     {
         $this->route
@@ -106,6 +109,7 @@ class ShortUrlTest extends ResourceTests
         $this->getNewResource()->deleteShortUrl($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsAnExceptionWhenTheShortUrlDoesNotExistWhenGetting(): void
     {
         $this->route
@@ -123,6 +127,7 @@ class ShortUrlTest extends ResourceTests
         $this->getNewResource()->getShortUrl($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsAnExceptionWhenUserOrImageIdentifierDoesNotMatchWhenGetting(): void
     {
         $this->route

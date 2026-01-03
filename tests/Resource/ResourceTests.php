@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace Imbo\Resource;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
 abstract class ResourceTests extends TestCase
@@ -10,11 +11,13 @@ abstract class ResourceTests extends TestCase
      */
     abstract protected function getNewResource(): ResourceInterface;
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testReturnsCorrectEventSubscriptions(): void
     {
         $this->assertIsArray($this->getNewResource()::getSubscribedEvents());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testReturnsTheCorrectAllowedMethods(): void
     {
         $this->expectNotToPerformAssertions();

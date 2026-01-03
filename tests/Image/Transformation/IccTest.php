@@ -124,7 +124,7 @@ class IccTest extends TestCase
 
         $expectedProfile = file_get_contents(DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc');
 
-        $imagick = $this->createMock(Imagick::class);
+        $imagick = $this->createStub(Imagick::class);
         $imagick
             ->method('profileImage')
             ->willReturnCallback(
@@ -152,7 +152,7 @@ class IccTest extends TestCase
         $expectedProfile = file_get_contents(DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc');
         $e = new ImagickException('error #2');
 
-        $imagick = $this->createMock(Imagick::class);
+        $imagick = $this->createStub(Imagick::class);
         $imagick
             ->method('profileImage')
             ->willReturnCallback(
@@ -173,7 +173,7 @@ class IccTest extends TestCase
             'default' => DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc',
         ]))
             ->setImagick($imagick)
-            ->setImage($this->createMock(Image::class))
+            ->setImage($this->createStub(Image::class))
             ->transform([]);
     }
 }

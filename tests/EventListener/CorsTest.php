@@ -7,6 +7,7 @@ use Imbo\EventManager\EventManager;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Router\Route;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -49,6 +50,7 @@ class CorsTest extends ListenerTests
         return $this->listener;
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCleansUpOrigins(): void
     {
         $listener = new Cors([
@@ -72,6 +74,7 @@ class CorsTest extends ListenerTests
         $this->assertCount(2, $allowed);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testDoesNotAddHeadersWhenOriginIsDisallowedAndHttpMethodIsOptions(): void
     {
         $headers = $this->createMock(ResponseHeaderBag::class);
@@ -83,6 +86,7 @@ class CorsTest extends ListenerTests
         $this->listener->options($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testDoesNotAddHeadersWhenOriginIsDisallowedAndHttpMethodIsOtherThanOptions(): void
     {
         $this->event
@@ -91,6 +95,7 @@ class CorsTest extends ListenerTests
         $this->listener->invoke($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testAddsHeadersIfWildcardOriginIsDefined(): void
     {
         $listener = new Cors([
@@ -110,7 +115,7 @@ class CorsTest extends ListenerTests
             ->expects($this->once())
             ->method('getMethod')
             ->willReturn('GET');
-        $route = $this->createConfiguredMock(Route::class, [
+        $route = $this->createConfiguredStub(Route::class, [
             '__toString' => 'index',
         ]);
         $this->request
@@ -120,6 +125,7 @@ class CorsTest extends ListenerTests
         $listener->invoke($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testAddsHeadersIfOriginIsDefinedAndAllowed(): void
     {
         $listener = new Cors([
@@ -139,7 +145,7 @@ class CorsTest extends ListenerTests
             ->expects($this->once())
             ->method('getMethod')
             ->willReturn('GET');
-        $route = $this->createConfiguredMock(Route::class, [
+        $route = $this->createConfiguredStub(Route::class, [
             '__toString' => 'index',
         ]);
         $this->request
@@ -149,6 +155,7 @@ class CorsTest extends ListenerTests
         $listener->invoke($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testIncludesAllImboHeadersAsExposedHeaders(): void
     {
         $listener = new Cors([
@@ -179,7 +186,7 @@ class CorsTest extends ListenerTests
 
         $this->response->headers = $headers;
 
-        $route = $this->createConfiguredMock(Route::class, [
+        $route = $this->createConfiguredStub(Route::class, [
             '__toString' => 'index',
         ]);
 
@@ -196,6 +203,7 @@ class CorsTest extends ListenerTests
         $listener->setExposedHeaders($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testDoesNotAddExposeHeadersHeaderWhenOriginIsInvalid(): void
     {
         $listener = new Cors([]);
@@ -209,6 +217,7 @@ class CorsTest extends ListenerTests
         $listener->setExposedHeaders($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testSetsCorrectResposeHeadersOnOptionsRequestWhenOriginIsAllowed(): void
     {
         $listener = new Cors([
@@ -219,7 +228,7 @@ class CorsTest extends ListenerTests
             'maxAge' => 60,
         ]);
 
-        $route = $this->createConfiguredMock(Route::class, [
+        $route = $this->createConfiguredStub(Route::class, [
             '__toString' => 'image',
         ]);
 
@@ -266,15 +275,17 @@ class CorsTest extends ListenerTests
         $listener->options($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testReturnsSubscribedEvents(): void
     {
         $className = get_class($this->listener);
         $this->assertIsArray($className::getSubscribedEvents());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testDoesNotAddAccessControlHeadersWhenOriginIsNotAllowed(): void
     {
-        $route = $this->createConfiguredMock(Route::class, [
+        $route = $this->createConfiguredStub(Route::class, [
             '__toString' => 'image',
         ]);
 
@@ -285,14 +296,14 @@ class CorsTest extends ListenerTests
             ->with('Origin')
             ->willReturn('http://somehost');
 
-        $request = $this->createConfiguredMock(Request::class, [
+        $request = $this->createConfiguredStub(Request::class, [
             'getRoute' => $route,
             'getMethod' => 'GET',
         ]);
 
         $request->headers = $requestHeaders;
 
-        $event = $this->createConfiguredMock(EventInterface::class, [
+        $event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $request,
             'getResponse' => $this->response,
         ]);
@@ -311,6 +322,7 @@ class CorsTest extends ListenerTests
     }
 
     #[DataProvider('getAllowedMethodsParams')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testWillSubscribeToTheCorrectEventsBasedOnParams(array $params, array $events): void
     {
         $listener = new Cors($params);
@@ -321,7 +333,7 @@ class CorsTest extends ListenerTests
             ->method('set')
             ->with('Allow', 'OPTIONS', false);
 
-        $response = $this->createMock(Response::class);
+        $response = $this->createStub(Response::class);
         $response->headers = $headers;
 
         $manager = $this->createMock(EventManager::class);
@@ -330,7 +342,7 @@ class CorsTest extends ListenerTests
             ->method('addCallbacks')
             ->with('handler', $events);
 
-        $event = $this->createConfiguredMock(EventInterface::class, [
+        $event = $this->createConfiguredStub(EventInterface::class, [
             'getManager' => $manager,
             'getHandler' => 'handler',
             'getResponse' => $response,
@@ -339,13 +351,14 @@ class CorsTest extends ListenerTests
         $listener->subscribe($event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testAddsVaryHeaderContainingOriginRegardlessOfAllowedStatus(): void
     {
         $this->request
             ->expects($this->any())
             ->method('getMethod')
             ->willReturn('GET');
-        $route = $this->createConfiguredMock(Route::class, [
+        $route = $this->createConfiguredStub(Route::class, [
             '__toString' => 'index',
         ]);
         $this->request
@@ -363,9 +376,9 @@ class CorsTest extends ListenerTests
             ->expects($this->once())
             ->method('setVary')
             ->with('Origin', false);
-        $response->headers = $this->createMock(ResponseHeaderBag::class);
+        $response->headers = $this->createStub(ResponseHeaderBag::class);
 
-        $event = $this->createConfiguredMock(EventInterface::class, [
+        $event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $this->request,
             'getResponse' => $response,
         ]);
@@ -383,7 +396,7 @@ class CorsTest extends ListenerTests
             ->method('setVary')
             ->with('Origin', false);
 
-        $event = $this->createConfiguredMock(EventInterface::class, [
+        $event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $this->request,
             'getResponse' => $response,
         ]);

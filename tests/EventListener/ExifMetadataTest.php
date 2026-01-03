@@ -35,7 +35,7 @@ class ExifMetadataTest extends ListenerTests
         $imageIdentifier = 'imageIdentifier';
         $blob = 'blob';
 
-        $image = $this->createConfiguredMock(Image::class, [
+        $image = $this->createConfiguredStub(Image::class, [
             'getImageIdentifier' => $imageIdentifier,
             'getBlob' => $blob,
         ]);
@@ -48,7 +48,7 @@ class ExifMetadataTest extends ListenerTests
             ->method('readImageBlob')
             ->with($blob);
 
-        $request = $this->createConfiguredMock(Request::class, [
+        $request = $this->createConfiguredStub(Request::class, [
             'getUser' => $user,
             'getImage' => $image,
         ]);
@@ -82,22 +82,22 @@ class ExifMetadataTest extends ListenerTests
             ->expects($this->once())
             ->method('updateMetadata')
             ->with('user', 'imageidentifier', [])
-            ->willThrowException($this->createMock(DatabaseException::class));
+            ->willThrowException($this->createStub(DatabaseException::class));
         $database
             ->expects($this->once())
             ->method('deleteImage')
             ->with('user', 'imageidentifier');
 
-        $image = $this->createConfiguredMock(Image::class, [
+        $image = $this->createConfiguredStub(Image::class, [
             'getImageIdentifier' => 'imageidentifier',
         ]);
 
-        $request = $this->createConfiguredMock(Request::class, [
+        $request = $this->createConfiguredStub(Request::class, [
             'getUser' => 'user',
             'getImage' => $image,
         ]);
 
-        $event = $this->createConfiguredMock(Event::class, [
+        $event = $this->createConfiguredStub(Event::class, [
             'getRequest' => $request,
             'getDatabase' => $database,
         ]);
@@ -117,11 +117,11 @@ class ExifMetadataTest extends ListenerTests
         $image = new Image();
         $image->setBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));
 
-        $request = $this->createConfiguredMock(Request::class, [
+        $request = $this->createConfiguredStub(Request::class, [
             'getImage' => $image,
         ]);
 
-        $event = $this->createConfiguredMock(EventInterface::class, [
+        $event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $request,
         ]);
 
@@ -146,11 +146,11 @@ class ExifMetadataTest extends ListenerTests
         $image = new Image();
         $image->setBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));
 
-        $request = $this->createConfiguredMock(Request::class, [
+        $request = $this->createConfiguredStub(Request::class, [
             'getImage' => $image,
         ]);
 
-        $event = $this->createConfiguredMock(EventInterface::class, [
+        $event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $request,
         ]);
 
@@ -168,11 +168,11 @@ class ExifMetadataTest extends ListenerTests
         $image = new Image();
         $image->setBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));
 
-        $request = $this->createConfiguredMock(Request::class, [
+        $request = $this->createConfiguredStub(Request::class, [
             'getImage' => $image,
         ]);
 
-        $event = $this->createConfiguredMock(EventInterface::class, [
+        $event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $request,
         ]);
 

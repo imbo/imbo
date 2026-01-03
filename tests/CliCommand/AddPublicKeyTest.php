@@ -6,6 +6,7 @@ use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
 use Imbo\Exception\RuntimeException;
 use Imbo\Resource;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -34,6 +35,7 @@ class AddPublicKeyTest extends TestCase
     }
 
     #[DataProvider('getInvalidAccessControlConfig')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsWhenAccessControlIsNotValid(array $config, string $errorMessage): void
     {
         if (is_string($config['accessControl'])) {
@@ -82,6 +84,10 @@ class AddPublicKeyTest extends TestCase
 
     public function testWillNotAcceptEmptyUserSpecification(): void
     {
+        $this->adapter
+            ->expects($this->never())
+            ->method('addKeyPair');
+
         $commandTester = new CommandTester($this->command);
         $commandTester->setInputs([
             '0',
@@ -95,6 +101,10 @@ class AddPublicKeyTest extends TestCase
 
     public function testWillNotAcceptEmptyCustomResourceSpecification(): void
     {
+        $this->adapter
+            ->expects($this->never())
+            ->method('addKeyPair');
+
         $commandTester = new CommandTester($this->command);
         $commandTester->setInputs([
             '4',
@@ -230,6 +240,10 @@ class AddPublicKeyTest extends TestCase
 
     public function testConfiguresCommand(): void
     {
+        $this->adapter
+            ->expects($this->never())
+            ->method('addKeyPair');
+
         $this->assertSame('Add a public key', $this->command->getDescription());
         $this->assertSame('add-public-key', $this->command->getName());
         $this->assertSame('Add a public key to the configured access control adapter', $this->command->getHelp());

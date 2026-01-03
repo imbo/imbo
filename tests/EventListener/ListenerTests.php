@@ -1,12 +1,14 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventListener;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
 abstract class ListenerTests extends TestCase
 {
     abstract protected function getListener(): ListenerInterface;
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testReturnsCorrectEventSubscriptions(): void
     {
         $listener = $this->getListener();

@@ -57,7 +57,7 @@ class ErrorTest extends TestCase
 
     public function testCanCreateAnErrorBasedOnAnException(): void
     {
-        $request = $this->createMock(Request::class);
+        $request = $this->createStub(Request::class);
 
         $exception = new RuntimeException('You wronged', Response::HTTP_BAD_REQUEST);
 
@@ -74,7 +74,7 @@ class ErrorTest extends TestCase
         $exception = new RuntimeException('You wronged', Response::HTTP_BAD_REQUEST);
         $exception->setImboErrorCode(123);
 
-        $request = $this->createConfiguredMock(Request::class, [
+        $request = $this->createConfiguredStub(Request::class, [
             'getImage' => null,
             'getImageIdentifier' => 'imageIdentifier',
         ]);
@@ -90,14 +90,16 @@ class ErrorTest extends TestCase
         $exception = new RuntimeException('You wronged', Response::HTTP_BAD_REQUEST);
         $exception->setImboErrorCode(123);
 
-        $image = $this->createConfiguredMock(Image::class, [
+        $image = $this->createConfiguredStub(Image::class, [
             'getImageIdentifier' => 'imageId',
         ]);
 
         $request = $this->createConfiguredMock(Request::class, [
             'getImage' => $image,
         ]);
-        $request->expects($this->never())->method('getImageIdentifier');
+        $request
+            ->expects($this->never())
+            ->method('getImageIdentifier');
 
         $model = Error::createFromException($exception, $request);
 

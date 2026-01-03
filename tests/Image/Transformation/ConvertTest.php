@@ -45,14 +45,13 @@ class ConvertTest extends TransformationTests
         $imagick = new Imagick();
         $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
 
-        $outputConverterManager = $this->createMock(OutputConverterManager::class);
+        $outputConverterManager = $this->createStub(OutputConverterManager::class);
         $outputConverterManager
-            ->expects($this->any())
             ->method('getMimetypeFromExtension')
             ->with('gif')
             ->willReturn('image/gif');
 
-        $event = $this->createConfiguredMock(EventInterface::class, [
+        $event = $this->createConfiguredStub(EventInterface::class, [
             'getOutputConverterManager' => $outputConverterManager,
         ]);
 
@@ -116,7 +115,7 @@ class ConvertTest extends TransformationTests
             ->with($newType)
             ->willReturn($newMimeType);
 
-        $event = $this->createConfiguredMock(EventInterface::class, [
+        $event = $this->createConfiguredStub(EventInterface::class, [
             'getOutputConverterManager' => $converterManager,
         ]);
 
@@ -129,7 +128,7 @@ class ConvertTest extends TransformationTests
 
     public function testThrowsExceptionOnImagickError(): void
     {
-        $image = $this->createConfiguredMock(Image::class, [
+        $image = $this->createConfiguredStub(Image::class, [
             'getExtension' => 'png',
         ]);
 

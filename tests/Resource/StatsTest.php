@@ -14,7 +14,7 @@ class StatsTest extends ResourceTests
     private Stats $resource;
     private Response&MockObject $response;
     private EventManager&MockObject $eventManager;
-    private EventInterface&MockObject $event;
+    private EventInterface $event;
 
     protected function getNewResource(): Stats
     {
@@ -25,7 +25,7 @@ class StatsTest extends ResourceTests
     {
         $this->response = $this->createMock(Response::class);
         $this->eventManager = $this->createMock(EventManager::class);
-        $this->event = $this->createConfiguredMock(EventInterface::class, [
+        $this->event = $this->createConfiguredStub(EventInterface::class, [
             'getResponse' => $this->response,
             'getManager' => $this->eventManager,
         ]);

@@ -10,6 +10,7 @@ use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
 use Imbo\Model\ModelInterface;
 use Imbo\Storage\StorageInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -20,9 +21,8 @@ class MetadataTest extends ResourceTests
     private Request&MockObject $request;
     private Response&MockObject $response;
     private DatabaseInterface&MockObject $database;
-    private StorageInterface&MockObject $storage;
     private EventManager&MockObject $manager;
-    private EventInterface&MockObject $event;
+    private EventInterface $event;
 
     protected function getNewResource(): Metadata
     {
@@ -34,19 +34,19 @@ class MetadataTest extends ResourceTests
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);
-        $this->storage = $this->createMock(StorageInterface::class);
         $this->manager = $this->createMock(EventManager::class);
-        $this->event = $this->createConfiguredMock(EventInterface::class, [
+        $this->event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $this->request,
             'getResponse' => $this->response,
             'getDatabase' => $this->database,
-            'getStorage' => $this->storage,
+            'getStorage' => $this->createStub(StorageInterface::class),
             'getManager' => $this->manager,
         ]);
 
         $this->resource = $this->getNewResource();
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testSupportsHttpDelete(): void
     {
         $this->manager
@@ -61,6 +61,7 @@ class MetadataTest extends ResourceTests
         $this->resource->delete($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testSupportsHttpPut(): void
     {
         $metadata = ['foo' => 'bar'];
@@ -121,6 +122,7 @@ class MetadataTest extends ResourceTests
         $this->resource->post($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testSupportsHttpGet(): void
     {
         $this->manager
@@ -130,6 +132,7 @@ class MetadataTest extends ResourceTests
         $this->resource->get($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsExceptionWhenValidatingMissingJsonData(): void
     {
         $this->request
@@ -140,6 +143,7 @@ class MetadataTest extends ResourceTests
         $this->resource->validateMetadata($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsExceptionWhenValidatingInvalidJsonData(): void
     {
         $this->request
@@ -150,6 +154,7 @@ class MetadataTest extends ResourceTests
         $this->resource->validateMetadata($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testAllowsValidJsonData(): void
     {
         $this->request
@@ -159,6 +164,7 @@ class MetadataTest extends ResourceTests
         $this->resource->validateMetadata($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsExceptionOnInvalidKeys(): void
     {
         $this->request

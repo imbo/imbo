@@ -9,6 +9,7 @@ use Imbo\Exception\ConfigurationException;
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -23,7 +24,7 @@ class AccessTokenTest extends ListenerTests
     private EventInterface&MockObject $event;
     private AccessControlAdapter&MockObject $accessControl;
     private Request&MockObject $request;
-    private Response&MockObject $response;
+    private Response $response;
     private ResponseHeaderBag&MockObject $responseHeaders;
 
     public function setUp(): void
@@ -34,7 +35,7 @@ class AccessTokenTest extends ListenerTests
         $this->request->query = new InputBag();
 
         $this->responseHeaders = $this->createMock(ResponseHeaderBag::class);
-        $this->response = $this->createMock(Response::class);
+        $this->response = $this->createStub(Response::class);
         $this->response->headers = $this->responseHeaders;
 
         $this->event = $this->getEventMock();
@@ -47,6 +48,7 @@ class AccessTokenTest extends ListenerTests
         return $this->listener;
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testRequestWithBogusAccessToken(): void
     {
         $this->request->query = new InputBag(['accessToken' => '/string']);
@@ -67,6 +69,7 @@ class AccessTokenTest extends ListenerTests
         $this->listener->checkAccessToken($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsExceptionIfAnAccessTokenIsMissingFromTheRequestWhenNotWhitelisted(): void
     {
         $this->event
@@ -79,6 +82,7 @@ class AccessTokenTest extends ListenerTests
     }
 
     #[DataProvider('getFilterData')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testSupportsFilters(array $filter, array $transformations, bool $whitelisted): void
     {
         $listener = new AccessToken($filter);
@@ -100,6 +104,7 @@ class AccessTokenTest extends ListenerTests
     }
 
     #[DataProvider('getAccessTokens')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsExceptionOnIncorrectToken(string $url, string $token, string $privateKey, bool $correct): void
     {
         if (!$correct) {
@@ -130,6 +135,7 @@ class AccessTokenTest extends ListenerTests
         $this->listener->checkAccessToken($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWillSkipValidationWhenShortUrlHeaderIsPresent(): void
     {
         $this->responseHeaders
@@ -141,6 +147,7 @@ class AccessTokenTest extends ListenerTests
         $this->listener->checkAccessToken($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWillAcceptBothProtocolsIfConfiguredTo(): void
     {
         $privateKey = 'foobar';
@@ -156,14 +163,14 @@ class AccessTokenTest extends ListenerTests
             foreach (['http', 'https'] as $protocol) {
                 $url = $protocol . ':' . $baseUrl . '&accessToken=' . $token;
 
-                $request = $this->createConfiguredMock(Request::class, [
+                $request = $this->createConfiguredStub(Request::class, [
                     'getRawUri' => urldecode($url),
                     'getUriAsIs' => $url,
                     'getPublicKey' => 'some-key',
                 ]);
                 $request->query = new InputBag(['accessToken' => $token]);
 
-                $event = $this->createConfiguredMock(Event::class, [
+                $event = $this->createConfiguredStub(Event::class, [
                     'getAccessControl' => $this->accessControl,
                     'getRequest' => $request,
                     'getResponse' => $this->response,
@@ -182,6 +189,7 @@ class AccessTokenTest extends ListenerTests
         }
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testAccessTokenArgumentKey(): void
     {
         $url = 'http://imbo/users/christer';
@@ -217,13 +225,14 @@ class AccessTokenTest extends ListenerTests
     }
 
     #[DataProvider('getAccessTokensForMultipleGenerator')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testMultipleAccessTokensGenerator(string $url, string $token, string $privateKey, bool $correct, string $argumentKey): void
     {
         if (!$correct) {
             $this->expectExceptionObject(new RuntimeException('Incorrect access token', Response::HTTP_BAD_REQUEST));
         }
 
-        $dummyAccessToken = $this->createConfiguredMock(AccessTokenInterface::class, [
+        $dummyAccessToken = $this->createConfiguredStub(AccessTokenInterface::class, [
             'generateSignature' => 'dummy',
         ]);
 
@@ -260,6 +269,7 @@ class AccessTokenTest extends ListenerTests
         $listener->checkAccessToken($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testConfigurationExceptionOnInvalidAccessTokenGenerator(): void
     {
         $this->expectExceptionObject(new ConfigurationException('Invalid accessTokenGenerator', Response::HTTP_INTERNAL_SERVER_ERROR));
@@ -268,6 +278,7 @@ class AccessTokenTest extends ListenerTests
     }
 
     #[DataProvider('getRewrittenAccessTokenData')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testWillRewriteIncomingUrlToConfiguredProtocol(string $accessToken, string $url, string $protocol, bool $correct): void
     {
         if (!$correct) {

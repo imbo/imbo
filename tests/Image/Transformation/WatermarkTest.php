@@ -3,6 +3,7 @@ namespace Imbo\Image\Transformation;
 
 use Imagick;
 use Imbo\EventManager\Event;
+use Imbo\EventManager\EventInterface;
 use Imbo\Exception\StorageException;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Request\Request;
@@ -32,7 +33,7 @@ class WatermarkTest extends TransformationTests
 
     public function testTransformThrowsExceptionIfNoImageSpecified(): void
     {
-        $image = $this->createMock(Image::class);
+        $image = $this->createStub(Image::class);
         $this->expectExceptionObject(new TransformationException(
             'You must specify an image identifier to use for the watermark',
             Response::HTTP_BAD_REQUEST,
@@ -51,17 +52,17 @@ class WatermarkTest extends TransformationTests
             ->with('someuser', 'foobar')
             ->willThrowException($e);
 
-        $request = $this->createConfiguredMock(Request::class, [
+        $request = $this->createConfiguredStub(Request::class, [
             'getUser' => 'someuser',
         ]);
 
-        $event = $this->createConfiguredMock(Event::class, [
+        $event = $this->createConfiguredStub(EventInterface::class, [
             'getStorage' => $storage,
             'getRequest' => $request,
         ]);
 
         $this->transformation
-            ->setImage($this->createMock(Image::class))
+            ->setImage($this->createStub(Image::class))
             ->setEvent($event);
 
         $this->expectExceptionObject(new TransformationException(

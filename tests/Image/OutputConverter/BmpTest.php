@@ -59,7 +59,7 @@ class BmpTest extends TestCase
         $this->expectExceptionObject(new OutputConverterException('some error', Response::HTTP_BAD_REQUEST));
         $this->converter->convert(
             $imagick,
-            $this->createMock(Image::class),
+            $this->createStub(Image::class),
             $extension,
             'image/bmp',
         );

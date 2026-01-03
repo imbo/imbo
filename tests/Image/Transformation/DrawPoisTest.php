@@ -16,11 +16,11 @@ class DrawPoisTest extends TestCase
 {
     public function testDoesNotModifyImageIfNoPoisAreFound(): void
     {
-        $database = $this->createConfiguredMock(DatabaseInterface::class, [
+        $database = $this->createConfiguredStub(DatabaseInterface::class, [
             'getMetadata' => [],
         ]);
 
-        $event = $this->createConfiguredMock(Event::class, [
+        $event = $this->createConfiguredStub(Event::class, [
             'getDatabase' => $database,
         ]);
 
@@ -48,7 +48,7 @@ class DrawPoisTest extends TestCase
             ->with('user', 'image identifier')
             ->willReturn(['poi' => 'wat']);
 
-        $event = $this->createConfiguredMock(Event::class, [
+        $event = $this->createConfiguredStub(Event::class, [
             'getDatabase' => $database,
         ]);
 
@@ -69,13 +69,13 @@ class DrawPoisTest extends TestCase
 
     public function testThrowsExceptionOnInvalidPoi(): void
     {
-        $database = $this->createConfiguredMock(DatabaseInterface::class, [
+        $database = $this->createConfiguredStub(DatabaseInterface::class, [
             'getMetadata' => [
                 'poi' => [['foo' => 'bar']],
             ],
         ]);
 
-        $event = $this->createConfiguredMock(Event::class, [
+        $event = $this->createConfiguredStub(Event::class, [
             'getDatabase' => $database,
         ]);
 
@@ -99,7 +99,7 @@ class DrawPoisTest extends TestCase
 
     public function testDrawsSameAmountOfTimesAsPoisArePresent(): void
     {
-        $database = $this->createConfiguredMock(DatabaseInterface::class, [
+        $database = $this->createConfiguredStub(DatabaseInterface::class, [
             'getMetadata' => [
                 'poi' => [
                     [
@@ -126,7 +126,7 @@ class DrawPoisTest extends TestCase
             ],
         ]);
 
-        $event = $this->createConfiguredMock(Event::class, [
+        $event = $this->createConfiguredStub(Event::class, [
             'getDatabase' => $database,
         ]);
 
@@ -155,7 +155,7 @@ class DrawPoisTest extends TestCase
 
     public function testThrowsExceptionWhenImagickThrowsException(): void
     {
-        $database = $this->createConfiguredMock(DatabaseInterface::class, [
+        $database = $this->createConfiguredStub(DatabaseInterface::class, [
             'getMetadata' => [
                 'poi' => [[
                     'width'  => 100,
@@ -166,14 +166,14 @@ class DrawPoisTest extends TestCase
             ],
         ]);
 
-        $image = $this->createConfiguredMock(Image::class, [
+        $image = $this->createConfiguredStub(Image::class, [
             'getUser'            => 'user',
             'getImageIdentifier' => 'image identifier',
             'getWidth'           => 1000,
             'getHeight'          => 800,
         ]);
 
-        $event = $this->createConfiguredMock(Event::class, [
+        $event = $this->createConfiguredStub(Event::class, [
             'getDatabase' => $database,
         ]);
 

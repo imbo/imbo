@@ -16,6 +16,7 @@ use Imbo\Model\Metadata;
 use Imbo\Model\Stats;
 use Imbo\Model\Status;
 use Imbo\Model\User;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -34,6 +35,7 @@ class JSONTest extends TestCase
         $this->formatter = new JSON($this->dateFormatter);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testReturnsCurrectContentType(): void
     {
         $this->assertSame('application/json', $this->formatter->getContentType());
@@ -44,7 +46,7 @@ class JSONTest extends TestCase
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
         $date = new DateTime($formattedDate);
 
-        $model = $this->createConfiguredMock(Error::class, [
+        $model = $this->createConfiguredStub(Error::class, [
             'getHttpCode' => Response::HTTP_NOT_FOUND,
             'getErrorMessage' => 'Public key not found',
             'getDate' => $date,
@@ -69,11 +71,12 @@ class JSONTest extends TestCase
         $this->assertSame('identifier', $data['imageIdentifier']);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanFormatAnErrorModelWhenNoImageIdentifierExists(): void
     {
         $date = new DateTime();
 
-        $model = $this->createConfiguredMock(Error::class, [
+        $model = $this->createConfiguredStub(Error::class, [
             'getDate' => $date,
             'getImageIdentifier' => null,
         ]);
@@ -90,7 +93,7 @@ class JSONTest extends TestCase
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
         $date = new DateTime($formattedDate);
 
-        $model = $this->createConfiguredMock(Status::class, [
+        $model = $this->createConfiguredStub(Status::class, [
             'getDate' => $date,
             'getDatabaseStatus' => true,
             'getStorageStatus' => false,
@@ -116,7 +119,7 @@ class JSONTest extends TestCase
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
         $date = new DateTime($formattedDate);
 
-        $model = $this->createConfiguredMock(User::class, [
+        $model = $this->createConfiguredStub(User::class, [
             'getLastModified' => $date,
             'getNumImages' => 123,
             'getUserId' => 'christer',
@@ -137,6 +140,7 @@ class JSONTest extends TestCase
         $this->assertSame(123, $data['numImages']);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanFormatAnImagesModel(): void
     {
         $formattedDate = 'Wed, 30 Jan 2013 10:53:11 GMT';
@@ -158,7 +162,7 @@ class JSONTest extends TestCase
             'some other key' => 'some other value',
         ];
 
-        $image = $this->createConfiguredMock(Image::class, [
+        $image = $this->createConfiguredStub(Image::class, [
             'getUser' => $user,
             'getImageIdentifier' => $imageIdentifier,
             'getChecksum' => $checksum,
@@ -173,7 +177,7 @@ class JSONTest extends TestCase
         ]);
 
         $images = [$image];
-        $model = $this->createConfiguredMock(Images::class, [
+        $model = $this->createConfiguredStub(Images::class, [
             'getImages' => $images,
             'getHits' => 100,
             'getPage' => 2,
@@ -230,9 +234,10 @@ class JSONTest extends TestCase
         $this->assertSame($metadata, $image['metadata']);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanFormatAnImagesModelWithNoMetadataSet(): void
     {
-        $image = $this->createConfiguredMock(Image::class, [
+        $image = $this->createConfiguredStub(Image::class, [
             'getMetadata' => [],
             'getAddedDate' => new DateTime(),
             'getUpdatedDate' => new DateTime(),
@@ -255,9 +260,10 @@ class JSONTest extends TestCase
         $this->assertSame([], $image['metadata']);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanFormatAnImagesModelWithNoMetadata(): void
     {
-        $image = $this->createConfiguredMock(Image::class, [
+        $image = $this->createConfiguredStub(Image::class, [
             'getMetadata' => [],
             'getAddedDate' => new DateTime(),
             'getUpdatedDate' => new DateTime(),
@@ -280,6 +286,7 @@ class JSONTest extends TestCase
         $this->assertEmpty($image['metadata']);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanFormatAnImagesModelWithNoImages(): void
     {
         $model = $this->createMock(Images::class);
@@ -295,9 +302,10 @@ class JSONTest extends TestCase
         $this->assertCount(0, $data['images']);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanFormatAnImagesModelWithSomefields(): void
     {
-        $image = $this->createConfiguredMock(Image::class, [
+        $image = $this->createConfiguredStub(Image::class, [
             'getAddedDate' => new DateTime(),
             'getUpdatedDate' => new DateTime(),
         ]);
@@ -329,13 +337,14 @@ class JSONTest extends TestCase
         $this->assertSameSize($fields, $image, 'Image array has to many keys');
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanFormatAMetadataModel(): void
     {
         $metadata = [
             'some key' => 'some value',
             'some other key' => 'some other value',
         ];
-        $model = $this->createConfiguredMock(Metadata::class, [
+        $model = $this->createConfiguredStub(Metadata::class, [
             'getData' => $metadata,
         ]);
 
@@ -346,9 +355,10 @@ class JSONTest extends TestCase
         $this->assertSame($data, $metadata);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanFormatAMetadataModelWithNoMetadata(): void
     {
-        $model = $this->createConfiguredMock(Metadata::class, [
+        $model = $this->createConfiguredStub(Metadata::class, [
             'getData' => [],
         ]);
 
@@ -358,6 +368,7 @@ class JSONTest extends TestCase
         $this->assertSame([], $data);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanFormatAnArrayModel(): void
     {
         $data = [
@@ -369,7 +380,7 @@ class JSONTest extends TestCase
                 ],
             ],
         ];
-        $model = $this->createConfiguredMock(ArrayModel::class, [
+        $model = $this->createConfiguredStub(ArrayModel::class, [
             'getData' => $data,
         ]);
 
@@ -378,9 +389,10 @@ class JSONTest extends TestCase
         $this->assertSame(json_decode($json, true), $data);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanFormatAnEmptyArrayModel(): void
     {
-        $model = $this->createConfiguredMock(ArrayModel::class, [
+        $model = $this->createConfiguredStub(ArrayModel::class, [
             'getData' => [],
         ]);
 
@@ -390,6 +402,7 @@ class JSONTest extends TestCase
         $this->assertSame([], $data);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanFormatGroupsModel(): void
     {
         $groups = ['group', 'othergroup'];
@@ -398,7 +411,7 @@ class JSONTest extends TestCase
         $limit = 5;
         $page = 1;
 
-        $model = $this->createConfiguredMock(Groups::class, [
+        $model = $this->createConfiguredStub(Groups::class, [
             'getHits' => $hits,
             'getPage' => $page,
             'getLimit' => $limit,
@@ -409,6 +422,7 @@ class JSONTest extends TestCase
         $this->assertSame('{"search":{"hits":2,"page":1,"limit":5,"count":2},"groups":["group","othergroup"]}', $this->formatter->format($model));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanFormatAGroupModel(): void
     {
         $name = 'group';
@@ -417,7 +431,7 @@ class JSONTest extends TestCase
             'user.head',
         ];
 
-        $model = $this->createConfiguredMock(Group::class, [
+        $model = $this->createConfiguredStub(Group::class, [
             'getName' => $name,
             'getResources' => $resources,
         ]);
@@ -425,13 +439,14 @@ class JSONTest extends TestCase
         $this->assertSame('{"name":"group","resources":["user.get","user.head"]}', $this->formatter->format($model));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanFormatAnAccessRuleModelWithGroup(): void
     {
         $id = 1;
         $users = ['user1', 'user2'];
         $group = 'group';
 
-        $model = $this->createConfiguredMock(AccessRule::class, [
+        $model = $this->createConfiguredStub(AccessRule::class, [
             'getId' => $id,
             'getUsers' => $users,
             'getGroup' => $group,
@@ -440,13 +455,14 @@ class JSONTest extends TestCase
         $this->assertSame('{"id":1,"users":["user1","user2"],"group":"group"}', $this->formatter->format($model));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanFormatAnAccessRuleModelWithResource(): void
     {
         $id = 1;
         $users = ['user1', 'user2'];
         $resources = ['resource1', 'resource2'];
 
-        $model = $this->createConfiguredMock(AccessRule::class, [
+        $model = $this->createConfiguredStub(AccessRule::class, [
             'getId' => $id,
             'getUsers' => $users,
             'getResources' => $resources,
@@ -455,6 +471,7 @@ class JSONTest extends TestCase
         $this->assertSame('{"id":1,"users":["user1","user2"],"resources":["resource1","resource2"]}', $this->formatter->format($model));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanFormatAccessRulesModel(): void
     {
         $rules = [
@@ -469,7 +486,7 @@ class JSONTest extends TestCase
                 'users' => ['user3', 'user4'],
             ],
         ];
-        $model = $this->createConfiguredMock(AccessRules::class, [
+        $model = $this->createConfiguredStub(AccessRules::class, [
             'getRules' => $rules,
         ]);
 
@@ -477,9 +494,10 @@ class JSONTest extends TestCase
     }
 
     #[DataProvider('getStats')]
+    #[AllowMockObjectsWithoutExpectations]
     public function testCanFormatAStatsModel(int $images, int $users, int $bytes, array $customStats, string $expectedJson): void
     {
-        $model = $this->createConfiguredMock(Stats::class, [
+        $model = $this->createConfiguredStub(Stats::class, [
             'getNumImages' => $images,
             'getNumUsers' => $users,
             'getNumBytes' => $bytes,

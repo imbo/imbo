@@ -33,12 +33,12 @@ class EightbimMetadataTest extends ListenerTests
         $imageIdentifier = 'imageIdentifier';
         $blob = file_get_contents(FIXTURES_DIR . '/jpeg-with-multiple-paths.jpg');
 
-        $image = $this->createConfiguredMock(Image::class, [
+        $image = $this->createConfiguredStub(Image::class, [
             'getImageIdentifier' => $imageIdentifier,
             'getBlob' => $blob,
         ]);
 
-        $request = $this->createConfiguredMock(Request::class, [
+        $request = $this->createConfiguredStub(Request::class, [
             'getUser' => $user,
             'getImage' => $image,
         ]);
@@ -84,12 +84,12 @@ class EightbimMetadataTest extends ListenerTests
         $imageIdentifier = 'imageIdentifier';
         $blob = file_get_contents(FIXTURES_DIR . '/jpeg-with-multiple-paths.jpg');
 
-        $image = $this->createConfiguredMock(Image::class, [
+        $image = $this->createConfiguredStub(Image::class, [
             'getImageIdentifier' => $imageIdentifier,
             'getBlob' => $blob,
         ]);
 
-        $request = $this->createConfiguredMock(Request::class, [
+        $request = $this->createConfiguredStub(Request::class, [
             'getUser' => $user,
             'getImage' => $image,
         ]);
@@ -107,7 +107,7 @@ class EightbimMetadataTest extends ListenerTests
             ->method('deleteImage')
             ->with($user, $imageIdentifier);
 
-        $event = $this->createConfiguredMock(EventInterface::class, [
+        $event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $request,
             'getDatabase' => $database,
         ]);
