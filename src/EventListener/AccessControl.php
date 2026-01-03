@@ -58,7 +58,7 @@ class AccessControl implements ListenerInterface
      *
      * @param array $params Parameters for the listener
      */
-    public function __construct(array $params = null)
+    public function __construct(?array $params = null)
     {
         if ($params) {
             $this->params = array_replace_recursive($this->params, $params);

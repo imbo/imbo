@@ -118,7 +118,7 @@ interface DatabaseInterface
      * @throws DatabaseException
      * @return DateTime Returns an instance of DateTime
      */
-    public function getLastModified(array $users, string $imageIdentifier = null): DateTime;
+    public function getLastModified(array $users, ?string $imageIdentifier = null): DateTime;
 
     /**
      * Update the last modified timestamp for a given image to now.
@@ -149,7 +149,7 @@ interface DatabaseInterface
      * @throws DatabaseException
      * @return int Returns the number of images
      */
-    public function getNumImages(string $user = null): int;
+    public function getNumImages(?string $user = null): int;
 
     /**
      * Fetch the number of bytes stored, optionally filtered by a given user
@@ -158,7 +158,7 @@ interface DatabaseInterface
      * @throws DatabaseException
      * @return int Returns the number of bytes
      */
-    public function getNumBytes(string $user = null): int;
+    public function getNumBytes(?string $user = null): int;
 
     /**
      * Fetch the number of users which has one or more images
@@ -207,7 +207,7 @@ interface DatabaseInterface
      * @param array<string, string|string[]> $query Optional query parameters
      * @return bool
      */
-    public function insertShortUrl(string $shortUrlId, string $user, string $imageIdentifier, string $extension = null, array $query = []): bool;
+    public function insertShortUrl(string $shortUrlId, string $user, string $imageIdentifier, ?string $extension = null, array $query = []): bool;
 
     /**
      * Fetch the short URL identifier
@@ -218,7 +218,7 @@ interface DatabaseInterface
      * @param array<string, string|string[]> $query Optional query parameters
      * @return ?string
      */
-    public function getShortUrlId(string $user, string $imageIdentifier, string $extension = null, array $query = []): ?string;
+    public function getShortUrlId(string $user, string $imageIdentifier, ?string $extension = null, array $query = []): ?string;
 
     /**
      * Fetch parameters for a short URL
@@ -242,7 +242,7 @@ interface DatabaseInterface
      *                           a user
      * @return bool
      */
-    public function deleteShortUrls(string $user, string $imageIdentifier, string $shortUrlId = null): bool;
+    public function deleteShortUrls(string $user, string $imageIdentifier, ?string $shortUrlId = null): bool;
 
     /**
      * Return a list of the users present in the database

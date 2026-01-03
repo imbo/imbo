@@ -15,7 +15,7 @@ class ResizeTest extends TransformationTests
     }
 
     #[DataProvider('getResizeParams')]
-    public function testCanTransformImage(array $params, bool $transformation, int $resizedWidth = null, int $resizedHeight = null): void
+    public function testCanTransformImage(array $params, bool $transformation, ?int $resizedWidth = null, ?int $resizedHeight = null): void
     {
         $image = $this->createConfiguredMock(Image::class, [
             'getWidth' => 665,

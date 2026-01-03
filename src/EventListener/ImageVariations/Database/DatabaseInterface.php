@@ -38,5 +38,5 @@ interface DatabaseInterface
      * @param int $width Only delete the variation with this width
      * @return bool
      */
-    public function deleteImageVariations(string $user, string $imageIdentifier, int $width = null): bool;
+    public function deleteImageVariations(string $user, string $imageIdentifier, ?int $width = null): bool;
 }

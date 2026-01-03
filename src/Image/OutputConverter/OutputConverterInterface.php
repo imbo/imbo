@@ -27,5 +27,5 @@ interface OutputConverterInterface
      * @param string $mimeType Mime type of the file being output.
      * @return null|bool|Imagick
      */
-    public function convert(Imagick $imagick, Image $image, string $extension, string $mimeType = null);
+    public function convert(Imagick $imagick, Image $image, string $extension, ?string $mimeType = null);
 }

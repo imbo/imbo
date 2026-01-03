@@ -18,7 +18,7 @@ class Imagick implements InitializerInterface
      */
     private BaseImagick $imagick;
 
-    public function __construct(BaseImagick $imagick = null)
+    public function __construct(?BaseImagick $imagick = null)
     {
         if ($imagick === null) {
             $imagick = new BaseImagick();

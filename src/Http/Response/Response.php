@@ -17,7 +17,7 @@ class Response extends SymfonyResponse
         return $this->model;
     }
 
-    public function setModel(ModelInterface $model = null): self
+    public function setModel(?ModelInterface $model = null): self
     {
         $this->model = $model;
         return $this;

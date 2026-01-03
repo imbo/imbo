@@ -2,6 +2,7 @@
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
+use Imbo\Model\Image;
 
 /**
  * HashTwo event listener
@@ -24,7 +25,7 @@ class VarnishHashTwo implements ListenerInterface
      *
      * @param array $params Parameters for the event listener
      */
-    public function __construct(array $params = null)
+    public function __construct(?array $params = null)
     {
         if ($params && isset($params['headerName'])) {
             $this->header = $params['headerName'];
@@ -50,7 +51,9 @@ class VarnishHashTwo implements ListenerInterface
         $response = $event->getResponse();
 
         $user = $request->getUser();
-        $imageIdentifier = $response->getModel()->getImageIdentifier();
+        /** @var Image */
+        $model = $response->getModel();
+        $imageIdentifier = $model->getImageIdentifier();
 
         $response->headers->set(
             $this->header,

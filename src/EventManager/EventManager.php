@@ -210,7 +210,7 @@ class EventManager
         return $this;
     }
 
-    private function triggersFor(string $user = null, array $filter = []): bool
+    private function triggersFor(?string $user = null, array $filter = []): bool
     {
         if (empty($user) || empty($filter)) {
             return true;

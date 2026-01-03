@@ -547,7 +547,7 @@ class FeatureContextTest extends TestCase
     }
 
     #[DataProvider('getDataForWatermarkImages')]
-    public function testCanSpecifyWatermarkImage(string $image, string $imageIdentifier, string $params = null, string $uri): void
+    public function testCanSpecifyWatermarkImage(string $image, string $imageIdentifier, string $uri, ?string $params = null): void
     {
         $this->mockHandler->append(
             new Response(200, [], json_encode(['imageIdentifier' => $imageIdentifier])),
@@ -655,7 +655,7 @@ class FeatureContextTest extends TestCase
     }
 
     #[DataProvider('getDataForReplayingRequests')]
-    public function testCanReplayTheLastRequest(string $originalMethod, string $method = null, string $expectedUrl, string $publicKey = null, string $privateKey = null): void
+    public function testCanReplayTheLastRequest(string $originalMethod, string $expectedUrl, ?string $method = null, ?string $publicKey = null, ?string $privateKey = null): void
     {
         $this->mockHandler->append(new Response(200), new Response(200));
 
@@ -1397,7 +1397,7 @@ class FeatureContextTest extends TestCase
     }
 
     #[DataProvider('getCacheabilityData')]
-    public function testCanAssertResponseCacheability(ResponseInterface $response, bool $expected, string $exceptionMessage = null): void
+    public function testCanAssertResponseCacheability(ResponseInterface $response, bool $expected, ?string $exceptionMessage = null): void
     {
         $this->mockHandler->append($response);
         $this->context->requestPath('/path');
@@ -2024,14 +2024,14 @@ class FeatureContextTest extends TestCase
             'no params' => [
                 'image' => FIXTURES_DIR . '/image1.png',
                 'imageIdentifier' => 'someId',
-                'params' => null,
                 'uri' => 'http://localhost:8080/path?t%5B0%5D=watermark%3Aimg%3DsomeId',
+                'params' => null,
             ],
             'with params' => [
                 'image' => FIXTURES_DIR . '/image1.png',
                 'imageIdentifier' => 'someId',
-                'params' => 'x=10,y=5,position=bottom-right,width=20,height=20',
                 'uri' => 'http://localhost:8080/path?t%5B0%5D=watermark%3Aimg%3DsomeId%2Cx%3D10%2Cy%3D5%2Cposition%3Dbottom-right%2Cwidth%3D20%2Cheight%3D20',
+                'params' => 'x=10,y=5,position=bottom-right,width=20,height=20',
             ],
         ];
     }
@@ -2084,29 +2084,29 @@ class FeatureContextTest extends TestCase
         return [
             'use original method' => [
                 'originalMethod' => 'GET',
-                'method' => null,
                 'expectedUrl' => 'http://localhost:8080/path',
+                'method' => null,
                 'publicKey' => null,
                 'privateKey' => null,
             ],
             'specify custom method' => [
                 'originalMethod' => 'GET',
-                'method' => 'HEAD',
                 'expectedUrl' => 'http://localhost:8080/path',
+                'method' => 'HEAD',
                 'publicKey' => null,
                 'privateKey' => null,
             ],
             'specify custom method that the same as the original' => [
                 'originalMethod' => 'DELETE',
-                'method' => 'DELETE',
                 'expectedUrl' => 'http://localhost:8080/path',
+                'method' => 'DELETE',
                 'publicKey' => null,
                 'privateKey' => null,
             ],
             'specify custom method and append access token' => [
                 'originalMethod' => 'DELETE',
-                'method' => 'DELETE',
                 'expectedUrl' => 'http://localhost:8080/path?publicKey=key&accessToken=dd4217a681cf8abdcecdc68cf49630df1e57dc733735e902b8a69859e50797a8',
+                'method' => 'DELETE',
                 'publicKey' => 'key',
                 'privateKey' => 'secret',
             ],

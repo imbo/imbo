@@ -343,7 +343,7 @@ class Listener implements ListenerInterface
 {
     private ?array $params;
 
-    public function __construct(array $params = null)
+    public function __construct(?array $params = null)
     {
         $this->params = $params;
     }

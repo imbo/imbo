@@ -10,7 +10,7 @@ abstract class Formatter implements FormatterInterface
 {
     protected DateFormatter $dateFormatter;
 
-    public function __construct(DateFormatter $formatter = null)
+    public function __construct(?DateFormatter $formatter = null)
     {
         if ($formatter === null) {
             $formatter = new DateFormatter();

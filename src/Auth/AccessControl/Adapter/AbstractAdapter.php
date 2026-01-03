@@ -15,7 +15,7 @@ abstract class AbstractAdapter implements AdapterInterface
     abstract public function groupExists(string $groupName): bool;
     abstract public function getGroup(string $groupName): ?array;
 
-    public function hasAccess(string $publicKey, string $resource, string $user = null): bool
+    public function hasAccess(string $publicKey, string $resource, ?string $user = null): bool
     {
         $accessList = $this->getAccessListForPublicKey($publicKey) ?: [];
 

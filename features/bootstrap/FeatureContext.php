@@ -541,7 +541,7 @@ class FeatureContext extends ApiContext
      * @Given :imagePath exists for user :user
      * @Given :imagePath exists for user :user with the following metadata:
      */
-    public function addUserImageToImbo(string $imagePath, string $user, PyStringNode $metadata = null): static
+    public function addUserImageToImbo(string $imagePath, string $user, ?PyStringNode $metadata = null): static
     {
         if (!file_exists($imagePath)) {
             throw new InvalidArgumentException(sprintf('File does not exist: "%s".', $imagePath));

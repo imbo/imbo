@@ -316,7 +316,7 @@ class AccessTokenTest extends ListenerTests
         );
     }
 
-    protected function getEventMock(array $config = null): EventInterface&MockObject
+    protected function getEventMock(?array $config = null): EventInterface&MockObject
     {
         return $this->createConfiguredMock(EventInterface::class, [
             'getAccessControl' => $this->accessControl,

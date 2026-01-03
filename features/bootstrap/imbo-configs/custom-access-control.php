@@ -8,7 +8,7 @@ use Imbo\Model\Groups as GroupsModel;
 
 class StaticAccessControl extends AbstractAdapter implements AdapterInterface
 {
-    public function hasAccess(string $publicKey, string $resource, string $user = null): bool
+    public function hasAccess(string $publicKey, string $resource, ?string $user = null): bool
     {
         return $publicKey === 'public';
     }

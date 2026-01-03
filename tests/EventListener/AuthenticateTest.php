@@ -49,7 +49,7 @@ class AuthenticateTest extends ListenerTests
     /**
      * @param ?array{authentication:array{protocol:string}} $config
      */
-    protected function getEventStub(array $config = null): EventInterface
+    protected function getEventStub(?array $config = null): EventInterface
     {
         return $this->createConfiguredStub(EventInterface::class, [
             'getResponse' => $this->response,

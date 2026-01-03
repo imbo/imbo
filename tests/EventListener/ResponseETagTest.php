@@ -57,7 +57,7 @@ class ResponseETagTest extends ListenerTests
     }
 
     #[DataProvider('getRoutesForETags')]
-    public function testWillSetETagForSomeRoutes(string $route, bool $hasETag, bool $isOk = false, string $content = null): void
+    public function testWillSetETagForSomeRoutes(string $route, bool $hasETag, bool $isOk = false, ?string $content = null): void
     {
         $request = $this->createMock(Request::class);
         $request

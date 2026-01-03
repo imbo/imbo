@@ -22,7 +22,7 @@ abstract class AccessTokenGenerator implements AccessTokenInterface
      *
      * @param array<string,mixed> $params Parameters for the listener
      */
-    public function __construct(array $params = null)
+    public function __construct(?array $params = null)
     {
         if (null !== $params) {
             $this->params = array_replace_recursive($this->params, $params);

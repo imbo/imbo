@@ -26,7 +26,7 @@ interface AdapterInterface
      * @param string $user Optional user which the resource belongs to
      * @return bool True if public key has access, false otherwise
      */
-    public function hasAccess(string $publicKey, string $resource, string $user = null): bool;
+    public function hasAccess(string $publicKey, string $resource, ?string $user = null): bool;
 
     /**
      * Fetch a list of available resource groups
