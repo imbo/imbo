@@ -1,6 +1,6 @@
 services:
   mongo:
-    image: mongo
+    image: mongo:latest
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
@@ -13,7 +13,7 @@ services:
       timeout: 5s
       retries: 5
   mysql:
-    image: mysql
+    image: mysql:latest
     ports:
       - 3333:3306
     environment:
@@ -34,7 +34,7 @@ services:
       retries: 5
       start_period: 30s
   postgres:
-    image: postgres
+    image: postgres:latest
     ports:
       - 5555:5432
     environment:
@@ -57,12 +57,11 @@ services:
     image: adminer:latest
     ports:
       - "8888:8080"
-
   mongo-express:
     depends_on:
       mongo:
         condition: service_healthy
-    image: mongo-express
+    image: mongo-express:latest
     ports:
       - 8081:8081
     environment:
