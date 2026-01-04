@@ -103,7 +103,7 @@ jobs:
           key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
       - run: composer install
       - if: ${{ matrix.test-suite == 'sqlite-filesystem' }}
-        run: sqlite3 /tmp/imbo-sqlite-integration-test.sq3 < ./vendor/imbo/imbo-sqlite-adapters/setup/000-imbo.sql
+        run: sqlite3 /tmp/imbo-sqlite-integration-test.sq3 < ./scripts/sqlite/000-imbo.sql
       - if: ${{ matrix.test-suite == 'mysql-filesystem' }}
         run: mysql -uimbo_test -pimbo_test -h127.0.0.1 -P3333 imbo_test < ./vendor/imbo/imbo-mysql-adapters/setup/000-imbo.sql
       - if: ${{ matrix.test-suite == 'postgresql-filesystem' }}
