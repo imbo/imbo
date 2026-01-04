@@ -20,16 +20,22 @@ jobs:
           - "8.3"
           - "8.4"
           - "8.5"
+        mongodb:
+          - "8.2.23"
+        mysql:
+          - "9.5.0"
+        postgresql:
+          - "18.1"
     services:
       mongodb:
-        image: mongo:5.0.2
+        image: mongo:${{ matrix.mongodb }}
         ports:
           - 27017:27017
         env:
           MONGO_INITDB_ROOT_USERNAME: admin
           MONGO_INITDB_ROOT_PASSWORD: password
       mysql:
-        image: mysql:8.0.20
+        image: mysql:${{ matrix.mysql }}
         ports:
           - 3333:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -39,7 +45,7 @@ jobs:
           MYSQL_USER: imbo_test
           MYSQL_PASSWORD: imbo_test
       postgreql:
-        image: postgres
+        image: postgres:${{ matrix.postgresql }}
         ports:
           - 5555:5432
         env:
@@ -81,16 +87,22 @@ jobs:
           - sqlite-filesystem
           - mysql-filesystem
           - postgresql-filesystem
+        mongodb:
+          - "8.2.23"
+        mysql:
+          - "9.5.0"
+        postgresql:
+          - "18.1"
     services:
       mongodb:
-        image: mongo:5.0.2
+        image: mongo:${{ matrix.mongodb }}
         ports:
           - 27017:27017
         env:
           MONGO_INITDB_ROOT_USERNAME: admin
           MONGO_INITDB_ROOT_PASSWORD: password
       mysql:
-        image: mysql:8.0.20
+        image: mysql:${{ matrix.mysql }}
         ports:
           - 3333:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -99,8 +111,8 @@ jobs:
           MYSQL_DATABASE: imbo_test
           MYSQL_USER: imbo_test
           MYSQL_PASSWORD: imbo_test
-      postgreql:
-        image: postgres
+      postgresql:
+        image: postgres:${{ matrix.postgresql }}
         ports:
           - 5555:5432
         env:
