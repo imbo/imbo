@@ -2,6 +2,7 @@
 namespace Imbo\Database;
 
 use PDO;
+use PDOException;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(SQLite::class)]
@@ -29,7 +30,11 @@ class SQLiteIntegrationTest extends DatabaseTests
         ];
 
         foreach ($tables as $table) {
-            $this->pdo->exec("DELETE FROM `{$table}`");
+            try {
+                $this->pdo->exec("DELETE FROM `{$table}`");
+            } catch (PDOException $e) {
+                $this->markTestSkipped('SQLite database have not been initialized: ' . $e->getMessage());
+            }
         }
     }
 }

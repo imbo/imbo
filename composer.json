@@ -39,7 +39,6 @@
     "friendsofphp/php-cs-fixer": "^3.92",
     "imbo/behat-api-extension": "^6.0",
     "imbo/imbo-coding-standard": "^2.1",
-    "imbo/imbo-mysql-adapters": "dev-main",
     "imbo/imbo-postgresql-adapters": "dev-main",
     "mongodb/mongodb": "^2.1",
     "phpstan/extension-installer": "^1.4",

@@ -2,6 +2,7 @@
 namespace Imbo\EventListener\ImageVariations\Database;
 
 use PDO;
+use PDOException;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(SQLite::class)]
@@ -21,6 +22,10 @@ class SQLiteIntegrationTest extends DatabaseTests
             options: [PDO::ATTR_PERSISTENT => true],
         );
         $table = SQLite::IMAGEVARIATIONS_TABLE;
-        $pdo->exec("DELETE FROM `{$table}`");
+        try {
+            $pdo->exec("DELETE FROM `{$table}`");
+        } catch (PDOException $e) {
+            $this->markTestSkipped('SQLite database have not been initialized: ' . $e->getMessage());
+        }
     }
 }

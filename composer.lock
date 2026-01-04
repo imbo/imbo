@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a06470d9fb9de410b5415c8f325d7adf",
+    "content-hash": "69f197a74004ca8df748b177295c5fc6",
     "packages": [
         {
             "name": "brick/math",
@@ -2509,69 +2509,6 @@
                 "source": "https://github.com/imbo/imbo-coding-standard/tree/v2.1.1"
             },
             "time": "2023-07-03T18:44:31+00:00"
-        },
-        {
-            "name": "imbo/imbo-mysql-adapters",
-            "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/imbo/imbo-mysql-adapters.git",
-                "reference": "ace8309f78aebddb3a673df39aa5ad58ceada2f3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-mysql-adapters/zipball/ace8309f78aebddb3a673df39aa5ad58ceada2f3",
-                "reference": "ace8309f78aebddb3a673df39aa5ad58ceada2f3",
-                "shasum": ""
-            },
-            "require": {
-                "ext-pdo": "*",
-                "ext-pdo_mysql": "*",
-                "imbo/imbo-pdo-adapters": "dev-main",
-                "php": ">=8.3"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.92",
-                "imbo/imbo": "dev-main",
-                "imbo/imbo-adapters-sdk": "dev-main",
-                "imbo/imbo-coding-standard": "^2.1",
-                "phpstan/extension-installer": "^1.4",
-                "phpstan/phpstan": "^2.1",
-                "phpstan/phpstan-phpunit": "^2.0",
-                "phpunit/phpunit": "^12.5"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Imbo\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Christer Edvartsen",
-                    "email": "cogo@starzinger.net",
-                    "homepage": "https://github.com/christeredvartsen"
-                },
-                {
-                    "name": "Contributors",
-                    "homepage": "https://github.com/imbo"
-                }
-            ],
-            "description": "MySQL adapters for Imbo",
-            "homepage": "https://imbo.io/",
-            "keywords": [
-                "imbo"
-            ],
-            "support": {
-                "issues": "https://github.com/imbo/imbo-mysql-adapters/issues",
-                "source": "https://github.com/imbo/imbo-mysql-adapters/tree/main"
-            },
-            "time": "2026-01-03T16:37:05+00:00"
         },
         {
             "name": "imbo/imbo-pdo-adapters",
@@ -6741,7 +6678,6 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "imbo/imbo-mysql-adapters": 20,
         "imbo/imbo-postgresql-adapters": 20
     },
     "prefer-stable": true,
