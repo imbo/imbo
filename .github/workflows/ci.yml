@@ -54,6 +54,7 @@ jobs:
       - run: composer install
       - run: sqlite3 /tmp/imbo-sqlite-integration-test.sq3 < ./scripts/sqlite/000-imbo.sql
       - run: mysql -uimbo_test -pimbo_test -h127.0.0.1 -P3333 imbo_test < ./scripts/mysql/000-imbo.sql
+      - run: psql postgresql://imbo_test:imbo_test@127.0.0.1:5555/imbo_test -f ./scripts/postgresql/000-imbo.sql
       - run: vendor/bin/phpstan analyse
       - run: vendor/bin/phpunit
       - run: PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer check --diff
@@ -114,7 +115,7 @@ jobs:
       - run: composer install
       - run: sqlite3 /tmp/imbo-sqlite-integration-test.sq3 < ./scripts/sqlite/000-imbo.sql
       - run: mysql -uimbo_test -pimbo_test -h127.0.0.1 -P3333 imbo_test < ./scripts/mysql/000-imbo.sql
-      - run: psql postgresql://imbo_test:imbo_test@127.0.0.1:5555/imbo_test -f ./vendor/imbo/imbo-postgresql-adapters/setup/000-imbo.sql
+      - run: psql postgresql://imbo_test:imbo_test@127.0.0.1:5555/imbo_test -f ./scripts/postgresql/000-imbo.sql
       - run: |
           mkdir -p build/logs
           php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &
