@@ -38,6 +38,13 @@ jobs:
           MYSQL_DATABASE: imbo_test
           MYSQL_USER: imbo_test
           MYSQL_PASSWORD: imbo_test
+      postgreql:
+        image: postgres
+        ports:
+          - 5555:5432
+        env:
+          POSTGRES_USER: imbo_test
+          POSTGRES_PASSWORD: imbo_test
     steps:
       - uses: actions/checkout@v6
       - uses: shivammathur/setup-php@v2
