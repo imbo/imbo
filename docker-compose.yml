@@ -1,6 +1,6 @@
 services:
   mongo:
-    image: mongo:latest
+    image: mongo:8.2
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
@@ -13,7 +13,7 @@ services:
       timeout: 5s
       retries: 5
   mysql:
-    image: mysql:latest
+    image: mysql:9.5
     ports:
       - 3333:3306
     environment:
@@ -34,7 +34,7 @@ services:
       retries: 5
       start_period: 30s
   postgres:
-    image: postgres:latest
+    image: postgres:18.1
     ports:
       - 5555:5432
     environment:

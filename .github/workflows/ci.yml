@@ -21,9 +21,9 @@ jobs:
           - "8.4"
           - "8.5"
         mongodb:
-          - "8.2.23"
+          - "8.2"
         mysql:
-          - "9.5.0"
+          - "9.5"
         postgresql:
           - "18.1"
     services:
@@ -88,9 +88,9 @@ jobs:
           - mysql-filesystem
           - postgresql-filesystem
         mongodb:
-          - "8.2.23"
+          - "8.2"
         mysql:
-          - "9.5.0"
+          - "9.5"
         postgresql:
           - "18.1"
     services:
