@@ -11,13 +11,15 @@ permissions:
   contents: read
 jobs:
   unit-tests:
-    name: Unit tests and QA
+    name: Unit tests and QA (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         php:
           - "8.3"
+          - "8.4"
+          - "8.5"
     services:
       mongodb:
         image: mongo:5.0.2
