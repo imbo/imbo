@@ -59,29 +59,31 @@ jobs:
           - sqlite-filesystem
           - mysql-filesystem
           - postgresql-filesystem
-    env:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password
-      MYSQL_ALLOW_EMPTY_PASSWORD: yes
-      MYSQL_DATABASE: imbo_test
-      MYSQL_USER: imbo_test
-      MYSQL_PASSWORD: imbo_test
-      POSTGRES_USER: imbo_test
-      POSTGRES_PASSWORD: imbo_test
     services:
       mongodb:
         image: mongo:5.0.2
         ports:
           - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: admin
+          MONGO_INITDB_ROOT_PASSWORD: password
       mysql:
         image: mysql:8.0.20
         ports:
           - 3333:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: imbo_test
+          MYSQL_USER: imbo_test
+          MYSQL_PASSWORD: imbo_test
       postgreql:
         image: postgres
         ports:
           - 5555:5432
+        env:
+          POSTGRES_USER: imbo_test
+          POSTGRES_PASSWORD: imbo_test
     steps:
       - uses: actions/checkout@v6
       - uses: shivammathur/setup-php@v2
