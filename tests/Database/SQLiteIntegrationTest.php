@@ -12,7 +12,7 @@ class SQLiteIntegrationTest extends DatabaseTests
 
     protected function getAdapter(): SQLite
     {
-        return new SQLite((string) getenv('DB_DSN'));
+        return new SQLite((string) getenv('SQLITE_DSN'));
     }
 
     protected function setUp(): void
@@ -20,7 +20,7 @@ class SQLiteIntegrationTest extends DatabaseTests
         parent::setUp();
 
         $this->pdo = new PDO(
-            dsn: (string) getenv('DB_DSN'),
+            dsn: (string) getenv('SQLITE_DSN'),
             options: [PDO::ATTR_PERSISTENT => true],
         );
 

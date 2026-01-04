@@ -5,10 +5,10 @@ use DateTime;
 use DateTimeZone;
 use Imbo\Exception\DatabaseException;
 use Imbo\Exception\DuplicateImageIdentifierException;
-use Imbo\IdentifierQuoter;
 use Imbo\Model\Image;
 use Imbo\Model\Images;
 use Imbo\Resource\Images\Query;
+use Imbo\Trait\IdentifierQuoter;
 use PDO;
 use PDOException;
 

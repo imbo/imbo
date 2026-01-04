@@ -2,7 +2,7 @@
 namespace Imbo\EventListener\ImageVariations\Database;
 
 use Imbo\Exception\DatabaseException;
-use Imbo\IdentifierQuoter;
+use Imbo\Trait\IdentifierQuoter;
 use PDO;
 use PDOException;
 

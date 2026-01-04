@@ -6,7 +6,12 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
     ports:
       - 27017:27017
-
+    healthcheck:
+      test:
+        ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   mysql:
     image: mysql
     ports:
@@ -22,15 +27,41 @@ services:
       - mysqld
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
-
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+  postgres:
+    image: postgres
+    ports:
+      - 5555:5432
+    environment:
+      POSTGRES_USER: imbo_test
+      POSTGRES_PASSWORD: imbo_test
+    volumes:
+      - ./scripts/postgresql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -U $$POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
   adminer:
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     image: adminer:latest
     ports:
       - "8888:8080"
 
   mongo-express:
+    depends_on:
+      mongo:
+        condition: service_healthy
     image: mongo-express
     ports:
       - 8081:8081

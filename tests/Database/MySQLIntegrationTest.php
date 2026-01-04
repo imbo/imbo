@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace Imbo\Database;
 
+use Imbo\Exception\DatabaseException;
 use PDO;
 use PDOException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -10,11 +11,15 @@ class MySQLIntegrationTest extends DatabaseTests
 {
     protected function getAdapter(): MySQL
     {
-        return new MySQL(
-            (string) getenv('DB_DSN'),
-            (string) getenv('DB_USERNAME'),
-            (string) getenv('DB_PASSWORD'),
-        );
+        try {
+            return new MySQL(
+                (string) getenv('MYSQL_DSN'),
+                (string) getenv('MYSQL_USERNAME'),
+                (string) getenv('MYSQL_PASSWORD'),
+            );
+        } catch (DatabaseException $e) {
+            $this->markTestSkipped('Unable to connect to MySQL database: ' . $e->getMessage());
+        }
     }
 
     protected function setUp(): void
@@ -22,9 +27,9 @@ class MySQLIntegrationTest extends DatabaseTests
         parent::setUp();
 
         $pdo = new PDO(
-            (string) getenv('DB_DSN'),
-            (string) getenv('DB_USERNAME'),
-            (string) getenv('DB_PASSWORD'),
+            (string) getenv('MYSQL_DSN'),
+            (string) getenv('MYSQL_USERNAME'),
+            (string) getenv('MYSQL_PASSWORD'),
             [
                 PDO::ATTR_PERSISTENT => true,
             ],

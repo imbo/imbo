@@ -5,7 +5,7 @@
   beStrictAboutOutputDuringTests="true" requireCoverageMetadata="true"
   displayDetailsOnAllIssues="true">
   <testsuites>
-    <testsuite name="imbo-unit">
+    <testsuite name="default">
       <directory suffix="Test.php">tests</directory>
     </testsuite>
   </testsuites>
@@ -17,10 +17,19 @@
   </source>
   <php>
     <ini name="error_reporting" value="E_ALL" />
+
     <env name="MONGODB_URI" value="mongodb://localhost:27017" />
     <env name="MONGODB_USERNAME" value="admin" />
     <env name="MONGODB_PASSWORD" value="password" />
 
-    <env name="DB_DSN" value="sqlite:/tmp/imbo-sqlite-integration-test.sq3" />
+    <env name="SQLITE_DSN" value="sqlite:/tmp/imbo-sqlite-integration-test.sq3" />
+
+    <env name="MYSQL_DSN" value="mysql:host=127.0.0.1;port=3333;dbname=imbo_test" />
+    <env name="MYSQL_USERNAME" value="imbo_test" />
+    <env name="MYSQL_PASSWORD" value="imbo_test" />
+
+    <env name="POSTGRESQL_DSN" value="pgsql:host=127.0.0.1;port=5555;dbname=imbo_test" />
+    <env name="POSTGRESQL_USERNAME" value="imbo_test" />
+    <env name="POSTGRESQL_PASSWORD" value="imbo_test" />
   </php>
 </phpunit>
