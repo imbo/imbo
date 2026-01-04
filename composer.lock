@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "027f524d627399a7d0802343527b7535",
+    "content-hash": "a06470d9fb9de410b5415c8f325d7adf",
     "packages": [
         {
             "name": "brick/math",
@@ -2692,69 +2692,6 @@
                 "source": "https://github.com/imbo/imbo-postgresql-adapters/tree/main"
             },
             "time": "2026-01-03T16:28:23+00:00"
-        },
-        {
-            "name": "imbo/imbo-sqlite-adapters",
-            "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/imbo/imbo-sqlite-adapters.git",
-                "reference": "e7ca13dbd6f9cb17df5411b2f8384df56c128fc5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-sqlite-adapters/zipball/e7ca13dbd6f9cb17df5411b2f8384df56c128fc5",
-                "reference": "e7ca13dbd6f9cb17df5411b2f8384df56c128fc5",
-                "shasum": ""
-            },
-            "require": {
-                "ext-pdo": "*",
-                "ext-pdo_sqlite": "*",
-                "imbo/imbo-pdo-adapters": "dev-main",
-                "php": ">=8.3"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.92",
-                "imbo/imbo": "dev-main",
-                "imbo/imbo-adapters-sdk": "dev-main",
-                "imbo/imbo-coding-standard": "^2.1",
-                "phpstan/extension-installer": "^1.4",
-                "phpstan/phpstan": "^2.1",
-                "phpstan/phpstan-phpunit": "^2.0",
-                "phpunit/phpunit": "^12.5"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Imbo\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Christer Edvartsen",
-                    "email": "cogo@starzinger.net",
-                    "homepage": "https://github.com/christeredvartsen"
-                },
-                {
-                    "name": "Contributors",
-                    "homepage": "https://github.com/imbo"
-                }
-            ],
-            "description": "SQLite adapters for Imbo",
-            "homepage": "https://imbo.io/",
-            "keywords": [
-                "imbo"
-            ],
-            "support": {
-                "issues": "https://github.com/imbo/imbo-sqlite-adapters/issues",
-                "source": "https://github.com/imbo/imbo-sqlite-adapters/tree/main"
-            },
-            "time": "2026-01-03T14:30:42+00:00"
         },
         {
             "name": "mongodb/mongodb",
@@ -6805,8 +6742,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "imbo/imbo-mysql-adapters": 20,
-        "imbo/imbo-postgresql-adapters": 20,
-        "imbo/imbo-sqlite-adapters": 20
+        "imbo/imbo-postgresql-adapters": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

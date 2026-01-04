@@ -41,7 +41,6 @@
     "imbo/imbo-coding-standard": "^2.1",
     "imbo/imbo-mysql-adapters": "dev-main",
     "imbo/imbo-postgresql-adapters": "dev-main",
-    "imbo/imbo-sqlite-adapters": "dev-main",
     "mongodb/mongodb": "^2.1",
     "phpstan/extension-installer": "^1.4",
     "phpstan/phpstan": "^2.1",
