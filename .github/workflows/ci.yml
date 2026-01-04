@@ -41,8 +41,6 @@ jobs:
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-php-${{ matrix.php }}-composer-
       - run: composer install
       - run: sqlite3 /tmp/imbo-sqlite-integration-test.sq3 < ./scripts/sqlite/000-imbo.sql
       - run: vendor/bin/phpstan analyse
