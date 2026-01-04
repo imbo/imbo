@@ -56,6 +56,7 @@ jobs:
         test-suite:
           - mongodb-gridfs
           - mongodb-filesystem
+          - sqlite-filesystem
     services:
       mongodb:
         image: mongo:5.0.2
@@ -78,6 +79,8 @@ jobs:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
       - run: composer install
+      - if: ${{ matrix.test-suite == 'sqlite-filesystem' }}
+        run: sqlite3 /tmp/imbo-sqlite-integration-test.sq3 < ./vendor/imbo/imbo-sqlite-adapters/setup/000-imbo.sql
       - run: |
           mkdir -p build/logs
           php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &
@@ -85,47 +88,6 @@ jobs:
       - uses: actions/upload-artifact@v6
         with:
           name: httpd-logs-${{ matrix.test-suite }}-php-${{ matrix.php }}
-          path: build/logs/
-  integration-tests-sqlite-filesystem:
-    name: Integration tests (SQLite / Filesystem)
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        php:
-          - "8.3"
-    services:
-      mongodb:
-        image: mongo:5.0.2
-        ports:
-          - 27017:27017
-        env:
-          MONGO_INITDB_ROOT_USERNAME: admin
-          MONGO_INITDB_ROOT_PASSWORD: password
-    steps:
-      - uses: actions/checkout@v6
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: imagick
-      - id: composer-cache-dir
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-      - id: composer-cache
-        uses: actions/cache@v5
-        with:
-          path: ${{ steps.composer-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-php-${{ matrix.php }}-composer-
-      - run: composer install
-      - run: sqlite3 /tmp/imbo-sqlite-integration-test.sq3 < ./vendor/imbo/imbo-sqlite-adapters/setup/000-imbo.sql
-      - run: |
-          mkdir -p build/logs
-          php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &
-      - run: vendor/bin/behat --strict --suite=sqlite-filesystem
-      - uses: actions/upload-artifact@v5
-        with:
-          name: httpd-logs-sqlite-filesystem-php-${{ matrix.php }}
           path: build/logs/
   integration-tests-mysql-filesystem:
     name: Integration tests (MySQL / Filesystem)
