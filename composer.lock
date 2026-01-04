@@ -2075,16 +2075,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.92.3",
+            "version": "v3.92.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "2ba8f5a60f6f42fb65758cfb3768434fa2d1c7e8"
+                "reference": "9e7488b19403423e02e8403cc1eb596baf4673b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/2ba8f5a60f6f42fb65758cfb3768434fa2d1c7e8",
-                "reference": "2ba8f5a60f6f42fb65758cfb3768434fa2d1c7e8",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/9e7488b19403423e02e8403cc1eb596baf4673b0",
+                "reference": "9e7488b19403423e02e8403cc1eb596baf4673b0",
                 "shasum": ""
             },
             "require": {
@@ -2116,17 +2116,17 @@
             },
             "require-dev": {
                 "facile-it/paraunit": "^1.3.1 || ^2.7",
-                "infection/infection": "^0.31.0",
-                "justinrainbow/json-schema": "^6.5",
-                "keradus/cli-executor": "^2.2",
+                "infection/infection": "^0.31",
+                "justinrainbow/json-schema": "^6.6",
+                "keradus/cli-executor": "^2.3",
                 "mikey179/vfsstream": "^1.6.12",
                 "php-coveralls/php-coveralls": "^2.9",
                 "php-cs-fixer/phpunit-constraint-isidenticalstring": "^1.6",
                 "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "^1.6",
-                "phpunit/phpunit": "^9.6.25 || ^10.5.53 || ^11.5.34",
+                "phpunit/phpunit": "^9.6.31 || ^10.5.60 || ^11.5.46",
                 "symfony/polyfill-php85": "^1.33",
-                "symfony/var-dumper": "^5.4.48 || ^6.4.24 || ^7.3.2 || ^8.0",
-                "symfony/yaml": "^5.4.45 || ^6.4.24 || ^7.3.2 || ^8.0"
+                "symfony/var-dumper": "^5.4.48 || ^6.4.26 || ^7.4.0 || ^8.0",
+                "symfony/yaml": "^5.4.45 || ^6.4.30 || ^7.4.1 || ^8.0"
             },
             "suggest": {
                 "ext-dom": "For handling output formats in XML",
@@ -2167,7 +2167,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.92.3"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.92.4"
             },
             "funding": [
                 {
@@ -2175,7 +2175,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-18T10:45:02+00:00"
+            "time": "2026-01-04T00:38:52+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -2464,12 +2464,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-adapters-sdk.git",
-                "reference": "222d2b1f07b6560f69815de044e679cd527566f9"
+                "reference": "b80f65d53a6e3115fa9e49ce9c67a779209b5c7c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-adapters-sdk/zipball/222d2b1f07b6560f69815de044e679cd527566f9",
-                "reference": "222d2b1f07b6560f69815de044e679cd527566f9",
+                "url": "https://api.github.com/repos/imbo/imbo-adapters-sdk/zipball/b80f65d53a6e3115fa9e49ce9c67a779209b5c7c",
+                "reference": "b80f65d53a6e3115fa9e49ce9c67a779209b5c7c",
                 "shasum": ""
             },
             "require": {
@@ -2515,7 +2515,7 @@
                 "issues": "https://github.com/imbo/imbo-adapters-sdk/issues",
                 "source": "https://github.com/imbo/imbo-adapters-sdk/tree/main"
             },
-            "time": "2026-01-02T17:55:42+00:00"
+            "time": "2026-01-03T14:39:01+00:00"
         },
         {
             "name": "imbo/imbo-coding-standard",
@@ -2575,12 +2575,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-filesystem-adapters.git",
-                "reference": "eace76c91506b2d2555d9e9d6c9e829f8bede2d1"
+                "reference": "de2735b5d13fa7b443009902c383ef027342de61"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-filesystem-adapters/zipball/eace76c91506b2d2555d9e9d6c9e829f8bede2d1",
-                "reference": "eace76c91506b2d2555d9e9d6c9e829f8bede2d1",
+                "url": "https://api.github.com/repos/imbo/imbo-filesystem-adapters/zipball/de2735b5d13fa7b443009902c383ef027342de61",
+                "reference": "de2735b5d13fa7b443009902c383ef027342de61",
                 "shasum": ""
             },
             "require": {
@@ -2628,7 +2628,7 @@
                 "issues": "https://github.com/imbo/imbo-filesystem-adapters/issues",
                 "source": "https://github.com/imbo/imbo-filesystem-adapters/tree/main"
             },
-            "time": "2026-01-02T18:07:58+00:00"
+            "time": "2026-01-03T14:48:07+00:00"
         },
         {
             "name": "imbo/imbo-mongodb-adapters",
@@ -2636,21 +2636,21 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-mongodb-adapters.git",
-                "reference": "11c86692de4d03b952a484055052902fa6d4195a"
+                "reference": "7de0b7682900201433b2176d58c253509c0069dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-mongodb-adapters/zipball/11c86692de4d03b952a484055052902fa6d4195a",
-                "reference": "11c86692de4d03b952a484055052902fa6d4195a",
+                "url": "https://api.github.com/repos/imbo/imbo-mongodb-adapters/zipball/7de0b7682900201433b2176d58c253509c0069dd",
+                "reference": "7de0b7682900201433b2176d58c253509c0069dd",
                 "shasum": ""
             },
             "require": {
                 "ext-mongodb": "^2.0",
-                "mongodb/mongodb": "^2.0",
+                "mongodb/mongodb": "^2.1",
                 "php": ">=8.3"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.75",
+                "friendsofphp/php-cs-fixer": "^3.92",
                 "imbo/imbo": "dev-main",
                 "imbo/imbo-adapters-sdk": "dev-main",
                 "imbo/imbo-coding-standard": "dev-main",
@@ -2658,8 +2658,8 @@
                 "phpstan/phpstan": "^2.1",
                 "phpstan/phpstan-deprecation-rules": "^2.0",
                 "phpstan/phpstan-phpunit": "^2.0",
-                "phpunit/phpunit": "^12.0",
-                "symfony/var-dumper": "^7.2"
+                "phpunit/phpunit": "^12.5",
+                "symfony/var-dumper": "^7.4"
             },
             "default-branch": true,
             "type": "library",
@@ -2692,7 +2692,7 @@
                 "issues": "https://github.com/imbo/imbo-mongodb-adapters/issues",
                 "source": "https://github.com/imbo/imbo-mongodb-adapters/tree/main"
             },
-            "time": "2025-04-24T08:40:48+00:00"
+            "time": "2026-01-03T16:28:47+00:00"
         },
         {
             "name": "imbo/imbo-mysql-adapters",
@@ -2700,12 +2700,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-mysql-adapters.git",
-                "reference": "79a695945b21b79f28e725018db739597975592a"
+                "reference": "ace8309f78aebddb3a673df39aa5ad58ceada2f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-mysql-adapters/zipball/79a695945b21b79f28e725018db739597975592a",
-                "reference": "79a695945b21b79f28e725018db739597975592a",
+                "url": "https://api.github.com/repos/imbo/imbo-mysql-adapters/zipball/ace8309f78aebddb3a673df39aa5ad58ceada2f3",
+                "reference": "ace8309f78aebddb3a673df39aa5ad58ceada2f3",
                 "shasum": ""
             },
             "require": {
@@ -2715,14 +2715,14 @@
                 "php": ">=8.3"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.70",
+                "friendsofphp/php-cs-fixer": "^3.92",
                 "imbo/imbo": "dev-main",
                 "imbo/imbo-adapters-sdk": "dev-main",
-                "imbo/imbo-coding-standard": "^2.0",
+                "imbo/imbo-coding-standard": "^2.1",
                 "phpstan/extension-installer": "^1.4",
                 "phpstan/phpstan": "^2.1",
                 "phpstan/phpstan-phpunit": "^2.0",
-                "phpunit/phpunit": "^12.0"
+                "phpunit/phpunit": "^12.5"
             },
             "default-branch": true,
             "type": "library",
@@ -2755,7 +2755,7 @@
                 "issues": "https://github.com/imbo/imbo-mysql-adapters/issues",
                 "source": "https://github.com/imbo/imbo-mysql-adapters/tree/main"
             },
-            "time": "2025-02-24T08:24:52+00:00"
+            "time": "2026-01-03T16:37:05+00:00"
         },
         {
             "name": "imbo/imbo-pdo-adapters",
@@ -2820,12 +2820,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-postgresql-adapters.git",
-                "reference": "2d52ce815258d55fc1a291f4d02e21653e825290"
+                "reference": "43204bea399192123eb9095695c80ab05bd5fb6f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-postgresql-adapters/zipball/2d52ce815258d55fc1a291f4d02e21653e825290",
-                "reference": "2d52ce815258d55fc1a291f4d02e21653e825290",
+                "url": "https://api.github.com/repos/imbo/imbo-postgresql-adapters/zipball/43204bea399192123eb9095695c80ab05bd5fb6f",
+                "reference": "43204bea399192123eb9095695c80ab05bd5fb6f",
                 "shasum": ""
             },
             "require": {
@@ -2835,14 +2835,14 @@
                 "php": ">=8.3"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.70",
+                "friendsofphp/php-cs-fixer": "^3.92",
                 "imbo/imbo": "dev-main",
                 "imbo/imbo-adapters-sdk": "dev-main",
-                "imbo/imbo-coding-standard": "^2.0",
+                "imbo/imbo-coding-standard": "^2.1",
                 "phpstan/extension-installer": "^1.4",
                 "phpstan/phpstan": "^2.1",
                 "phpstan/phpstan-phpunit": "^2.0",
-                "phpunit/phpunit": "^12.0"
+                "phpunit/phpunit": "^12.5"
             },
             "default-branch": true,
             "type": "library",
@@ -2875,7 +2875,7 @@
                 "issues": "https://github.com/imbo/imbo-postgresql-adapters/issues",
                 "source": "https://github.com/imbo/imbo-postgresql-adapters/tree/main"
             },
-            "time": "2025-02-24T08:25:40+00:00"
+            "time": "2026-01-03T16:28:23+00:00"
         },
         {
             "name": "imbo/imbo-sqlite-adapters",
@@ -2883,12 +2883,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-sqlite-adapters.git",
-                "reference": "d0198b3884da1604f229ce8530581ac40dd3304e"
+                "reference": "e7ca13dbd6f9cb17df5411b2f8384df56c128fc5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-sqlite-adapters/zipball/d0198b3884da1604f229ce8530581ac40dd3304e",
-                "reference": "d0198b3884da1604f229ce8530581ac40dd3304e",
+                "url": "https://api.github.com/repos/imbo/imbo-sqlite-adapters/zipball/e7ca13dbd6f9cb17df5411b2f8384df56c128fc5",
+                "reference": "e7ca13dbd6f9cb17df5411b2f8384df56c128fc5",
                 "shasum": ""
             },
             "require": {
@@ -2938,7 +2938,7 @@
                 "issues": "https://github.com/imbo/imbo-sqlite-adapters/issues",
                 "source": "https://github.com/imbo/imbo-sqlite-adapters/tree/main"
             },
-            "time": "2026-01-03T10:31:58+00:00"
+            "time": "2026-01-03T14:30:42+00:00"
         },
         {
             "name": "mongodb/mongodb",
