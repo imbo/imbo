@@ -45,7 +45,7 @@ jobs:
       - run: vendor/bin/phpstan analyse
       - run: vendor/bin/phpunit
       - run: PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer check --diff
-  integration-tests-mongodb-gridfs:
+  integration-tests:
     name: Integration tests (MongoDB / GridFS)
     runs-on: ubuntu-latest
     strategy:
@@ -53,6 +53,8 @@ jobs:
       matrix:
         php:
           - "8.3"
+        test-suite:
+          - mongodb-gridfs
     services:
       mongodb:
         image: mongo:5.0.2
@@ -74,16 +76,14 @@ jobs:
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-php-${{ matrix.php }}-composer-
       - run: composer install
       - run: |
           mkdir -p build/logs
           php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &
-      - run: vendor/bin/behat --strict --suite=mongodb-gridfs
+      - run: vendor/bin/behat --strict --suite=${{ matrix.test-suite }}
       - uses: actions/upload-artifact@v6
         with:
-          name: httpd-logs-mongodb-gridfs-php-${{ matrix.php }}
+          name: httpd-logs-${{ matrix.test-suite }}-php-${{ matrix.php }}
           path: build/logs/
   integration-tests-mongodb-filesystem:
     name: Integration tests (MongoDB / Filesystem)
@@ -265,3 +265,14 @@ jobs:
         with:
           name: httpd-logs-postgresql-filesystem-php-${{ matrix.php }}
           path: build/logs/
+  branch-protection:
+    needs:
+      - unit-tests
+      - integration-tests
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    name: Branch protection
+    steps:
+      - if: ${{ needs.unit-tests.result != 'success' || needs.integration-tests.result != 'success' }}
+        run: exit 1
+      - run: echo "All checks passed."
