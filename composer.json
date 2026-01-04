@@ -34,16 +34,16 @@
     "symfony/http-foundation": "^7.4"
   },
   "require-dev": {
+    "ext-mongodb": "^2.0",
     "christeredvartsen/testfs": "^0.6",
     "friendsofphp/php-cs-fixer": "^3.92",
     "imbo/behat-api-extension": "^6.0",
-    "imbo/imbo-adapters-sdk": "dev-main",
     "imbo/imbo-coding-standard": "^2.1",
     "imbo/imbo-filesystem-adapters": "dev-main",
-    "imbo/imbo-mongodb-adapters": "dev-main",
     "imbo/imbo-mysql-adapters": "dev-main",
     "imbo/imbo-postgresql-adapters": "dev-main",
     "imbo/imbo-sqlite-adapters": "dev-main",
+    "mongodb/mongodb": "^2.1",
     "phpstan/extension-installer": "^1.4",
     "phpstan/phpstan": "^2.1",
     "phpstan/phpstan-deprecation-rules": "^2.0",
@@ -57,7 +57,6 @@
     "imbo/imbo-filesystem-adapters": "Enables usage of a (local) filesystem for storing images",
     "imbo/imbo-metadata-cache": "Enables caching of metadata through an event listener",
     "imbo/imbo-mysql-adapters": "Enables usage of MySQL as database",
-    "imbo/imbo-mongodb-adapters": "Enables usage of MongoDB for storing images",
     "imbo/imbo-postgresql-adapters": "Enables usage of PostgreSQL as database",
     "imbo/imbo-sqlite-adapters": "Enables usage of SQLite as database"
   },

@@ -8,4 +8,4 @@ End-user docs can be found [here](https://docs.imbo.io).
 
 ## License
 
-Licensed under the MIT License.
+MIT, see [LICENSE](LICENSE).

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e8be328a5a18b4a6dc11debd8200b454",
+    "content-hash": "02efe7afa34a9ca321ead852feb68c19",
     "packages": [
         {
             "name": "brick/math",
@@ -2459,65 +2459,6 @@
             "time": "2025-11-16T14:34:02+00:00"
         },
         {
-            "name": "imbo/imbo-adapters-sdk",
-            "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/imbo/imbo-adapters-sdk.git",
-                "reference": "b80f65d53a6e3115fa9e49ce9c67a779209b5c7c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-adapters-sdk/zipball/b80f65d53a6e3115fa9e49ce9c67a779209b5c7c",
-                "reference": "b80f65d53a6e3115fa9e49ce9c67a779209b5c7c",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.3"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.92",
-                "imbo/imbo": "dev-main",
-                "imbo/imbo-coding-standard": "^2.1",
-                "phpstan/extension-installer": "^1.4",
-                "phpstan/phpstan": "^2.1",
-                "phpstan/phpstan-phpunit": "^2.0",
-                "phpunit/phpunit": "^12.5"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Imbo\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Christer Edvartsen",
-                    "email": "cogo@starzinger.net",
-                    "homepage": "https://github.com/christeredvartsen"
-                },
-                {
-                    "name": "Contributors",
-                    "homepage": "https://github.com/imbo"
-                }
-            ],
-            "description": "SDK for Imbo adapters",
-            "homepage": "https://imbo.io/",
-            "keywords": [
-                "imbo"
-            ],
-            "support": {
-                "issues": "https://github.com/imbo/imbo-adapters-sdk/issues",
-                "source": "https://github.com/imbo/imbo-adapters-sdk/tree/main"
-            },
-            "time": "2026-01-03T14:39:01+00:00"
-        },
-        {
             "name": "imbo/imbo-coding-standard",
             "version": "v2.1.1",
             "source": {
@@ -2629,70 +2570,6 @@
                 "source": "https://github.com/imbo/imbo-filesystem-adapters/tree/main"
             },
             "time": "2026-01-03T14:48:07+00:00"
-        },
-        {
-            "name": "imbo/imbo-mongodb-adapters",
-            "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/imbo/imbo-mongodb-adapters.git",
-                "reference": "7de0b7682900201433b2176d58c253509c0069dd"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-mongodb-adapters/zipball/7de0b7682900201433b2176d58c253509c0069dd",
-                "reference": "7de0b7682900201433b2176d58c253509c0069dd",
-                "shasum": ""
-            },
-            "require": {
-                "ext-mongodb": "^2.0",
-                "mongodb/mongodb": "^2.1",
-                "php": ">=8.3"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.92",
-                "imbo/imbo": "dev-main",
-                "imbo/imbo-adapters-sdk": "dev-main",
-                "imbo/imbo-coding-standard": "dev-main",
-                "phpstan/extension-installer": "^1.4",
-                "phpstan/phpstan": "^2.1",
-                "phpstan/phpstan-deprecation-rules": "^2.0",
-                "phpstan/phpstan-phpunit": "^2.0",
-                "phpunit/phpunit": "^12.5",
-                "symfony/var-dumper": "^7.4"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Imbo\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Christer Edvartsen",
-                    "email": "cogo@starzinger.net",
-                    "homepage": "https://github.com/christeredvartsen"
-                },
-                {
-                    "name": "Contributors",
-                    "homepage": "https://github.com/imbo"
-                }
-            ],
-            "description": "MongoDB adapters for Imbo",
-            "homepage": "https://imbo.io/",
-            "keywords": [
-                "imbo"
-            ],
-            "support": {
-                "issues": "https://github.com/imbo/imbo-mongodb-adapters/issues",
-                "source": "https://github.com/imbo/imbo-mongodb-adapters/tree/main"
-            },
-            "time": "2026-01-03T16:28:47+00:00"
         },
         {
             "name": "imbo/imbo-mysql-adapters",
@@ -6988,9 +6865,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "imbo/imbo-adapters-sdk": 20,
         "imbo/imbo-filesystem-adapters": 20,
-        "imbo/imbo-mongodb-adapters": 20,
         "imbo/imbo-mysql-adapters": 20,
         "imbo/imbo-postgresql-adapters": 20,
         "imbo/imbo-sqlite-adapters": 20
@@ -7001,6 +6876,8 @@
         "php": ">=8.3",
         "ext-imagick": "^3.7"
     },
-    "platform-dev": {},
+    "platform-dev": {
+        "ext-mongodb": "^2.0"
+    },
     "plugin-api-version": "2.9.0"
 }
