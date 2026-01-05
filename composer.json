@@ -38,6 +38,7 @@
     "christeredvartsen/testfs": "^0.6",
     "friendsofphp/php-cs-fixer": "^3.92",
     "imbo/behat-api-extension": "^6.0",
+    "imbo/imbo-adapters-sdk": "dev-main",
     "imbo/imbo-coding-standard": "^2.1",
     "mongodb/mongodb": "^2.1",
     "phpstan/extension-installer": "^1.4",

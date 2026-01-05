@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "24a955a7e52d53362d614d3bf4526cd2",
+    "content-hash": "3d08ed6977773dfbdcafcdfa4e3b8639",
     "packages": [
         {
             "name": "brick/math",
@@ -2457,6 +2457,65 @@
                 "source": "https://github.com/imbo/behat-api-extension"
             },
             "time": "2025-11-16T14:34:02+00:00"
+        },
+        {
+            "name": "imbo/imbo-adapters-sdk",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/imbo/imbo-adapters-sdk.git",
+                "reference": "b80f65d53a6e3115fa9e49ce9c67a779209b5c7c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/imbo/imbo-adapters-sdk/zipball/b80f65d53a6e3115fa9e49ce9c67a779209b5c7c",
+                "reference": "b80f65d53a6e3115fa9e49ce9c67a779209b5c7c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.3"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.92",
+                "imbo/imbo": "dev-main",
+                "imbo/imbo-coding-standard": "^2.1",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpunit/phpunit": "^12.5"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Imbo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christer Edvartsen",
+                    "email": "cogo@starzinger.net",
+                    "homepage": "https://github.com/christeredvartsen"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/imbo"
+                }
+            ],
+            "description": "SDK for Imbo adapters",
+            "homepage": "https://imbo.io/",
+            "keywords": [
+                "imbo"
+            ],
+            "support": {
+                "issues": "https://github.com/imbo/imbo-adapters-sdk/issues",
+                "source": "https://github.com/imbo/imbo-adapters-sdk/tree/main"
+            },
+            "time": "2026-01-03T14:39:01+00:00"
         },
         {
             "name": "imbo/imbo-coding-standard",
@@ -6557,7 +6616,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "imbo/imbo-adapters-sdk": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
