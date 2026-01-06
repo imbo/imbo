@@ -19,6 +19,7 @@ use Imbo\BehatApiExtension\Exception\AssertionFailedException;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -103,9 +104,10 @@ class FeatureContextTest extends TestCase
         $this->assertSame('current', $request->getHeaderLine('X-Bar'));
     }
 
+    #[DoesNotPerformAssertions]
     public function testIsDateFunctionValidatesDates(): void
     {
-        $this->assertNull($this->context->isDate('Wed, 15 Mar 2017 21:28:14 GMT'));
+        $this->context->isDate('Wed, 15 Mar 2017 21:28:14 GMT');
     }
 
     public function testIsDateFunctionCanFail(): void

@@ -3,14 +3,12 @@ namespace Imbo\EventManager;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use SplPriorityQueue;
 
 #[CoversClass(PriorityQueue::class)]
 class PriorityQueueTest extends TestCase
 {
     public function testUsesAPredictableOrder(): void
     {
-        /** @var SplPriorityQueue<int,string> */
         $queue = new PriorityQueue();
 
         for ($i = 0; $i < 10; $i++) {

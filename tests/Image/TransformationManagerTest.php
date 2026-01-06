@@ -22,8 +22,9 @@ class TransformationManagerTest extends TestCase
 
     public function setUp(): void
     {
-        /** @var array{transformations:array<string,class-string>} */
-        $this->config = require __DIR__ . '/../../config/config.default.php';
+        /** @var array{transformations:array<string,class-string>} $config */
+        $config = require __DIR__ . '/../../config/config.default.php';
+        $this->config = $config;
         $this->manager = new TransformationManager();
         $this->manager->addTransformations($this->config['transformations']);
         $this->query = new InputBag([]);

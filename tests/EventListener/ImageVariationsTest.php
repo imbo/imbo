@@ -643,7 +643,7 @@ class ImageVariationsTest extends ListenerTests
                 $this->imageIdentifier,
             );
 
-        $this->assertNull($this->listener->deleteVariations($this->event));
+        $this->listener->deleteVariations($this->event);
     }
 
     #[AllowMockObjectsWithoutExpectations]

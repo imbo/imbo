@@ -3,9 +3,6 @@ namespace Imbo\EventManager;
 
 use SplPriorityQueue;
 
-/**
- * @template-extends SplPriorityQueue<int, array>
- */
 class PriorityQueue extends SplPriorityQueue
 {
     private int $queueOrder = PHP_INT_MAX;

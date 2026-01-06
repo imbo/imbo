@@ -30,12 +30,11 @@ class ImageTransformationLimiterTest extends TestCase
                 $exceptionMessage,
                 Response::HTTP_FORBIDDEN,
             ));
+        } else {
+            $this->expectNotToPerformAssertions();
         }
 
-        $this->assertNull(
-            $listener->checkTransformationCount($event),
-            'Did not expect method to return anything',
-        );
+        $listener->checkTransformationCount($event);
     }
 
     #[DataProvider('getLimits')]

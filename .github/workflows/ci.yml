@@ -11,7 +11,7 @@ permissions:
   contents: read
 jobs:
   unit-tests:
-    name: Unit tests and QA (PHP ${{ matrix.php }})
+    name: composer run ${{ matrix.composer-script }} / PHP ${{ matrix.php }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

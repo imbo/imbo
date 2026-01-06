@@ -72,10 +72,7 @@ class EightbimMetadataTest extends ListenerTests
             ->expects($this->never())
             ->method('getRequest');
 
-        $this->assertNull(
-            $this->listener->save($event),
-            'Did not expect method to return anything',
-        );
+        $this->listener->save($event);
     }
 
     public function testDeletesImageWhenStoringMetadataFails(): void
