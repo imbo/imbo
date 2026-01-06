@@ -1,13 +1,14 @@
 <?php declare(strict_types=1);
-namespace Imbo\Database;
+namespace ImboSDK\Database;
 
 use DateTime;
-use Imbo\Constraint\MultidimensionalArrayIsEqual;
+use Imbo\Database\DatabaseInterface;
 use Imbo\Exception\DatabaseException;
 use Imbo\Exception\DuplicateImageIdentifierException;
 use Imbo\Model\Image;
 use Imbo\Model\Images;
 use Imbo\Resource\Images\Query;
+use ImboSDK\Constraint\MultidimensionalArrayIsEqual;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -18,6 +19,7 @@ use RuntimeException;
 abstract class DatabaseTests extends TestCase
 {
     protected DatabaseInterface $adapter;
+    protected static string $fixturesDir  = __DIR__ . '/../Fixtures';
     protected int $allowedTimestampDelta = 1;
 
     /**
@@ -37,9 +39,9 @@ abstract class DatabaseTests extends TestCase
      * @throws RuntimeException
      * @return Image
      */
-    private static function getImageModel(string $image = '16x16.png', ?int $added = null, ?int $updated = null): Image
+    private static function getImageModel(string $image = 'test-image.png', ?int $added = null, ?int $updated = null): Image
     {
-        $file = FIXTURES_DIR . '/' . $image;
+        $file = self::$fixturesDir . '/' . $image;
 
         if (!file_exists($file)) {
             throw new RuntimeException(sprintf('Image files does not exist: %s', $file));
@@ -205,7 +207,7 @@ abstract class DatabaseTests extends TestCase
      */
     public static function getDataForLastModificationTest(): array
     {
-        $image = self::getImageModel('16x16.png', 1499234238, 1499234238)
+        $image = self::getImageModel('test-image.png', 1499234238, 1499234238)
             ->setUser('user')
             ->setImageIdentifier(uniqid());
         $image2 = clone $image;
@@ -298,7 +300,7 @@ abstract class DatabaseTests extends TestCase
         $user            = 'user';
         $imageIdentifier = 'id';
         $added           = time() - 10;
-        $original        = self::getImageModel('16x16.png', $added, $added);
+        $original        = self::getImageModel('test-image.png', $added, $added);
 
         $this->assertTrue(
             $this->adapter->insertImage($user, $imageIdentifier, $original),
@@ -1738,7 +1740,7 @@ abstract class DatabaseTests extends TestCase
             ->setExtension('png')
             ->setWidth(665)
             ->setHeight(463)
-            ->setBlob((string) file_get_contents(FIXTURES_DIR . '/image.png'))
+            ->setBlob((string) file_get_contents(self::$fixturesDir . '/image.png'))
             ->setAddedDate(new DateTime('@1331852400'))
             ->setUpdatedDate(new DateTime('@1331852400'))
             ->setOriginalChecksum('929db9c5fc3099f7576f5655207eba47');
@@ -1782,7 +1784,7 @@ abstract class DatabaseTests extends TestCase
         $start = $now;
 
         foreach (['image.jpg', 'image.png', 'image1.png', 'image2.png', 'image3.png', 'image4.png'] as $i => $fileName) {
-            $path            = FIXTURES_DIR . '/' . $fileName;
+            $path            = self::$fixturesDir . '/' . $fileName;
             $imageIdentifier = (string) md5_file($path);
 
             if (false === ($info = getimagesize($path))) {

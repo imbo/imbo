@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
-namespace Imbo\EventListener\ImageVariations\Storage;
+namespace ImboSDK\EventListener\ImageVariations\Storage;
 
+use Imbo\EventListener\ImageVariations\Storage\StorageInterface;
 use PHPUnit\Framework\TestCase;
 
 abstract class StorageTests extends TestCase

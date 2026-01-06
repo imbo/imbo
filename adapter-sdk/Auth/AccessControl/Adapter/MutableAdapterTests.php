@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
-namespace Imbo\Auth\AccessControl\Adapter;
+namespace ImboSDK\Auth\AccessControl\Adapter;
 
+use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
 use Imbo\Auth\AccessControl\GroupQuery;
 use Imbo\Model\Groups;
 use PHPUnit\Framework\TestCase;

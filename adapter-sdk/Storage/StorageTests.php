@@ -1,7 +1,8 @@
 <?php declare(strict_types=1);
-namespace Imbo\Storage;
+namespace ImboSDK\Storage;
 
 use Imbo\Exception\StorageException;
+use Imbo\Storage\StorageInterface;
 use PHPUnit\Framework\TestCase;
 
 /**

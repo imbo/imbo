@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace Imbo\Constraint;
+namespace ImboSDK\Constraint;
 
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Util\Exporter;

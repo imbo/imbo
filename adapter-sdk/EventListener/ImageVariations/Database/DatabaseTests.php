@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
-namespace Imbo\EventListener\ImageVariations\Database;
+namespace ImboSDK\EventListener\ImageVariations\Database;
 
+use Imbo\EventListener\ImageVariations\Database\DatabaseInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
