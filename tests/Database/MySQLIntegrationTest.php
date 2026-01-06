@@ -2,6 +2,7 @@
 namespace Imbo\Database;
 
 use Imbo\Exception\DatabaseException;
+use ImboSDK\Database\DatabaseTests;
 use PDO;
 use PDOException;
 use PHPUnit\Framework\Attributes\CoversClass;

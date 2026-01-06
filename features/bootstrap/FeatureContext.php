@@ -15,7 +15,7 @@ use ImagickException;
 use Imbo\BehatApiExtension\ArrayContainsComparator;
 use Imbo\BehatApiExtension\Context\ApiContext;
 use Imbo\BehatApiExtension\Exception\AssertionFailedException;
-use Imbo\Constraint\MultidimensionalArrayIsEqual;
+use ImboSDK\Constraint\MultidimensionalArrayIsEqual;
 use InvalidArgumentException;
 use MongoDB\Client as MongoClient;
 use Psr\Http\Message\RequestInterface;
@@ -38,17 +38,13 @@ class FeatureContext extends ApiContext
 
     /**
      * The public key used by the client
-     *
-     * @var string
      */
-    private $publicKey;
+    private ?string $publicKey = null;
 
     /**
      * The private key used by the client
-     *
-     * @var string
      */
-    private $privateKey;
+    private ?string $privateKey = null;
 
     /**
      * An array of urls for added images, keyed by local file path
@@ -67,7 +63,7 @@ class FeatureContext extends ApiContext
     /**
      * Array container for the history middleware
      *
-     * @param array
+     * @var array
      */
     private $history = [];
 
@@ -690,7 +686,8 @@ class FeatureContext extends ApiContext
             ));
         }
 
-        $mongoDB = (new MongoClient('mongodb://localhost:27017', ['username' => 'admin', 'password' => 'password']))->imbo_testing;
+        $client = new MongoClient('mongodb://localhost:27017', ['username' => 'admin', 'password' => 'password']);
+        $mongoDB = $client->getDatabase('imbo_testing');
 
         foreach ($fixtures as $collection => $data) {
             $mongoDB->$collection->drop();
@@ -1869,7 +1866,7 @@ class FeatureContext extends ApiContext
     /**
      * Check the size of the response body (not the Content-Length response header)
      *
-     * @param int $expetedSize The size we are expecting
+     * @param int $expectedSize The size we are expecting
      * @return self
      *
      * @Then the response body size is :expectedSize

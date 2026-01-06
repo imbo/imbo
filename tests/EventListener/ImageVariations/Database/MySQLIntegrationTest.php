@@ -2,6 +2,7 @@
 namespace Imbo\EventListener\ImageVariations\Database;
 
 use Imbo\Exception\DatabaseException;
+use ImboSDK\EventListener\ImageVariations\Database\DatabaseTests;
 use PDO;
 use PDOException;
 use PHPUnit\Framework\Attributes\CoversClass;

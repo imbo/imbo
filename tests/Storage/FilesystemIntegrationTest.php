@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace Imbo\Storage;
 
+use ImboSDK\Storage\StorageTests;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(Filesystem::class)]

@@ -13,6 +13,7 @@ use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
@@ -23,7 +24,7 @@ class ImagePreparationTest extends TestCase
     private Request&MockObject $request;
     private EventInterface $event;
     private array $config;
-    private InputLoaderManager $inputLoaderManager;
+    private InputLoaderManager&Stub $inputLoaderManager;
     private Closure $imagickLoader;
 
     public function setUp(): void

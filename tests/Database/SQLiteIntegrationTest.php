@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace Imbo\Database;
 
+use ImboSDK\Database\DatabaseTests;
 use PDO;
 use PDOException;
 use PHPUnit\Framework\Attributes\CoversClass;

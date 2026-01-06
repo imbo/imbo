@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventListener\ImageVariations\Database;
 
+use ImboSDK\EventListener\ImageVariations\Database\DatabaseTests;
 use MongoDB\Client;
 use MongoDB\Driver\Exception\RuntimeException;
 use PHPUnit\Framework\Attributes\CoversClass;

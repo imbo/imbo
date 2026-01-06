@@ -16,8 +16,11 @@ return [
         $adapter = (new Generator())->testDouble(
             DatabaseInterface::class,
             true,
-            callOriginalConstructor: false,
-            callOriginalClone: false,
+            [],
+            [],
+            '',
+            false,
+            false,
         );
         $adapter
             ->method('getStatus')
@@ -31,8 +34,11 @@ return [
         $adapter = (new Generator())->testDouble(
             StorageInterface::class,
             true,
-            callOriginalConstructor: false,
-            callOriginalClone: false,
+            [],
+            [],
+            '',
+            false,
+            false,
         );
         $adapter
             ->method('getStatus')

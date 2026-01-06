@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace Imbo\Auth\AccessControl\Adapter;
 
+use ImboSDK\Auth\AccessControl\Adapter\MutableAdapterTests;
 use MongoDB\Client;
 use MongoDB\Driver\Exception\RuntimeException;
 use PHPUnit\Framework\Attributes\CoversClass;

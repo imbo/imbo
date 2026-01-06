@@ -50,14 +50,12 @@
   "suggest": {
     "imbo/imbo-s3-adapters": "Enables usage of AWS S3 for storing images",
     "imbo/imbo-b2-adapters": "Enables usage of Backblaze B2 for storing images",
-    "imbo/imbo-metadata-cache": "Enables caching of metadata through an event listener",
-    "imbo/imbo-mysql-adapters": "Enables usage of MySQL as database",
-    "imbo/imbo-postgresql-adapters": "Enables usage of PostgreSQL as database",
-    "imbo/imbo-sqlite-adapters": "Enables usage of SQLite as database"
+    "imbo/imbo-metadata-cache": "Enables caching of metadata through an event listener"
   },
   "autoload": {
     "psr-4": {
-      "Imbo\\": "src/"
+      "Imbo\\": "src/",
+      "ImboSDK\\": "adapter-sdk/"
     }
   },
   "autoload-dev": {
@@ -101,7 +99,16 @@
     ],
     "cs": "vendor/bin/php-cs-fixer check --diff",
     "cs:fix": "vendor/bin/php-cs-fixer fix --diff",
-    "sa": "vendor/bin/phpstan analyse",
+    "sa": [
+      "@sa:adapter-sdk",
+      "@sa:features",
+      "@sa:src",
+      "@sa:tests"
+    ],
+    "sa:adapter-sdk": "vendor/bin/phpstan analyse --level 8 adapter-sdk",
+    "sa:features": "vendor/bin/phpstan analyse --level 5 features",
+    "sa:src": "vendor/bin/phpstan analyse --level 1 src",
+    "sa:tests": "vendor/bin/phpstan analyse --level 2 tests",
     "dev": [
       "mkdir -p build/logs",
       "php -S localhost:8080 -t ./public features/bootstrap/router.php"
