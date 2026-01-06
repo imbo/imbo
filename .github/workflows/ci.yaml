@@ -10,7 +10,7 @@ concurrency:
 permissions:
   contents: read
 jobs:
-  unit-tests:
+  tests-and-qa:
     name: composer run ${{ matrix.composer-script }} / PHP ${{ matrix.php }}
     runs-on: ubuntu-latest
     strategy:
@@ -147,12 +147,12 @@ jobs:
           path: build/logs/
   branch-protection:
     needs:
-      - unit-tests
+      - tests-and-qa
       - integration-tests
     if: ${{ always() }}
     runs-on: ubuntu-latest
     name: Branch protection
     steps:
-      - if: ${{ needs.unit-tests.result != 'success' || needs.integration-tests.result != 'success' }}
+      - if: ${{ needs.tests-and-qa.result != 'success' || needs.integration-tests.result != 'success' }}
         run: exit 1
       - run: echo "All checks passed."
