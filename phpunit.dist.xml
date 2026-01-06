@@ -13,6 +13,7 @@
     <include>
       <directory suffix=".php">src</directory>
       <file>features/bootstrap/FeatureContext.php</file>
+      <file>adapter-sdk/Constraint/MultidimensionalArrayIsEqual.php</file>
     </include>
   </source>
   <php>
