@@ -26,6 +26,10 @@ jobs:
           - "9.5"
         postgresql:
           - "18.1"
+        composer-script:
+          - sa
+          - test:unit
+          - cs
     services:
       mongodb:
         image: mongo:${{ matrix.mongodb }}
@@ -68,9 +72,7 @@ jobs:
       - run: sqlite3 /tmp/imbo-sqlite-integration-test.sq3 < ./scripts/sqlite/000-imbo.sql
       - run: mysql -uimbo_test -pimbo_test -h127.0.0.1 -P3333 imbo_test < ./scripts/mysql/000-imbo.sql
       - run: psql postgresql://imbo_test:imbo_test@127.0.0.1:5555/imbo_test -f ./scripts/postgresql/000-imbo.sql
-      - run: vendor/bin/phpstan analyse
-      - run: vendor/bin/phpunit
-      - run: PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer check --diff
+      - run: composer run ${{ matrix.composer-script }}
   integration-tests:
     name: Integration tests (${{ matrix.test-suite }} / PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
