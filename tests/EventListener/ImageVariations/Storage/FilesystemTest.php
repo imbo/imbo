@@ -3,6 +3,7 @@ namespace Imbo\EventListener\ImageVariations\Storage;
 
 use Imbo\Exception\StorageException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
 use TestFs\StreamWrapper as TestFs;
 
@@ -32,13 +33,14 @@ class FilesystemTest extends TestCase
         $adapter->storeImageVariation('pub', 'img', 'blob', 700);
     }
 
-    public function testDoesNotThrowWhenDeletingNonExistantVariation(): void
+    #[DoesNotPerformAssertions]
+    public function testDoesNotFailWhenDeletingNonExistantVariation(): void
     {
         $dir = TestFs::url('dirname');
         mkdir($dir);
 
         $adapter = new Filesystem($dir);
-        $this->assertFalse($adapter->deleteImageVariations('pub', 'img'));
+        $adapter->deleteImageVariations('pub', 'img');
     }
 
     public function testCanGetImageVariation(): void

@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace Imbo\EventListener\ImageVariations\Storage;
 
+use FilesystemIterator;
 use Imbo\Exception\StorageException;
 
 class Filesystem implements StorageInterface
@@ -17,7 +18,7 @@ class Filesystem implements StorageInterface
         $this->dataDir = $dataDir;
     }
 
-    public function storeImageVariation(string $user, string $imageIdentifier, string $blob, int $width): bool
+    public function storeImageVariation(string $user, string $imageIdentifier, string $blob, int $width): void
     {
         if (!is_writable($this->dataDir)) {
             throw new StorageException('Could not store image variation (directory not writable)', 500);
@@ -32,50 +33,63 @@ class Filesystem implements StorageInterface
             umask($oldUmask);
         }
 
-        return (bool) file_put_contents($variationsPath, $blob);
+        $result = file_put_contents($variationsPath, $blob);
+
+        if (false === $result) {
+            throw new StorageException('Could not store image variation (write failed)', 500);
+        }
+
+        return;
     }
 
-    public function getImageVariation(string $user, string $imageIdentifier, int $width): ?string
+    public function getImageVariation(string $user, string $imageIdentifier, int $width): string
     {
         $variationPath = $this->getImagePath($user, $imageIdentifier, $width);
 
-        if (file_exists($variationPath)) {
-            return (string) file_get_contents($variationPath);
+        if (!file_exists($variationPath)) {
+            throw new StorageException('File not found', 404);
         }
 
-        return null;
+        $blob = file_get_contents($variationPath);
+
+        if (false === $blob) {
+            throw new StorageException('Unable to get image variation', 500);
+        }
+
+        return $blob;
     }
 
-    public function deleteImageVariations(string $user, string $imageIdentifier, ?int $width = null): bool
+    public function deleteImageVariations(string $user, string $imageIdentifier, ?int $width = null): void
     {
+        $dir = $this->getImagePath($user, $imageIdentifier);
+
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        $files = [];
+
         if (null !== $width) {
-            return unlink($this->getImagePath($user, $imageIdentifier, $width));
+            $files[] = $this->getImagePath($user, $imageIdentifier, $width);
+        } else {
+            $files = glob($dir . '/*');
+
+            if (false === $files) {
+                return;
+            }
         }
-
-        $variationsPath = $this->getImagePath($user, $imageIdentifier);
-
-        if (!is_dir($variationsPath)) {
-            return false;
-        }
-
-        /** @var list<string> */
-        $files = glob($variationsPath . '/*');
 
         foreach ($files as $file) {
             unlink($file);
         }
 
-        return rmdir($variationsPath);
+        if ($this->isDirectoryEmpty($dir)) {
+            rmdir($dir);
+        }
+
+        return;
     }
 
-    /**
-     * Get the path to an image
-     *
-     * @param string $user The user which the image belongs to
-     * @param string $imageIdentifier Image identifier
-     * @param int $width Width of the image, in pixels
-     * @return string
-     */
     private function getImagePath(string $user, string $imageIdentifier, ?int $width = null): string
     {
         $userPath = str_pad($user, 3, '0', STR_PAD_LEFT);
@@ -93,5 +107,15 @@ class Filesystem implements StorageInterface
         ]);
 
         return implode(DIRECTORY_SEPARATOR, $parts);
+    }
+
+    private function isDirectoryEmpty(string $path): bool
+    {
+        if (!is_dir($path)) {
+            return true;
+        }
+
+        $iterator = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
+        return !$iterator->valid();
     }
 }

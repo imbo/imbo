@@ -437,7 +437,7 @@ class ImageVariationsTest extends ListenerTests
                 $this->imageIdentifier,
                 $variationWidth,
             )
-            ->willReturn(null);
+            ->willThrowException(new StorageException('Not found', 404));
 
         $this->imageStorage
             ->expects($this->never())

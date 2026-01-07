@@ -41,11 +41,13 @@ class GridFS implements StorageInterface
             ->selectGridFSBucket($bucketOptions);
     }
 
-    public function storeImageVariation(string $user, string $imageIdentifier, string $blob, int $width): true
+    public function storeImageVariation(string $user, string $imageIdentifier, string $blob, int $width): void
     {
+        $filename = $this->getImageFilename($user, $imageIdentifier, $width);
+
         try {
             $this->bucket->uploadFromStream(
-                $this->getImageFilename($user, $imageIdentifier, $width),
+                $filename,
                 $this->createStream($blob),
                 [
                     'metadata' => [
@@ -60,23 +62,31 @@ class GridFS implements StorageInterface
             throw new StorageException('Unable to store image variation', 500, $e);
         }
 
-        return true;
+        return;
     }
 
-    public function getImageVariation(string $user, string $imageIdentifier, int $width): ?string
+    public function getImageVariation(string $user, string $imageIdentifier, int $width): string
     {
+        $filename = $this->getImageFilename($user, $imageIdentifier, $width);
+
         try {
-            return stream_get_contents($this->bucket->openDownloadStreamByName(
-                $this->getImageFilename($user, $imageIdentifier, $width),
-            )) ?: null;
+            $stream = $this->bucket->openDownloadStreamByName($filename);
         } catch (FileNotFoundException $e) {
             throw new StorageException('File not found', 404, $e);
         } catch (MongoDBException $e) {
             throw new StorageException('Unable to get image variation', 500, $e);
         }
+
+        $blob = stream_get_contents($stream);
+
+        if (false === $blob) {
+            throw new StorageException('Unable to get image variation', 500);
+        }
+
+        return $blob;
     }
 
-    public function deleteImageVariations(string $user, string $imageIdentifier, ?int $width = null): true
+    public function deleteImageVariations(string $user, string $imageIdentifier, ?int $width = null): void
     {
         $filter = [
             'metadata.user'            => $user,
@@ -98,7 +108,7 @@ class GridFS implements StorageInterface
             }
         }
 
-        return true;
+        return;
     }
 
     /**

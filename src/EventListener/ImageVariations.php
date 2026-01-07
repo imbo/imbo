@@ -135,9 +135,9 @@ class ImageVariations implements ListenerInterface
         ]);
 
         // Fetch the image variation blob from the storage adapter
-        $imageBlob = $this->storage->getImageVariation($user, $imageIdentifier, $variation['width']);
-
-        if (!$imageBlob) {
+        try {
+            $imageBlob = $this->storage->getImageVariation($user, $imageIdentifier, $variation['width']);
+        } catch (StorageException $e) {
             // The image blob does not exist in the storage, which it should. Trigger an error and
             // return
             trigger_error('Image variation storage is not in sync with the image variation database', E_USER_WARNING);
