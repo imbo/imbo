@@ -48,8 +48,8 @@
     "symfony/var-dumper": "^7.4"
   },
   "suggest": {
-    "imbo/imbo-s3-adapters": "Enables usage of AWS S3 for storing images",
     "imbo/imbo-b2-adapters": "Enables usage of Backblaze B2 for storing images",
+    "imbo/imbo-s3-adapters": "Enables usage of AWS S3 for storing images",
     "imbo/imbo-metadata-cache": "Enables caching of metadata through an event listener"
   },
   "autoload": {
@@ -71,34 +71,16 @@
     "bin/imbo"
   ],
   "scripts": {
-    "test:unit": "vendor/bin/phpunit",
-    "test:unit:coverage": [
-      "rm -rf build/coverage",
-      "mkdir -p build/coverage",
-      "vendor/bin/phpunit --coverage-html build/coverage"
-    ],
-    "test:integration": [
-      "@test:integration:mongodb-gridfs",
-      "@test:integration:mongodb-filesystem",
-      "@test:integration:sqlite-filesystem",
-      "@test:integration:mysql-filesystem",
-      "@test:integration:postgresql-filesystem"
-    ],
-    "test:integration:mongodb-gridfs": "vendor/bin/behat --strict --suite=mongodb-gridfs",
-    "test:integration:mongodb-filesystem": "vendor/bin/behat --strict --suite=mongodb-filesystem",
-    "test:integration:sqlite-filesystem": "vendor/bin/behat --strict --suite=sqlite-filesystem",
-    "test:integration:mysql-filesystem": "vendor/bin/behat --strict --suite=mysql-filesystem",
-    "test:integration:postgresql-filesystem": "vendor/bin/behat --strict --suite=postgresql-filesystem",
-    "test": [
-      "@test:unit",
-      "@test:integration"
+    "cs": "vendor/bin/php-cs-fixer check --diff",
+    "cs:fix": "vendor/bin/php-cs-fixer fix --diff",
+    "dev": [
+      "mkdir -p build/logs",
+      "php -S localhost:8080 -t ./public features/bootstrap/router.php"
     ],
     "docs": [
       "cd docs; make spelling",
       "cd docs; make html"
     ],
-    "cs": "vendor/bin/php-cs-fixer check --diff",
-    "cs:fix": "vendor/bin/php-cs-fixer fix --diff",
     "sa": [
       "@sa:adapter-sdk",
       "@sa:features",
@@ -109,9 +91,27 @@
     "sa:features": "vendor/bin/phpstan analyse --level 5 features",
     "sa:src": "vendor/bin/phpstan analyse --level 1 src",
     "sa:tests": "vendor/bin/phpstan analyse --level 2 tests",
-    "dev": [
-      "mkdir -p build/logs",
-      "php -S localhost:8080 -t ./public features/bootstrap/router.php"
+    "test": [
+      "@test:integration",
+      "@test:unit"
+    ],
+    "test:integration": [
+      "@test:integration:mongodb-filesystem",
+      "@test:integration:mongodb-gridfs",
+      "@test:integration:mysql-filesystem",
+      "@test:integration:postgresql-filesystem",
+      "@test:integration:sqlite-filesystem"
+    ],
+    "test:integration:mongodb-filesystem": "vendor/bin/behat --strict --suite=mongodb-filesystem",
+    "test:integration:mongodb-gridfs": "vendor/bin/behat --strict --suite=mongodb-gridfs",
+    "test:integration:mysql-filesystem": "vendor/bin/behat --strict --suite=mysql-filesystem",
+    "test:integration:postgresql-filesystem": "vendor/bin/behat --strict --suite=postgresql-filesystem",
+    "test:integration:sqlite-filesystem": "vendor/bin/behat --strict --suite=sqlite-filesystem",
+    "test:unit": "vendor/bin/phpunit",
+    "test:unit:coverage": [
+      "rm -rf build/coverage",
+      "mkdir -p build/coverage",
+      "vendor/bin/phpunit --coverage-html build/coverage"
     ]
   },
   "config": {
@@ -120,7 +120,5 @@
     "allow-plugins": {
       "phpstan/extension-installer": true
     }
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true
+  }
 }
