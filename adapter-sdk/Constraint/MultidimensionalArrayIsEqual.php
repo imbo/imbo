@@ -30,6 +30,9 @@ class MultidimensionalArrayIsEqual extends Constraint
         return 'is the same as '.Exporter::export($this->value);
     }
 
+    /**
+     * @param mixed $other The value to compare against, must be an array
+     */
     public function matches($other): bool
     {
         if (!is_array($other)) {
