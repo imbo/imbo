@@ -2464,12 +2464,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-coding-standard.git",
-                "reference": "06fe8d0d1e3526b7b272cc85b09ef504d5eda667"
+                "reference": "3562dd661d5ad3b4f7a9e09e4078f11f2ec17b21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-coding-standard/zipball/06fe8d0d1e3526b7b272cc85b09ef504d5eda667",
-                "reference": "06fe8d0d1e3526b7b272cc85b09ef504d5eda667",
+                "url": "https://api.github.com/repos/imbo/imbo-coding-standard/zipball/3562dd661d5ad3b4f7a9e09e4078f11f2ec17b21",
+                "reference": "3562dd661d5ad3b4f7a9e09e4078f11f2ec17b21",
                 "shasum": ""
             },
             "require": {
@@ -2509,7 +2509,7 @@
                 "issues": "https://github.com/imbo/imbo-coding-standard/issues",
                 "source": "https://github.com/imbo/imbo-coding-standard/tree/main"
             },
-            "time": "2026-01-10T15:12:23+00:00"
+            "time": "2026-01-10T16:05:59+00:00"
         },
         {
             "name": "kubawerlos/php-cs-fixer-custom-fixers",

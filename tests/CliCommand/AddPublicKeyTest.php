@@ -199,11 +199,9 @@ class AddPublicKeyTest extends TestCase
                 /**
                  * @param array{users:string,resources:array} $rule
                  */
-                fn (array $rule): bool =>
-                    '*' === $rule['users']
+                fn (array $rule): bool => '*' === $rule['users']
                     && $rule['resources'][0] === $allResources[0]
-                    && $rule['resources'][1] === $allResources[5]
-                ,
+                    && $rule['resources'][1] === $allResources[5],
             ));
 
         $this->adapter
