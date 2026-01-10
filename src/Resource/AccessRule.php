@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
@@ -10,7 +11,7 @@ use Imbo\Model\AccessRule as AccessRuleModel;
 use Imbo\Model\ArrayModel;
 
 /**
- * Access rule resource
+ * Access rule resource.
  */
 class AccessRule implements ResourceInterface
 {
@@ -29,7 +30,7 @@ class AccessRule implements ResourceInterface
     }
 
     /**
-     * Get an access control rule specified by ID
+     * Get an access control rule specified by ID.
      *
      * @param EventInterface $event The current event
      */
@@ -69,7 +70,7 @@ class AccessRule implements ResourceInterface
     }
 
     /**
-     * Delete the specified access control rule
+     * Delete the specified access control rule.
      *
      * @param EventInterface $event The current event
      */

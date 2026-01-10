@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -38,7 +39,7 @@ class BorderTest extends TransformationTests
             ->method('setHasBeenTransformed')
             ->with(true);
 
-        $blob = file_get_contents(FIXTURES_DIR . '/image.png');
+        $blob = file_get_contents(FIXTURES_DIR.'/image.png');
 
         $imagick = new Imagick();
         $imagick->readImageBlob($blob);

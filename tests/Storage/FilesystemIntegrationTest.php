@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Storage;
 
 use ImboSDK\Storage\StorageTests;
@@ -11,7 +12,7 @@ class FilesystemIntegrationTest extends StorageTests
 
     protected function getAdapter(): Filesystem
     {
-        $this->path = sys_get_temp_dir() . '/imbo-storage-filesystem-integration-test-' . uniqid();
+        $this->path = sys_get_temp_dir().'/imbo-storage-filesystem-integration-test-'.uniqid();
         mkdir($this->path);
 
         return new Filesystem($this->path);
@@ -28,7 +29,7 @@ class FilesystemIntegrationTest extends StorageTests
 
     private function rmdir(string $path): void
     {
-        $paths = glob($path . '/*');
+        $paths = glob($path.'/*');
 
         if (false === $paths) {
             return;

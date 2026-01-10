@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image;
 
 use finfo;
@@ -11,8 +12,10 @@ use Imbo\Exception\LoaderException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 
+use const FILEINFO_MIME_TYPE;
+
 /**
- * Image preparation
+ * Image preparation.
  */
 class ImagePreparation implements ListenerInterface
 {
@@ -24,12 +27,13 @@ class ImagePreparation implements ListenerInterface
     }
 
     /**
-     * Prepare an image
+     * Prepare an image.
      *
      * This method should prepare an image object from php://input. The method must also figure out
      * the width, height, mime type and extension of the image.
      *
      * @param EventInterface $event The current event
+     *
      * @throws ImageException
      */
     public function prepareImage(EventInterface $event): void
@@ -67,7 +71,7 @@ class ImagePreparation implements ListenerInterface
 
         // Unsupported image type
         if (!$imagick) {
-            $e = new ImageException('Unsupported image type: ' . $mime, Response::HTTP_UNSUPPORTED_MEDIA_TYPE);
+            $e = new ImageException('Unsupported image type: '.$mime, Response::HTTP_UNSUPPORTED_MEDIA_TYPE);
             $e->setImboErrorCode(Exception::IMAGE_UNSUPPORTED_MIMETYPE);
 
             throw $e;

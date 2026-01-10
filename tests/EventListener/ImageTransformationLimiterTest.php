@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\Event;
@@ -8,6 +9,8 @@ use Imbo\Http\Response\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+
+use function sprintf;
 
 #[CoversClass(ImageTransformationLimiter::class)]
 class ImageTransformationLimiterTest extends TestCase

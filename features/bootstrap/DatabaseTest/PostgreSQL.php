@@ -1,9 +1,12 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Behat\DatabaseTest;
 
 use Imbo\Behat\AdapterTest;
 use Imbo\Database\PostgreSQL as DatabaseAdapter;
 use PDO;
+
+use function sprintf;
 
 class PostgreSQL implements AdapterTest
 {

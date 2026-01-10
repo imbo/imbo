@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\Database\DatabaseInterface;
@@ -21,13 +22,13 @@ class UserTest extends ResourceTests
         return new User();
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->event = $this->createConfiguredMock(EventInterface::class, [
-            'getRequest'  => $this->createStub(Request::class),
+            'getRequest' => $this->createStub(Request::class),
             'getResponse' => $this->createStub(Response::class),
             'getDatabase' => $this->createStub(DatabaseInterface::class),
-            'getStorage'  => $this->createStub(StorageInterface::class),
+            'getStorage' => $this->createStub(StorageInterface::class),
         ]);
 
         $this->resource = $this->getNewResource();

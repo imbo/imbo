@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Model;
 
 use DateTime;
@@ -6,31 +7,32 @@ use DateTime;
 class Status implements ModelInterface
 {
     /**
-     * Date
+     * Date.
      */
     private ?DateTime $date = null;
 
     /**
-     * Database status
+     * Database status.
      */
     private ?bool $databaseStatus = null;
 
     /**
-     * Storage status
+     * Storage status.
      */
     private ?bool $storageStatus = null;
 
     /**
-     * Set the date
+     * Set the date.
      */
     public function setDate(DateTime $date): self
     {
         $this->date = $date;
+
         return $this;
     }
 
     /**
-     * Get the date
+     * Get the date.
      */
     public function getDate(): ?DateTime
     {
@@ -38,16 +40,17 @@ class Status implements ModelInterface
     }
 
     /**
-     * Set the database status
+     * Set the database status.
      */
     public function setDatabaseStatus(bool $status): self
     {
         $this->databaseStatus = $status;
+
         return $this;
     }
 
     /**
-     * Get the database status
+     * Get the database status.
      */
     public function getDatabaseStatus(): ?bool
     {
@@ -55,16 +58,17 @@ class Status implements ModelInterface
     }
 
     /**
-     * Set the storage status
+     * Set the storage status.
      */
     public function setStorageStatus(bool $status): self
     {
         $this->storageStatus = $status;
+
         return $this;
     }
 
     /**
-     * Get the storage status
+     * Get the storage status.
      */
     public function getStorageStatus(): ?bool
     {

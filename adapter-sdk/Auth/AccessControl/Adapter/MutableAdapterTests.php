@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace ImboSDK\Auth\AccessControl\Adapter;
 
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;

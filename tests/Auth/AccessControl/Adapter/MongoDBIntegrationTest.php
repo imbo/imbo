@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Auth\AccessControl\Adapter;
 
 use ImboSDK\Auth\AccessControl\Adapter\MutableAdapterTests;
@@ -38,7 +39,7 @@ class MongoDBIntegrationTest extends MutableAdapterTests
         try {
             $client->getDatabase($this->databaseName)->command(['ping' => 1]);
         } catch (RuntimeException) {
-            $this->markTestSkipped('MongoDB is not running, start it with `docker compose up -d`', );
+            $this->markTestSkipped('MongoDB is not running, start it with `docker compose up -d`');
         }
 
         $client->dropDatabase($this->databaseName);

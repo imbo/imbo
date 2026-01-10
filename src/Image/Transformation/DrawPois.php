@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use ImagickDraw;
@@ -6,20 +7,23 @@ use ImagickException;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 
+use function array_key_exists;
+use function is_array;
+
 class DrawPois extends Transformation
 {
     /**
-     * Color of the border
+     * Color of the border.
      */
     private string $color = '#f00';
 
     /**
-     * Size of the border
+     * Size of the border.
      */
     private int $borderSize = 2;
 
     /**
-     * Size of the "points" (points of interest without a width/height)
+     * Size of the "points" (points of interest without a width/height).
      */
     private int $pointSize = 30;
 
@@ -45,9 +49,7 @@ class DrawPois extends Transformation
                 } elseif (isset($poi['cx']) && isset($poi['cy'])) {
                     $this->drawPoiCircle($poi, $color, $borderSize, $pointSize);
                 } else {
-                    throw new TransformationException(
-                        'Point of interest had neither `width` and `height` nor `cx` and `cy`',
-                    );
+                    throw new TransformationException('Point of interest had neither `width` and `height` nor `cx` and `cy`');
                 }
             }
         } catch (ImagickException $e) {
@@ -58,7 +60,7 @@ class DrawPois extends Transformation
     }
 
     /**
-     * Draw rectangle around a POI
+     * Draw rectangle around a POI.
      *
      * @param array{x:int,y:int,width:int,height:int} $poi
      */
@@ -109,7 +111,7 @@ class DrawPois extends Transformation
     }
 
     /**
-     * Draw a circle/dot to mark a POI
+     * Draw a circle/dot to mark a POI.
      *
      * @param array{cx:float,cy:float} $poi
      */
@@ -128,7 +130,7 @@ class DrawPois extends Transformation
     }
 
     /**
-     * Fetch POIs from metadata for the image
+     * Fetch POIs from metadata for the image.
      *
      * @return array Array with POIs
      */

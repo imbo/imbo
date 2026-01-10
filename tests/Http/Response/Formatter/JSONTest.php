@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Http\Response\Formatter;
 
 use DateTime;
@@ -22,6 +23,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+use function count;
+
 #[CoversClass(JSON::class)]
 #[CoversClass(Formatter::class)]
 class JSONTest extends TestCase
@@ -29,7 +32,7 @@ class JSONTest extends TestCase
     private JSON $formatter;
     private DateFormatter&MockObject $dateFormatter;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->dateFormatter = $this->createMock(DateFormatter::class);
         $this->formatter = new JSON($this->dateFormatter);

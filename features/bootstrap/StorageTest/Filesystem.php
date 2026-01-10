@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Behat\StorageTest;
 
 use Imbo\Behat\AdapterTest;
@@ -7,11 +8,13 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
 
+use const DIRECTORY_SEPARATOR;
+
 class Filesystem implements AdapterTest
 {
     public static function setUp(array $config): array
     {
-        $dataDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'imbo_behat_test_storage';
+        $dataDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'imbo_behat_test_storage';
         self::clearPath($dataDir);
         mkdir($dataDir);
 
@@ -28,7 +31,7 @@ class Filesystem implements AdapterTest
     }
 
     /**
-     * Clear the storage path
+     * Clear the storage path.
      *
      * @param string $dir The directory to wipe
      */
@@ -44,7 +47,7 @@ class Filesystem implements AdapterTest
             foreach ($iterator as $file) {
                 $name = $file->getPathname();
 
-                if (substr($name, -1) === '.') {
+                if ('.' === substr($name, -1)) {
                     continue;
                 }
 

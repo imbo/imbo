@@ -1,13 +1,14 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 /**
- * Event listener interface
+ * Event listener interface.
  */
 interface ListenerInterface
 {
     /**
-     * Return an array with events to subscribe to
+     * Return an array with events to subscribe to.
      *
      * Single callbacks can use the simplest method, defaulting to a priority of 0
      *

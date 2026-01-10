@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo;
 
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
@@ -78,7 +79,7 @@ class ApplicationTest extends TestCase
         $this->expectOutputRegex('|.*}|');
 
         /** @var array */
-        $default = require __DIR__ . '/../config/config.default.php';
+        $default = require __DIR__.'/../config/config.default.php';
         $test = [
             'database' => fn (Request $request, Response $response): DatabaseInterface => $this->createStub(DatabaseInterface::class),
             'storage' => fn (Request $request, Response $response): StorageInterface => $this->createStub(StorageInterface::class),
@@ -118,7 +119,7 @@ class ApplicationTest extends TestCase
     private function getDefaultConfig(): array
     {
         /** @var array */
-        $defaultConfig = require __DIR__ . '/../config/config.default.php';
+        $defaultConfig = require __DIR__.'/../config/config.default.php';
 
         return array_replace_recursive(
             $defaultConfig,

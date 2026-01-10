@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\CliCommand;
 
 use Imbo\Exception\RuntimeException;
@@ -12,7 +13,7 @@ class GeneratePrivateKeyTest extends TestCase
 {
     private GeneratePrivateKey $command;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->command = new GeneratePrivateKey();
 

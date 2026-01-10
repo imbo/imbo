@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
@@ -9,12 +10,14 @@ use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+use function get_class;
+
 #[CoversClass(AutoRotateImage::class)]
 class AutoRotateImageTest extends TestCase
 {
     private AutoRotateImage $listener;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->listener = new AutoRotateImage();
     }

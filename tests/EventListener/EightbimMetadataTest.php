@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imagick;
@@ -16,7 +17,7 @@ class EightbimMetadataTest extends ListenerTests
 {
     protected EightbimMetadata $listener;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->listener = new EightbimMetadata();
         $this->listener->setImagick(new Imagick());
@@ -31,7 +32,7 @@ class EightbimMetadataTest extends ListenerTests
     {
         $user = 'user';
         $imageIdentifier = 'imageIdentifier';
-        $blob = file_get_contents(FIXTURES_DIR . '/jpeg-with-multiple-paths.jpg');
+        $blob = file_get_contents(FIXTURES_DIR.'/jpeg-with-multiple-paths.jpg');
 
         $image = $this->createConfiguredStub(Image::class, [
             'getImageIdentifier' => $imageIdentifier,
@@ -79,7 +80,7 @@ class EightbimMetadataTest extends ListenerTests
     {
         $user = 'user';
         $imageIdentifier = 'imageIdentifier';
-        $blob = file_get_contents(FIXTURES_DIR . '/jpeg-with-multiple-paths.jpg');
+        $blob = file_get_contents(FIXTURES_DIR.'/jpeg-with-multiple-paths.jpg');
 
         $image = $this->createConfiguredStub(Image::class, [
             'getImageIdentifier' => $imageIdentifier,

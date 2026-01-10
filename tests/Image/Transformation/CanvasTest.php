@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -17,7 +18,7 @@ class CanvasTest extends TransformationTests
     #[DataProvider('getCanvasParameters')]
     public function testTransformWithDifferentParameters(?int $width, ?int $height, string $mode, int $resultingWidth, int $resultingHeight): void
     {
-        $blob = file_get_contents(FIXTURES_DIR . '/image.png');
+        $blob = file_get_contents(FIXTURES_DIR.'/image.png');
 
         $image = $this->createConfiguredMock(Image::class, [
             'getBlob' => $blob,
@@ -132,14 +133,14 @@ class CanvasTest extends TransformationTests
                 'resultingWidth' => 200,
                 'resultingHeight' => 1000,
             ],
-            'center-x mode where one of the sides are smaller than the original' =>  [
+            'center-x mode where one of the sides are smaller than the original' => [
                 'width' => 1000,
                 'height' => 200,
                 'mode' => 'center-x',
                 'resultingWidth' => 1000,
                 'resultingHeight' => 200,
             ],
-            'center-y mode where one of the sides are smaller than the original' =>  [
+            'center-y mode where one of the sides are smaller than the original' => [
                 'width' => 1000,
                 'height' => 200,
                 'mode' => 'center-y',

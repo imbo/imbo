@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -10,27 +11,27 @@ use Imbo\Http\Response\Response;
 use Imbo\Image\InputSizeConstraint;
 
 /**
- * Border transformation
+ * Border transformation.
  */
 class Border extends Transformation implements InputSizeConstraint
 {
     /**
-     * Color of the border
+     * Color of the border.
      */
     private string $color = '#000';
 
     /**
-     * Width of the border
+     * Width of the border.
      */
     private int $width = 1;
 
     /**
-     * Height of the border
+     * Height of the border.
      */
     private int $height = 1;
 
     /**
-     * Border mode, "inline" or "outbound"
+     * Border mode, "inline" or "outbound".
      */
     private string $mode = 'outbound';
 
@@ -42,7 +43,7 @@ class Border extends Transformation implements InputSizeConstraint
         $mode = !empty($params['mode']) ? $params['mode'] : $this->mode;
 
         try {
-            if ($mode === 'outbound') {
+            if ('outbound' === $mode) {
                 // Paint the border outside of the image, increasing the width/height
                 if ($this->imagick->getImageAlphaChannel()) {
                     // If we have an alpha channel and call `borderImage()`, Imagick will remove
@@ -74,8 +75,8 @@ class Border extends Transformation implements InputSizeConstraint
      * side, than copy the original image to the center of the canvas.
      *
      * @param string $color
-     * @param integer $borderWidth
-     * @param integer $borderHeight
+     * @param int    $borderWidth
+     * @param int    $borderHeight
      */
     private function expandImage($color, $borderWidth, $borderHeight)
     {
@@ -88,7 +89,7 @@ class Border extends Transformation implements InputSizeConstraint
         $this->imagick->clear();
 
         $this->imagick->newImage(
-            $imageWidth  + ($borderWidth  * 2),
+            $imageWidth + ($borderWidth * 2),
             $imageHeight + ($borderHeight * 2),
             $color,
         );
@@ -104,11 +105,11 @@ class Border extends Transformation implements InputSizeConstraint
     }
 
     /**
-     * Draw border inside (on top of) the existing image
+     * Draw border inside (on top of) the existing image.
      *
      * @param string $color
-     * @param integer $borderWidth
-     * @param integer $borderHeight
+     * @param int    $borderWidth
+     * @param int    $borderHeight
      */
     private function drawBorderInside($color, $borderWidth, $borderHeight)
     {

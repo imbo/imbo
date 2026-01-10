@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -14,9 +15,6 @@ use Imbo\Image\InputSizeConstraint;
  */
 class AutoRotate extends Transformation implements InputSizeConstraint
 {
-    /**
-     * {@inheritdoc}
-     */
     public function transform(array $params)
     {
         try {
@@ -25,7 +23,7 @@ class AutoRotate extends Transformation implements InputSizeConstraint
 
             /**
              * Transform image if orientation is set and greater than 1
-             * (Imagick::ORIENTATION_TOPLEFT)
+             * (Imagick::ORIENTATION_TOPLEFT).
              */
             if ($orientation > 1) {
                 $flipHorizontally = false;
@@ -33,27 +31,27 @@ class AutoRotate extends Transformation implements InputSizeConstraint
                 $rotate = 0;
 
                 switch ($orientation) {
-                    case Imagick::ORIENTATION_TOPRIGHT:     //2
+                    case Imagick::ORIENTATION_TOPRIGHT:     // 2
                         $flipHorizontally = true;
                         break;
-                    case Imagick::ORIENTATION_BOTTOMRIGHT:  //3
+                    case Imagick::ORIENTATION_BOTTOMRIGHT:  // 3
                         $rotate = 180;
                         break;
-                    case Imagick::ORIENTATION_BOTTOMLEFT:   //4
+                    case Imagick::ORIENTATION_BOTTOMLEFT:   // 4
                         $flipVertically = true;
                         break;
-                    case Imagick::ORIENTATION_LEFTTOP:      //5
+                    case Imagick::ORIENTATION_LEFTTOP:      // 5
                         $rotate = 90;
                         $flipHorizontally = true;
                         break;
-                    case Imagick::ORIENTATION_RIGHTTOP:     //6
+                    case Imagick::ORIENTATION_RIGHTTOP:     // 6
                         $rotate = 90;
                         break;
-                    case Imagick::ORIENTATION_RIGHTBOTTOM:  //7
+                    case Imagick::ORIENTATION_RIGHTBOTTOM:  // 7
                         $rotate = 90;
                         $flipVertically = true;
                         break;
-                    case Imagick::ORIENTATION_LEFTBOTTOM:   //8
+                    case Imagick::ORIENTATION_LEFTBOTTOM:   // 8
                         $rotate = 270;
                         break;
                 }
@@ -94,9 +92,6 @@ class AutoRotate extends Transformation implements InputSizeConstraint
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMinimumInputSize(array $params, array $imageSize)
     {
         // We don't have an imagick instance at this point in the flow, so we don't have any way to

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
@@ -19,7 +20,7 @@ class User implements ResourceInterface
     }
 
     /**
-     * Handle GET requests
+     * Handle GET requests.
      *
      * @param EventInterface $event The current event
      */

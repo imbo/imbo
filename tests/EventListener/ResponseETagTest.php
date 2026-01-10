@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
@@ -13,7 +14,7 @@ class ResponseETagTest extends ListenerTests
 {
     private ResponseETag $listener;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->listener = new ResponseETag();
     }
@@ -82,7 +83,7 @@ class ResponseETagTest extends ListenerTests
                 $response
                     ->expects($this->once())
                     ->method('setETag')
-                    ->with('"' . md5($content) . '"');
+                    ->with('"'.md5($content).'"');
             }
         } else {
             $response
@@ -157,7 +158,7 @@ class ResponseETagTest extends ListenerTests
                 'route' => 'image',
                 'hasETag' => true,
                 'isOk' => true,
-                'content' => file_get_contents(FIXTURES_DIR . '/image.png'),
+                'content' => file_get_contents(FIXTURES_DIR.'/image.png'),
             ],
             'metadata route has ETag' => [
                 'route' => 'metadata',
@@ -169,7 +170,7 @@ class ResponseETagTest extends ListenerTests
                 'route' => 'globalshorturl',
                 'hasETag' => true,
                 'isOk' => true,
-                'content' => file_get_contents(FIXTURES_DIR . '/image.png'),
+                'content' => file_get_contents(FIXTURES_DIR.'/image.png'),
             ],
             'response codes other than 200 does not get ETags' => [
                 'route' => 'globalshorturl',

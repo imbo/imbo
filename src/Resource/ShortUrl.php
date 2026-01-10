@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
@@ -20,8 +21,8 @@ class ShortUrl implements ResourceInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'shorturl.head'   => 'getShortUrl',
-            'shorturl.get'    => 'getShortUrl',
+            'shorturl.head' => 'getShortUrl',
+            'shorturl.get' => 'getShortUrl',
             'shorturl.delete' => 'deleteShortUrl',
         ];
     }

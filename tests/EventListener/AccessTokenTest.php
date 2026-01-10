@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface as AccessControlAdapter;
@@ -27,7 +28,7 @@ class AccessTokenTest extends ListenerTests
     private Response $response;
     private ResponseHeaderBag&MockObject $responseHeaders;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->accessControl = $this->createMock(AccessControlAdapter::class);
 
@@ -158,10 +159,10 @@ class AccessTokenTest extends ListenerTests
             ->willReturn($privateKey);
 
         foreach (['http', 'https'] as $signedProtocol) {
-            $token = hash_hmac('sha256', $signedProtocol . ':' . $baseUrl, $privateKey);
+            $token = hash_hmac('sha256', $signedProtocol.':'.$baseUrl, $privateKey);
 
             foreach (['http', 'https'] as $protocol) {
-                $url = $protocol . ':' . $baseUrl . '&accessToken=' . $token;
+                $url = $protocol.':'.$baseUrl.'&accessToken='.$token;
 
                 $request = $this->createConfiguredStub(Request::class, [
                     'getRawUri' => urldecode($url),
@@ -274,7 +275,7 @@ class AccessTokenTest extends ListenerTests
     {
         $this->expectExceptionObject(new ConfigurationException('Invalid accessTokenGenerator', Response::HTTP_INTERNAL_SERVER_ERROR));
 
-        new AccessToken(['accessTokenGenerator' => new StdClass()]);
+        new AccessToken(['accessTokenGenerator' => new stdClass()]);
     }
 
     #[DataProvider('getRewrittenAccessTokenData')]
@@ -291,7 +292,7 @@ class AccessTokenTest extends ListenerTests
             ],
         ]);
 
-        $url = $url . '&accessToken=' . $accessToken;
+        $url = $url.'&accessToken='.$accessToken;
 
         $this->request->query = new InputBag(['accessToken' => $accessToken]);
         $this->request
@@ -320,9 +321,9 @@ class AccessTokenTest extends ListenerTests
     {
         return $this->createConfiguredMock(EventInterface::class, [
             'getAccessControl' => $this->accessControl,
-            'getRequest'       => $this->request,
-            'getResponse'      => $this->response,
-            'getConfig'        => $config ?: [
+            'getRequest' => $this->request,
+            'getResponse' => $this->response,
+            'getConfig' => $config ?: [
                 'authentication' => [
                     'protocol' => 'incoming',
                 ],

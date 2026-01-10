@@ -1,17 +1,20 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use ImagickException;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 
+use function in_array;
+
 /**
- * SmartSize transformation
+ * SmartSize transformation.
  */
 class SmartSize extends Transformation
 {
     /**
-     * Holds cached metadata for this image
+     * Holds cached metadata for this image.
      */
     private ?array $metadata = null;
 
@@ -23,11 +26,12 @@ class SmartSize extends Transformation
 
         if (!$params['poi']) {
             $this->simpleCrop($params['width'], $params['height']);
+
             return;
         }
 
         $crop = $this->calculateCrop($params, [
-            'width'  => $this->image->getWidth(),
+            'width' => $this->image->getWidth(),
             'height' => $this->image->getHeight(),
         ]);
 
@@ -45,24 +49,22 @@ class SmartSize extends Transformation
     }
 
     /**
-     * Calculate the coordinates and size of the crop area
+     * Calculate the coordinates and size of the crop area.
      *
-     * @param array $parameters
-     * @param array $imageSize
      * @return array Crop data
      */
     private function calculateCrop(array $parameters, array $imageSize)
     {
         $focalX = $parameters['poi'][0];
-        $focalY  = $parameters['poi'][1];
+        $focalY = $parameters['poi'][1];
 
         $sourceWidth = $imageSize['width'];
         $sourceHeight = $imageSize['height'];
-        $sourceRatio  = $sourceWidth / $sourceHeight;
+        $sourceRatio = $sourceWidth / $sourceHeight;
 
         $targetWidth = $parameters['width'];
         $targetHeight = $parameters['height'];
-        $targetRatio  = $targetWidth / $targetHeight;
+        $targetRatio = $targetWidth / $targetHeight;
 
         $growFactor = $this->getGrowFactor($parameters['closeness']);
         $sourcePortionThreshold = $this->getSourcePercentageThreshold($parameters['closeness']);
@@ -113,11 +115,11 @@ class SmartSize extends Transformation
     }
 
     /**
-     * Fetch POI from metadata for the image
+     * Fetch POI from metadata for the image.
      */
     private function getPoiFromMetadata(): ?array
     {
-        if ($this->metadata === null) {
+        if (null === $this->metadata) {
             $metadata = $this->event->getDatabase()->getMetadata(
                 $this->image->getUser(),
                 $this->image->getImageIdentifier(),
@@ -132,12 +134,12 @@ class SmartSize extends Transformation
                     (int) $poi['cy'],
                 ];
             } elseif (
-                $poi &&
-                isset($poi['x']) && isset($poi['y']) &&
-                isset($poi['width']) && isset($poi['height'])
+                $poi
+                && isset($poi['x']) && isset($poi['y'])
+                && isset($poi['width']) && isset($poi['height'])
             ) {
                 $this->metadata = [
-                    (int) $poi['x'] + ($poi['width']  / 2),
+                    (int) $poi['x'] + ($poi['width'] / 2),
                     (int) $poi['y'] + ($poi['height'] / 2),
                 ];
             } else {
@@ -149,10 +151,10 @@ class SmartSize extends Transformation
     }
 
     /**
-      * Get the threshold value that specifies the portion of the original width/height that
-      * the crop area should never go below.
-      *
-      * This is important in order to avoid using a very small portion of a large image.
+     * Get the threshold value that specifies the portion of the original width/height that
+     * the crop area should never go below.
+     *
+     * This is important in order to avoid using a very small portion of a large image.
      */
     private function getSourcePercentageThreshold(string $closeness): float
     {
@@ -172,8 +174,8 @@ class SmartSize extends Transformation
     }
 
     /**
-      * Get the factor by which the crop area is grown in order to include stuff around
-      * the POI. The larger the factor, the wider the crop.
+     * Get the factor by which the crop area is grown in order to include stuff around
+     * the POI. The larger the factor, the wider the crop.
      */
     private function getGrowFactor(string $closeness): float
     {
@@ -193,7 +195,7 @@ class SmartSize extends Transformation
     }
 
     /**
-     * Perform a simple crop/resize operation on the image
+     * Perform a simple crop/resize operation on the image.
      */
     private function simpleCrop(int $width, int $height): void
     {
@@ -222,7 +224,7 @@ class SmartSize extends Transformation
     }
 
     /**
-     * Validate parameters and return a normalized parameter array
+     * Validate parameters and return a normalized parameter array.
      *
      * @throws TransformationException Thrown on invalid or missing parameters
      */
@@ -252,7 +254,7 @@ class SmartSize extends Transformation
                 throw new TransformationException('Invalid POI format, expected format `<x>,<y>`', Response::HTTP_BAD_REQUEST);
             }
 
-            if (!empty($params['crop']) && in_array($params['crop'], ['close', 'medium', 'wide', 'full']) === false) {
+            if (!empty($params['crop']) && false === in_array($params['crop'], ['close', 'medium', 'wide', 'full'])) {
                 throw new TransformationException('Invalid crop value. Valid values are: close,medium,wide,full', Response::HTTP_BAD_REQUEST);
             }
         }

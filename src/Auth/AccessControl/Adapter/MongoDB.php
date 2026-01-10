@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Auth\AccessControl\Adapter;
 
 use Imbo\Auth\AccessControl\GroupQuery;
@@ -11,30 +12,34 @@ use MongoDB\Driver\Exception\Exception as MongoDBException;
 use MongoDB\Driver\Exception\InvalidArgumentException as MongoDBInvalidArgumentException;
 use MongoDB\Model\BSONArray;
 
+use function is_string;
+use function sprintf;
+
 class MongoDB extends AbstractAdapter implements MutableAdapterInterface
 {
-    public const ACL_COLLECTION_NAME       = 'accesscontrol';
+    public const ACL_COLLECTION_NAME = 'accesscontrol';
     public const ACL_GROUP_COLLECTION_NAME = 'accesscontrolgroup';
 
     private Collection $aclCollection;
     private Collection $aclGroupCollection;
 
     /**
-     * Create a new MongoDB access control adapter
+     * Create a new MongoDB access control adapter.
      *
-     * @param string $databaseName The name of the database to use
-     * @param string $uri The URI to use when connecting to MongoDB
-     * @param array<mixed> $uriOptions Options for the URI, sent to the MongoDB\Client instance
+     * @param string       $databaseName  The name of the database to use
+     * @param string       $uri           The URI to use when connecting to MongoDB
+     * @param array<mixed> $uriOptions    Options for the URI, sent to the MongoDB\Client instance
      * @param array<mixed> $driverOptions Additional options for the MongoDB\Client instance
-     * @param ?Client $client Pre-configured MongoDB client. When specified $uri, $uriOptions and $driverOptions are ignored
+     * @param ?Client      $client        Pre-configured MongoDB client. When specified $uri, $uriOptions and $driverOptions are ignored
+     *
      * @throws DatabaseException
      */
     public function __construct(
         string $databaseName = 'imbo',
-        string $uri          = 'mongodb://localhost:27017',
-        array $uriOptions    = [],
+        string $uri = 'mongodb://localhost:27017',
+        array $uriOptions = [],
         array $driverOptions = [],
-        ?Client $client      = null,
+        ?Client $client = null,
     ) {
         try {
             $client = $client ?: new Client($uri, $uriOptions, $driverOptions);
@@ -300,8 +305,8 @@ class MongoDB extends AbstractAdapter implements MutableAdapterInterface
 
             $r = [
                 'resources' => $resources,
-                'users'     => $users,
-                'id'        => (string) $rule['id'],
+                'users' => $users,
+                'id' => (string) $rule['id'],
             ];
 
             if (is_string($rule['group'] ?? null)) {

@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Database;
 
 /**
- * MySQL database driver
+ * MySQL database driver.
  */
 class MySQL extends PDOAdapter
 {

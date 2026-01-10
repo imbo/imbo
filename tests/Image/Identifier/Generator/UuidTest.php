@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Identifier\Generator;
 
 use Imbo\Image\Identifier\Generator\Uuid as UuidGenerator;
@@ -6,7 +7,9 @@ use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Uuid::class)]
+use function count;
+
+#[CoversClass(UuidGenerator::class)]
 class UuidTest extends TestCase
 {
     public function testGeneratesUniqueUuidV4(): void
@@ -15,7 +18,7 @@ class UuidTest extends TestCase
         $generator = new UuidGenerator();
         $generated = [];
 
-        for ($i = 0; $i < 100; $i++) {
+        for ($i = 0; $i < 100; ++$i) {
             $imageIdentifier = $generator->generate($image);
 
             // Does it have the right format?

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\Database\DatabaseInterface;
@@ -27,7 +28,7 @@ class ShortUrlsTest extends ResourceTests
         return new ShortUrls();
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->request = $this->createConfiguredMock(Request::class, [
             'getUser' => 'user',
@@ -39,7 +40,7 @@ class ShortUrlsTest extends ResourceTests
         $this->outputConverterManager
             ->method('supportsExtension')
             ->willReturnCallback(
-                fn (string $ext): bool => $ext === 'gif',
+                fn (string $ext): bool => 'gif' === $ext,
             );
 
         $this->event = $this->createConfiguredMock(EventInterface::class, [
@@ -143,8 +144,8 @@ class ShortUrlsTest extends ResourceTests
             {
                 "user": "user",
                 "imageIdentifier": "id",
-                "extension": ' . ($extension ? '"' . $extension . '"' : 'null') . ',
-                "query": ' . ($queryString ? '"' . $queryString . '"' : 'null') . '
+                "extension": '.($extension ? '"'.$extension.'"' : 'null').',
+                "query": '.($queryString ? '"'.$queryString.'"' : 'null').'
             }
         ');
         $this->database

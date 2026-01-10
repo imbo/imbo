@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener\ImageVariations\Storage;
 
 use Imbo\Exception\StorageException;
@@ -7,10 +8,12 @@ use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
 use TestFs\StreamWrapper as TestFs;
 
+use function dirname;
+
 #[CoversClass(Filesystem::class)]
 class FilesystemTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         TestFs::register();
     }
@@ -25,7 +28,7 @@ class FilesystemTest extends TestCase
         $dir = TestFs::url('dirname');
         mkdir($dir, 0);
 
-        $adapter = new Filesystem(TestFS::url('someDirectory'));
+        $adapter = new Filesystem(TestFs::url('someDirectory'));
         $this->expectExceptionObject(new StorageException(
             'Could not store image variation (directory not writable)',
             500,
@@ -45,7 +48,7 @@ class FilesystemTest extends TestCase
 
     public function testCanGetImageVariation(): void
     {
-        $blob = file_get_contents(__DIR__ . '/../../../Fixtures/image.png');
+        $blob = file_get_contents(__DIR__.'/../../../Fixtures/image.png');
         $imagePath = TestFs::url('someDir/u/s/e/user/i/m/a/image/300');
         mkdir(dirname($imagePath), 0000, true);
         file_put_contents($imagePath, $blob);

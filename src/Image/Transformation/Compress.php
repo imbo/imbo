@@ -1,11 +1,12 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 
 /**
- * Compression transformation
+ * Compression transformation.
  */
 class Compress extends Transformation
 {

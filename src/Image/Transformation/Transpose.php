@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use ImagickException;
@@ -6,13 +7,10 @@ use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 
 /**
- * Transpose transformation
+ * Transpose transformation.
  */
 class Transpose extends Transformation
 {
-    /**
-     * {@inheritdoc}
-     */
     public function transform(array $params)
     {
         try {

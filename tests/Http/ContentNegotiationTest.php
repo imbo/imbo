@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Http;
 
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -10,7 +11,7 @@ class ContentNegotiationTest extends TestCase
 {
     private ContentNegotiation $cn;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->cn = new ContentNegotiation();
     }
@@ -28,7 +29,7 @@ class ContentNegotiationTest extends TestCase
     }
 
     /**
-     * @return array<array{mimeType:string,acceptable:array<string,double>,result:double|bool}>
+     * @return array<array{mimeType:string,acceptable:array<string,float>,result:float|bool}>
      */
     public static function getIsAcceptableData(): array
     {
@@ -62,7 +63,7 @@ class ContentNegotiationTest extends TestCase
     }
 
     /**
-     * @return array<array{mimeTypes:array<string>,acceptable:array<string,double>,result:string|bool}>
+     * @return array<array{mimeTypes:array<string>,acceptable:array<string,float>,result:string|bool}>
      */
     public static function getMimeTypes(): array
     {

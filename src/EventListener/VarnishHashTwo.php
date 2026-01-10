@@ -1,27 +1,28 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
 use Imbo\Model\Image;
 
 /**
- * HashTwo event listener
+ * HashTwo event listener.
  *
  * This event listener can be used to send HashTwo headers for Varnish.
  *
- * @link https://www.varnish-software.com/blog/advanced-cache-invalidation-strategies
+ * @see https://www.varnish-software.com/blog/advanced-cache-invalidation-strategies
  */
 class VarnishHashTwo implements ListenerInterface
 {
     /**
-     * The response header to use
+     * The response header to use.
      *
      * @var string
      */
     private $header = 'X-HashTwo';
 
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param array $params Parameters for the event listener
      */
@@ -41,7 +42,7 @@ class VarnishHashTwo implements ListenerInterface
     }
 
     /**
-     * Add the HashTwo header to the response
+     * Add the HashTwo header to the response.
      *
      * @param EventInterface $event The current event
      */
@@ -58,8 +59,8 @@ class VarnishHashTwo implements ListenerInterface
         $response->headers->set(
             $this->header,
             [
-                'imbo;image;' . $user . ';' . $imageIdentifier,
-                'imbo;user;' . $user,
+                'imbo;image;'.$user.';'.$imageIdentifier,
+                'imbo;user;'.$user,
             ],
         );
     }

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
@@ -7,6 +8,12 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\ResourceException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Group as GroupModel;
+
+use function array_key_exists;
+use function is_array;
+use function is_string;
+
+use const JSON_ERROR_NONE;
 
 class Group implements ResourceInterface
 {
@@ -18,15 +25,15 @@ class Group implements ResourceInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'group.get'    => 'getGroup',
-            'group.head'   => 'getGroup',
-            'group.put'    => 'updateGroup',
+            'group.get' => 'getGroup',
+            'group.head' => 'getGroup',
+            'group.put' => 'updateGroup',
             'group.delete' => 'deleteGroup',
         ];
     }
 
     /**
-     * Get the resources associated with a specific group
+     * Get the resources associated with a specific group.
      */
     public function getGroup(EventInterface $event): void
     {
@@ -50,7 +57,7 @@ class Group implements ResourceInterface
     }
 
     /**
-     * Add resources to a group
+     * Add resources to a group.
      */
     public function updateGroup(EventInterface $event): void
     {
@@ -71,7 +78,7 @@ class Group implements ResourceInterface
 
         $body = json_decode($request->getContent(), true);
 
-        if ($body === null || json_last_error() !== JSON_ERROR_NONE) {
+        if (null === $body || JSON_ERROR_NONE !== json_last_error()) {
             throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
         }
 
@@ -97,7 +104,7 @@ class Group implements ResourceInterface
     }
 
     /**
-     * Delete a resource group
+     * Delete a resource group.
      */
     public function deleteGroup(EventInterface $event): void
     {

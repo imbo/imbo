@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventManager;
 
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
@@ -10,6 +11,8 @@ use Imbo\Image\InputLoaderManager;
 use Imbo\Image\OutputConverterManager;
 use Imbo\Image\TransformationManager;
 use Imbo\Storage\StorageInterface;
+
+use function sprintf;
 
 class Event implements EventInterface
 {
@@ -30,6 +33,7 @@ class Event implements EventInterface
     public function setName(string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -41,6 +45,7 @@ class Event implements EventInterface
     public function stopPropagation(): self
     {
         $this->propagationStopped = true;
+
         return $this;
     }
 
@@ -56,12 +61,14 @@ class Event implements EventInterface
     public function setArgument(string $key, $value): self
     {
         $this->arguments[$key] = $value;
+
         return $this;
     }
 
     public function setArguments(array $arguments = []): self
     {
         $this->arguments = $arguments;
+
         return $this;
     }
 

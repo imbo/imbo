@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\InputLoader;
 
 use Imagick;
@@ -10,7 +11,7 @@ class BasicTest extends TestCase
 {
     private Basic $loader;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->loader = new Basic();
     }
@@ -26,7 +27,7 @@ class BasicTest extends TestCase
 
     public function testLoadsImage(): void
     {
-        $blob = file_get_contents(FIXTURES_DIR . '/1024x256.png');
+        $blob = file_get_contents(FIXTURES_DIR.'/1024x256.png');
 
         $imagick = $this->createMock(Imagick::class);
         $imagick

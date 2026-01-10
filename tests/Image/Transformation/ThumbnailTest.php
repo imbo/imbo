@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -39,7 +40,7 @@ class ThumbnailTest extends TransformationTests
             ->willReturn($image);
 
         $imagick = new Imagick();
-        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
+        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR.'/image.png'));
 
         $this->getTransformation()
             ->setImage($image)
@@ -55,39 +56,39 @@ class ThumbnailTest extends TransformationTests
         return [
             'no params' => [
                 'params' => [],
-                'width'  => 50,
+                'width' => 50,
                 'height' => 50,
             ],
             'only width' => [
                 'params' => ['width' => 60],
-                'width'  => 60,
+                'width' => 60,
                 'height' => 50,
             ],
             'only height' => [
                 'params' => ['height' => 60],
-                'width'  => 50,
+                'width' => 50,
                 'height' => 60,
             ],
             'only fit (inset)' => [
                 'params' => ['fit' => 'inset'],
-                'width'  => 50,
+                'width' => 50,
                 'height' => 34,
-                'diff'   => 1,
+                'diff' => 1,
             ],
             'only fit (outbound)' => [
                 'params' => ['fit' => 'outbound'],
-                'width'  => 50,
+                'width' => 50,
                 'height' => 50,
             ],
             'all params (inset)' => [
                 'params' => ['width' => 123, 'height' => 456, 'fit' => 'inset'],
-                'width'  => 123,
+                'width' => 123,
                 'height' => 85,
-                'diff'   => 1,
+                'diff' => 1,
             ],
             'all params (outbound)' => [
                 'params' => ['width' => 123, 'height' => 456, 'fit' => 'outbound'],
-                'width'  => 123,
+                'width' => 123,
                 'height' => 456,
             ],
         ];

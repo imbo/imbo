@@ -1,29 +1,30 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
 
 /**
- * Max image size event listener
+ * Max image size event listener.
  */
 class MaxImageSize implements ListenerInterface
 {
     /**
-     * Max width
+     * Max width.
      *
      * @var int
      */
     private $width;
 
     /**
-     * Max height
+     * Max height.
      *
      * @var int
      */
     private $height;
 
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param array $params Parameters for the event listener
      */
@@ -40,9 +41,6 @@ class MaxImageSize implements ListenerInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function enforceMaxSize(EventInterface $event)
     {
         $image = $event->getRequest()->getImage();

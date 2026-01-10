@@ -1,10 +1,11 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
 
 /**
- * Stats resource
+ * Stats resource.
  *
  * This resource can be used to monitor the imbo installation to see if it has access to the
  * current database and storage.
@@ -25,7 +26,7 @@ class Stats implements ResourceInterface
     }
 
     /**
-     * Handle GET requests
+     * Handle GET requests.
      *
      * @param EventInterface $event The current event
      */

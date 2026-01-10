@@ -1,15 +1,17 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Trait;
+
+use function sprintf;
 
 trait IdentifierQuoter
 {
     abstract protected function getIdentifierQuote(): string;
 
     /**
-     * Quote database tables / columns
+     * Quote database tables / columns.
      *
      * @param string $identifier Identifier to quote
-     * @return string
      */
     protected function quote(string $identifier): string
     {

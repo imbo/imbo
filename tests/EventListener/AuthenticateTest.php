@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
@@ -14,6 +15,8 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
+use function sprintf;
+
 #[CoversClass(Authenticate::class)]
 class AuthenticateTest extends ListenerTests
 {
@@ -24,7 +27,7 @@ class AuthenticateTest extends ListenerTests
     private Response $response;
     private HeaderBag&MockObject $headers;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->headers = $this->createMock(HeaderBag::class);
         $this->accessControl = $this->createMock(AdapterInterface::class);
@@ -91,6 +94,7 @@ class AuthenticateTest extends ListenerTests
                 static function (string $header): bool {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $header]) {
                         [0, 'x-imbo-authenticate-timestamp'],
                         [1, 'x-imbo-authenticate-signature'] => true,
@@ -104,6 +108,7 @@ class AuthenticateTest extends ListenerTests
                 static function (string $header, ?string $value) {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $header, $value]) {
                         [0, 'x-imbo-authenticate-timestamp', null] => gmdate('Y-m-d\TH:i:s\Z'),
                         [1, 'x-imbo-authenticate-signature', null] => null,
@@ -124,6 +129,7 @@ class AuthenticateTest extends ListenerTests
                 static function (string $header): bool {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $header]) {
                         [0, 'x-imbo-authenticate-timestamp'],
                         [1, 'x-imbo-authenticate-signature'] => true,
@@ -149,6 +155,7 @@ class AuthenticateTest extends ListenerTests
                 static function (string $header): bool {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $header]) {
                         [0, 'x-imbo-authenticate-timestamp'],
                         [1, 'x-imbo-authenticate-signature'] => true,
@@ -174,6 +181,7 @@ class AuthenticateTest extends ListenerTests
                 static function (string $header): bool {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $header]) {
                         [0, 'x-imbo-authenticate-timestamp'],
                         [1, 'x-imbo-authenticate-signature'] => true,
@@ -187,6 +195,7 @@ class AuthenticateTest extends ListenerTests
                 static function (string $header) {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $header]) {
                         [0, 'x-imbo-authenticate-timestamp'] => gmdate('Y-m-d\TH:i:s\Z'),
                         [1, 'x-imbo-authenticate-signature'] => 'foobar',
@@ -231,6 +240,7 @@ class AuthenticateTest extends ListenerTests
                 static function (string $header): bool {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $header]) {
                         [0, 'x-imbo-authenticate-timestamp'],
                         [1, 'x-imbo-authenticate-signature'] => true,
@@ -244,6 +254,7 @@ class AuthenticateTest extends ListenerTests
                 static function (string $header) use ($timestamp, $signature): string {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $header]) {
                         [0, 'x-imbo-authenticate-timestamp'] => $timestamp,
                         [1, 'x-imbo-authenticate-signature'] => $signature,
@@ -305,6 +316,7 @@ class AuthenticateTest extends ListenerTests
                 static function (string $header, string $value) use ($timestamp, $signature): string {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $header, $value]) {
                         [0, 'x-imbo-authenticate-timestamp', $timestamp] => $timestamp,
                         [1, 'x-imbo-authenticate-signature', $signature] => $signature,
@@ -366,6 +378,7 @@ class AuthenticateTest extends ListenerTests
                 static function (string $header, string $value) use ($timestamp, $signature): string {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $header, $value]) {
                         [0, 'x-imbo-authenticate-timestamp', $timestamp] => $timestamp,
                         [1, 'x-imbo-authenticate-signature', $signature] => $signature,
@@ -415,6 +428,7 @@ class AuthenticateTest extends ListenerTests
         return array_map(
             /**
              * @param array{clientSideUrl:string,serverUrl:string,protocol:string,authHeader:string,shouldMatch:bool} $dataSet
+             *
              * @return array{serverUrl:string,protocol:string,authHeader:string,shouldMatch:bool,signature:string,timestamp:string}
              */
             function (array $dataSet): array {
@@ -426,7 +440,7 @@ class AuthenticateTest extends ListenerTests
                 $signature = hash_hmac('sha256', $data, $privateKey);
 
                 return [
-                    'serverUrl' => $dataSet['serverUrl'] . '?signature=' . $signature . '&timestamp=' . $timestamp,
+                    'serverUrl' => $dataSet['serverUrl'].'?signature='.$signature.'&timestamp='.$timestamp,
                     'protocol' => $dataSet['protocol'],
                     'authHeader' => $dataSet['authHeader'],
                     'shouldMatch' => $dataSet['shouldMatch'],

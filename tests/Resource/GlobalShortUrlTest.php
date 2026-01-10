@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\Database\DatabaseInterface;
@@ -12,6 +13,8 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+
+use function sprintf;
 
 #[CoversClass(GlobalShortUrl::class)]
 class GlobalShortUrlTest extends ResourceTests
@@ -28,7 +31,7 @@ class GlobalShortUrlTest extends ResourceTests
         return new GlobalShortUrl();
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createStub(Response::class);
@@ -72,6 +75,7 @@ class GlobalShortUrlTest extends ResourceTests
                     static function (string $name): bool {
                         /** @var int */
                         static $i = 0;
+
                         return match ([$i++, $name]) {
                             [0, 'user'],
                             [1, 'imageIdentifier'],
@@ -83,6 +87,7 @@ class GlobalShortUrlTest extends ResourceTests
                     static function (string $value): bool {
                         /** @var int */
                         static $i = 0;
+
                         return match ([$i++, $value]) {
                             [0, 'christer'],
                             [1, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'],

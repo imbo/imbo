@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Http\Response;
 
 use Imbo\EventManager\EventInterface;
@@ -23,6 +24,11 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
+use function get_class;
+use function in_array;
+use function sprintf;
+use function strlen;
+
 #[CoversClass(ResponseFormatter::class)]
 class ResponseFormatterTest extends TestCase
 {
@@ -36,7 +42,7 @@ class ResponseFormatterTest extends TestCase
     private OutputConverterManager&MockObject $outputConverterManager;
     private TransformationManager $transformationManager;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $defaultSupported = [];
 

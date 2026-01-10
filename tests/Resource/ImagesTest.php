@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\Database\DatabaseInterface;
@@ -36,7 +37,7 @@ class ImagesTest extends ResourceTests
         return new Images();
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
@@ -75,6 +76,7 @@ class ImagesTest extends ResourceTests
                 static function (string $event, array $params = []) use ($manager) {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $event, $params]) {
                         [0, 'db.image.insert', ['updateIfDuplicate' => false]],
                         [1, 'storage.image.insert', []] => $manager,
@@ -154,6 +156,7 @@ class ImagesTest extends ResourceTests
                 static function (string $event, array $params = []) use ($manager) {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $event, $params]) {
                         [0, 'db.image.insert', ['updateIfDuplicate' => true]] => throw new DuplicateImageIdentifierException(),
                         [1, 'db.image.insert', ['updateIfDuplicate' => true]],

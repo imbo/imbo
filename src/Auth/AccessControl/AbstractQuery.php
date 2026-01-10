@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Auth\AccessControl;
 
 /**
- * Abstract query interface for access control
+ * Abstract query interface for access control.
  */
 abstract class AbstractQuery
 {
@@ -12,6 +13,7 @@ abstract class AbstractQuery
     public function setLimit(int $limit): static
     {
         $this->limit = $limit;
+
         return $this;
     }
 
@@ -23,6 +25,7 @@ abstract class AbstractQuery
     public function setPage(int $page): static
     {
         $this->page = $page;
+
         return $this;
     }
 

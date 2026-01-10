@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image;
 
 /**
@@ -12,8 +13,9 @@ interface RegionExtractor
      * Get the region of the image that is extracted when applying the transformation
      * with the parameters provided.
      *
-     * @param array $params Transformation parameters
+     * @param array $params    Transformation parameters
      * @param array $imageSize Size of image
+     *
      * @return array Array containing `width`, `height`, `x` and `y`
      */
     public function getExtractedRegion(array $params, array $imageSize);

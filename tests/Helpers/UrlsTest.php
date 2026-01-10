@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Helpers;
 
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -10,7 +11,7 @@ class UrlsTest extends TestCase
 {
     private Urls $helper;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->helper = new Urls();
     }

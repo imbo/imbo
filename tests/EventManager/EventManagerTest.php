@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventManager;
 
 use Closure;
@@ -21,7 +22,7 @@ class EventManagerTest extends TestCase
     private Request&MockObject $request;
     private Event $event;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->request = $this->createMock(Request::class);
         $this->event = new Event(['request' => $this->request]);
@@ -142,7 +143,6 @@ class EventManagerTest extends TestCase
                 ->method('getUser')
                 ->willReturn($user);
         }
-
 
         $this->manager->trigger('event');
         $this->assertSame($willTrigger, $check->triggered);
@@ -286,13 +286,13 @@ class EventManagerTest extends TestCase
     public static function getWildcardListeners(): array
     {
         $callback1 = function (EventInterface $event): void {
-            echo '1:' . (string) $event->getName() . ' ';
+            echo '1:'.(string) $event->getName().' ';
         };
         $callback2 = function (EventInterface $event): void {
-            echo '2:' . (string) $event->getName() . ' ';
+            echo '2:'.(string) $event->getName().' ';
         };
         $callback3 = function (EventInterface $event): void {
-            echo '3:' . (string) $event->getName() . ' ';
+            echo '3:'.(string) $event->getName().' ';
         };
 
         return [

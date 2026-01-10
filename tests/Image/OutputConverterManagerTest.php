@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image;
 
 use Imagick;
@@ -13,12 +14,15 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
+use function count;
+use function sprintf;
+
 #[CoversClass(OutputConverterManager::class)]
 class OutputConverterManagerTest extends TestCase
 {
     private OutputConverterManager $manager;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->manager = new OutputConverterManager();
     }
@@ -36,7 +40,6 @@ class OutputConverterManagerTest extends TestCase
         ));
         $this->manager->addConverters([new stdClass()]);
     }
-
 
     public function testCanAddConvertersAsStrings(): void
     {

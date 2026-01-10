@@ -1,73 +1,74 @@
 <?php declare(strict_types=1);
+
 namespace Imbo;
 
 class Resource
 {
-    public const GROUPS_GET              = 'groups.get';
-    public const GROUPS_HEAD             = 'groups.head';
-    public const GROUPS_POST             = 'groups.post';
-    public const GROUPS_OPTIONS          = 'groups.options';
+    public const GROUPS_GET = 'groups.get';
+    public const GROUPS_HEAD = 'groups.head';
+    public const GROUPS_POST = 'groups.post';
+    public const GROUPS_OPTIONS = 'groups.options';
 
-    public const GROUP_GET               = 'group.get';
-    public const GROUP_HEAD              = 'group.head';
-    public const GROUP_PUT               = 'group.put';
-    public const GROUP_DELETE            = 'group.delete';
-    public const GROUP_OPTIONS           = 'group.options';
+    public const GROUP_GET = 'group.get';
+    public const GROUP_HEAD = 'group.head';
+    public const GROUP_PUT = 'group.put';
+    public const GROUP_DELETE = 'group.delete';
+    public const GROUP_OPTIONS = 'group.options';
 
-    public const KEYS_POST               = 'keys.post';
-    public const KEYS_OPTIONS            = 'keys.options';
+    public const KEYS_POST = 'keys.post';
+    public const KEYS_OPTIONS = 'keys.options';
 
-    public const KEY_HEAD                = 'key.head';
-    public const KEY_PUT                 = 'key.put';
-    public const KEY_DELETE              = 'key.delete';
-    public const KEY_OPTIONS             = 'key.options';
+    public const KEY_HEAD = 'key.head';
+    public const KEY_PUT = 'key.put';
+    public const KEY_DELETE = 'key.delete';
+    public const KEY_OPTIONS = 'key.options';
 
-    public const ACCESS_RULE_GET         = 'accessrule.get';
-    public const ACCESS_RULE_HEAD        = 'accessrule.head';
-    public const ACCESS_RULE_DELETE      = 'accessrule.delete';
-    public const ACCESS_RULE_OPTIONS     = 'accessrule.options';
+    public const ACCESS_RULE_GET = 'accessrule.get';
+    public const ACCESS_RULE_HEAD = 'accessrule.head';
+    public const ACCESS_RULE_DELETE = 'accessrule.delete';
+    public const ACCESS_RULE_OPTIONS = 'accessrule.options';
 
-    public const ACCESS_RULES_GET        = 'accessrules.get';
-    public const ACCESS_RULES_HEAD       = 'accessrules.head';
-    public const ACCESS_RULES_POST       = 'accessrules.post';
-    public const ACCESS_RULES_OPTIONS    = 'accessrules.options';
+    public const ACCESS_RULES_GET = 'accessrules.get';
+    public const ACCESS_RULES_HEAD = 'accessrules.head';
+    public const ACCESS_RULES_POST = 'accessrules.post';
+    public const ACCESS_RULES_OPTIONS = 'accessrules.options';
 
-    public const USER_GET                = 'user.get';
-    public const USER_HEAD               = 'user.head';
-    public const USER_OPTIONS            = 'user.options';
+    public const USER_GET = 'user.get';
+    public const USER_HEAD = 'user.head';
+    public const USER_OPTIONS = 'user.options';
 
-    public const IMAGE_GET               = 'image.get';
-    public const IMAGE_HEAD              = 'image.head';
-    public const IMAGE_DELETE            = 'image.delete';
-    public const IMAGE_OPTIONS           = 'image.options';
+    public const IMAGE_GET = 'image.get';
+    public const IMAGE_HEAD = 'image.head';
+    public const IMAGE_DELETE = 'image.delete';
+    public const IMAGE_OPTIONS = 'image.options';
 
-    public const IMAGES_GET              = 'images.get';
-    public const IMAGES_HEAD             = 'images.head';
-    public const IMAGES_POST             = 'images.post';
-    public const IMAGES_OPTIONS          = 'images.options';
+    public const IMAGES_GET = 'images.get';
+    public const IMAGES_HEAD = 'images.head';
+    public const IMAGES_POST = 'images.post';
+    public const IMAGES_OPTIONS = 'images.options';
 
-    public const GLOBAL_IMAGES_GET       = 'globalimages.get';
-    public const GLOBAL_IMAGES_HEAD      = 'globalimages.head';
-    public const GLOBAL_IMAGES_OPTIONS   = 'globalimages.options';
+    public const GLOBAL_IMAGES_GET = 'globalimages.get';
+    public const GLOBAL_IMAGES_HEAD = 'globalimages.head';
+    public const GLOBAL_IMAGES_OPTIONS = 'globalimages.options';
 
-    public const METADATA_GET            = 'metadata.get';
-    public const METADATA_HEAD           = 'metadata.head';
-    public const METADATA_PUT            = 'metadata.put';
-    public const METADATA_POST           = 'metadata.post';
-    public const METADATA_DELETE         = 'metadata.delete';
-    public const METADATA_OPTIONS        = 'metadata.options';
+    public const METADATA_GET = 'metadata.get';
+    public const METADATA_HEAD = 'metadata.head';
+    public const METADATA_PUT = 'metadata.put';
+    public const METADATA_POST = 'metadata.post';
+    public const METADATA_DELETE = 'metadata.delete';
+    public const METADATA_OPTIONS = 'metadata.options';
 
-    public const SHORTURL_GET            = 'shorturl.get';
-    public const SHORTURL_HEAD           = 'shorturl.head';
-    public const SHORTURL_DELETE         = 'shorturl.delete';
-    public const SHORTURL_OPTIONS        = 'shorturl.options';
+    public const SHORTURL_GET = 'shorturl.get';
+    public const SHORTURL_HEAD = 'shorturl.head';
+    public const SHORTURL_DELETE = 'shorturl.delete';
+    public const SHORTURL_OPTIONS = 'shorturl.options';
 
-    public const SHORTURLS_POST          = 'shorturls.post';
-    public const SHORTURLS_DELETE        = 'shorturls.delete';
-    public const SHORTURLS_OPTIONS       = 'shorturls.options';
+    public const SHORTURLS_POST = 'shorturls.post';
+    public const SHORTURLS_DELETE = 'shorturls.delete';
+    public const SHORTURLS_OPTIONS = 'shorturls.options';
 
     /**
-     * Returns a list of resources which should be accessible for read-only public keys
+     * Returns a list of resources which should be accessible for read-only public keys.
      *
      * @return array<string>
      */
@@ -103,7 +104,7 @@ class Resource
     }
 
     /**
-     * Returns a list of resources which should be accessible for read+write public keys
+     * Returns a list of resources which should be accessible for read+write public keys.
      *
      * @return array<string>
      */
@@ -128,7 +129,7 @@ class Resource
     }
 
     /**
-     * Returns a list of all resources available, including those which involves access control
+     * Returns a list of all resources available, including those which involves access control.
      *
      * @return array<string>
      */

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\OutputConverter;
 
 use Imagick;
@@ -16,8 +17,8 @@ class Basic implements OutputConverterInterface
                 'jpg',
                 'jpeg',
             ],
-            'image/png'  => 'png',
-            'image/gif'  => 'gif',
+            'image/png' => 'png',
+            'image/gif' => 'gif',
         ];
     }
 

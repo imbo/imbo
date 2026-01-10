@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace ImboSDK\EventListener\ImageVariations\Storage;
 
 use Imbo\EventListener\ImageVariations\Storage\StorageInterface;
@@ -11,18 +12,18 @@ abstract class StorageTests extends TestCase
     protected StorageInterface $adapter;
     protected string $user = 'user';
     protected string $imageIdentifier = 'imageIdentifier';
-    protected string $fixturesDir  = __DIR__ . '/../../../Fixtures';
+    protected string $fixturesDir = __DIR__.'/../../../Fixtures';
     protected string $imageData;
     protected int $imageWidth;
 
     /**
-     * Get the adapter we want to test
+     * Get the adapter we want to test.
      */
     abstract protected function getAdapter(): StorageInterface;
 
     protected function setUp(): void
     {
-        $this->imageData = (string) file_get_contents($this->fixturesDir . '/image.png');
+        $this->imageData = (string) file_get_contents($this->fixturesDir.'/image.png');
         $this->imageWidth = 665;
         $this->adapter = $this->getAdapter();
     }
@@ -61,7 +62,7 @@ abstract class StorageTests extends TestCase
     public function testCanDeleteOneOrMoreImageVariations(): void
     {
         $key = 'key';
-        $id  = 'imageId';
+        $id = 'imageId';
 
         $this->adapter->storeImageVariation($key, $id, 'blob1', 100);
         $this->adapter->storeImageVariation($key, $id, 'blob2', 200);

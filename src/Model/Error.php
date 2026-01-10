@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Model;
 
 use DateTime;
@@ -9,41 +10,42 @@ use Imbo\Http\Request\Request;
 class Error implements ModelInterface
 {
     /**
-     * HTTP code
+     * HTTP code.
      */
     private ?int $httpCode = null;
 
     /**
-     * Error message from Imbo
+     * Error message from Imbo.
      */
     private ?string $errorMessage = null;
 
     /**
-     * Current date
+     * Current date.
      */
     private ?DateTime $date = null;
 
     /**
-     * Internal Imbo error code
+     * Internal Imbo error code.
      */
     private ?int $imboErrorCode = null;
 
     /**
-     * Optional image identifier
+     * Optional image identifier.
      */
     private ?string $imageIdentifier = null;
 
     /**
-     * Set the HTTP code
+     * Set the HTTP code.
      */
     public function setHttpCode(int $code): self
     {
         $this->httpCode = $code;
+
         return $this;
     }
 
     /**
-     * Get the HTTP code
+     * Get the HTTP code.
      */
     public function getHttpCode(): ?int
     {
@@ -51,16 +53,17 @@ class Error implements ModelInterface
     }
 
     /**
-     * Set the error message
+     * Set the error message.
      */
     public function setErrorMessage(string $message): self
     {
         $this->errorMessage = $message;
+
         return $this;
     }
 
     /**
-     * Get the error message
+     * Get the error message.
      */
     public function getErrorMessage(): ?string
     {
@@ -68,16 +71,17 @@ class Error implements ModelInterface
     }
 
     /**
-     * Set the date
+     * Set the date.
      */
     public function setDate(DateTime $date): self
     {
         $this->date = $date;
+
         return $this;
     }
 
     /**
-     * Get the date
+     * Get the date.
      */
     public function getDate(): ?DateTime
     {
@@ -85,16 +89,17 @@ class Error implements ModelInterface
     }
 
     /**
-     * Set the imbo error code
+     * Set the imbo error code.
      */
     public function setImboErrorCode(int $code): self
     {
         $this->imboErrorCode = $code;
+
         return $this;
     }
 
     /**
-     * Get the imbo error code
+     * Get the imbo error code.
      */
     public function getImboErrorCode(): ?int
     {
@@ -102,16 +107,17 @@ class Error implements ModelInterface
     }
 
     /**
-     * Set the image identifier
+     * Set the image identifier.
      */
     public function setImageIdentifier(string $imageIdentifier): self
     {
         $this->imageIdentifier = $imageIdentifier;
+
         return $this;
     }
 
     /**
-     * Get the image identifier
+     * Get the image identifier.
      */
     public function getImageIdentifier(): ?string
     {
@@ -133,10 +139,11 @@ class Error implements ModelInterface
     }
 
     /**
-     * Create an error based on an exception instance
+     * Create an error based on an exception instance.
      *
      * @param Exception $exception An Imbo\Exception instance
      * @param Request The current request
+     *
      * @return Error
      */
     public static function createFromException(Exception $exception, Request $request)

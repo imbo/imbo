@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -8,8 +9,10 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Exception\TransformationException;
 use Imbo\Model\Image;
 
+use function is_callable;
+
 /**
- * Abstract transformation
+ * Abstract transformation.
  */
 abstract class Transformation implements ListenerInterface, ImagickAware
 {
@@ -35,9 +38,10 @@ abstract class Transformation implements ListenerInterface, ImagickAware
     }
 
     /**
-     * Set the transformation event that triggered the transformation
+     * Set the transformation event that triggered the transformation.
      *
      * @param EventInterface $event An Event instance
+     *
      * @return self
      */
     public function setEvent(EventInterface $event)
@@ -50,7 +54,7 @@ abstract class Transformation implements ListenerInterface, ImagickAware
     protected function formatColor(string $color): string
     {
         if (preg_match('/^[A-F0-9]{3,6}$/i', $color)) {
-            return '#' . $color;
+            return '#'.$color;
         }
 
         return $color;
@@ -71,10 +75,11 @@ abstract class Transformation implements ListenerInterface, ImagickAware
 
     /**
      * Adjust the parameters for this transformation, in the event that the size of the
-     * input image has changed, for instance if the `ImageVariations`-listener is in place
+     * input image has changed, for instance if the `ImageVariations`-listener is in place.
      *
-     * @param float $ratio Ratio (input image width / original image width)
+     * @param float $ratio      Ratio (input image width / original image width)
      * @param array $parameters Transformation parameters
+     *
      * @return array Adjusted parameters
      */
     public function adjustParameters(float $ratio, array $parameters): array
@@ -83,9 +88,10 @@ abstract class Transformation implements ListenerInterface, ImagickAware
     }
 
     /**
-     * Transform the image
+     * Transform the image.
      *
      * @param array $params Parameters for the transformation
+     *
      * @throws TransformationException
      */
     abstract public function transform(array $params);

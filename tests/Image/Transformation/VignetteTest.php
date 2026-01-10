@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -27,7 +28,7 @@ class VignetteTest extends TransformationTests
             ->willReturn($image);
 
         $imagick = new Imagick();
-        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
+        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR.'/image.png'));
 
         $this->getTransformation()
             ->setImage($image)

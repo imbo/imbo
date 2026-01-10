@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Http\Response\Formatter;
 
 use Imbo\Exception\InvalidArgumentException;
@@ -12,7 +13,7 @@ abstract class Formatter implements FormatterInterface
 
     public function __construct(?DateFormatter $formatter = null)
     {
-        if ($formatter === null) {
+        if (null === $formatter) {
             $formatter = new DateFormatter();
         }
 

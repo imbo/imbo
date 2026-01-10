@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -55,7 +56,7 @@ class ResizeTest extends TransformationTests
         }
 
         $imagick = new Imagick();
-        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
+        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR.'/image.png'));
 
         $this->getTransformation()
             ->setImage($image)
@@ -70,25 +71,25 @@ class ResizeTest extends TransformationTests
     {
         return [
             'only width' => [
-                'params'         => ['width' => 100],
+                'params' => ['width' => 100],
                 'transformation' => true,
-                'resizedWidth'   => 100,
-                'resizedHeight'  => 70,
+                'resizedWidth' => 100,
+                'resizedHeight' => 70,
             ],
             'only height' => [
-                'params'         => ['height' => 100],
+                'params' => ['height' => 100],
                 'transformation' => true,
-                'resizedWidth'   => 144,
-                'resizedHeight'  => 100,
+                'resizedWidth' => 144,
+                'resizedHeight' => 100,
             ],
             'width and height' => [
-                'params'         => ['width' => 100, 'height' => 200],
+                'params' => ['width' => 100, 'height' => 200],
                 'transformation' => true,
-                'resizedWidth'   => 100,
-                'resizedHeight'  => 200,
+                'resizedWidth' => 100,
+                'resizedHeight' => 200,
             ],
             'params match image size' => [
-                'params'         => ['width' => 665, 'height' => 463],
+                'params' => ['width' => 665, 'height' => 463],
                 'transformation' => false,
             ],
         ];

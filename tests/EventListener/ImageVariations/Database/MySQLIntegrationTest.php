@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener\ImageVariations\Database;
 
 use Imbo\Exception\DatabaseException;
@@ -6,6 +7,8 @@ use ImboSDK\EventListener\ImageVariations\Database\DatabaseTests;
 use PDO;
 use PDOException;
 use PHPUnit\Framework\Attributes\CoversClass;
+
+use function sprintf;
 
 #[CoversClass(MySQL::class)]
 class MySQLIntegrationTest extends DatabaseTests
@@ -19,7 +22,7 @@ class MySQLIntegrationTest extends DatabaseTests
                 (string) getenv('MYSQL_PASSWORD'),
             );
         } catch (DatabaseException $e) {
-            $this->markTestSkipped('Unable to connect to MySQL database: ' . $e->getMessage());
+            $this->markTestSkipped('Unable to connect to MySQL database: '.$e->getMessage());
         }
     }
 
@@ -34,9 +37,9 @@ class MySQLIntegrationTest extends DatabaseTests
         );
 
         try {
-            $pdo->exec(sprintf("DELETE FROM `%s`", MySQL::IMAGEVARIATIONS_TABLE));
+            $pdo->exec(sprintf('DELETE FROM `%s`', MySQL::IMAGEVARIATIONS_TABLE));
         } catch (PDOException $e) {
-            $this->markTestSkipped('MySQL database have not been initialized: ' . $e->getMessage());
+            $this->markTestSkipped('MySQL database have not been initialized: '.$e->getMessage());
         }
     }
 }

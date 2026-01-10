@@ -1,13 +1,16 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
+use function sprintf;
+
 abstract class ResourceTests extends TestCase
 {
     /**
-     * Return a resource that can be tested
+     * Return a resource that can be tested.
      */
     abstract protected function getNewResource(): ResourceInterface;
 
@@ -25,13 +28,13 @@ abstract class ResourceTests extends TestCase
         $resource = $this->getNewResource();
 
         // Translate the class name to an event name: Imbo\Resource\GlobalShortUrl => globalshorturl
-        $shortName = strtolower(substr(get_class($resource), (int) strrpos(get_class($resource), '\\') + 1));
+        $shortName = strtolower(substr($resource::class, (int) strrpos($resource::class, '\\') + 1));
 
         $methods = $resource->getAllowedMethods();
         $definition = $resource::getSubscribedEvents();
 
         foreach ($methods as $method) {
-            $expectedEventName = strtolower($shortName . '.' . $method);
+            $expectedEventName = strtolower($shortName.'.'.$method);
 
             foreach (array_keys($definition) as $event) {
                 if ($event === $expectedEventName) {
@@ -47,7 +50,7 @@ abstract class ResourceTests extends TestCase
         }
 
         foreach (array_keys($definition) as $event) {
-            if (strpos($event, $shortName) !== 0) {
+            if (!str_starts_with($event, $shortName)) {
                 continue;
             }
 

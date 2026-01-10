@@ -1,15 +1,21 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener\ImageVariations\Storage;
 
 use FilesystemIterator;
 use Imbo\Exception\StorageException;
+
+use function dirname;
+
+use const DIRECTORY_SEPARATOR;
+use const STR_PAD_LEFT;
 
 class Filesystem implements StorageInterface
 {
     private string $dataDir;
 
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param string $dataDir Directory to store the files in
      */
@@ -72,7 +78,7 @@ class Filesystem implements StorageInterface
         if (null !== $width) {
             $files[] = $this->getImagePath($user, $imageIdentifier, $width);
         } else {
-            $files = glob($dir . '/*');
+            $files = glob($dir.'/*');
 
             if (false === $files) {
                 return;
@@ -116,6 +122,7 @@ class Filesystem implements StorageInterface
         }
 
         $iterator = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
+
         return !$iterator->valid();
     }
 }

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image;
 
 use Imbo\EventManager\EventInterface;
@@ -20,10 +21,10 @@ class TransformationManagerTest extends TestCase
     protected Image $image;
     private array $config;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         /** @var array{transformations:array<string,class-string>} $config */
-        $config = require __DIR__ . '/../../config/config.default.php';
+        $config = require __DIR__.'/../../config/config.default.php';
         $this->config = $config;
         $this->manager = new TransformationManager();
         $this->manager->addTransformations($this->config['transformations']);

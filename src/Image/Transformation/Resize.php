@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use ImagickException;
@@ -7,14 +8,14 @@ use Imbo\Http\Response\Response;
 use Imbo\Image\InputSizeConstraint;
 
 /**
- * Resize transformation
+ * Resize transformation.
  */
 class Resize extends Transformation implements InputSizeConstraint
 {
     public function transform(array $params)
     {
         $size = $this->calculateSize($params, [
-            'width'  => $this->image->getWidth(),
+            'width' => $this->image->getWidth(),
             'height' => $this->image->getHeight(),
         ]);
 
@@ -42,19 +43,14 @@ class Resize extends Transformation implements InputSizeConstraint
     }
 
     /**
-     * Calculate output size of image
+     * Calculate output size of image.
      *
-     * @param array $params
-     * @param array $imageSize
      * @return ?array{width:int,height:int}
      */
     protected function calculateSize(array $params, array $imageSize): ?array
     {
         if (empty($params['width']) && empty($params['height'])) {
-            throw new TransformationException(
-                'Missing both width and height. You need to specify at least one of them',
-                Response::HTTP_BAD_REQUEST,
-            );
+            throw new TransformationException('Missing both width and height. You need to specify at least one of them', Response::HTTP_BAD_REQUEST);
         }
 
         $width = !empty($params['width']) ? (int) $params['width'] : 0;

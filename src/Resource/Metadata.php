@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
@@ -7,7 +8,7 @@ use Imbo\Http\Response\Response;
 use Imbo\Model;
 
 /**
- * Metadata resource
+ * Metadata resource.
  */
 class Metadata implements ResourceInterface
 {
@@ -34,7 +35,7 @@ class Metadata implements ResourceInterface
     }
 
     /**
-     * Handle DELETE requests
+     * Handle DELETE requests.
      *
      * @param EventInterface $event The current event
      */
@@ -45,7 +46,7 @@ class Metadata implements ResourceInterface
     }
 
     /**
-     * Handle PUT requests
+     * Handle PUT requests.
      *
      * @param EventInterface $event The current event
      */
@@ -67,7 +68,7 @@ class Metadata implements ResourceInterface
     }
 
     /**
-     * Handle POST requests
+     * Handle POST requests.
      *
      * @param EventInterface $event The current event
      */
@@ -86,7 +87,7 @@ class Metadata implements ResourceInterface
     }
 
     /**
-     * Handle GET requests
+     * Handle GET requests.
      *
      * @param EventInterface $event The current event
      */
@@ -96,9 +97,10 @@ class Metadata implements ResourceInterface
     }
 
     /**
-     * Validate metadata found in the request body
+     * Validate metadata found in the request body.
      *
      * @param EventInterface $event The event instance
+     *
      * @throws InvalidArgumentException
      */
     public function validateMetadata(EventInterface $event): void
@@ -111,19 +113,16 @@ class Metadata implements ResourceInterface
         } else {
             $metadata = json_decode($metadata, true);
 
-            if ($metadata === null) {
+            if (null === $metadata) {
                 throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
             }
 
             foreach (array_keys($metadata) as $key) {
-                if (strpos($key, '.') === false) {
+                if (!str_contains($key, '.')) {
                     continue;
                 }
 
-                throw new InvalidArgumentException(
-                    'Invalid metadata. Dot characters (\'.\') are not allowed in metadata keys',
-                    Response::HTTP_BAD_REQUEST,
-                );
+                throw new InvalidArgumentException('Invalid metadata. Dot characters (\'.\') are not allowed in metadata keys', Response::HTTP_BAD_REQUEST);
             }
         }
     }

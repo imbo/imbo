@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Helpers;
 
 use MongoDB\Model\BSONArray;
@@ -7,9 +8,10 @@ use MongoDB\Model\BSONDocument;
 class BSONToArray
 {
     /**
-     * Convert to array, recursively
+     * Convert to array, recursively.
      *
      * @param BSONDocument|BSONArray|array<mixed> $document
+     *
      * @return array<mixed>
      */
     public function toArray(BSONDocument|BSONArray|array $document): array

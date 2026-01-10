@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use GuzzleHttp\Psr7\Query;
@@ -12,8 +13,13 @@ use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
 use Imbo\Resource;
 
+use function in_array;
+use function is_array;
+
+use const PHP_QUERY_RFC3986;
+
 /**
- * Access token event listener
+ * Access token event listener.
  *
  * This event listener will listen to all GET and HEAD requests and make sure that they include a
  * valid access token. The official PHP-based imbo client (https://github.com/imbo/imboclient-php)
@@ -23,7 +29,7 @@ use Imbo\Resource;
 class AccessToken implements ListenerInterface
 {
     /**
-     * Parameters for the listener
+     * Parameters for the listener.
      *
      * @var array
      */
@@ -66,7 +72,7 @@ class AccessToken implements ListenerInterface
     ];
 
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param array $params Parameters for the listener
      */
@@ -82,10 +88,7 @@ class AccessToken implements ListenerInterface
         }
 
         if (!$this->params['accessTokenGenerator'] instanceof AccessTokenInterface) {
-            throw new ConfigurationException(
-                'Invalid accessTokenGenerator defined (does not implement the AccessTokenInterface).',
-                Response::HTTP_INTERNAL_SERVER_ERROR,
-            );
+            throw new ConfigurationException('Invalid accessTokenGenerator defined (does not implement the AccessTokenInterface).', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -126,11 +129,11 @@ class AccessToken implements ListenerInterface
     }
 
     /**
-     * Check the access token of the request
+     * Check the access token of the request.
      *
-     * @param EventInterface $event
+     * @return true|null Returns true on a successful access token comparion, null otherwise
+     *
      * @throws RuntimeException
-     * @return null|true Returns true on a successful access token comparion, null otherwise
      */
     public function checkAccessToken(EventInterface $event)
     {
@@ -141,7 +144,7 @@ class AccessToken implements ListenerInterface
         $config = $event->getConfig();
         $accessTokenGenerator = $this->params['accessTokenGenerator'];
 
-        if (($eventName === 'image.get' || $eventName === 'image.head') && $this->isWhitelisted($request)) {
+        if (('image.get' === $eventName || 'image.head' === $eventName) && $this->isWhitelisted($request)) {
             // All transformations in the request are whitelisted. Skip the access token check
             return;
         }
@@ -174,11 +177,12 @@ class AccessToken implements ListenerInterface
 
         // See if we should modify the protocol for the incoming request
         $protocol = $config['authentication']['protocol'];
-        if ($protocol === 'both') {
+        if ('both' === $protocol) {
             $uris = array_reduce($uris, function ($dest, $uri) {
                 $baseUrl = preg_replace('#^https?#', '', $uri);
-                $dest[] = 'http' . $baseUrl;
-                $dest[] = 'https' . $baseUrl;
+                $dest[] = 'http'.$baseUrl;
+                $dest[] = 'https'.$baseUrl;
+
                 return $dest;
             }, []);
         } elseif (in_array($protocol, ['http', 'https'])) {
@@ -190,7 +194,7 @@ class AccessToken implements ListenerInterface
         foreach (array_filter($uris) as $uri) {
             foreach ($presentAccessTokenArgumentKeys as $argumentKey => $token) {
                 // Remove the access token from the query string as it's not used to generate the signature
-                $uriWithoutAccessToken = rtrim(preg_replace('/(?<=(\?|&))' . $argumentKey . '=[^&]+&?/', '', $uri), '&?');
+                $uriWithoutAccessToken = rtrim(preg_replace('/(?<=(\?|&))'.$argumentKey.'=[^&]+&?/', '', $uri), '&?');
                 $correctToken = $accessTokenGenerator->generateSignature($argumentKey, $uriWithoutAccessToken, $privateKey);
 
                 if ($correctToken === $token) {
@@ -214,8 +218,9 @@ class AccessToken implements ListenerInterface
      * requested from the backend. Since we sign our URLs, this breaks the token generation and thus breaks
      * URLs when Facebook attempts to retrieve them.
      *
-     * @param string $url The URL to generate the alternative form of
-     * @param int $encoding The encoding to use - from GuzzleHttp\Psr7
+     * @param string $url      The URL to generate the alternative form of
+     * @param int    $encoding The encoding to use - from GuzzleHttp\Psr7
+     *
      * @return string
      */
     protected function getAlternativeURL($url, $encoding = PHP_QUERY_RFC3986)
@@ -245,11 +250,11 @@ class AccessToken implements ListenerInterface
                 }
 
                 $newArguments[$fixedKey][] = $value;
-            } elseif (is_array($value) && substr($key, -2) == '[]') {
+            } elseif (is_array($value) && '[]' == substr($key, -2)) {
                 // if the value is an array, and we have the [] format already, we expand the keys
                 foreach ($value as $innerKey => $innerValue) {
                     // remove [] from the key and append the inner array key
-                    $indexedKey = substr($key, 0, -2) . '[' . $innerKey . ']';
+                    $indexedKey = substr($key, 0, -2).'['.$innerKey.']';
                     $newArguments[$indexedKey] = $innerValue;
                 }
             } else {
@@ -267,7 +272,9 @@ class AccessToken implements ListenerInterface
      * Generate an unescaped, alternative version of an url.
      *
      * @see AccessToken::getAlternativeURL()
+     *
      * @param $url string The URL to generate the alternative version of
+     *
      * @return string
      */
     protected function getUnescapedAlternativeURL($url)
@@ -279,7 +286,9 @@ class AccessToken implements ListenerInterface
      * Generate an escaped, alternative version of an url.
      *
      * @see AccessToken::getAlternativeURL()
+     *
      * @param $url string The URL to generate the alternative version of
+     *
      * @return string
      */
     protected function getEscapedAlternativeURL($url)
@@ -288,7 +297,7 @@ class AccessToken implements ListenerInterface
     }
 
     /**
-     * Check if the request is whitelisted
+     * Check if the request is whitelisted.
      *
      * This method will whitelist a request only if all the transformations present in the request
      * are listed in the whitelist filter OR if the whitelist filter is empty, and the blacklist
@@ -296,7 +305,8 @@ class AccessToken implements ListenerInterface
      * blacklist.
      *
      * @param Request $request The request instance
-     * @return boolean
+     *
+     * @return bool
      */
     private function isWhitelisted(Request $request)
     {

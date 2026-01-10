@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imagick;
@@ -7,8 +8,10 @@ use Imbo\Exception\DatabaseException;
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Response\Response;
 
+use function count;
+
 /**
- * Exif metadata event listener
+ * Exif metadata event listener.
  *
  * This listener will look for properties stored in the image, and store them as metadata in Imbo.
  */
@@ -21,7 +24,7 @@ class ExifMetadata implements ListenerInterface
     private ?Imagick $imagick = null;
 
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param array $params Parameters for the event listener
      */
@@ -46,6 +49,7 @@ class ExifMetadata implements ListenerInterface
     public function setImagick(Imagick $imagick): self
     {
         $this->imagick = $imagick;
+
         return $this;
     }
 
@@ -125,7 +129,7 @@ class ExifMetadata implements ListenerInterface
             if (($pos = strpos($key, ':')) !== false) {
                 $namespace = substr($key, 0, $pos);
 
-                if (isset($tags[$namespace . ':*'])) {
+                if (isset($tags[$namespace.':*'])) {
                     $filtered[$key] = $value;
                     continue;
                 }
@@ -163,7 +167,7 @@ class ExifMetadata implements ListenerInterface
             $key = str_replace('.', ':', $key);
 
             // Replace underscore with dash for png properties
-            if (substr($key, 0, 3) === 'png') {
+            if ('png' === substr($key, 0, 3)) {
                 $key = str_replace('_', '-', $key);
             }
 
@@ -177,20 +181,20 @@ class ExifMetadata implements ListenerInterface
     {
         $coordinates = explode(',', str_replace(' ', '', $coordinate));
 
-        for ($i = 0; $i < 3; $i++) {
+        for ($i = 0; $i < 3; ++$i) {
             $part = explode('/', $coordinates[$i]);
             $parts = count($part);
 
-            if ($parts === 1) {
+            if (1 === $parts) {
                 $coordinates[$i] = $part[0];
-            } elseif ($parts === 2) {
-                $coordinates[$i] = floatval($part[0]) / floatval($part[1]);
+            } elseif (2 === $parts) {
+                $coordinates[$i] = (float) $part[0] / (float) $part[1];
             } else {
                 $coordinates[$i] = 0;
             }
         }
 
-        $sign = ($hemisphere === 'W' || $hemisphere === 'S') ? -1 : 1;
+        $sign = ('W' === $hemisphere || 'S' === $hemisphere) ? -1 : 1;
         $degrees = ($coordinates[0] + ($coordinates[1] / 60) + ($coordinates[2] / 3600));
 
         return $sign * $degrees;

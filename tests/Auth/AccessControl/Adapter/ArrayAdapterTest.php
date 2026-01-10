@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Auth\AccessControl\Adapter;
 
 use Imbo\Auth\AccessControl\GroupQuery;
@@ -9,6 +10,8 @@ use Imbo\Resource;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+
+use function count;
 
 #[CoversClass(ArrayAdapter::class)]
 class ArrayAdapterTest extends TestCase
@@ -88,7 +91,7 @@ class ArrayAdapterTest extends TestCase
     {
         $acl = [
             [
-                'publicKey'  => 'pubkey',
+                'publicKey' => 'pubkey',
                 'privateKey' => 'privkey',
                 'acl' => [
                     [
@@ -119,7 +122,7 @@ class ArrayAdapterTest extends TestCase
     {
         $accessControl = new ArrayAdapter([
             [
-                'publicKey'  => 'pubkey',
+                'publicKey' => 'pubkey',
                 'privateKey' => 'privkey',
                 'acl' => [
                     [
@@ -142,8 +145,8 @@ class ArrayAdapterTest extends TestCase
             Response::HTTP_INTERNAL_SERVER_ERROR,
         ));
         new ArrayAdapter([
-            ['publicKey'  => 'pubkey', 'privateKey' => 'privkey', 'acl' => []],
-            ['publicKey'  => 'pubkey', 'privateKey' => 'privkey', 'acl' => []],
+            ['publicKey' => 'pubkey', 'privateKey' => 'privkey', 'acl' => []],
+            ['publicKey' => 'pubkey', 'privateKey' => 'privkey', 'acl' => []],
         ]);
     }
 
@@ -238,7 +241,7 @@ class ArrayAdapterTest extends TestCase
     {
         $acl = [
             [
-                'publicKey'  => 'pubkey',
+                'publicKey' => 'pubkey',
                 'privateKey' => 'privkey',
                 'acl' => [
                     [
@@ -410,7 +413,6 @@ class ArrayAdapterTest extends TestCase
                             'foo' => 'bar',
                         ]],
                     ],
-
                 ],
                 'publicKey' => 'some-public-key',
                 'result' => [],
@@ -431,7 +433,6 @@ class ArrayAdapterTest extends TestCase
                             'foo' => 'bar',
                         ]],
                     ],
-
                 ],
                 'publicKey' => 'other-key',
                 'result' => [[

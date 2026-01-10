@@ -1,102 +1,101 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Model;
 
 use DateTime;
 
+use function strlen;
+
 class Image implements ModelInterface
 {
     /**
-     * Mapping for some mime types
+     * Mapping for some mime types.
      *
      * @var array<string,string>
      */
     public static array $mimeTypeMapping = [
-        'image/x-png'  => 'image/png',
+        'image/x-png' => 'image/png',
         'image/x-jpeg' => 'image/jpeg',
-        'image/x-gif'  => 'image/gif',
+        'image/x-gif' => 'image/gif',
     ];
 
     /**
-     * Size of the file
+     * Size of the file.
      */
     private int $filesize;
 
     /**
-     * Mime type of the image
+     * Mime type of the image.
      */
     private string $mimeType;
 
     /**
-     * Extension of the file without the dot
+     * Extension of the file without the dot.
      */
     private string $extension;
 
     /**
-     * Blob containing the image itself
+     * Blob containing the image itself.
      */
     private string $blob;
 
     /**
-     * The metadata attached to this image
-     *
-     * @var array
+     * The metadata attached to this image.
      */
     private array $metadata = [];
 
     /**
-     * Width of the image
+     * Width of the image.
      */
     private int $width;
 
     /**
-     * Heigt of the image
+     * Heigt of the image.
      */
     private int $height;
 
     /**
-     * MD5 checksum of the image data
+     * MD5 checksum of the image data.
      */
     private string $checksum;
 
     /**
-     * MD5 checksum of the original image
+     * MD5 checksum of the original image.
      */
     private string $originalChecksum;
 
     /**
-     * Added date
+     * Added date.
      */
     private DateTime $added;
 
     /**
-     * Updated date
+     * Updated date.
      */
     private DateTime $updated;
 
     /**
-     * User
+     * User.
      */
     private string $user;
 
     /**
-     * Image identifier
+     * Image identifier.
      */
     private string $imageIdentifier;
 
     /**
-     * Flag informing us if the image has been transformed by any image transformations
+     * Flag informing us if the image has been transformed by any image transformations.
      */
     private bool $hasBeenTransformed = false;
 
     /**
-     * Track requested output quality compression
+     * Track requested output quality compression.
      */
     private int $outputQualityCompression;
 
     /**
-     * Get the size of the image data in bytes
-     *
-     * @return ?int
+     * Get the size of the image data in bytes.
      */
     public function getFilesize(): ?int
     {
@@ -104,10 +103,9 @@ class Image implements ModelInterface
     }
 
     /**
-     * Set the size of the image in bytes
+     * Set the size of the image in bytes.
      *
      * @param int $size The size of the image
-     * @return self
      */
     public function setFilesize(int $size): self
     {
@@ -117,9 +115,7 @@ class Image implements ModelInterface
     }
 
     /**
-     * Get the mime type
-     *
-     * @return ?string
+     * Get the mime type.
      */
     public function getMimeType(): ?string
     {
@@ -127,10 +123,9 @@ class Image implements ModelInterface
     }
 
     /**
-     * Set the mime type
+     * Set the mime type.
      *
      * @param string $mimeType The mime type, for instance "image/png"
-     * @return self
      */
     public function setMimeType(string $mimeType): self
     {
@@ -145,9 +140,7 @@ class Image implements ModelInterface
     }
 
     /**
-     * Get the extension
-     *
-     * @return ?string
+     * Get the extension.
      */
     public function getExtension(): ?string
     {
@@ -155,10 +148,9 @@ class Image implements ModelInterface
     }
 
     /**
-     * Set the extension
+     * Set the extension.
      *
      * @param string $extension The file extension
-     * @return self
      */
     public function setExtension(string $extension): self
     {
@@ -168,9 +160,7 @@ class Image implements ModelInterface
     }
 
     /**
-     * Get the blob
-     *
-     * @return ?string
+     * Get the blob.
      */
     public function getBlob(): ?string
     {
@@ -178,10 +168,9 @@ class Image implements ModelInterface
     }
 
     /**
-     * Set the blob and update filesize and checksum properties
+     * Set the blob and update filesize and checksum properties.
      *
      * @param string $blob The binary data to set
-     * @return self
      */
     public function setBlob(string $blob): self
     {
@@ -193,9 +182,7 @@ class Image implements ModelInterface
     }
 
     /**
-     * Get the metadata
-     *
-     * @return array
+     * Get the metadata.
      */
     public function getMetadata(): array
     {
@@ -203,10 +190,9 @@ class Image implements ModelInterface
     }
 
     /**
-     * Set the metadata
+     * Set the metadata.
      *
      * @param array $metadata An array with metadata
-     * @return self
      */
     public function setMetadata(array $metadata): self
     {
@@ -216,9 +202,7 @@ class Image implements ModelInterface
     }
 
     /**
-     * Get the width
-     *
-     * @return ?int
+     * Get the width.
      */
     public function getWidth(): ?int
     {
@@ -226,12 +210,11 @@ class Image implements ModelInterface
     }
 
     /**
-     * Set the width
+     * Set the width.
      *
      * @param int $width Width in pixels
-     * @return Image
      */
-    public function setWidth(int $width): Image
+    public function setWidth(int $width): self
     {
         $this->width = $width;
 
@@ -239,9 +222,7 @@ class Image implements ModelInterface
     }
 
     /**
-     * Get the height
-     *
-     * @return ?int
+     * Get the height.
      */
     public function getHeight(): ?int
     {
@@ -249,10 +230,9 @@ class Image implements ModelInterface
     }
 
     /**
-     * Set the height
+     * Set the height.
      *
      * @param int $height Height in pixels
-     * @return self
      */
     public function setHeight(int $height): self
     {
@@ -262,9 +242,7 @@ class Image implements ModelInterface
     }
 
     /**
-     * Get the added date
-     *
-     * @return ?DateTime
+     * Get the added date.
      */
     public function getAddedDate(): ?DateTime
     {
@@ -272,10 +250,9 @@ class Image implements ModelInterface
     }
 
     /**
-     * Set the added date
+     * Set the added date.
      *
      * @param DateTime $added When the image was added
-     * @return self
      */
     public function setAddedDate(DateTime $added): self
     {
@@ -285,9 +262,7 @@ class Image implements ModelInterface
     }
 
     /**
-     * Get the updated date
-     *
-     * @return ?DateTime
+     * Get the updated date.
      */
     public function getUpdatedDate(): ?DateTime
     {
@@ -295,10 +270,9 @@ class Image implements ModelInterface
     }
 
     /**
-     * Set the updated date
+     * Set the updated date.
      *
      * @param DateTime $updated When the image was updated
-     * @return self
      */
     public function setUpdatedDate(DateTime $updated): self
     {
@@ -308,9 +282,7 @@ class Image implements ModelInterface
     }
 
     /**
-     * Get the user
-     *
-     * @return ?string
+     * Get the user.
      */
     public function getUser(): ?string
     {
@@ -318,10 +290,9 @@ class Image implements ModelInterface
     }
 
     /**
-     * Set the user
+     * Set the user.
      *
      * @param string $user The user
-     * @return self
      */
     public function setUser(string $user): self
     {
@@ -331,9 +302,7 @@ class Image implements ModelInterface
     }
 
     /**
-     * Get the image identifier
-     *
-     * @return ?string
+     * Get the image identifier.
      */
     public function getImageIdentifier(): ?string
     {
@@ -341,10 +310,9 @@ class Image implements ModelInterface
     }
 
     /**
-     * Set the image identifier
+     * Set the image identifier.
      *
      * @param string $imageIdentifier The image identifier
-     * @return self
      */
     public function setImageIdentifier(string $imageIdentifier): self
     {
@@ -354,9 +322,7 @@ class Image implements ModelInterface
     }
 
     /**
-     * Get the checksum of the current image data
-     *
-     * @return ?string
+     * Get the checksum of the current image data.
      */
     public function getChecksum(): ?string
     {
@@ -364,10 +330,9 @@ class Image implements ModelInterface
     }
 
     /**
-     * Set the checksum
+     * Set the checksum.
      *
      * @param string $checksum The checksum to set
-     * @return self
      */
     public function setChecksum(string $checksum): self
     {
@@ -377,9 +342,7 @@ class Image implements ModelInterface
     }
 
     /**
-     * Get the original checksum of the current image data
-     *
-     * @return ?string
+     * Get the original checksum of the current image data.
      */
     public function getOriginalChecksum(): ?string
     {
@@ -387,10 +350,7 @@ class Image implements ModelInterface
     }
 
     /**
-     * Set the original checksum
-     *
-     * @param string $originalChecksum The original checksum to set
-     * @return self
+     * Set the original checksum.
      */
     public function setOriginalChecksum(string $checksum): self
     {
@@ -400,10 +360,7 @@ class Image implements ModelInterface
     }
 
     /**
-     * Set the hasBeenTransformed flag
-     *
-     * @param bool $flag
-     * @return self
+     * Set the hasBeenTransformed flag.
      */
     public function setHasBeenTransformed(bool $flag): self
     {
@@ -413,9 +370,7 @@ class Image implements ModelInterface
     }
 
     /**
-     * Get the hasBeenTransformed flag
-     *
-     * @return bool
+     * Get the hasBeenTransformed flag.
      */
     public function getHasBeenTransformed(): bool
     {
@@ -423,9 +378,7 @@ class Image implements ModelInterface
     }
 
     /**
-     * Get the requested output quality compression or quality value
-     *
-     * @return ?int
+     * Get the requested output quality compression or quality value.
      */
     public function getOutputQualityCompression(): ?int
     {
@@ -437,7 +390,6 @@ class Image implements ModelInterface
      * make use of the value.
      *
      * @param int $outputQualityCompression The requested compression or quality value
-     * @return self
      */
     public function setOutputQualityCompression(int $outputQualityCompression): self
     {
@@ -452,19 +404,19 @@ class Image implements ModelInterface
     public function getData(): array
     {
         return [
-            'filesize'                 => $this->getFilesize(),
-            'mimeType'                 => $this->getMimeType(),
-            'extension'                => $this->getExtension(),
-            'metadata'                 => $this->getMetadata(),
-            'width'                    => $this->getWidth(),
-            'height'                   => $this->getHeight(),
-            'addedDate'                => $this->getAddedDate(),
-            'updatedDate'              => $this->getUpdatedDate(),
-            'user'                     => $this->getUser(),
-            'imageIdentifier'          => $this->getImageIdentifier(),
-            'checksum'                 => $this->getChecksum(),
-            'originalChecksum'         => $this->getOriginalChecksum(),
-            'hasBeenTransformed'       => $this->getHasBeenTransformed(),
+            'filesize' => $this->getFilesize(),
+            'mimeType' => $this->getMimeType(),
+            'extension' => $this->getExtension(),
+            'metadata' => $this->getMetadata(),
+            'width' => $this->getWidth(),
+            'height' => $this->getHeight(),
+            'addedDate' => $this->getAddedDate(),
+            'updatedDate' => $this->getUpdatedDate(),
+            'user' => $this->getUser(),
+            'imageIdentifier' => $this->getImageIdentifier(),
+            'checksum' => $this->getChecksum(),
+            'originalChecksum' => $this->getOriginalChecksum(),
+            'hasBeenTransformed' => $this->getHasBeenTransformed(),
             'outputQualityCompression' => $this->getOutputQualityCompression(),
         ];
     }

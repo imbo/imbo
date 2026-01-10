@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
@@ -7,6 +8,12 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\ResourceException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Group;
+
+use function array_key_exists;
+use function is_array;
+use function is_string;
+
+use const JSON_ERROR_NONE;
 
 class Groups implements ResourceInterface
 {
@@ -18,14 +25,14 @@ class Groups implements ResourceInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'groups.get'  => 'listGroups',
+            'groups.get' => 'listGroups',
             'groups.head' => 'listGroups',
             'groups.post' => 'addGroup',
         ];
     }
 
     /**
-     * Get a list of available resource groups
+     * Get a list of available resource groups.
      */
     public function listGroups(EventInterface $event): void
     {
@@ -33,7 +40,7 @@ class Groups implements ResourceInterface
     }
 
     /**
-     * Add a new group
+     * Add a new group.
      */
     public function addGroup(EventInterface $event): void
     {
@@ -43,14 +50,14 @@ class Groups implements ResourceInterface
         }
 
         $request = $event->getRequest();
-        $body    = $request->getContent();
+        $body = $request->getContent();
 
         if (empty($body)) {
             throw new InvalidArgumentException('Missing JSON data', Response::HTTP_BAD_REQUEST);
         } else {
             $body = json_decode($body, true);
 
-            if ($body === null || json_last_error() !== JSON_ERROR_NONE) {
+            if (null === $body || JSON_ERROR_NONE !== json_last_error()) {
                 throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
             }
         }
@@ -63,7 +70,7 @@ class Groups implements ResourceInterface
             throw new InvalidArgumentException('Invalid group name', Response::HTTP_BAD_REQUEST);
         }
 
-        $name      = $body['name'];
+        $name = $body['name'];
         $resources = $body['resources'];
 
         $group = $accessControl->getGroup($name);

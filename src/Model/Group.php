@@ -1,31 +1,33 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Model;
 
 class Group implements ModelInterface
 {
     /**
-     * Name of the group
+     * Name of the group.
      */
     private ?string $name = null;
 
     /**
-     * Resources
+     * Resources.
      *
      * @var array<string>
      */
     private array $resources = [];
 
     /**
-     * Set the group name
+     * Set the group name.
      */
     public function setName(string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
     /**
-     * Get the group name
+     * Get the group name.
      */
     public function getName(): ?string
     {
@@ -33,18 +35,19 @@ class Group implements ModelInterface
     }
 
     /**
-     * Set the group resources
+     * Set the group resources.
      *
      * @param array<string> $resources
      */
     public function setResources(array $resources = []): self
     {
         $this->resources = $resources;
+
         return $this;
     }
 
     /**
-     * Get the group resources
+     * Get the group resources.
      *
      * @return array<string>
      */

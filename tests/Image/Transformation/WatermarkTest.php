@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -13,6 +14,8 @@ use Imbo\Storage\StorageInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+use function sprintf;
+
 #[CoversClass(Watermark::class)]
 class WatermarkTest extends TransformationTests
 {
@@ -26,7 +29,7 @@ class WatermarkTest extends TransformationTests
         return new Watermark();
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->transformation = new Watermark();
     }
@@ -76,7 +79,7 @@ class WatermarkTest extends TransformationTests
     #[DataProvider('getParamsForWatermarks')]
     public function testApplyToImageTopLeftWithOnlyWidthAndDefaultWatermark(array $params, array $colors): void
     {
-        $blob = file_get_contents(FIXTURES_DIR . '/white.png');
+        $blob = file_get_contents(FIXTURES_DIR.'/white.png');
 
         $image = new Image();
         $image->setBlob($blob);
@@ -98,7 +101,7 @@ class WatermarkTest extends TransformationTests
             ->expects($this->once())
             ->method('getImage')
             ->with('someUser', $expectedWatermark)
-            ->willReturn(file_get_contents(FIXTURES_DIR . '/' . $watermarkFixture));
+            ->willReturn(file_get_contents(FIXTURES_DIR.'/'.$watermarkFixture));
 
         $request = $this->createMock(Request::class);
         $request
@@ -123,13 +126,13 @@ class WatermarkTest extends TransformationTests
     }
 
     /**
-     * Verifies that the given image has a pixel with the given color value at the given position
+     * Verifies that the given image has a pixel with the given color value at the given position.
      *
-     * @param Imagick $imagick The imagick instance to verify
-     * @param int $x X position to check
-     * @param int $y Y position to check
+     * @param Imagick        $imagick     The imagick instance to verify
+     * @param int            $x           X position to check
+     * @param int            $y           Y position to check
      * @param array<int,int> $expectedRgb Expected color value, in RGB format, as array
-     * @param string $key Name of the key from the colors array
+     * @param string         $key         Name of the key from the colors array
      */
     protected function verifyColor(Imagick $imagick, int $x, int $y, array $expectedRgb, string $key): void
     {
@@ -137,7 +140,7 @@ class WatermarkTest extends TransformationTests
         $pixelValue = $imagick->getImagePixelColor($x, $y)->getColorAsString();
 
         $this->assertStringEndsWith(
-            $expected = 'rgb(' . implode(',', $expectedRgb) . ')',
+            $expected = 'rgb('.implode(',', $expectedRgb).')',
             $actual = $pixelValue,
             sprintf('Color comparison for key "%s" failed. Expected "%s", got: "%s"', $key, $expected, $actual),
         );
@@ -158,19 +161,19 @@ class WatermarkTest extends TransformationTests
                     'height' => 100,
                 ],
                 'colors' => [
-                    'top left corner'                  => ['x' => 0,   'y' => 0,   'color' => $black],
-                    'top right corner'                 => ['x' => 499, 'y' => 0,   'color' => $white],
-                    'bottom left corner'               => ['x' => 0,   'y' => 499, 'color' => $white],
-                    'bottom right corner'              => ['x' => 499, 'y' => 499, 'color' => $white],
+                    'top left corner' => ['x' => 0,   'y' => 0,   'color' => $black],
+                    'top right corner' => ['x' => 499, 'y' => 0,   'color' => $white],
+                    'bottom left corner' => ['x' => 0,   'y' => 499, 'color' => $white],
+                    'bottom right corner' => ['x' => 499, 'y' => 499, 'color' => $white],
 
-                    'inside watermark (top left)'      => ['x' => 0,   'y' => 0,   'color' => $black],
-                    'inside watermark (top right)'     => ['x' => 199, 'y' => 0,   'color' => $black],
-                    'inside watermark (bottom left)'   => ['x' => 0,   'y' => 99,  'color' => $black],
-                    'inside watermark (bottom right)'  => ['x' => 199, 'y' => 99,  'color' => $black],
+                    'inside watermark (top left)' => ['x' => 0,   'y' => 0,   'color' => $black],
+                    'inside watermark (top right)' => ['x' => 199, 'y' => 0,   'color' => $black],
+                    'inside watermark (bottom left)' => ['x' => 0,   'y' => 99,  'color' => $black],
+                    'inside watermark (bottom right)' => ['x' => 199, 'y' => 99,  'color' => $black],
 
-                    'outside watermark (right top)'    => ['x' => 200, 'y' => 0,   'color' => $white],
+                    'outside watermark (right top)' => ['x' => 200, 'y' => 0,   'color' => $white],
                     'outside watermark (right bottom)' => ['x' => 200, 'y' => 99,  'color' => $white],
-                    'outside watermark (bottom left)'  => ['x' => 0,   'y' => 100, 'color' => $white],
+                    'outside watermark (bottom left)' => ['x' => 0,   'y' => 100, 'color' => $white],
                     'outside watermark (bottom right)' => ['x' => 199, 'y' => 100, 'color' => $white],
                 ],
             ],
@@ -181,22 +184,22 @@ class WatermarkTest extends TransformationTests
                     'position' => 'top',
                 ],
                 'colors' => [
-                    'top left corner'                  => ['x' => 0,   'y' => 0,   'color' => $white],
-                    'top right corner'                 => ['x' => 499, 'y' => 0,   'color' => $white],
-                    'bottom left corner'               => ['x' => 0,   'y' => 499, 'color' => $white],
-                    'bottom right corner'              => ['x' => 499, 'y' => 499, 'color' => $white],
+                    'top left corner' => ['x' => 0,   'y' => 0,   'color' => $white],
+                    'top right corner' => ['x' => 499, 'y' => 0,   'color' => $white],
+                    'bottom left corner' => ['x' => 0,   'y' => 499, 'color' => $white],
+                    'bottom right corner' => ['x' => 499, 'y' => 499, 'color' => $white],
 
-                    'inside watermark (top left)'      => ['x' => 150, 'y' => 0,   'color' => $black],
-                    'inside watermark (top right)'     => ['x' => 349, 'y' => 0,   'color' => $black],
-                    'inside watermark (bottom left)'   => ['x' => 150, 'y' => 99,  'color' => $black],
-                    'inside watermark (bottom right)'  => ['x' => 349, 'y' => 99,  'color' => $black],
+                    'inside watermark (top left)' => ['x' => 150, 'y' => 0,   'color' => $black],
+                    'inside watermark (top right)' => ['x' => 349, 'y' => 0,   'color' => $black],
+                    'inside watermark (bottom left)' => ['x' => 150, 'y' => 99,  'color' => $black],
+                    'inside watermark (bottom right)' => ['x' => 349, 'y' => 99,  'color' => $black],
 
-                    'outside watermark (left top)'     => ['x' => 149, 'y' => 0,   'color' => $white],
-                    'outside watermark (left bottom)'  => ['x' => 149, 'y' => 100, 'color' => $white],
-                    'outside watermark (bottom left)'  => ['x' => 150, 'y' => 100, 'color' => $white],
+                    'outside watermark (left top)' => ['x' => 149, 'y' => 0,   'color' => $white],
+                    'outside watermark (left bottom)' => ['x' => 149, 'y' => 100, 'color' => $white],
+                    'outside watermark (bottom left)' => ['x' => 150, 'y' => 100, 'color' => $white],
                     'outside watermark (bottom right)' => ['x' => 349, 'y' => 100, 'color' => $white],
                     'outside watermark (right bottom)' => ['x' => 350, 'y' => 100, 'color' => $white],
-                    'outside watermark (right top)'    => ['x' => 350, 'y' => 0,   'color' => $white],
+                    'outside watermark (right top)' => ['x' => 350, 'y' => 0,   'color' => $white],
                 ],
             ],
             'top right with default watermark' => [
@@ -206,19 +209,19 @@ class WatermarkTest extends TransformationTests
                     'position' => 'top-right',
                 ],
                 'colors' => [
-                    'top left corner'                  => ['x' => 0,   'y' => 0,   'color' => $white],
-                    'top right corner'                 => ['x' => 499, 'y' => 0,   'color' => $black],
-                    'bottom left corner'               => ['x' => 0,   'y' => 499, 'color' => $white],
-                    'bottom right corner'              => ['x' => 499, 'y' => 499, 'color' => $white],
+                    'top left corner' => ['x' => 0,   'y' => 0,   'color' => $white],
+                    'top right corner' => ['x' => 499, 'y' => 0,   'color' => $black],
+                    'bottom left corner' => ['x' => 0,   'y' => 499, 'color' => $white],
+                    'bottom right corner' => ['x' => 499, 'y' => 499, 'color' => $white],
 
-                    'inside watermark (top left)'      => ['x' => 300, 'y' => 0,   'color' => $black],
-                    'inside watermark (top right)'     => ['x' => 499, 'y' => 0,   'color' => $black],
-                    'inside watermark (bottom left)'   => ['x' => 300, 'y' => 99,  'color' => $black],
-                    'inside watermark (bottom right)'  => ['x' => 499, 'y' => 99,  'color' => $black],
+                    'inside watermark (top left)' => ['x' => 300, 'y' => 0,   'color' => $black],
+                    'inside watermark (top right)' => ['x' => 499, 'y' => 0,   'color' => $black],
+                    'inside watermark (bottom left)' => ['x' => 300, 'y' => 99,  'color' => $black],
+                    'inside watermark (bottom right)' => ['x' => 499, 'y' => 99,  'color' => $black],
 
-                    'outside watermark (left top)'     => ['x' => 299, 'y' => 0,   'color' => $white],
-                    'outside watermark (left bottom)'  => ['x' => 299, 'y' => 99,  'color' => $white],
-                    'outside watermark (bottom left)'  => ['x' => 300, 'y' => 100, 'color' => $white],
+                    'outside watermark (left top)' => ['x' => 299, 'y' => 0,   'color' => $white],
+                    'outside watermark (left bottom)' => ['x' => 299, 'y' => 99,  'color' => $white],
+                    'outside watermark (bottom left)' => ['x' => 300, 'y' => 100, 'color' => $white],
                     'outside watermark (bottom right)' => ['x' => 499, 'y' => 100, 'color' => $white],
                 ],
             ],
@@ -229,22 +232,22 @@ class WatermarkTest extends TransformationTests
                     'position' => 'left',
                 ],
                 'colors' => [
-                    'top left corner'                  => ['x' => 0,   'y' => 0,   'color' => $white],
-                    'top right corner'                 => ['x' => 499, 'y' => 0,   'color' => $white],
-                    'bottom left corner'               => ['x' => 0,   'y' => 499, 'color' => $white],
-                    'bottom right corner'              => ['x' => 499, 'y' => 499, 'color' => $white],
+                    'top left corner' => ['x' => 0,   'y' => 0,   'color' => $white],
+                    'top right corner' => ['x' => 499, 'y' => 0,   'color' => $white],
+                    'bottom left corner' => ['x' => 0,   'y' => 499, 'color' => $white],
+                    'bottom right corner' => ['x' => 499, 'y' => 499, 'color' => $white],
 
-                    'inside watermark (top left)'      => ['x' => 0,   'y' => 200, 'color' => $black],
-                    'inside watermark (top right)'     => ['x' => 199, 'y' => 200, 'color' => $black],
-                    'inside watermark (bottom left)'   => ['x' => 0,   'y' => 299, 'color' => $black],
-                    'inside watermark (bottom right)'  => ['x' => 199, 'y' => 299, 'color' => $black],
+                    'inside watermark (top left)' => ['x' => 0,   'y' => 200, 'color' => $black],
+                    'inside watermark (top right)' => ['x' => 199, 'y' => 200, 'color' => $black],
+                    'inside watermark (bottom left)' => ['x' => 0,   'y' => 299, 'color' => $black],
+                    'inside watermark (bottom right)' => ['x' => 199, 'y' => 299, 'color' => $black],
 
-                    'outside watermark (top left)'     => ['x' => 0,   'y' => 199, 'color' => $white],
-                    'outside watermark (top right)'    => ['x' => 199, 'y' => 199, 'color' => $white],
-                    'outside watermark (right top)'    => ['x' => 200, 'y' => 200, 'color' => $white],
+                    'outside watermark (top left)' => ['x' => 0,   'y' => 199, 'color' => $white],
+                    'outside watermark (top right)' => ['x' => 199, 'y' => 199, 'color' => $white],
+                    'outside watermark (right top)' => ['x' => 200, 'y' => 200, 'color' => $white],
                     'outside watermark (right bottom)' => ['x' => 200, 'y' => 299, 'color' => $white],
                     'outside watermark (bottom right)' => ['x' => 199, 'y' => 300, 'color' => $white],
-                    'outside watermark (bottom left)'  => ['x' => 0,   'y' => 300, 'color' => $white],
+                    'outside watermark (bottom left)' => ['x' => 0,   'y' => 300, 'color' => $white],
                 ],
             ],
             'center with default watermark' => [
@@ -254,24 +257,24 @@ class WatermarkTest extends TransformationTests
                     'position' => 'center',
                 ],
                 'colors' => [
-                    'top left corner'                  => ['x' => 0,   'y' => 0,   'color' => $white],
-                    'top right corner'                 => ['x' => 499, 'y' => 0,   'color' => $white],
-                    'bottom left corner'               => ['x' => 0,   'y' => 499, 'color' => $white],
-                    'bottom right corner'              => ['x' => 499, 'y' => 499, 'color' => $white],
+                    'top left corner' => ['x' => 0,   'y' => 0,   'color' => $white],
+                    'top right corner' => ['x' => 499, 'y' => 0,   'color' => $white],
+                    'bottom left corner' => ['x' => 0,   'y' => 499, 'color' => $white],
+                    'bottom right corner' => ['x' => 499, 'y' => 499, 'color' => $white],
 
-                    'inside watermark (top left)'      => ['x' => 150, 'y' => 200, 'color' => $black],
-                    'inside watermark (top right)'     => ['x' => 349, 'y' => 200, 'color' => $black],
-                    'inside watermark (bottom left)'   => ['x' => 150, 'y' => 299, 'color' => $black],
-                    'inside watermark (bottom right)'  => ['x' => 349, 'y' => 299, 'color' => $black],
+                    'inside watermark (top left)' => ['x' => 150, 'y' => 200, 'color' => $black],
+                    'inside watermark (top right)' => ['x' => 349, 'y' => 200, 'color' => $black],
+                    'inside watermark (bottom left)' => ['x' => 150, 'y' => 299, 'color' => $black],
+                    'inside watermark (bottom right)' => ['x' => 349, 'y' => 299, 'color' => $black],
 
-                    'outside watermark (top left)'     => ['x' => 150, 'y' => 199, 'color' => $white],
-                    'outside watermark (top right)'    => ['x' => 349, 'y' => 199, 'color' => $white],
-                    'outside watermark (right top)'    => ['x' => 350, 'y' => 200, 'color' => $white],
+                    'outside watermark (top left)' => ['x' => 150, 'y' => 199, 'color' => $white],
+                    'outside watermark (top right)' => ['x' => 349, 'y' => 199, 'color' => $white],
+                    'outside watermark (right top)' => ['x' => 350, 'y' => 200, 'color' => $white],
                     'outside watermark (right bottom)' => ['x' => 350, 'y' => 299, 'color' => $white],
                     'outside watermark (bottom right)' => ['x' => 349, 'y' => 300, 'color' => $white],
-                    'outside watermark (bottom left)'  => ['x' => 150, 'y' => 300, 'color' => $white],
-                    'outside watermark (left bottom)'  => ['x' => 149, 'y' => 299, 'color' => $white],
-                    'outside watermark (left top)'     => ['x' => 149, 'y' => 299, 'color' => $white],
+                    'outside watermark (bottom left)' => ['x' => 150, 'y' => 300, 'color' => $white],
+                    'outside watermark (left bottom)' => ['x' => 149, 'y' => 299, 'color' => $white],
+                    'outside watermark (left top)' => ['x' => 149, 'y' => 299, 'color' => $white],
                 ],
             ],
             'right with default watermark' => [
@@ -281,21 +284,21 @@ class WatermarkTest extends TransformationTests
                     'position' => 'right',
                 ],
                 'colors' => [
-                    'top left corner'                  => ['x' => 0,   'y' => 0,   'color' => $white],
-                    'top right corner'                 => ['x' => 499, 'y' => 0,   'color' => $white],
-                    'bottom left corner'               => ['x' => 0,   'y' => 499, 'color' => $white],
-                    'bottom right corner'              => ['x' => 499, 'y' => 499, 'color' => $white],
+                    'top left corner' => ['x' => 0,   'y' => 0,   'color' => $white],
+                    'top right corner' => ['x' => 499, 'y' => 0,   'color' => $white],
+                    'bottom left corner' => ['x' => 0,   'y' => 499, 'color' => $white],
+                    'bottom right corner' => ['x' => 499, 'y' => 499, 'color' => $white],
 
-                    'inside watermark (top left)'      => ['x' => 300, 'y' => 200, 'color' => $black],
-                    'inside watermark (top right)'     => ['x' => 499, 'y' => 200, 'color' => $black],
-                    'inside watermark (bottom left)'   => ['x' => 300, 'y' => 299, 'color' => $black],
-                    'inside watermark (bottom right)'  => ['x' => 499, 'y' => 299, 'color' => $black],
+                    'inside watermark (top left)' => ['x' => 300, 'y' => 200, 'color' => $black],
+                    'inside watermark (top right)' => ['x' => 499, 'y' => 200, 'color' => $black],
+                    'inside watermark (bottom left)' => ['x' => 300, 'y' => 299, 'color' => $black],
+                    'inside watermark (bottom right)' => ['x' => 499, 'y' => 299, 'color' => $black],
 
-                    'outside watermark (top left)'     => ['x' => 300, 'y' => 199, 'color' => $white],
-                    'outside watermark (top right)'    => ['x' => 499, 'y' => 199, 'color' => $white],
-                    'outside watermark (left top)'     => ['x' => 299, 'y' => 200, 'color' => $white],
-                    'outside watermark (left bottom)'  => ['x' => 299, 'y' => 299, 'color' => $white],
-                    'outside watermark (bottom left)'  => ['x' => 300, 'y' => 300, 'color' => $white],
+                    'outside watermark (top left)' => ['x' => 300, 'y' => 199, 'color' => $white],
+                    'outside watermark (top right)' => ['x' => 499, 'y' => 199, 'color' => $white],
+                    'outside watermark (left top)' => ['x' => 299, 'y' => 200, 'color' => $white],
+                    'outside watermark (left bottom)' => ['x' => 299, 'y' => 299, 'color' => $white],
+                    'outside watermark (bottom left)' => ['x' => 300, 'y' => 300, 'color' => $white],
                     'outside watermark (bottom right)' => ['x' => 499, 'y' => 300, 'color' => $white],
                 ],
             ],
@@ -306,19 +309,19 @@ class WatermarkTest extends TransformationTests
                     'position' => 'bottom-left',
                 ],
                 'colors' => [
-                    'top left corner'                  => ['x' => 0,   'y' => 0,   'color' => $white],
-                    'top right corner'                 => ['x' => 499, 'y' => 0,   'color' => $white],
-                    'bottom left corner'               => ['x' => 0,   'y' => 499, 'color' => $black],
-                    'bottom right corner'              => ['x' => 499, 'y' => 499, 'color' => $white],
+                    'top left corner' => ['x' => 0,   'y' => 0,   'color' => $white],
+                    'top right corner' => ['x' => 499, 'y' => 0,   'color' => $white],
+                    'bottom left corner' => ['x' => 0,   'y' => 499, 'color' => $black],
+                    'bottom right corner' => ['x' => 499, 'y' => 499, 'color' => $white],
 
-                    'inside watermark (top left)'      => ['x' => 0,   'y' => 400, 'color' => $black],
-                    'inside watermark (top right)'     => ['x' => 199, 'y' => 400, 'color' => $black],
-                    'inside watermark (bottom left)'   => ['x' => 0,   'y' => 499, 'color' => $black],
-                    'inside watermark (bottom right)'  => ['x' => 199, 'y' => 499, 'color' => $black],
+                    'inside watermark (top left)' => ['x' => 0,   'y' => 400, 'color' => $black],
+                    'inside watermark (top right)' => ['x' => 199, 'y' => 400, 'color' => $black],
+                    'inside watermark (bottom left)' => ['x' => 0,   'y' => 499, 'color' => $black],
+                    'inside watermark (bottom right)' => ['x' => 199, 'y' => 499, 'color' => $black],
 
-                    'outside watermark (top left)'     => ['x' => 0,   'y' => 399, 'color' => $white],
-                    'outside watermark (top right)'    => ['x' => 199, 'y' => 399, 'color' => $white],
-                    'outside watermark (right top)'    => ['x' => 200, 'y' => 400, 'color' => $white],
+                    'outside watermark (top left)' => ['x' => 0,   'y' => 399, 'color' => $white],
+                    'outside watermark (top right)' => ['x' => 199, 'y' => 399, 'color' => $white],
+                    'outside watermark (right top)' => ['x' => 200, 'y' => 400, 'color' => $white],
                     'outside watermark (right bottom)' => ['x' => 200, 'y' => 499, 'color' => $white],
                 ],
             ],
@@ -329,22 +332,22 @@ class WatermarkTest extends TransformationTests
                     'position' => 'bottom',
                 ],
                 'colors' => [
-                    'top left corner'                  => ['x' => 0,   'y' => 0,   'color' => $white],
-                    'top right corner'                 => ['x' => 499, 'y' => 0,   'color' => $white],
-                    'bottom left corner'               => ['x' => 0,   'y' => 499, 'color' => $white],
-                    'bottom right corner'              => ['x' => 499, 'y' => 499, 'color' => $white],
+                    'top left corner' => ['x' => 0,   'y' => 0,   'color' => $white],
+                    'top right corner' => ['x' => 499, 'y' => 0,   'color' => $white],
+                    'bottom left corner' => ['x' => 0,   'y' => 499, 'color' => $white],
+                    'bottom right corner' => ['x' => 499, 'y' => 499, 'color' => $white],
 
-                    'inside watermark (top left)'      => ['x' => 150, 'y' => 400, 'color' => $black],
-                    'inside watermark (top right)'     => ['x' => 349, 'y' => 400, 'color' => $black],
-                    'inside watermark (bottom left)'   => ['x' => 150, 'y' => 499, 'color' => $black],
-                    'inside watermark (bottom right)'  => ['x' => 349, 'y' => 499, 'color' => $black],
+                    'inside watermark (top left)' => ['x' => 150, 'y' => 400, 'color' => $black],
+                    'inside watermark (top right)' => ['x' => 349, 'y' => 400, 'color' => $black],
+                    'inside watermark (bottom left)' => ['x' => 150, 'y' => 499, 'color' => $black],
+                    'inside watermark (bottom right)' => ['x' => 349, 'y' => 499, 'color' => $black],
 
-                    'outside watermark (top left)'     => ['x' => 150, 'y' => 399, 'color' => $white],
-                    'outside watermark (top right)'    => ['x' => 349, 'y' => 399, 'color' => $white],
-                    'outside watermark (right top)'    => ['x' => 350, 'y' => 400, 'color' => $white],
+                    'outside watermark (top left)' => ['x' => 150, 'y' => 399, 'color' => $white],
+                    'outside watermark (top right)' => ['x' => 349, 'y' => 399, 'color' => $white],
+                    'outside watermark (right top)' => ['x' => 350, 'y' => 400, 'color' => $white],
                     'outside watermark (right bottom)' => ['x' => 350, 'y' => 499, 'color' => $white],
-                    'outside watermark (left bottom)'  => ['x' => 149, 'y' => 499, 'color' => $white],
-                    'outside watermark (left top)'     => ['x' => 149, 'y' => 499, 'color' => $white],
+                    'outside watermark (left bottom)' => ['x' => 149, 'y' => 499, 'color' => $white],
+                    'outside watermark (left top)' => ['x' => 149, 'y' => 499, 'color' => $white],
                 ],
             ],
             'bottom right with default watermark' => [
@@ -354,20 +357,20 @@ class WatermarkTest extends TransformationTests
                     'position' => 'bottom-right',
                 ],
                 'colors' => [
-                    'top left corner'                  => ['x' => 0,   'y' => 0,   'color' => $white],
-                    'top right corner'                 => ['x' => 499, 'y' => 0,   'color' => $white],
-                    'bottom left corner'               => ['x' => 0,   'y' => 499, 'color' => $white],
-                    'bottom right corner'              => ['x' => 499, 'y' => 499, 'color' => $black],
+                    'top left corner' => ['x' => 0,   'y' => 0,   'color' => $white],
+                    'top right corner' => ['x' => 499, 'y' => 0,   'color' => $white],
+                    'bottom left corner' => ['x' => 0,   'y' => 499, 'color' => $white],
+                    'bottom right corner' => ['x' => 499, 'y' => 499, 'color' => $black],
 
-                    'inside watermark (top left)'      => ['x' => 300, 'y' => 400, 'color' => $black],
-                    'inside watermark (top right)'     => ['x' => 499, 'y' => 400, 'color' => $black],
-                    'inside watermark (bottom left)'   => ['x' => 300, 'y' => 499, 'color' => $black],
-                    'inside watermark (bottom right)'  => ['x' => 499, 'y' => 499, 'color' => $black],
+                    'inside watermark (top left)' => ['x' => 300, 'y' => 400, 'color' => $black],
+                    'inside watermark (top right)' => ['x' => 499, 'y' => 400, 'color' => $black],
+                    'inside watermark (bottom left)' => ['x' => 300, 'y' => 499, 'color' => $black],
+                    'inside watermark (bottom right)' => ['x' => 499, 'y' => 499, 'color' => $black],
 
-                    'outside watermark (top left)'     => ['x' => 300, 'y' => 399, 'color' => $white],
-                    'outside watermark (top right)'    => ['x' => 499, 'y' => 399, 'color' => $white],
-                    'outside watermark (left top)'     => ['x' => 299, 'y' => 400, 'color' => $white],
-                    'outside watermark (left bottom)'  => ['x' => 299, 'y' => 499, 'color' => $white],
+                    'outside watermark (top left)' => ['x' => 300, 'y' => 399, 'color' => $white],
+                    'outside watermark (top right)' => ['x' => 499, 'y' => 399, 'color' => $white],
+                    'outside watermark (left top)' => ['x' => 299, 'y' => 400, 'color' => $white],
+                    'outside watermark (left bottom)' => ['x' => 299, 'y' => 499, 'color' => $white],
                 ],
             ],
 
@@ -378,17 +381,17 @@ class WatermarkTest extends TransformationTests
                     'y' => 1,
                 ],
                 'colors' => [
-                    'top left corner'                    => ['x' => 0,   'y' => 0,   'color' => $white],
-                    'top right corner'                   => ['x' => 499, 'y' => 0,   'color' => $white],
-                    'bottom left corner'                 => ['x' => 0,   'y' => 499, 'color' => $white],
-                    'bottom right corner'                => ['x' => 499, 'y' => 499, 'color' => $white],
-                    'left edge of watermark (inside)'    => ['x' => 1,   'y' => 1,   'color' => $black],
-                    'left edge of watermark (outside)'   => ['x' => 0,   'y' => 1,   'color' => $white],
-                    'right edge of watermark (inside)'   => ['x' => 100, 'y' => 1,   'color' => $black],
-                    'right edge of watermark (outside)'  => ['x' => 101, 'y' => 1,   'color' => $white],
-                    'top edge of watermark (inside)'     => ['x' => 1,   'y' => 1,   'color' => $black],
-                    'top edge of watermark (outside)'    => ['x' => 0,   'y' => 1,   'color' => $white],
-                    'bottom edge of watermark (inside)'  => ['x' => 1,   'y' => 100, 'color' => $black],
+                    'top left corner' => ['x' => 0,   'y' => 0,   'color' => $white],
+                    'top right corner' => ['x' => 499, 'y' => 0,   'color' => $white],
+                    'bottom left corner' => ['x' => 0,   'y' => 499, 'color' => $white],
+                    'bottom right corner' => ['x' => 499, 'y' => 499, 'color' => $white],
+                    'left edge of watermark (inside)' => ['x' => 1,   'y' => 1,   'color' => $black],
+                    'left edge of watermark (outside)' => ['x' => 0,   'y' => 1,   'color' => $white],
+                    'right edge of watermark (inside)' => ['x' => 100, 'y' => 1,   'color' => $black],
+                    'right edge of watermark (outside)' => ['x' => 101, 'y' => 1,   'color' => $white],
+                    'top edge of watermark (inside)' => ['x' => 1,   'y' => 1,   'color' => $black],
+                    'top edge of watermark (outside)' => ['x' => 0,   'y' => 1,   'color' => $white],
+                    'bottom edge of watermark (inside)' => ['x' => 1,   'y' => 100, 'color' => $black],
                     'bottom edge of watermark (outside)' => ['x' => 1,   'y' => 101, 'color' => $white],
                 ],
             ],
@@ -398,7 +401,7 @@ class WatermarkTest extends TransformationTests
                     'opacity' => 40,
                 ],
                 'colors' => [
-                    'top left corner'  => ['x' => 0,   'y' => 0, 'color' => [153, 153, 153]], // 255 * 0.6 = 153
+                    'top left corner' => ['x' => 0,   'y' => 0, 'color' => [153, 153, 153]], // 255 * 0.6 = 153
                     'top right corner' => ['x' => 499, 'y' => 0, 'color' => $white],
                 ],
             ],
@@ -407,7 +410,7 @@ class WatermarkTest extends TransformationTests
                     'watermarkFixture' => 'black-alpha.png',
                 ],
                 'colors' => [
-                    'top left corner'   => ['x' => 0,  'y' => 0,  'color' => $white],
+                    'top left corner' => ['x' => 0,  'y' => 0,  'color' => $white],
                     'top mid watermark' => ['x' => 50, 'y' => 50, 'color' => $black],
                 ],
             ],
@@ -417,7 +420,7 @@ class WatermarkTest extends TransformationTests
                     'watermarkFixture' => 'black-alpha.png',
                 ],
                 'colors' => [
-                    'top left corner'   => ['x' => 0,  'y' => 0,  'color' => $white],
+                    'top left corner' => ['x' => 0,  'y' => 0,  'color' => $white],
                     'top mid watermark' => ['x' => 50, 'y' => 50, 'color' => [153, 153, 153]], // 255 * 0.6 = 153
                 ],
             ],
@@ -427,7 +430,7 @@ class WatermarkTest extends TransformationTests
                     'watermarkFixture' => 'black.jpg',
                 ],
                 'colors' => [
-                    'top left corner'  => ['x' => 0,   'y' => 0, 'color' => [153, 153, 153]], // 255 * 0.6 = 153
+                    'top left corner' => ['x' => 0,   'y' => 0, 'color' => [153, 153, 153]], // 255 * 0.6 = 153
                     'top right corner' => ['x' => 499, 'y' => 0, 'color' => $white],
                 ],
             ],

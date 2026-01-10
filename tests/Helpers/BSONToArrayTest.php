@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Helpers;
 
 use MongoDB\Model\BSONArray;
@@ -12,7 +13,7 @@ class BSONToArrayTest extends TestCase
 {
     /**
      * @param BSONDocument|BSONArray|array<mixed> $document
-     * @param array<mixed> $expected
+     * @param array<mixed>                        $expected
      */
     #[DataProvider('getValues')]
     public function testCanConvertValuesToArray(BSONDocument|BSONArray|array $document, array $expected): void

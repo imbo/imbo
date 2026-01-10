@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use ImagickException;
@@ -11,7 +12,7 @@ class MaxSize extends Transformation implements InputSizeConstraint
     public function transform(array $params): void
     {
         $newSize = $this->calculateSize($params, [
-            'width'  => $this->image->getWidth(),
+            'width' => $this->image->getWidth(),
             'height' => $this->image->getHeight(),
         ]);
 
@@ -39,10 +40,8 @@ class MaxSize extends Transformation implements InputSizeConstraint
     }
 
     /**
-     * Calculate the output size based on the specified parameters
+     * Calculate the output size based on the specified parameters.
      *
-     * @param array $params
-     * @param array $imageSize
      * @return ?array{width:int,height:int}
      */
     protected function calculateSize(array $params, array $imageSize): ?array
@@ -50,17 +49,17 @@ class MaxSize extends Transformation implements InputSizeConstraint
         $maxWidth = !empty($params['width']) ? (int) $params['width'] : 0;
         $maxHeight = !empty($params['height']) ? (int) $params['height'] : 0;
 
-        $sourceWidth  = $imageSize['width'];
+        $sourceWidth = $imageSize['width'];
         $sourceHeight = $imageSize['height'];
 
-        $width  = $maxWidth ?: $sourceWidth;
+        $width = $maxWidth ?: $sourceWidth;
         $height = $maxHeight ?: $sourceHeight;
 
         // Figure out original ratio
         $ratio = $sourceWidth / $sourceHeight;
 
         if (($width / $height) > $ratio) {
-            $width  = round($height * $ratio);
+            $width = round($height * $ratio);
         } else {
             $height = round($width / $ratio);
         }

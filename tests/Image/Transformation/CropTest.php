@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -46,7 +47,7 @@ class CropTest extends TransformationTests
                 ->willReturn($image);
         }
 
-        $blob = file_get_contents(FIXTURES_DIR . '/image.png');
+        $blob = file_get_contents(FIXTURES_DIR.'/image.png');
         $imagick = new Imagick();
         $imagick->readImageBlob($blob);
 
@@ -86,7 +87,7 @@ class CropTest extends TransformationTests
         $imagick = $this->createMock(Imagick::class);
 
         $image = $this->createConfiguredMock(Image::class, [
-            'getWidth'  => $originalWidth,
+            'getWidth' => $originalWidth,
             'getHeight' => $originalHeight,
         ]);
 
@@ -129,7 +130,7 @@ class CropTest extends TransformationTests
         $imagick = $this->createMock(Imagick::class);
 
         $image = $this->createConfiguredMock(Image::class, [
-            'getWidth'  => $originalWidth,
+            'getWidth' => $originalWidth,
             'getHeight' => $originalHeight,
         ]);
 
@@ -159,7 +160,7 @@ class CropTest extends TransformationTests
                 ->expects($this->once())
                 ->method('getImageGeometry')
                 ->willReturn([
-                    'width'  => $params['width'],
+                    'width' => $params['width'],
                     'height' => $params['height'],
                 ]);
         }
@@ -264,7 +265,7 @@ class CropTest extends TransformationTests
                 'originalWidth' => 200,
                 'originalHeight' => 200,
             ],
-            'Throw if width is out of bounds'  => [
+            'Throw if width is out of bounds' => [
                 'params' => ['width' => 300, 'height' => 100],
                 'originalWidth' => 200,
                 'originalHeight' => 200,
@@ -276,19 +277,19 @@ class CropTest extends TransformationTests
                 'originalHeight' => 200,
                 'errRegex' => '#image height#i',
             ],
-            'Throw if X is out of bounds'  => [
+            'Throw if X is out of bounds' => [
                 'params' => ['width' => 100, 'height' => 100, 'x' => 500],
                 'originalWidth' => 200,
                 'originalHeight' => 200,
                 'errRegex' => '#image width#i',
             ],
-            'Throw if Y is out of bounds'  => [
+            'Throw if Y is out of bounds' => [
                 'params' => ['width' => 100, 'height' => 100, 'y' => 500],
                 'originalWidth' => 200,
                 'originalHeight' => 200,
                 'errRegex' => '#image height#i',
             ],
-            'Throw if X + width is out of bounds'  => [
+            'Throw if X + width is out of bounds' => [
                 'params' => ['width' => 100, 'height' => 100, 'x' => 105],
                 'originalWidth' => 200,
                 'originalHeight' => 200,

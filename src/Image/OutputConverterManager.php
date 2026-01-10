@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image;
 
 use Imagick;
@@ -7,8 +8,12 @@ use Imbo\Http\Response\Response;
 use Imbo\Image\OutputConverter\OutputConverterInterface;
 use Imbo\Model\Image;
 
+use function is_array;
+use function is_object;
+use function is_string;
+
 /**
- * Output converter manager
+ * Output converter manager.
  *
  * This class manages converting images to the requested output format through registered plugins.
  *
@@ -45,7 +50,8 @@ class OutputConverterManager
     /**
      * Add a list of converters to the available output converters.
      *
-     * @param array $converters A list of objects or object names (strings) implementing `OutputConverterInterface`.
+     * @param array $converters a list of objects or object names (strings) implementing `OutputConverterInterface`
+     *
      * @return self
      */
     public function addConverters(array $converters)
@@ -56,8 +62,8 @@ class OutputConverterManager
             }
 
             if (!$converter instanceof OutputConverterInterface) {
-                $name = is_object($converter) ? get_class($converter) : (string) $converter;
-                throw new InvalidArgumentException('Given converter (' . $name . ') does not implement OutputConverterInterface', Response::HTTP_INTERNAL_SERVER_ERROR);
+                $name = is_object($converter) ? $converter::class : (string) $converter;
+                throw new InvalidArgumentException('Given converter ('.$name.') does not implement OutputConverterInterface', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
             $this->registerConverter($converter);
@@ -70,6 +76,7 @@ class OutputConverterManager
      * Register a single output converter with the manager to make it available inside Imbo.
      *
      * @param OutputConverterInterface $converter The converter to register
+     *
      * @return self
      */
     public function registerConverter(OutputConverterInterface $converter)
@@ -108,9 +115,10 @@ class OutputConverterManager
     /**
      * Ask for an image blob to be converted to its output format (i.e. configure Imagick).
      *
-     * @param Image $image The image model of the image to convert
+     * @param Image  $image     The image model of the image to convert
      * @param string $extension Extension we should look up the converter for
-     * @param string $mime Mime type we should look up the converter from, if available
+     * @param string $mime      Mime type we should look up the converter from, if available
+     *
      * @return bool|null Returns true if it we were able to convert or null if we failed
      */
     public function convert(Image $image, $extension, $mime = null)
@@ -119,8 +127,9 @@ class OutputConverterManager
             foreach ($this->convertersByExtension[$extension] as $converter) {
                 $result = $converter->convert($this->imagick, $image, $extension, $mime);
 
-                if ($result !== false) {
+                if (false !== $result) {
                     $image->setMimeType($this->getMimeTypeFromExtension($extension));
+
                     return true;
                 }
             }
@@ -130,8 +139,9 @@ class OutputConverterManager
             foreach ($this->convertersByMimeType[$mime] as $converter) {
                 $result = $converter->convert($this->imagick, $image, $extension, $mime);
 
-                if ($result !== false) {
+                if (false !== $result) {
                     $image->setMimeType($mime);
+
                     return true;
                 }
             }
@@ -141,7 +151,7 @@ class OutputConverterManager
     }
 
     /**
-     * Get a list of extensions registered with the output converter manager
+     * Get a list of extensions registered with the output converter manager.
      *
      * @return array<string> A list of extensions registered with the converter manager
      */
@@ -151,7 +161,7 @@ class OutputConverterManager
     }
 
     /**
-     * Get a list of mime types registered with the output converter manager
+     * Get a list of mime types registered with the output converter manager.
      *
      * @return array<string> A list of mime types registered with the converter manager
      */
@@ -164,6 +174,7 @@ class OutputConverterManager
      * Look up the mime type of a given extension.
      *
      * @param string $extension The extension to look up the mime type for
+     *
      * @return string|null
      */
     public function getMimeTypeFromExtension($extension)
@@ -174,7 +185,8 @@ class OutputConverterManager
     /**
      * Look up the extension for a given mime type.
      *
-     * @param string $mimeType The mime type to look up the extension for.
+     * @param string $mimeType the mime type to look up the extension for
+     *
      * @return string|null Returns the first registered mime type for a given extension
      */
     public function getExtensionFromMimeType($mimeType)
@@ -183,7 +195,7 @@ class OutputConverterManager
     }
 
     /**
-     * Get the mime type to extension mapping
+     * Get the mime type to extension mapping.
      *
      * @return array A map of string => string entries with mime type => extension mapping
      */
@@ -193,7 +205,7 @@ class OutputConverterManager
     }
 
     /**
-     * Get the extension to mime type mapping
+     * Get the extension to mime type mapping.
      *
      * @return array A map of string => string entries with extension => mime type mapping
      */
@@ -203,9 +215,10 @@ class OutputConverterManager
     }
 
     /**
-     * Check if we have an output converter that supports the given extension
+     * Check if we have an output converter that supports the given extension.
      *
      * @param string $extension The extension to check if we support
+     *
      * @return bool Whether the extension is supported
      */
     public function supportsExtension($extension)
@@ -216,7 +229,6 @@ class OutputConverterManager
     /**
      * Set the imagick instance that will be configured for output or used to get raw data to perform a conversion.
      *
-     * @param Imagick $imagick
      * @return self
      */
     public function setImagick(Imagick $imagick)

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -56,7 +57,7 @@ class ContrastTest extends TestCase
     }
 
     /**
-     * @return array<string,array{params:array<string,double>,shouldTransform:bool}>
+     * @return array<string,array{params:array<string,float>,shouldTransform:bool}>
      */
     public static function getContrastParams(): array
     {

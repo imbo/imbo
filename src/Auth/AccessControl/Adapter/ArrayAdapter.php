@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Auth\AccessControl\Adapter;
 
 use Imbo\Auth\AccessControl\GroupQuery;
@@ -6,8 +7,12 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Groups as GroupsModel;
 
+use function array_slice;
+use function count;
+use function in_array;
+
 /**
- * Array-backed access control adapter
+ * Array-backed access control adapter.
  */
 class ArrayAdapter extends AbstractAdapter implements AdapterInterface
 {
@@ -16,10 +21,10 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface
     private array $groups = [];
 
     /**
-     * Class constructor
+     * Class constructor.
      *
-     * @param array $accessList Array defining the available public/private keys, along with the
-     *                          associated ACL rules for each public key.
+     * @param array $accessList array defining the available public/private keys, along with the
+     *                          associated ACL rules for each public key
      * @param array $groups     Array of group => resources combinations
      */
     public function __construct(array $accessList = [], array $groups = [])
@@ -36,6 +41,7 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface
         $model->setHits(count($this->groups));
 
         $offset = ($query->getPage() - 1) * $query->getLimit();
+
         return array_slice($this->groups, $offset, $query->getLimit(), true);
     }
 
@@ -94,7 +100,7 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface
     }
 
     /**
-     * Get an array of public => private key pairs defined in the ACL
+     * Get an array of public => private key pairs defined in the ACL.
      *
      * @return array
      */
@@ -109,7 +115,7 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface
     }
 
     /**
-     * Validate access list data
+     * Validate access list data.
      *
      * @throws InvalidArgumentException
      */
@@ -123,7 +129,7 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface
         $publicKeys = [];
         foreach ($declaredPublicKeys as $key) {
             if (in_array($key, $publicKeys)) {
-                throw new InvalidArgumentException('Public key declared twice in config: ' . $key, Response::HTTP_INTERNAL_SERVER_ERROR);
+                throw new InvalidArgumentException('Public key declared twice in config: '.$key, Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
             $publicKeys[] = $key;

@@ -1,8 +1,12 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
+
+use function is_string;
+use function sprintf;
 
 abstract class ListenerTests extends TestCase
 {
@@ -12,7 +16,7 @@ abstract class ListenerTests extends TestCase
     public function testReturnsCorrectEventSubscriptions(): void
     {
         $listener = $this->getListener();
-        $className = get_class($listener);
+        $className = $listener::class;
         $events = $className::getSubscribedEvents();
 
         foreach ($events as $callbacks) {

@@ -1,12 +1,15 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception\RuntimeException;
 use Imbo\Http\Response\Response;
 
+use function in_array;
+
 /**
- * Stats access listener
+ * Stats access listener.
  *
  * This event listener lets you control the access to the /stats endpoint by white-/blacklisting ip
  * addresses or subnets (using CIDR notation). If you disable the listener from the configuration
@@ -15,7 +18,7 @@ use Imbo\Http\Response\Response;
 class StatsAccess implements ListenerInterface
 {
     /**
-     * Parameters for the listener
+     * Parameters for the listener.
      *
      * The only supported parameter is "allow" which is an array of IP addresses/subnets that is
      * allowed access. If one of the entries in the array is "*", all clients are allowed.
@@ -27,7 +30,7 @@ class StatsAccess implements ListenerInterface
     ];
 
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param array $params Parameters for the listener
      */
@@ -66,7 +69,7 @@ class StatsAccess implements ListenerInterface
     }
 
     /**
-     * See if an IP address is allowed
+     * See if an IP address is allowed.
      */
     private function isAllowed(string $ip): bool
     {
@@ -84,7 +87,7 @@ class StatsAccess implements ListenerInterface
         }
 
         foreach ($list as $range) {
-            if ((strpos($range, '/') !== false && $this->cidrMatch($ip, $range)) || $ip === $range) {
+            if ((str_contains($range, '/') && $this->cidrMatch($ip, $range)) || $ip === $range) {
                 return true;
             }
         }
@@ -93,11 +96,10 @@ class StatsAccess implements ListenerInterface
     }
 
     /**
-     * Check if an IP address is in a subnet
+     * Check if an IP address is in a subnet.
      *
-     * @param string $ip The IP address to check
+     * @param string $ip    The IP address to check
      * @param string $range A CIDR notated IP address and routing prefix
-     * @return bool
      */
     private function cidrMatch(string $ip, string $range): bool
     {
@@ -105,11 +107,10 @@ class StatsAccess implements ListenerInterface
     }
 
     /**
-     * Check an IPv4 address is in a subnet
+     * Check an IPv4 address is in a subnet.
      *
-     * @param string $ip The IP address to check (for instance 192.168.1.10)
+     * @param string $ip    The IP address to check (for instance 192.168.1.10)
      * @param string $range A CIDR notated IP address and routing prefix (for instance 192.168.1.0/24)
-     * @return bool
      */
     private function cidr4Match(string $ip, string $range): bool
     {
@@ -129,11 +130,10 @@ class StatsAccess implements ListenerInterface
     }
 
     /**
-     * Check an IPv6 address is in a subnet
+     * Check an IPv6 address is in a subnet.
      *
-     * @param string $ip The IP address to check (for instance 2001:db8:0:0:0:0:0:0)
+     * @param string $ip    The IP address to check (for instance 2001:db8:0:0:0:0:0:0)
      * @param string $range A CIDR notated IP address and routing prefix (for instance 2001:db8::/48)
-     * @return bool
      */
     private function cidr6Match(string $ip, string $range): bool
     {
@@ -151,10 +151,9 @@ class StatsAccess implements ListenerInterface
     }
 
     /**
-     * Fetch the binary representation of a mask
+     * Fetch the binary representation of a mask.
      *
      * @param int $mask A mask from a CIDR
-     * @return string
      */
     private function getBinaryMask(int $mask): string
     {
@@ -182,20 +181,22 @@ class StatsAccess implements ListenerInterface
     }
 
     /**
-     * Check if an IP address is an IPv6 address or not
+     * Check if an IP address is an IPv6 address or not.
      *
      * @param string $ip The address to check
+     *
      * @return bool True if the ip address looks like an IPv6 address
      */
     private function isIPv6(string $ip): bool
     {
-        return strpos($ip, ':') !== false;
+        return str_contains($ip, ':');
     }
 
     /**
-     * Check if an IP address ia an IPv4 address or not
+     * Check if an IP address ia an IPv4 address or not.
      *
      * @param string $ip The address to check
+     *
      * @return bool True if the ip address looks like an IPv4 address
      */
     private function isIPv4(string $ip): bool
@@ -204,9 +205,10 @@ class StatsAccess implements ListenerInterface
     }
 
     /**
-     * Expand a short IPv6
+     * Expand a short IPv6.
      *
      * @param string $ip For instance 2a00:1b60:1011::1338
+     *
      * @return string 2a00:1b60:1011:0000:0000:0000:0000:1338
      */
     private function expandIPv6(string $ip): string
@@ -219,7 +221,7 @@ class StatsAccess implements ListenerInterface
     }
 
     /**
-     * Expand all IPv6 addresses in a filter
+     * Expand all IPv6 addresses in a filter.
      *
      * @param string $ip An IP address that might be expanded
      */
@@ -229,7 +231,7 @@ class StatsAccess implements ListenerInterface
             if (($pos = strpos($ip, '/')) !== false) {
                 // The IPv6 has a routing prefix attached to it
                 $mask = substr($ip, $pos);
-                $ip = $this->expandIPv6(substr($ip, 0, $pos)) . $mask;
+                $ip = $this->expandIPv6(substr($ip, 0, $pos)).$mask;
             } else {
                 // Regular IPv6 address
                 $ip = $this->expandIPv6($ip);

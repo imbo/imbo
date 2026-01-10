@@ -1,43 +1,45 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Model;
 
 class AccessRule implements ModelInterface
 {
     /**
-     * ID of the rule
+     * ID of the rule.
      */
     private ?int $id = null;
 
     /**
-     * Group name
+     * Group name.
      */
     private ?string $group = null;
 
     /**
-     * List of resources
+     * List of resources.
      *
      * @var array<string>
      */
     private array $resources = [];
 
     /**
-     * List of users
+     * List of users.
      *
      * @var array<string>
      */
     private array $users = [];
 
     /**
-     * Set the ID
+     * Set the ID.
      */
     public function setId(int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
     /**
-     * Get the ID
+     * Get the ID.
      */
     public function getId(): ?int
     {
@@ -45,16 +47,17 @@ class AccessRule implements ModelInterface
     }
 
     /**
-     * Set the group
+     * Set the group.
      */
     public function setGroup(string $group): self
     {
         $this->group = $group;
+
         return $this;
     }
 
     /**
-     * Get the group
+     * Get the group.
      */
     public function getGroup(): ?string
     {
@@ -62,18 +65,19 @@ class AccessRule implements ModelInterface
     }
 
     /**
-     * Set the resources
+     * Set the resources.
      *
      * @param array<string> $resources
      */
     public function setResources(array $resources): self
     {
         $this->resources = $resources;
+
         return $this;
     }
 
     /**
-     * Get the resources
+     * Get the resources.
      *
      * @return array<string>
      */
@@ -83,18 +87,19 @@ class AccessRule implements ModelInterface
     }
 
     /**
-     * Set the users
+     * Set the users.
      *
      * @param array<string> $users
      */
     public function setUsers(array $users): self
     {
         $this->users = $users;
+
         return $this;
     }
 
     /**
-     * Get the users
+     * Get the users.
      *
      * @return array<string>
      */

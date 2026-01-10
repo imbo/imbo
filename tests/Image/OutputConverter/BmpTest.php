@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\OutputConverter;
 
 use Imagick;
@@ -14,7 +15,7 @@ class BmpTest extends TestCase
 {
     private Bmp $converter;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->converter = new Bmp();
     }

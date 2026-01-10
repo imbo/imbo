@@ -3,7 +3,7 @@
 Contributing to Imbo
 ====================
 
-Imbo is an open source project licensed with the `MIT license <http://opensource.org/licenses/MIT>`_. All contributions should ideally be sent in form of a pull request on GitHub. Please use features branches with descriptive names, and remember to send the pull request against the ``develop`` branch.
+Imbo is an open source project licensed with the `MIT license <https://opensource.org/license/MIT>`_. All contributions should ideally be sent in form of a pull request on GitHub. Please use features branches with descriptive names, and remember to send the pull request against the ``develop`` branch.
 
 If you have found a bug in Imbo, please leave an issue in the `issue tracker <https://github.com/imbo/imbo/issues>`_.
 

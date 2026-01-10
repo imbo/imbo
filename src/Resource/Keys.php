@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
@@ -7,6 +8,8 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\ResourceException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
+
+use const JSON_ERROR_NONE;
 
 class Keys implements ResourceInterface
 {
@@ -31,19 +34,19 @@ class Keys implements ResourceInterface
         }
 
         $request = $event->getRequest();
-        $body    = $request->getContent();
+        $body = $request->getContent();
 
         if (empty($body)) {
             throw new InvalidArgumentException('Missing JSON data', Response::HTTP_BAD_REQUEST);
         } else {
             $body = json_decode($body, true);
 
-            if ($body === null || json_last_error() !== JSON_ERROR_NONE) {
+            if (null === $body || JSON_ERROR_NONE !== json_last_error()) {
                 throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
             }
         }
 
-        $publicKey  = $body['publicKey'] ?? null;
+        $publicKey = $body['publicKey'] ?? null;
         $privateKey = $body['privateKey'] ?? null;
 
         if (null === $publicKey) {

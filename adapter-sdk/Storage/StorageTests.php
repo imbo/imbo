@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace ImboSDK\Storage;
 
 use Imbo\Exception\StorageException;
@@ -6,26 +7,26 @@ use Imbo\Storage\StorageInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Base test case for database adapters
+ * Base test case for database adapters.
  */
 abstract class StorageTests extends TestCase
 {
     protected StorageInterface $adapter;
     protected string $user = 'user';
     protected string $imageIdentifier = 'imageIdentifier';
-    protected string $fixturesDir  = __DIR__ . '/../Fixtures';
+    protected string $fixturesDir = __DIR__.'/../Fixtures';
     protected string $imageData;
     protected int $allowedTimestampDelta = 1;
 
     /**
-     * Get the adapter we want to test
+     * Get the adapter we want to test.
      */
     abstract protected function getAdapter(): StorageInterface;
 
     protected function setUp(): void
     {
-        $this->imageData = (string) file_get_contents($this->fixturesDir . '/image.png');
-        $this->adapter   = $this->getAdapter();
+        $this->imageData = (string) file_get_contents($this->fixturesDir.'/image.png');
+        $this->adapter = $this->getAdapter();
     }
 
     public function testStoreAndGetImage(): void

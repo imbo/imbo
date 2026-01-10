@@ -1,7 +1,10 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener\AccessToken;
 
 use Imbo\Exception\RuntimeException;
+
+use function is_array;
 
 class MultipleAccessTokenGenerators extends AccessTokenGenerator
 {
@@ -18,7 +21,7 @@ class MultipleAccessTokenGenerators extends AccessTokenGenerator
      * the Dummy generator if the first authentication attempt fails. This allows you to introduce new access token
      * validation schemes while keeping backwards compatible signature algorithms valid.
      *
-     * @param array $params Parameters to the MultipleAccessTokenGenerators.
+     * @param array $params parameters to the MultipleAccessTokenGenerators
      */
     public function __construct(array $params = [])
     {

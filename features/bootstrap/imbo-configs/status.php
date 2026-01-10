@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Behat;
 
 use Imbo\Database\DatabaseInterface;
@@ -8,7 +9,7 @@ use PHPUnit\Framework\MockObject\Generator\Generator;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
- * Set a database and storage adapter that has some behaviour determined via request headers
+ * Set a database and storage adapter that has some behaviour determined via request headers.
  */
 return [
     'database' => function (Request $request): DatabaseInterface {

@@ -11,7 +11,9 @@ Feature: Imbo provides an index endpoint
         And the response reason phrase is "Hell Yeah"
         And the response body contains JSON:
             """
-            {"site":"http://imbo.io"}
+            {
+                "site": "https://imbo.io"
+            }
             """
 
     Scenario Outline: The index endpoint only supports HTTP GET and HEAD

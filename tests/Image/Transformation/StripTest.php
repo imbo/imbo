@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -26,12 +27,12 @@ class StripTest extends TransformationTests
             ->willReturn($image);
 
         $imagick = new Imagick();
-        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));
+        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR.'/exif-logo.jpg'));
 
         $exifExists = false;
 
         foreach (array_keys($imagick->getImageProperties()) as $key) {
-            if (substr((string) $key, 0, 5) === 'exif:') {
+            if ('exif:' === substr((string) $key, 0, 5)) {
                 $exifExists = true;
                 break;
             }

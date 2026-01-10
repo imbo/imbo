@@ -1,10 +1,11 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
 
 /**
- * Response sender listener
+ * Response sender listener.
  */
 class ResponseSender implements ListenerInterface
 {
@@ -16,7 +17,7 @@ class ResponseSender implements ListenerInterface
     }
 
     /**
-     * Send the response
+     * Send the response.
      *
      * @param EventInterface $event The current event
      */

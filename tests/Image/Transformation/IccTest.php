@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -10,6 +11,8 @@ use Imbo\Http\Response\Response;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+
+use function sprintf;
 
 #[CoversClass(Icc::class)]
 class IccTest extends TestCase
@@ -42,7 +45,7 @@ class IccTest extends TestCase
             ->method('setHasBeenTransformed')
             ->with(true);
 
-        $profilePath = DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc';
+        $profilePath = DATA_DIR.'/profiles/sRGB_v4_ICC_preference.icc';
 
         $imagick = $this->createMock(Imagick::class);
         $imagick
@@ -66,7 +69,7 @@ class IccTest extends TestCase
             ->method('setHasBeenTransformed')
             ->with(true);
 
-        $profilePath = DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc';
+        $profilePath = DATA_DIR.'/profiles/sRGB_v4_ICC_preference.icc';
 
         $imagick = $this->createMock(Imagick::class);
         $imagick
@@ -75,7 +78,7 @@ class IccTest extends TestCase
             ->with('icc', file_get_contents($profilePath));
 
         (new Icc([
-            'default' => DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc',
+            'default' => DATA_DIR.'/profiles/sRGB_v4_ICC_preference.icc',
         ]))
             ->setImagick($imagick)
             ->setImage($image)
@@ -93,7 +96,7 @@ class IccTest extends TestCase
         $this->expectExceptionObject(new TransformationException('Some error', Response::HTTP_BAD_REQUEST, $e));
 
         (new Icc([
-            'default' => DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc',
+            'default' => DATA_DIR.'/profiles/sRGB_v4_ICC_preference.icc',
         ]))
             ->setImagick($imagick)
             ->transform([]);
@@ -101,7 +104,7 @@ class IccTest extends TestCase
 
     public function testThrowsExceptionWhenInvalidPathIsUsed(): void
     {
-        $path = DATA_DIR . '/foo/bar.icc';
+        $path = DATA_DIR.'/foo/bar.icc';
 
         $this->expectExceptionObject(new ConfigurationException(
             sprintf(
@@ -122,7 +125,7 @@ class IccTest extends TestCase
             ->method('setHasBeenTransformed')
             ->with(true);
 
-        $expectedProfile = file_get_contents(DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc');
+        $expectedProfile = file_get_contents(DATA_DIR.'/profiles/sRGB_v4_ICC_preference.icc');
 
         $imagick = $this->createStub(Imagick::class);
         $imagick
@@ -131,6 +134,7 @@ class IccTest extends TestCase
                 static function (string $name, string $profile) use ($expectedProfile): bool {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $name, $profile]) {
                         [0, 'icc', $expectedProfile] => throw new ImagickException('error #1', 465),
                         [1, '*', ''] => true,
@@ -140,7 +144,7 @@ class IccTest extends TestCase
             );
 
         (new Icc([
-            'default' => DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc',
+            'default' => DATA_DIR.'/profiles/sRGB_v4_ICC_preference.icc',
         ]))
             ->setImagick($imagick)
             ->setImage($image)
@@ -149,7 +153,7 @@ class IccTest extends TestCase
 
     public function testThrowsExceptionWhenApplyingStrippedProfileFails(): void
     {
-        $expectedProfile = file_get_contents(DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc');
+        $expectedProfile = file_get_contents(DATA_DIR.'/profiles/sRGB_v4_ICC_preference.icc');
         $e = new ImagickException('error #2');
 
         $imagick = $this->createStub(Imagick::class);
@@ -159,6 +163,7 @@ class IccTest extends TestCase
                 static function (string $name, string $profile) use ($expectedProfile, $e): bool {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $name, $profile]) {
                         [0, 'icc', $expectedProfile] => throw new ImagickException('error #1', 465),
                         [1, '*', ''] => true,
@@ -170,7 +175,7 @@ class IccTest extends TestCase
         $this->expectExceptionObject(new TransformationException('error #2', Response::HTTP_BAD_REQUEST, $e));
 
         (new Icc([
-            'default' => DATA_DIR . '/profiles/sRGB_v4_ICC_preference.icc',
+            'default' => DATA_DIR.'/profiles/sRGB_v4_ICC_preference.icc',
         ]))
             ->setImagick($imagick)
             ->setImage($this->createStub(Image::class))

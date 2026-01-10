@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo;
 
 use Imbo\Exception\RuntimeException;
@@ -35,7 +36,7 @@ class RouterTest extends TestCase
     public function testThrowsExceptionWhenNoRouteMatches(string $route): void
     {
         $request = $this->createConfiguredStub(Request::class, [
-            'getMethod'   => 'GET',
+            'getMethod' => 'GET',
             'getPathInfo' => $route,
         ]);
         $this->expectExceptionObject(new RuntimeException('Not Found', Response::HTTP_NOT_FOUND));

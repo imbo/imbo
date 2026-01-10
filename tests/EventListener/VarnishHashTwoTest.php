@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
@@ -18,7 +19,7 @@ class VarnishHashTwoTest extends ListenerTests
     private Response&MockObject $response;
     private ResponseHeaderBag&MockObject $responseHeaders;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->request = $this->createMock(Request::class);
 

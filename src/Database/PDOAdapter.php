@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Database;
 
 use DateTime;
@@ -12,8 +13,11 @@ use Imbo\Trait\IdentifierQuoter;
 use PDO;
 use PDOException;
 
+use function count;
+use function sprintf;
+
 /**
- * PDO database driver
+ * PDO database driver.
  */
 abstract class PDOAdapter implements DatabaseInterface
 {
@@ -37,12 +41,12 @@ abstract class PDOAdapter implements DatabaseInterface
     }
 
     /**
-     * Class constructor
+     * Class constructor.
      *
-     * @param string $dsn Database DSN
-     * @param string $username Username for the DSN string
-     * @param string $password Password for the DSN string
-     * @param array<mixed> $options Driver specific options
+     * @param string       $dsn      Database DSN
+     * @param string       $username Username for the DSN string
+     * @param string       $password Password for the DSN string
+     * @param array<mixed> $options  Driver specific options
      */
     public function __construct(string $dsn, ?string $username = null, ?string $password = null, array $options = [])
     {
@@ -61,7 +65,7 @@ abstract class PDOAdapter implements DatabaseInterface
                     // Forced options
                     [
                         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     ],
                 ),
             );
@@ -132,25 +136,21 @@ abstract class PDOAdapter implements DatabaseInterface
             return $this->pdo
                 ->prepare($sql)
                 ->execute([
-                    'size'             => $image->getFilesize(),
-                    'user'             => $user,
-                    'imageIdentifier'  => $imageIdentifier,
-                    'extension'        => $image->getExtension(),
-                    'mime'             => $image->getMimeType(),
-                    'added'            => $added ?: $now,
-                    'updated'          => $updated ?: $now,
-                    'width'            => $image->getWidth(),
-                    'height'           => $image->getHeight(),
-                    'checksum'         => $image->getChecksum(),
+                    'size' => $image->getFilesize(),
+                    'user' => $user,
+                    'imageIdentifier' => $imageIdentifier,
+                    'extension' => $image->getExtension(),
+                    'mime' => $image->getMimeType(),
+                    'added' => $added ?: $now,
+                    'updated' => $updated ?: $now,
+                    'width' => $image->getWidth(),
+                    'height' => $image->getHeight(),
+                    'checksum' => $image->getChecksum(),
                     'originalChecksum' => $image->getOriginalChecksum(),
                 ]);
         } catch (PDOException $e) {
             if ($this->getUniqueConstraintExceptionCode() === (int) $e->getCode()) {
-                throw new DuplicateImageIdentifierException(
-                    'Duplicate image identifier when attempting to insert image into DB.',
-                    503,
-                    $e,
-                );
+                throw new DuplicateImageIdentifierException('Duplicate image identifier when attempting to insert image into DB.', 503, $e);
             }
 
             throw new DatabaseException('Unable to save image data', 500, $e);
@@ -220,7 +220,6 @@ abstract class PDOAdapter implements DatabaseInterface
             ':id' => $id,
         ]);
 
-        /** @var mixed */
         $result = $stmt->fetchColumn();
 
         /** @var array<string,mixed> */
@@ -249,41 +248,41 @@ abstract class PDOAdapter implements DatabaseInterface
 
     public function getImages(array $users, Query $query, Images $model): array
     {
-        $images     = [];
-        $where      = [];
+        $images = [];
+        $where = [];
         $parameters = [];
-        $orderBy    = [];
+        $orderBy = [];
 
         if ($users) {
             $userWhere = [];
 
             foreach ($users as $i => $user) {
-                $parameterName = ':user' . $i;
-                $userWhere[] = "{$this->quote('user')} = " . $parameterName;
+                $parameterName = ':user'.$i;
+                $userWhere[] = "{$this->quote('user')} = ".$parameterName;
                 $parameters[$parameterName] = $user;
             }
 
-            $where[] = '(' . implode(' OR ', $userWhere) . ')';
+            $where[] = '('.implode(' OR ', $userWhere).')';
         }
 
         if ($sort = $query->getSort()) {
             $validFields = [
-                'size'             => true,
-                'user'             => true,
-                'imageIdentifier'  => true,
-                'extension'        => true,
-                'mime'             => true,
-                'added'            => true,
-                'updated'          => true,
-                'width'            => true,
-                'height'           => true,
-                'checksum'         => true,
+                'size' => true,
+                'user' => true,
+                'imageIdentifier' => true,
+                'extension' => true,
+                'mime' => true,
+                'added' => true,
+                'updated' => true,
+                'width' => true,
+                'height' => true,
+                'checksum' => true,
                 'originalChecksum' => true,
             ];
 
             foreach ($sort as $f) {
                 if (!isset($validFields[$f['field']])) {
-                    throw new DatabaseException('Invalid sort field: ' . $f['field'], 400);
+                    throw new DatabaseException('Invalid sort field: '.$f['field'], 400);
                 }
 
                 $orderBy[$f['field']] = $f['sort'];
@@ -296,12 +295,12 @@ abstract class PDOAdapter implements DatabaseInterface
         $to = $query->getTo();
 
         if ($from || $to) {
-            if ($from !== null) {
+            if (null !== $from) {
                 $where[] = "{$this->quote('added')} >= :from";
                 $parameters[':from'] = $from;
             }
 
-            if ($to !== null) {
+            if (null !== $to) {
                 $where[] = "{$this->quote('added')} <= :to";
                 $parameters[':to'] = $to;
             }
@@ -311,40 +310,40 @@ abstract class PDOAdapter implements DatabaseInterface
             $imageIdentifiersWhere = [];
 
             foreach ($imageIdentifiers as $i => $id) {
-                $parameterName = ':imageIdentifier' . $i;
-                $imageIdentifiersWhere[] = "{$this->quote('imageIdentifier')} = " . $parameterName;
+                $parameterName = ':imageIdentifier'.$i;
+                $imageIdentifiersWhere[] = "{$this->quote('imageIdentifier')} = ".$parameterName;
                 $parameters[$parameterName] = $id;
             }
 
-            $where[] = '(' . implode(' OR ', $imageIdentifiersWhere) . ')';
+            $where[] = '('.implode(' OR ', $imageIdentifiersWhere).')';
         }
 
         if ($checksums = $query->getChecksums()) {
             $checksumsWhere = [];
 
             foreach ($checksums as $i => $checksum) {
-                $parameterName = ':checksum' . $i;
-                $checksumsWhere[] = "{$this->quote('checksum')} = " . $parameterName;
+                $parameterName = ':checksum'.$i;
+                $checksumsWhere[] = "{$this->quote('checksum')} = ".$parameterName;
                 $parameters[$parameterName] = $checksum;
             }
 
-            $where[] = '(' . implode(' OR ', $checksumsWhere) . ')';
+            $where[] = '('.implode(' OR ', $checksumsWhere).')';
         }
 
         if ($originalChecksums = $query->getOriginalChecksums()) {
             $originalChecksumsWhere = [];
 
             foreach ($originalChecksums as $i => $originalChecksum) {
-                $parameterName = ':originalChecksum' . $i;
-                $originalChecksumsWhere[] = "{$this->quote('originalChecksum')} = " . $parameterName;
+                $parameterName = ':originalChecksum'.$i;
+                $originalChecksumsWhere[] = "{$this->quote('originalChecksum')} = ".$parameterName;
                 $parameters[$parameterName] = $originalChecksum;
             }
 
-            $where[] = '(' . implode(' OR ', $originalChecksumsWhere) . ')';
+            $where[] = '('.implode(' OR ', $originalChecksumsWhere).')';
         }
 
         if (!empty($where)) {
-            $where = 'WHERE ' . implode(' AND ', $where);
+            $where = 'WHERE '.implode(' AND ', $where);
         } else {
             $where = '';
         }
@@ -364,7 +363,7 @@ abstract class PDOAdapter implements DatabaseInterface
         $limitClause = '';
 
         if ($limit = $query->getLimit()) {
-            $limitClause = 'LIMIT ' . $limit;
+            $limitClause = 'LIMIT '.$limit;
         }
 
         if ($page = $query->getPage()) {
@@ -375,11 +374,11 @@ abstract class PDOAdapter implements DatabaseInterface
             $offset = $query->getLimit() * ($page - 1);
 
             if (0 < $offset) {
-                $limitClause .= ' OFFSET ' . $offset;
+                $limitClause .= ' OFFSET '.$offset;
             }
         }
 
-        $orderByClause = 'ORDER BY ' . implode(', ', array_map(function (string $col, string $dir): string {
+        $orderByClause = 'ORDER BY '.implode(', ', array_map(function (string $col, string $dir): string {
             return sprintf("{$this->quote($col)} %s", $dir);
         }, array_keys($orderBy), array_values($orderBy)));
 
@@ -402,17 +401,17 @@ abstract class PDOAdapter implements DatabaseInterface
 
         foreach ($rows as $row) {
             $image = [
-                'extension'        => $row['extension'],
-                'added'            => new DateTime('@' . (int) $row['added'], new DateTimeZone('UTC')),
-                'updated'          => new DateTime('@' . (int) $row['updated'], new DateTimeZone('UTC')),
-                'checksum'         => $row['checksum'],
+                'extension' => $row['extension'],
+                'added' => new DateTime('@'.(int) $row['added'], new DateTimeZone('UTC')),
+                'updated' => new DateTime('@'.(int) $row['updated'], new DateTimeZone('UTC')),
+                'checksum' => $row['checksum'],
                 'originalChecksum' => isset($row['originalChecksum']) ? $row['originalChecksum'] : null,
-                'user'             => $row['user'],
-                'imageIdentifier'  => $row['imageIdentifier'],
-                'mime'             => $row['mime'],
-                'size'             => (int) $row['size'],
-                'width'            => (int) $row['width'],
-                'height'           => (int) $row['height'],
+                'user' => $row['user'],
+                'imageIdentifier' => $row['imageIdentifier'],
+                'mime' => $row['mime'],
+                'size' => (int) $row['size'],
+                'width' => (int) $row['width'],
+                'height' => (int) $row['height'],
             ];
 
             if ($returnMetadata) {
@@ -440,7 +439,7 @@ abstract class PDOAdapter implements DatabaseInterface
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            'user'            => $user,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier,
         ]);
 
@@ -452,13 +451,13 @@ abstract class PDOAdapter implements DatabaseInterface
         }
 
         return [
-            'size'      => (int) $row['size'],
-            'width'     => (int) $row['width'],
-            'height'    => (int) $row['height'],
-            'mime'      => $row['mime'],
+            'size' => (int) $row['size'],
+            'width' => (int) $row['width'],
+            'height' => (int) $row['height'],
+            'mime' => $row['mime'],
             'extension' => $row['extension'],
-            'added'     => (int) $row['added'],
-            'updated'   => (int) $row['updated'],
+            'added' => (int) $row['added'],
+            'updated' => (int) $row['updated'],
         ];
     }
 
@@ -471,8 +470,8 @@ abstract class PDOAdapter implements DatabaseInterface
               ->setFilesize($row['size'])
               ->setMimeType($row['mime'])
               ->setExtension($row['extension'])
-              ->setAddedDate(new DateTime('@' . $row['added'], new DateTimeZone('UTC')))
-              ->setUpdatedDate(new DateTime('@' . $row['updated'], new DateTimeZone('UTC')));
+              ->setAddedDate(new DateTime('@'.$row['added'], new DateTimeZone('UTC')))
+              ->setUpdatedDate(new DateTime('@'.$row['updated'], new DateTimeZone('UTC')));
 
         return true;
     }
@@ -486,15 +485,15 @@ abstract class PDOAdapter implements DatabaseInterface
             $userWhere = [];
 
             foreach ($users as $i => $user) {
-                $parameterName = ':user' . $i;
-                $userWhere[] = "{$this->quote('user')} = " . $parameterName;
+                $parameterName = ':user'.$i;
+                $userWhere[] = "{$this->quote('user')} = ".$parameterName;
                 $parameters[$parameterName] = $user;
             }
 
-            $where[] = '(' . implode(' OR ', $userWhere) . ')';
+            $where[] = '('.implode(' OR ', $userWhere).')';
         }
 
-        if ($imageIdentifier !== null) {
+        if (null !== $imageIdentifier) {
             $where[] = "({$this->quote('imageIdentifier')} = :imageIdentifier)";
             $parameters[':imageIdentifier'] = $imageIdentifier;
         }
@@ -502,7 +501,7 @@ abstract class PDOAdapter implements DatabaseInterface
         $whereClause = '';
 
         if (count($where)) {
-            $whereClause = 'WHERE ' . implode(' AND ', $where);
+            $whereClause = 'WHERE '.implode(' AND ', $where);
         }
 
         $sql = <<<SQL
@@ -529,12 +528,12 @@ abstract class PDOAdapter implements DatabaseInterface
             $updated = time();
         }
 
-        return new DateTime('@' . $updated, new DateTimeZone('UTC'));
+        return new DateTime('@'.$updated, new DateTimeZone('UTC'));
     }
 
     public function setLastModifiedNow(string $user, string $imageIdentifier): DateTime
     {
-        return $this->setLastModifiedTime($user, $imageIdentifier, new DateTime('@' . time(), new DateTimeZone('UTC')));
+        return $this->setLastModifiedTime($user, $imageIdentifier, new DateTime('@'.time(), new DateTimeZone('UTC')));
     }
 
     public function setLastModifiedTime(string $user, string $imageIdentifier, DateTime $time): DateTime
@@ -632,7 +631,7 @@ abstract class PDOAdapter implements DatabaseInterface
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            'user'            => $user,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier,
         ]);
 
@@ -668,12 +667,13 @@ abstract class PDOAdapter implements DatabaseInterface
                 :query
             )
         SQL;
+
         return $this->pdo->prepare($sql)->execute([
-            'shortUrlId'      => $shortUrlId,
-            'user'            => $user,
+            'shortUrlId' => $shortUrlId,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier,
-            'extension'       => $extension,
-            'query'           => serialize($query),
+            'extension' => $extension,
+            'query' => serialize($query),
         ]);
     }
 
@@ -706,18 +706,19 @@ abstract class PDOAdapter implements DatabaseInterface
         /** @var array<string,string|array<string>> */
         $query = unserialize($row['query']);
         $row['query'] = $query;
+
         return $row;
     }
 
     public function getShortUrlId(string $user, string $imageIdentifier, ?string $extension = null, array $query = []): ?string
     {
         $parameters = [
-            ':user'            => $user,
+            ':user' => $user,
             ':imageIdentifier' => $imageIdentifier,
-            ':query'           => serialize($query),
+            ':query' => serialize($query),
         ];
 
-        if ($extension === null) {
+        if (null === $extension) {
             $extensionWhere = "AND {$this->quote('extension')} is NULL";
         } else {
             $extensionWhere = "AND {$this->quote('extension')} = :extension";
@@ -797,11 +798,10 @@ abstract class PDOAdapter implements DatabaseInterface
     }
 
     /**
-     * Get the internal image ID
+     * Get the internal image ID.
      *
-     * @param string $user The user which the image belongs to
+     * @param string $user            The user which the image belongs to
      * @param string $imageIdentifier The image identifier
-     * @return ?int
      */
     protected function getImageId(string $user, string $imageIdentifier): ?int
     {
@@ -816,7 +816,7 @@ abstract class PDOAdapter implements DatabaseInterface
         SQL;
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            'user'            => $user,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier,
         ]);
 

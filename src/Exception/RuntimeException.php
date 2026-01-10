@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Exception;
 
 use Imbo\Exception;
@@ -11,6 +12,7 @@ class RuntimeException extends BaseRuntimeException implements Exception
     public function setImboErrorCode(int $code): self
     {
         $this->imboCode = $code;
+
         return $this;
     }
 

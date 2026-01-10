@@ -1,17 +1,18 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Behat;
 
 use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
 use Imbo\Resource;
 
 /**
- * Use individual read-only/read+write keys
+ * Use individual read-only/read+write keys.
  */
 return [
     'accessControl' => function (): ArrayAdapter {
         return new ArrayAdapter([
             [
-                'publicKey'  => 'ro-pubkey',
+                'publicKey' => 'ro-pubkey',
                 'privateKey' => 'read-only-key',
                 'acl' => [[
                     'resources' => Resource::getReadOnlyResources(),
@@ -20,7 +21,7 @@ return [
             ],
 
             [
-                'publicKey'  => 'rw-pubkey',
+                'publicKey' => 'rw-pubkey',
                 'privateKey' => 'read+write-key',
                 'acl' => [[
                     'resources' => Resource::getReadWriteResources(),
@@ -29,7 +30,7 @@ return [
             ],
 
             [
-                'publicKey'  => 'foo',
+                'publicKey' => 'foo',
                 'privateKey' => 'bar',
                 'acl' => [[
                     'resources' => Resource::getReadOnlyResources(),

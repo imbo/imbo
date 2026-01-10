@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
@@ -14,7 +15,7 @@ class MaxImageSizeTest extends ListenerTests
 {
     private MaxImageSize $listener;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->listener = new MaxImageSize([]);
     }

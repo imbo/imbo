@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Storage;
 
 use DateTime;
@@ -17,22 +18,22 @@ class GridFS implements StorageInterface
     private Database $database;
 
     /**
-     * Class constructor
+     * Class constructor.
      *
-     * @param string $databaseName The name of the database to use
-     * @param string $uri The URI to use when connecting to MongoDB
-     * @param array<mixed> $uriOptions Options for the URI, sent to the MongoDB\Client instance
+     * @param string       $databaseName  The name of the database to use
+     * @param string       $uri           The URI to use when connecting to MongoDB
+     * @param array<mixed> $uriOptions    Options for the URI, sent to the MongoDB\Client instance
      * @param array<mixed> $driverOptions Additional options for the MongoDB\Client instance
      * @param array<mixed> $bucketOptions Options for the bucket operations
-     * @param ?Client $client Pre-configured MongoDB client. When specified $uri, $uriOptions and $driverOptions are ignored
+     * @param ?Client      $client        Pre-configured MongoDB client. When specified $uri, $uriOptions and $driverOptions are ignored
      */
     public function __construct(
         string $databaseName = 'imbo_storage',
-        string $uri          = 'mongodb://localhost:27017',
-        array $uriOptions    = [],
+        string $uri = 'mongodb://localhost:27017',
+        array $uriOptions = [],
         array $driverOptions = [],
         array $bucketOptions = [],
-        ?Client $client      = null,
+        ?Client $client = null,
     ) {
         try {
             $client = $client ?: new Client($uri, $uriOptions, $driverOptions);
@@ -48,12 +49,12 @@ class GridFS implements StorageInterface
     {
         if ($this->imageExists($user, $imageIdentifier)) {
             $collection = $this->database->selectCollection(
-                $this->bucket->getBucketName() . '.files',
+                $this->bucket->getBucketName().'.files',
             );
 
             try {
                 $collection->updateOne([
-                    'metadata.user'            => $user,
+                    'metadata.user' => $user,
                     'metadata.imageIdentifier' => $imageIdentifier,
                 ], [
                     '$set' => [
@@ -73,9 +74,9 @@ class GridFS implements StorageInterface
                 $this->createStream($imageData),
                 [
                     'metadata' => [
-                        'user'            => $user,
+                        'user' => $user,
                         'imageIdentifier' => $imageIdentifier,
-                        'updated'         => time(),
+                        'updated' => time(),
                     ],
                 ],
             );
@@ -112,7 +113,8 @@ class GridFS implements StorageInterface
     {
         /** @var array{metadata:array{updated:int}} */
         $file = $this->getImageObject($user, $imageIdentifier);
-        return new DateTime('@' . $file['metadata']['updated'], new DateTimeZone('UTC'));
+
+        return new DateTime('@'.$file['metadata']['updated'], new DateTimeZone('UTC'));
     }
 
     public function getStatus(): bool
@@ -130,7 +132,7 @@ class GridFS implements StorageInterface
     {
         try {
             return null !== $this->bucket->findOne([
-                'metadata.user'            => $user,
+                'metadata.user' => $user,
                 'metadata.imageIdentifier' => $imageIdentifier,
             ]);
         } catch (MongoDBException $e) {
@@ -145,7 +147,7 @@ class GridFS implements StorageInterface
     {
         /** @var ?BSONDocument */
         $document = $this->bucket->findOne([
-            'metadata.user'            => $user,
+            'metadata.user' => $user,
             'metadata.imageIdentifier' => $imageIdentifier,
         ]);
 
@@ -157,14 +159,15 @@ class GridFS implements StorageInterface
     }
 
     /**
-     * Create a stream for a string
+     * Create a stream for a string.
+     *
+     * @return resource
      *
      * @throws StorageException
-     * @return resource
      */
     private function createStream(string $data)
     {
-        $stream = fopen('php://temp', 'w+b');
+        $stream = fopen('php://temp', 'w+');
 
         if (false === $stream) {
             throw new StorageException('Unable to open stream', 500);
@@ -178,6 +181,6 @@ class GridFS implements StorageInterface
 
     private function getImageFilename(string $user, string $imageIdentifier): string
     {
-        return $user . '.' . $imageIdentifier;
+        return $user.'.'.$imageIdentifier;
     }
 }

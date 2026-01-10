@@ -1,11 +1,14 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
 use Imbo\Http\Response\Response;
 
+use function in_array;
+
 /**
- * Cross-Origin Resource Sharing (CORS) event listener
+ * Cross-Origin Resource Sharing (CORS) event listener.
  *
  * This event listener will listen to all incoming OPTIONS requests
  * and adds the correct headers required for CORS to function properly -
@@ -14,37 +17,37 @@ use Imbo\Http\Response\Response;
 class Cors implements ListenerInterface
 {
     /**
-     * Parameters for the listener
+     * Parameters for the listener.
      *
      * @var array
      */
     private $params = [
         'allowedOrigins' => [],
         'allowedMethods' => [
-            'index'          => ['GET', 'HEAD'],
-            'image'          => ['GET', 'HEAD'],
-            'images'         => ['GET', 'HEAD'],
-            'globalimages'   => ['GET', 'HEAD'],
-            'metadata'       => ['GET', 'HEAD'],
-            'status'         => ['GET', 'HEAD'],
-            'stats'          => ['GET', 'HEAD'],
-            'user'           => ['GET', 'HEAD'],
+            'index' => ['GET', 'HEAD'],
+            'image' => ['GET', 'HEAD'],
+            'images' => ['GET', 'HEAD'],
+            'globalimages' => ['GET', 'HEAD'],
+            'metadata' => ['GET', 'HEAD'],
+            'status' => ['GET', 'HEAD'],
+            'stats' => ['GET', 'HEAD'],
+            'user' => ['GET', 'HEAD'],
             'globalshorturl' => ['GET', 'HEAD'],
-            'shorturl'       => ['GET', 'HEAD'],
-            'shorturls'      => ['GET', 'HEAD'],
+            'shorturl' => ['GET', 'HEAD'],
+            'shorturls' => ['GET', 'HEAD'],
         ],
         'maxAge' => 3600,
     ];
 
     /**
-     * Whether the request matched an allowed method + origin
+     * Whether the request matched an allowed method + origin.
      *
-     * @var boolean
+     * @var bool
      */
     private $requestAllowed = false;
 
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param array $params Parameters for the listener
      */
@@ -70,7 +73,7 @@ class Cors implements ListenerInterface
     }
 
     /**
-     * Subscribe to events based on configuration parameters
+     * Subscribe to events based on configuration parameters.
      *
      * @param EventInterface $event The event instance
      */
@@ -81,12 +84,12 @@ class Cors implements ListenerInterface
         // Enable the event listener only for resources and methods specified
         foreach ($this->params['allowedMethods'] as $resource => $methods) {
             foreach ($methods as $method) {
-                $eventName = $resource . '.' . strtolower($method);
+                $eventName = $resource.'.'.strtolower($method);
                 $events[$eventName] = ['invoke' => 1000];
             }
 
             // Always enable the listener for the OPTIONS method
-            $eventName = $resource . '.options';
+            $eventName = $resource.'.options';
             $events[$eventName] = ['options' => 20];
         }
 
@@ -99,7 +102,7 @@ class Cors implements ListenerInterface
 
     /**
      * Right before the response is sent to the client, whitelist all included Imbo-headers in the
-     * "Access-Control-Expose-Headers"-header
+     * "Access-Control-Expose-Headers"-header.
      *
      * @param EventInterface $event The event instance
      */
@@ -117,9 +120,8 @@ class Cors implements ListenerInterface
         ];
 
         foreach ($event->getResponse()->headers as $header => $value) {
-            if (strpos($header, 'x-imbo') === 0) {
+            if (str_starts_with($header, 'x-imbo')) {
                 $headers[] = implode('-', array_map('ucfirst', explode('-', $header)));
-                ;
             }
         }
 
@@ -129,7 +131,7 @@ class Cors implements ListenerInterface
     }
 
     /**
-     * Handle the OPTIONS requests
+     * Handle the OPTIONS requests.
      *
      * @param EventInterface $event The event instance
      */
@@ -164,9 +166,8 @@ class Cors implements ListenerInterface
         $requestHeaders = array_map('trim', explode(',', $requestHeaders));
 
         foreach ($requestHeaders as $header) {
-            if (strpos($header, 'x-imbo') === 0) {
+            if (str_starts_with($header, 'x-imbo')) {
                 $allowedHeaders[] = implode('-', array_map('ucfirst', explode('-', $header)));
-                ;
             }
         }
 
@@ -182,7 +183,7 @@ class Cors implements ListenerInterface
     }
 
     /**
-     * Handle other requests
+     * Handle other requests.
      *
      * @param EventInterface $event The event instance
      */
@@ -217,7 +218,7 @@ class Cors implements ListenerInterface
     }
 
     /**
-     * Returns an array of allowed origins
+     * Returns an array of allowed origins.
      *
      * @return array The defined allowed origins
      */
@@ -227,10 +228,11 @@ class Cors implements ListenerInterface
     }
 
     /**
-     * Check if the given origin is defined as an allowed origin
+     * Check if the given origin is defined as an allowed origin.
      *
      * @param string $origin Origin to validate
-     * @return boolean True if allowed, false otherwise
+     *
+     * @return bool True if allowed, false otherwise
      */
     private function originIsAllowed($origin)
     {

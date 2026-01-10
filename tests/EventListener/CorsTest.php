@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use ArrayIterator;
@@ -14,6 +15,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
+use function get_class;
+
 #[CoversClass(Cors::class)]
 class CorsTest extends ListenerTests
 {
@@ -22,14 +25,14 @@ class CorsTest extends ListenerTests
     private Request&MockObject $request;
     private Response&MockObject $response;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
             ->expects($this->any())
             ->method('get')
             ->with('Origin')
-            ->willReturn('http://imbo-project.org');
+            ->willReturn('http://imbo.io');
 
         $this->request = $this->createMock(Request::class);
         $this->request->headers = $requestHeaders;
@@ -56,7 +59,7 @@ class CorsTest extends ListenerTests
         $listener = new Cors([
             'allowedOrigins' => [
                 'HTTP://www.rexxars.com:8080/',
-                'https://IMBO-project.org',
+                'https://IMBO.io',
             ],
         ]);
 
@@ -64,7 +67,7 @@ class CorsTest extends ListenerTests
 
         $expected = [
             'http://www.rexxars.com:8080',
-            'https://imbo-project.org',
+            'https://imbo.io',
         ];
 
         foreach ($expected as $e) {
@@ -107,7 +110,7 @@ class CorsTest extends ListenerTests
             ->expects($this->once())
             ->method('add')
             ->with([
-                'Access-Control-Allow-Origin' => 'http://imbo-project.org',
+                'Access-Control-Allow-Origin' => 'http://imbo.io',
             ]);
 
         $this->response->headers = $headers;
@@ -129,7 +132,7 @@ class CorsTest extends ListenerTests
     public function testAddsHeadersIfOriginIsDefinedAndAllowed(): void
     {
         $listener = new Cors([
-            'allowedOrigins' => ['http://imbo-project.org'],
+            'allowedOrigins' => ['http://imbo.io'],
         ]);
 
         $headers = $this->createMock(ResponseHeaderBag::class);
@@ -137,7 +140,7 @@ class CorsTest extends ListenerTests
             ->expects($this->once())
             ->method('add')
             ->with([
-                'Access-Control-Allow-Origin' => 'http://imbo-project.org',
+                'Access-Control-Allow-Origin' => 'http://imbo.io',
             ]);
 
         $this->response->headers = $headers;
@@ -159,7 +162,7 @@ class CorsTest extends ListenerTests
     public function testIncludesAllImboHeadersAsExposedHeaders(): void
     {
         $listener = new Cors([
-            'allowedOrigins' => ['http://imbo-project.org'],
+            'allowedOrigins' => ['http://imbo.io'],
         ]);
 
         $headerIterator = new ArrayIterator([
@@ -176,8 +179,9 @@ class CorsTest extends ListenerTests
                 static function (array $headers): bool {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $headers]) {
-                        [0, ['Access-Control-Allow-Origin' => 'http://imbo-project.org']],
+                        [0, ['Access-Control-Allow-Origin' => 'http://imbo.io']],
                         [1, ['Access-Control-Expose-Headers' => 'X-Imbo-ImageIdentifier, X-Imbo-Something']] => true,
                         default => false,
                     };
@@ -244,8 +248,9 @@ class CorsTest extends ListenerTests
                 static function (string $header, ?string $value = ''): string {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $header, $value]) {
-                        [0, 'Origin', null] => 'http://imbo-project.org',
+                        [0, 'Origin', null] => 'http://imbo.io',
                         [1, 'Access-Control-Request-Headers', ''] => 'x-imbo-signature,something-else',
                     };
                 },
@@ -257,10 +262,10 @@ class CorsTest extends ListenerTests
             ->expects($this->once())
             ->method('add')
             ->with([
-                'Access-Control-Allow-Origin'  => 'http://imbo-project.org',
+                'Access-Control-Allow-Origin' => 'http://imbo.io',
                 'Access-Control-Allow-Methods' => 'OPTIONS, HEAD',
                 'Access-Control-Allow-Headers' => 'Content-Type, Accept, X-Imbo-Signature',
-                'Access-Control-Max-Age'       => 60,
+                'Access-Control-Max-Age' => 60,
             ]);
 
         $this->response->headers = $headers;
@@ -368,7 +373,7 @@ class CorsTest extends ListenerTests
 
         // Allowed
         $listener = new Cors([
-            'allowedOrigins' => ['http://imbo-project.org'],
+            'allowedOrigins' => ['http://imbo.io'],
         ]);
 
         $response = $this->createMock(Response::class);

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -17,7 +18,7 @@ class HistogramTest extends TransformationTests
     #[DataProvider('getHistogramParameters')]
     public function testTransformWithDifferentParameters(int $scale, int $resultingWidth): void
     {
-        $blob = file_get_contents(FIXTURES_DIR . '/512x512.png');
+        $blob = file_get_contents(FIXTURES_DIR.'/512x512.png');
 
         $image = $this->createConfiguredMock(Image::class, [
             'getBlob' => $blob,

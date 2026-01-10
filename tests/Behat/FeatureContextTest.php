@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Behat;
 
 use Assert;
@@ -25,6 +26,9 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 
+use function count;
+use function sprintf;
+
 #[CoversClass(FeatureContext::class)]
 class FeatureContextTest extends TestCase
 {
@@ -39,7 +43,7 @@ class FeatureContextTest extends TestCase
     private string $publicKey = 'publicKey';
     private string $privateKey = 'privateKey';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->history = [];
 
@@ -55,7 +59,7 @@ class FeatureContextTest extends TestCase
     }
 
     /**
-     * Convenience method to make a single request and return the request instance
+     * Convenience method to make a single request and return the request instance.
      */
     private function makeRequest(string $path = '/somepath'): Request
     {
@@ -283,7 +287,7 @@ class FeatureContextTest extends TestCase
         $this->expectExceptionObject(new RuntimeException(
             'Image was not successfully added. Response body:',
         ));
-        $this->context->addUserImageToImbo(FIXTURES_DIR . '/image1.png', 'user');
+        $this->context->addUserImageToImbo(FIXTURES_DIR.'/image1.png', 'user');
     }
 
     public function testCanAddUserImageToImbo(): void
@@ -292,7 +296,7 @@ class FeatureContextTest extends TestCase
 
         $this->assertSame(
             $this->context,
-            $this->context->addUserImageToImbo(FIXTURES_DIR . '/image1.png', 'user'),
+            $this->context->addUserImageToImbo(FIXTURES_DIR.'/image1.png', 'user'),
         );
 
         $this->assertSame(
@@ -320,7 +324,7 @@ class FeatureContextTest extends TestCase
         $this->assertSame(
             $this->context,
             $this->context->addUserImageToImbo(
-                FIXTURES_DIR . '/image1.png',
+                FIXTURES_DIR.'/image1.png',
                 'user',
                 new PyStringNode(['{"foo": "bar"}'], 1),
             ),
@@ -470,17 +474,17 @@ class FeatureContextTest extends TestCase
         $this->assertSame(
             $this->context,
             $this->context
-                ->addUserImageToImbo(FIXTURES_DIR . '/image1.png', 'user')
-                ->addUserImageToImbo(FIXTURES_DIR . '/image2.png', 'user')
-                ->addUserImageToImbo(FIXTURES_DIR . '/image3.png', 'user'),
+                ->addUserImageToImbo(FIXTURES_DIR.'/image1.png', 'user')
+                ->addUserImageToImbo(FIXTURES_DIR.'/image2.png', 'user')
+                ->addUserImageToImbo(FIXTURES_DIR.'/image3.png', 'user'),
         );
 
         $this->assertSame(
             $this->context,
             $this->context
-                ->setRequestParameterToImageIdentifier('id1', FIXTURES_DIR . '/image1.png')
-                ->setRequestParameterToImageIdentifier('id2', FIXTURES_DIR . '/image2.png')
-                ->setRequestParameterToImageIdentifier('id3', FIXTURES_DIR . '/image3.png'),
+                ->setRequestParameterToImageIdentifier('id1', FIXTURES_DIR.'/image1.png')
+                ->setRequestParameterToImageIdentifier('id2', FIXTURES_DIR.'/image2.png')
+                ->setRequestParameterToImageIdentifier('id3', FIXTURES_DIR.'/image3.png'),
         );
 
         $this->assertSame(
@@ -644,7 +648,7 @@ class FeatureContextTest extends TestCase
             sprintf(
                 'http://localhost:8080/users/user/images/%s%s',
                 $imageIdentifier,
-                $extension ? '.' . $extension : '',
+                $extension ? '.'.$extension : '',
             ),
             (string) $request->getUri(),
         );
@@ -747,7 +751,7 @@ class FeatureContextTest extends TestCase
         $this->expectExceptionMessageMatches(
             '|Image URL for image with path ".*?[\\/]tests[\\/]Fixtures[\\/]image1\.png" can not be found\.|',
         );
-        $this->context->requestImageResourceForLocalImage(FIXTURES_DIR . '/image1.png');
+        $this->context->requestImageResourceForLocalImage(FIXTURES_DIR.'/image1.png');
     }
 
     #[DataProvider('getDataForRequestingImageWithLocalPath')]
@@ -793,16 +797,14 @@ class FeatureContextTest extends TestCase
         ));
         $this->context->requestPaths(new TableNode([
             ['path',  'access token', 'sign request'],
-            ['/path', 'yes',          'yes'         ],
+            ['/path', 'yes',          'yes'],
         ]));
     }
-
-
 
     #[DataProvider('getDataForBulkRequests')]
     public function testCanBulkRequest(TableNode $table, array $requests): void
     {
-        for ($i = 0; $i < count($table->getRows()) - 1; $i++) {
+        for ($i = 0; $i < count($table->getRows()) - 1; ++$i) {
             $this->mockHandler->append(new Response(200));
         }
 
@@ -835,16 +837,16 @@ class FeatureContextTest extends TestCase
 
         $requests = new TableNode([
             ['path',                   'method', 'transformation', 'extension', 'access token'],
-            ['previously added image', '',       'border',         '',          'yes'         ],
-            ['previously added image', 'HEAD',   'thumbnail',      '',          'yes'         ],
-            ['previously added image', '',       'strip',          'gif',       'yes'         ],
+            ['previously added image', '',       'border',         '',          'yes'],
+            ['previously added image', 'HEAD',   'thumbnail',      '',          'yes'],
+            ['previously added image', '',       'strip',          'gif',       'yes'],
         ]);
 
         $this->assertSame(
             $this->context,
             $this->context
                 ->setPublicAndPrivateKey('publicKey', 'privateKey')
-                ->addUserImageToImbo(FIXTURES_DIR . '/image1.png', 'user')
+                ->addUserImageToImbo(FIXTURES_DIR.'/image1.png', 'user')
                 ->requestPaths($requests),
         );
 
@@ -871,9 +873,9 @@ class FeatureContextTest extends TestCase
     {
         $requests = new TableNode([
             ['path',   'method', 'sign request'],
-            ['/path1', '',       'yes'         ],
-            ['/path2', 'GET',    ''            ],
-            ['/path3', 'HEAD',   'yes'         ],
+            ['/path1', '',       'yes'],
+            ['/path2', 'GET',    ''],
+            ['/path3', 'HEAD',   'yes'],
         ]);
         $publicKey = 'publicKey';
         $privateKey = 'privateKey';
@@ -932,8 +934,8 @@ class FeatureContextTest extends TestCase
 
         $requests = new TableNode([
             ['path',                               'method', 'access token'],
-            ['metadata of previously added image', '',       'yes'         ],
-            ['metadata of previously added image', 'HEAD',   'yes'         ],
+            ['metadata of previously added image', '',       'yes'],
+            ['metadata of previously added image', 'HEAD',   'yes'],
         ]);
 
         $this->assertSame(
@@ -941,7 +943,7 @@ class FeatureContextTest extends TestCase
             $this->context
                 ->setPublicAndPrivateKey('publicKey', 'privateKey')
                 ->addUserImageToImbo(
-                    FIXTURES_DIR . '/image1.png',
+                    FIXTURES_DIR.'/image1.png',
                     'user',
                     new PyStringNode(['{"foo": "bar"}'], 1),
                 )
@@ -1076,7 +1078,7 @@ class FeatureContextTest extends TestCase
     public function testAssertingImageWidthCanFail(): void
     {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
+            new Response(200, [], file_get_contents(FIXTURES_DIR.'/image1.png')),
         );
 
         $this->context->requestPath('/path');
@@ -1090,7 +1092,7 @@ class FeatureContextTest extends TestCase
     public function testCanAssertImageWidth(): void
     {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
+            new Response(200, [], file_get_contents(FIXTURES_DIR.'/image1.png')),
         );
 
         $this->assertSame(
@@ -1105,7 +1107,7 @@ class FeatureContextTest extends TestCase
     public function testCanAssertApproximateImageWidth(string $approximateWidth): void
     {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
+            new Response(200, [], file_get_contents(FIXTURES_DIR.'/image1.png')),
         );
 
         $this->assertSame(
@@ -1120,7 +1122,7 @@ class FeatureContextTest extends TestCase
     public function testAssertingApproximateImageWidthCanFail(string $approximateWidth, string $exceptionMessage): void
     {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
+            new Response(200, [], file_get_contents(FIXTURES_DIR.'/image1.png')),
         );
 
         $this->context->requestPath('/path');
@@ -1132,7 +1134,7 @@ class FeatureContextTest extends TestCase
     public function testAssertingImageHeightCanFail(): void
     {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
+            new Response(200, [], file_get_contents(FIXTURES_DIR.'/image1.png')),
         );
 
         $this->context->requestPath('/path');
@@ -1146,7 +1148,7 @@ class FeatureContextTest extends TestCase
     public function testCanAssertImageHeight(): void
     {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
+            new Response(200, [], file_get_contents(FIXTURES_DIR.'/image1.png')),
         );
 
         $this->assertSame(
@@ -1161,7 +1163,7 @@ class FeatureContextTest extends TestCase
     public function testCanAssertApproximateImageHeight(string $approximateHeight): void
     {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
+            new Response(200, [], file_get_contents(FIXTURES_DIR.'/image1.png')),
         );
 
         $this->assertSame(
@@ -1176,7 +1178,7 @@ class FeatureContextTest extends TestCase
     public function testAssertingApproximateImageHeightCanFail(string $approximateHeight, string $exceptionMessage): void
     {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
+            new Response(200, [], file_get_contents(FIXTURES_DIR.'/image1.png')),
         );
 
         $this->context->requestPath('/path');
@@ -1213,7 +1215,7 @@ class FeatureContextTest extends TestCase
     public function testCanAssertImageDimension(): void
     {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
+            new Response(200, [], file_get_contents(FIXTURES_DIR.'/image1.png')),
         );
 
         $this->assertSame(
@@ -1228,7 +1230,7 @@ class FeatureContextTest extends TestCase
     public function testCanAssertApproximateImageDimension(string $approximateDimension): void
     {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
+            new Response(200, [], file_get_contents(FIXTURES_DIR.'/image1.png')),
         );
 
         $this->assertSame(
@@ -1243,7 +1245,7 @@ class FeatureContextTest extends TestCase
     public function testAssertingApproximateImageDimensionCanFail(string $approximateDimension, string $exceptionMessage): void
     {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
+            new Response(200, [], file_get_contents(FIXTURES_DIR.'/image1.png')),
         );
 
         $this->context->requestPath('/path');
@@ -1283,7 +1285,7 @@ class FeatureContextTest extends TestCase
     public function testThrowsExceptionWhenAssertingImagePixelColorWithInvalidCoordinate(): void
     {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/image1.png')),
+            new Response(200, [], file_get_contents(FIXTURES_DIR.'/image1.png')),
         );
 
         $this->context->requestPath('/path');
@@ -1324,7 +1326,7 @@ class FeatureContextTest extends TestCase
     public function testThrowsExceptionWhenAssertingImagePixelAlphaWithInvalidCoordinate(): void
     {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/transparency.png')),
+            new Response(200, [], file_get_contents(FIXTURES_DIR.'/transparency.png')),
         );
 
         $this->context->requestPath('/path');
@@ -1706,7 +1708,7 @@ class FeatureContextTest extends TestCase
 
         $this->context->assertLastResponsesMatch(new TableNode([
             ['response', 'foobar'],
-            ['1',        'baz'   ],
+            ['1',        'baz'],
         ]));
     }
 
@@ -1715,7 +1717,7 @@ class FeatureContextTest extends TestCase
     {
         $this->mockHandler->append(...$responses);
 
-        for ($i = 0; $i < count($responses); $i++) {
+        for ($i = 0; $i < count($responses); ++$i) {
             $this->context->requestPath('/path');
         }
 
@@ -1730,7 +1732,7 @@ class FeatureContextTest extends TestCase
     {
         $this->mockHandler->append(...$responses);
 
-        for ($i = 0; $i < count($responses); $i++) {
+        for ($i = 0; $i < count($responses); ++$i) {
             $this->context->requestPath('/path');
         }
 
@@ -1754,8 +1756,8 @@ class FeatureContextTest extends TestCase
         $this->expectExceptionMessage('Incorrect response body for request 2, expected "{"bar":"foobar"}", got: "{"bar":"foo"}".');
 
         $this->context->assertLastResponsesMatch(new TableNode([
-            ['response', 'body is'         ],
-            ['1',        '{"foo":"bar"}'   ],
+            ['response', 'body is'],
+            ['1',        '{"foo":"bar"}'],
             ['2',        '{"bar":"foobar"}'],
         ]));
     }
@@ -1770,7 +1772,7 @@ class FeatureContextTest extends TestCase
 
     public function testCanAssertThatImageDoesNotHaveAnyPropertiesWithASpecificPrefix(): void
     {
-        $this->mockHandler->append(new Response(200, [], file_get_contents(FIXTURES_DIR . '/image.png')));
+        $this->mockHandler->append(new Response(200, [], file_get_contents(FIXTURES_DIR.'/image.png')));
         $this->assertSame(
             $this->context,
             $this->context
@@ -1781,7 +1783,7 @@ class FeatureContextTest extends TestCase
 
     public function testAssertingThatImageDoesNotHaveAnyPropertiesWithASpecificPrefixCanFail(): void
     {
-        $this->mockHandler->append(new Response(200, [], file_get_contents(FIXTURES_DIR . '/image.png')));
+        $this->mockHandler->append(new Response(200, [], file_get_contents(FIXTURES_DIR.'/image.png')));
         $this->context->requestPath('/path');
         $this->expectExceptionObject(new AssertionFailedException(
             'Image properties have not been properly stripped. Did not expect properties that starts with "png", found: "png:',
@@ -1807,7 +1809,7 @@ class FeatureContextTest extends TestCase
     public function testAssertApproximatePixelColorCanFail(string $coordinates, string $color, string $exceptionMessage): void
     {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/colors.png')),
+            new Response(200, [], file_get_contents(FIXTURES_DIR.'/colors.png')),
         );
 
         $this->context->requestPath('/path');
@@ -1820,7 +1822,7 @@ class FeatureContextTest extends TestCase
     public function testAssertApproximatePixelColor(string $coordinates, string $color): void
     {
         $this->mockHandler->append(
-            new Response(200, [], file_get_contents(FIXTURES_DIR . '/colors.png')),
+            new Response(200, [], file_get_contents(FIXTURES_DIR.'/colors.png')),
         );
 
         $this->assertSame(
@@ -1838,7 +1840,7 @@ class FeatureContextTest extends TestCase
     {
         return array_map(
             fn (string $file): array => [basename($file)],
-            glob(__DIR__ . '/../../features/bootstrap/imbo-configs/*.php'),
+            glob(__DIR__.'/../../features/bootstrap/imbo-configs/*.php'),
         );
     }
 
@@ -1979,7 +1981,7 @@ class FeatureContextTest extends TestCase
     {
         return [
             [
-                'image' => FIXTURES_DIR . '/image1.png',
+                'image' => FIXTURES_DIR.'/image1.png',
                 'user' => 'user',
                 'imageIdentifier' => 'fc7d2d06993047a0b5056e8fac4462a2',
                 'params' => [
@@ -1987,7 +1989,7 @@ class FeatureContextTest extends TestCase
                 ],
             ],
             [
-                'image' => FIXTURES_DIR . '/image2.png',
+                'image' => FIXTURES_DIR.'/image2.png',
                 'user' => 'user',
                 'imageIdentifier' => 'b914b28f4d5faa516e2049b9a6a2577c',
                 'params' => [
@@ -1996,7 +1998,7 @@ class FeatureContextTest extends TestCase
                 ],
             ],
             [
-                'image' => FIXTURES_DIR . '/image3.png',
+                'image' => FIXTURES_DIR.'/image3.png',
                 'user' => 'user',
                 'imageIdentifier' => '1d5b88aec8a3e1c4c57071307b2dae3a',
                 'params' => [
@@ -2005,7 +2007,7 @@ class FeatureContextTest extends TestCase
                 ],
             ],
             [
-                'image' => FIXTURES_DIR . '/image4.png',
+                'image' => FIXTURES_DIR.'/image4.png',
                 'user' => 'user',
                 'imageIdentifier' => 'a501051db16e3cbf88ea50bfb0138a47',
                 'params' => [
@@ -2024,13 +2026,13 @@ class FeatureContextTest extends TestCase
     {
         return [
             'no params' => [
-                'image' => FIXTURES_DIR . '/image1.png',
+                'image' => FIXTURES_DIR.'/image1.png',
                 'imageIdentifier' => 'someId',
                 'uri' => 'http://localhost:8080/path?t%5B0%5D=watermark%3Aimg%3DsomeId',
                 'params' => null,
             ],
             'with params' => [
-                'image' => FIXTURES_DIR . '/image1.png',
+                'image' => FIXTURES_DIR.'/image1.png',
                 'imageIdentifier' => 'someId',
                 'uri' => 'http://localhost:8080/path?t%5B0%5D=watermark%3Aimg%3DsomeId%2Cx%3D10%2Cy%3D5%2Cposition%3Dbottom-right%2Cwidth%3D20%2Cheight%3D20',
                 'params' => 'x=10,y=5,position=bottom-right,width=20,height=20',
@@ -2046,12 +2048,12 @@ class FeatureContextTest extends TestCase
         return [
             'HTTP GET' => [
                 'imageIdentifier' => 'imageId',
-                'image' => FIXTURES_DIR . '/image1.png',
+                'image' => FIXTURES_DIR.'/image1.png',
                 'method' => 'GET',
             ],
             'HTTP DELETE' => [
                 'imageIdentifier' => 'imageId',
-                'image' => FIXTURES_DIR . '/image1.png',
+                'image' => FIXTURES_DIR.'/image1.png',
                 'method' => 'DELETE',
             ],
         ];
@@ -2065,13 +2067,13 @@ class FeatureContextTest extends TestCase
         return [
             [
                 'imageIdentifier' => 'imageId',
-                'image' => FIXTURES_DIR . '/image1.png',
+                'image' => FIXTURES_DIR.'/image1.png',
                 'method' => 'HEAD',
                 'extension' => 'png',
             ],
             [
                 'imageIdentifier' => 'imageId',
-                'image' => FIXTURES_DIR . '/image1.png',
+                'image' => FIXTURES_DIR.'/image1.png',
                 'method' => 'GET',
                 'extension' => 'jpg',
             ],
@@ -2123,13 +2125,13 @@ class FeatureContextTest extends TestCase
         return [
             'no metadata' => [
                 'imageIdentifier' => 'imageId',
-                'image' => FIXTURES_DIR . '/image1.png',
+                'image' => FIXTURES_DIR.'/image1.png',
                 'method' => 'GET',
                 'metadata' => [],
             ],
             'with metadata and custom method' => [
                 'imageIdentifier' => 'imageId',
-                'image' => FIXTURES_DIR . '/image1.png',
+                'image' => FIXTURES_DIR.'/image1.png',
                 'method' => 'HEAD',
                 'metadata' => ['key' => 'value'],
             ],
@@ -2143,14 +2145,14 @@ class FeatureContextTest extends TestCase
     {
         return [
             'default values' => [
-                'image' => FIXTURES_DIR . '/image1.png',
+                'image' => FIXTURES_DIR.'/image1.png',
                 'imageIdentifier' => 'imageId',
                 'extension' => null,
                 'method' => 'GET',
                 'expectedPath' => '/users/user/images/imageId',
             ],
             'custom extension and method' => [
-                'image' => FIXTURES_DIR . '/image1.png',
+                'image' => FIXTURES_DIR.'/image1.png',
                 'imageIdentifier' => 'imageId',
                 'extension' => 'gif',
                 'method' => 'HEAD',
@@ -2305,8 +2307,8 @@ class FeatureContextTest extends TestCase
      */
     public static function getDataForImageDimensionAssertion(): array
     {
-        $image1 = file_get_contents(FIXTURES_DIR . '/image1.png');
-        $image2 = file_get_contents(FIXTURES_DIR . '/image2.png');
+        $image1 = file_get_contents(FIXTURES_DIR.'/image1.png');
+        $image2 = file_get_contents(FIXTURES_DIR.'/image2.png');
 
         return [
             [
@@ -2367,7 +2369,7 @@ class FeatureContextTest extends TestCase
      */
     public static function getDataForAssertingImagePixelInfoFailures(): array
     {
-        $image = file_get_contents(FIXTURES_DIR . '/image1.png');
+        $image = file_get_contents(FIXTURES_DIR.'/image1.png');
 
         return [
             [
@@ -2396,7 +2398,7 @@ class FeatureContextTest extends TestCase
      */
     public static function getDataForAssertingImagePixelInfo(): array
     {
-        $image = file_get_contents(FIXTURES_DIR . '/image1.png');
+        $image = file_get_contents(FIXTURES_DIR.'/image1.png');
 
         return [
             [
@@ -2422,7 +2424,7 @@ class FeatureContextTest extends TestCase
      */
     public static function getDataForAssertingImagePixelAlphaFailures(): array
     {
-        $image = file_get_contents(FIXTURES_DIR . '/transparency.png');
+        $image = file_get_contents(FIXTURES_DIR.'/transparency.png');
 
         return [
             [
@@ -2445,7 +2447,7 @@ class FeatureContextTest extends TestCase
      */
     public static function getDataForAssertingImagePixelAlpha(): array
     {
-        $image = file_get_contents(FIXTURES_DIR . '/transparency.png');
+        $image = file_get_contents(FIXTURES_DIR.'/transparency.png');
 
         return [
             [
@@ -2510,10 +2512,10 @@ class FeatureContextTest extends TestCase
                     new Response(500),
                 ],
                 'match' => new TableNode([
-                    ['response', 'status line'              ],
-                    ['1',        '200 OK'                   ],
-                    ['2',        '204 No Content'           ],
-                    ['3',        '404 Not Found'            ],
+                    ['response', 'status line'],
+                    ['1',        '200 OK'],
+                    ['2',        '204 No Content'],
+                    ['3',        '404 Not Found'],
                     ['4',        '500 Internal Server Error'],
                 ]),
             ],
@@ -2528,10 +2530,10 @@ class FeatureContextTest extends TestCase
                     ], '{"foo":"bar"}'),
                 ],
                 'match' => new TableNode([
-                    ['response', 'header name',    'header value'    ],
+                    ['response', 'header name',    'header value'],
                     ['1',        'content-type',   'application/json'],
-                    ['1',        'content-length', '13'              ],
-                    ['2',        'x-imbo-foo',     'bar'             ],
+                    ['1',        'content-length', '13'],
+                    ['2',        'x-imbo-foo',     'bar'],
                 ]),
             ],
             'checksum' => [
@@ -2540,20 +2542,20 @@ class FeatureContextTest extends TestCase
                     new Response(200, [], '{"bar":"foo"}'),
                 ],
                 'match' => new TableNode([
-                    ['response', 'checksum'                        ],
+                    ['response', 'checksum'],
                     ['1',        '9bb58f26192e4ba00f01e2e7b136bbd8'],
                     ['2',        'e561e07998cff8eca9f3acc8a2fdb12f'],
                 ]),
             ],
             'image width / height' => [
                 'responses' => [
-                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/1024x256.png')),
-                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png')),
+                    new Response(200, [], file_get_contents(FIXTURES_DIR.'/1024x256.png')),
+                    new Response(200, [], file_get_contents(FIXTURES_DIR.'/256x1024.png')),
                 ],
                 'match' => new TableNode([
                     ['response', 'image width', 'image height'],
-                    ['1',        1024,          256           ],
-                    ['2',        256,           1024          ],
+                    ['1',        1024,          256],
+                    ['2',        256,           1024],
                 ]),
             ],
             'body is' => [
@@ -2562,7 +2564,7 @@ class FeatureContextTest extends TestCase
                     new Response(200, [], '{"bar":"foo"}'),
                 ],
                 'match' => new TableNode([
-                    ['response', 'body is'      ],
+                    ['response', 'body is'],
                     ['1',        '{"foo":"bar"}'],
                     ['2',        '{"bar":"foo"}'],
                 ]),
@@ -2582,8 +2584,8 @@ class FeatureContextTest extends TestCase
                     new Response(201),
                 ],
                 'match' => new TableNode([
-                    ['response', 'status line'   ],
-                    ['1',        '200 OK'        ],
+                    ['response', 'status line'],
+                    ['1',        '200 OK'],
                     ['2',        '204 No Content'],
                 ]),
                 'exceptionMessage' => 'Incorrect status line in response 2, expected "204 No Content", got: "201 Created".',
@@ -2598,9 +2600,9 @@ class FeatureContextTest extends TestCase
                     ], '{"foo":"bar"}'),
                 ],
                 'match' => new TableNode([
-                    ['response', 'header name',    'header value'    ],
+                    ['response', 'header name',    'header value'],
                     ['1',        'content-type',   'application/json'],
-                    ['2',        'x-imbo-foo',     'foobar'          ],
+                    ['2',        'x-imbo-foo',     'foobar'],
                 ]),
                 'exceptionMessage' => 'Incorrect "x-imbo-foo" header value in response 2, expected "foobar", got: "bar".',
             ],
@@ -2610,7 +2612,7 @@ class FeatureContextTest extends TestCase
                     new Response(200, [], '{"bar":"foo"}'),
                 ],
                 'match' => new TableNode([
-                    ['response', 'checksum'                        ],
+                    ['response', 'checksum'],
                     ['1',        '9bb58f26192e4ba00f01e2e7b136bbd8'],
                     ['2',        '9bb58f26192e4ba00f01e2e7b136bbd8'],
                 ]),
@@ -2618,25 +2620,25 @@ class FeatureContextTest extends TestCase
             ],
             'image width / height (failure on width)' => [
                 'responses' => [
-                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/1024x256.png')),
-                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png')),
+                    new Response(200, [], file_get_contents(FIXTURES_DIR.'/1024x256.png')),
+                    new Response(200, [], file_get_contents(FIXTURES_DIR.'/256x1024.png')),
                 ],
                 'match' => new TableNode([
                     ['response', 'image width', 'image height'],
-                    ['1',        1024,          256           ],
-                    ['2',        255,           1024          ],
+                    ['1',        1024,          256],
+                    ['2',        255,           1024],
                 ]),
                 'exceptionMessage' => 'Expected image in response 2 to be 255 pixel(s) wide, actual: 256.',
             ],
             'image width / height (failure on height)' => [
                 'responses' => [
-                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/1024x256.png')),
-                    new Response(200, [], file_get_contents(FIXTURES_DIR . '/256x1024.png')),
+                    new Response(200, [], file_get_contents(FIXTURES_DIR.'/1024x256.png')),
+                    new Response(200, [], file_get_contents(FIXTURES_DIR.'/256x1024.png')),
                 ],
                 'match' => new TableNode([
                     ['response', 'image width', 'image height'],
-                    ['1',        1024,          256           ],
-                    ['2',        256,           1023          ],
+                    ['1',        1024,          256],
+                    ['2',        256,           1023],
                 ]),
                 'exceptionMessage' => 'Expected image in response 2 to be 1023 pixel(s) high, actual: 1024.',
             ],

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\Database\DatabaseInterface;
@@ -25,7 +26,7 @@ class StatusTest extends ResourceTests
         return new Status();
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->response = $this->createMock(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);
@@ -33,7 +34,7 @@ class StatusTest extends ResourceTests
         $this->event = $this->createConfiguredStub(EventInterface::class, [
             'getResponse' => $this->response,
             'getDatabase' => $this->database,
-            'getStorage'  => $this->storage,
+            'getStorage' => $this->storage,
         ]);
 
         $this->resource = $this->getNewResource();

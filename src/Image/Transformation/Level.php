@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -7,15 +8,12 @@ use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 
 /**
- * Level transformation
+ * Level transformation.
  *
  * This transformation can be used to adjust the level of RGB/CMYK in an image.
  */
 class Level extends Transformation
 {
-    /**
-     * {@inheritdoc}
-     */
     public function transform(array $params)
     {
         $channel = isset($params['channel']) ? $params['channel'] : 'all';
@@ -32,10 +30,10 @@ class Level extends Transformation
             $gamma = 1 - abs($amount) / 100;
         } else {
             // amount from 0 to 100 gets translated to 1 to 10
-            $gamma = floor(($amount / 10.1)) + 1;
+            $gamma = floor($amount / 10.1) + 1;
         }
 
-        if ($channel === 'all') {
+        if ('all' === $channel) {
             $channel = Imagick::CHANNEL_ALL;
         } else {
             $c = null;
@@ -50,7 +48,7 @@ class Level extends Transformation
             ];
 
             foreach ($channels as $id => $value) {
-                if (strpos($channel, $id) !== false) {
+                if (str_contains($channel, $id)) {
                     $c |= $value;
                 }
             }

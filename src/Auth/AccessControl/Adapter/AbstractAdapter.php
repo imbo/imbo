@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Auth\AccessControl\Adapter;
 
 use Imbo\Auth\AccessControl\GroupQuery;
@@ -6,13 +7,17 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\Groups as GroupsModel;
 
+use function in_array;
+
 /**
- * Abstract access control adapter
+ * Abstract access control adapter.
  */
 abstract class AbstractAdapter implements AdapterInterface
 {
     abstract public function getGroups(GroupQuery $query, GroupsModel $model): array;
+
     abstract public function groupExists(string $groupName): bool;
+
     abstract public function getGroup(string $groupName): ?array;
 
     public function hasAccess(string $publicKey, string $resource, ?string $user = null): bool
@@ -26,7 +31,7 @@ abstract class AbstractAdapter implements AdapterInterface
             }
 
             // If a user is specified, ensure the public key has access to the user
-            $userAccess = !$user || $acl['users'] === '*' || in_array($user, $acl['users']);
+            $userAccess = !$user || '*' === $acl['users'] || in_array($user, $acl['users']);
 
             if (!$userAccess) {
                 continue;
@@ -42,8 +47,8 @@ abstract class AbstractAdapter implements AdapterInterface
                 $resources = $this->getGroup($group);
 
                 // If the group has not been defined, throw an exception to help debug the problem
-                if ($resources === null) {
-                    throw new InvalidArgumentException('Group "' . $group . '" is not defined', Response::HTTP_INTERNAL_SERVER_ERROR);
+                if (null === $resources) {
+                    throw new InvalidArgumentException('Group "'.$group.'" is not defined', Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
             }
 

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
@@ -6,7 +7,7 @@ use Imbo\Exception\StorageException;
 use Imbo\Http\Response\Response;
 
 /**
- * Storage operations event listener
+ * Storage operations event listener.
  */
 class StorageOperations implements ListenerInterface
 {
@@ -20,7 +21,7 @@ class StorageOperations implements ListenerInterface
     }
 
     /**
-     * Delete an image
+     * Delete an image.
      *
      * @param EventInterface $event An event instance
      */
@@ -31,7 +32,7 @@ class StorageOperations implements ListenerInterface
     }
 
     /**
-     * Load an image
+     * Load an image.
      *
      * @param EventInterface $event An event instance
      */
@@ -50,7 +51,7 @@ class StorageOperations implements ListenerInterface
         // that's down, web-backed storage being unavailable or something
         // similar.
         if (null === $imageData) {
-            throw new StorageException('Failed reading file from storage backend for user ' . $user . ', id: ' . $imageIdentifier, Response::HTTP_SERVICE_UNAVAILABLE);
+            throw new StorageException('Failed reading file from storage backend for user '.$user.', id: '.$imageIdentifier, Response::HTTP_SERVICE_UNAVAILABLE);
         }
 
         $lastModified = $storage->getLastModified($user, $imageIdentifier);
@@ -62,7 +63,7 @@ class StorageOperations implements ListenerInterface
     }
 
     /**
-     * Insert an image
+     * Insert an image.
      *
      * @param EventInterface $event An event instance
      */

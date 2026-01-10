@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use DateTime;
@@ -25,7 +26,7 @@ class StorageOperationsTest extends ListenerTests
     private string $imageIdentifier = 'id';
     private StorageInterface&MockObject $storage;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->response = $this->createMock(Response::class);
         $this->request = $this->createConfiguredMock(Request::class, [

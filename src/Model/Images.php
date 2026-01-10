@@ -1,51 +1,54 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Model;
+
+use function count;
 
 class Images implements ModelInterface
 {
     /**
-     * An array of Image models
+     * An array of Image models.
      *
      * @var array<Image>
      */
     private array $images = [];
 
     /**
-     * Which fields to display
+     * Which fields to display.
      *
      * @var array<string>
      */
     private array $fields = [];
 
     /**
-     * Query hits
+     * Query hits.
      */
     private int $hits = 0;
 
     /**
-     * Limit the number of images
+     * Limit the number of images.
      */
     private int $limit = 20;
 
     /**
-     * The page number
+     * The page number.
      */
     private int $page = 1;
 
     /**
-     * Set the array of images
+     * Set the array of images.
      *
      * @param array<Image> $images An array of Image models
-     * @return self
      */
     public function setImages(array $images): self
     {
         $this->images = $images;
+
         return $this;
     }
 
     /**
-     * Get the images
+     * Get the images.
      *
      * @return array<Image>
      */
@@ -55,10 +58,9 @@ class Images implements ModelInterface
     }
 
     /**
-     * Set the fields to display
+     * Set the fields to display.
      *
      * @param array<string>
-     * @return self
      */
     public function setFields(array $fields): self
     {
@@ -68,7 +70,7 @@ class Images implements ModelInterface
     }
 
     /**
-     * Get the fields to display
+     * Get the fields to display.
      *
      * @return array<string>
      */
@@ -78,7 +80,7 @@ class Images implements ModelInterface
     }
 
     /**
-     * Get the number of images
+     * Get the number of images.
      */
     public function getCount(): int
     {
@@ -86,16 +88,17 @@ class Images implements ModelInterface
     }
 
     /**
-     * Set the hits property
+     * Set the hits property.
      */
     public function setHits(int $hits): self
     {
         $this->hits = $hits;
+
         return $this;
     }
 
     /**
-     * Get the hits property
+     * Get the hits property.
      */
     public function getHits(): int
     {
@@ -103,16 +106,17 @@ class Images implements ModelInterface
     }
 
     /**
-     * Set the limit
+     * Set the limit.
      */
     public function setLimit(int $limit): self
     {
         $this->limit = $limit;
+
         return $this;
     }
 
     /**
-     * Get the limit
+     * Get the limit.
      */
     public function getLimit(): int
     {
@@ -120,16 +124,17 @@ class Images implements ModelInterface
     }
 
     /**
-     * Set the page
+     * Set the page.
      */
     public function setPage(int $page): self
     {
         $this->page = $page;
+
         return $this;
     }
 
     /**
-     * Get the page
+     * Get the page.
      */
     public function getPage(): int
     {

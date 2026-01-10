@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imagick;
@@ -18,7 +19,7 @@ class ExifMetadataTest extends ListenerTests
 {
     private ExifMetadata $listener;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->listener = new ExifMetadata();
     }
@@ -115,7 +116,7 @@ class ExifMetadataTest extends ListenerTests
         $listener = new ExifMetadata();
 
         $image = new Image();
-        $image->setBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));
+        $image->setBlob(file_get_contents(FIXTURES_DIR.'/exif-logo.jpg'));
 
         $request = $this->createConfiguredStub(Request::class, [
             'getImage' => $image,
@@ -144,7 +145,7 @@ class ExifMetadataTest extends ListenerTests
         ]);
 
         $image = new Image();
-        $image->setBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));
+        $image->setBlob(file_get_contents(FIXTURES_DIR.'/exif-logo.jpg'));
 
         $request = $this->createConfiguredStub(Request::class, [
             'getImage' => $image,
@@ -166,7 +167,7 @@ class ExifMetadataTest extends ListenerTests
         $listener = new ExifMetadata();
 
         $image = new Image();
-        $image->setBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));
+        $image->setBlob(file_get_contents(FIXTURES_DIR.'/exif-logo.jpg'));
 
         $request = $this->createConfiguredStub(Request::class, [
             'getImage' => $image,
@@ -176,7 +177,7 @@ class ExifMetadataTest extends ListenerTests
             'getRequest' => $request,
         ]);
 
-        /** @var array{"gps:location":array<double>,"gps:altitude":double} */
+        /** @var array{"gps:location":array<float>,"gps:altitude":float} */
         $properties = $listener->populate($event);
 
         $this->assertEqualsWithDelta(9.0841802, $properties['gps:location'][0], 0.05);
@@ -191,7 +192,7 @@ class ExifMetadataTest extends ListenerTests
         $imageIdentifier = 'imageId';
 
         $image = new Image();
-        $image->setBlob(file_get_contents(FIXTURES_DIR . '/exif-logo.jpg'));
+        $image->setBlob(file_get_contents(FIXTURES_DIR.'/exif-logo.jpg'));
         $image->setImageIdentifier($imageIdentifier);
 
         $request = $this->createMock(Request::class);
@@ -234,7 +235,7 @@ class ExifMetadataTest extends ListenerTests
     }
 
     /**
-     * @return array<array{data:array<string,string>,tags:?array,expectedData:array<string,string|double|array<double>>}>
+     * @return array<array{data:array<string,string>,tags:?array,expectedData:array<string,string|float|array<float>>}>
      */
     public static function getFilterData(): array
     {
@@ -267,7 +268,6 @@ class ExifMetadataTest extends ListenerTests
                     'gps:location' => [9.0841802, 63.68043730000316],
                     'gps:altitude' => 50.8,
                 ]),
-
             ],
             'specific value' => [
                 'data' => $data,
