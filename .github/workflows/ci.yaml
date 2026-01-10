@@ -68,6 +68,7 @@ jobs:
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
+      - run: composer validate --strict
       - run: composer install
       - run: sqlite3 /tmp/imbo-sqlite-integration-test.sq3 < ./scripts/sqlite/000-imbo.sql
       - run: mysql -uimbo_test -pimbo_test -h127.0.0.1 -P3333 imbo_test < ./scripts/mysql/000-imbo.sql
