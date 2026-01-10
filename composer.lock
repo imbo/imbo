@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fe989266b4ed97499ec3fc0d62048b3a",
+    "content-hash": "e07b96afe115d6c101aea2c3e16c6b23",
     "packages": [
         {
             "name": "brick/math",
@@ -1559,16 +1559,16 @@
         },
         {
             "name": "christeredvartsen/testfs",
-            "version": "v0.6.0",
+            "version": "v0.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/christeredvartsen/testfs.git",
-                "reference": "6dcd655ade0aa45e52d9b4e16ab3cc9035052fb4"
+                "reference": "6264ec5b2bcb5a5092e7b83faf77585128b22d7a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/christeredvartsen/testfs/zipball/6dcd655ade0aa45e52d9b4e16ab3cc9035052fb4",
-                "reference": "6dcd655ade0aa45e52d9b4e16ab3cc9035052fb4",
+                "url": "https://api.github.com/repos/christeredvartsen/testfs/zipball/6264ec5b2bcb5a5092e7b83faf77585128b22d7a",
+                "reference": "6264ec5b2bcb5a5092e7b83faf77585128b22d7a",
                 "shasum": ""
             },
             "require": {
@@ -1576,7 +1576,7 @@
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.92",
-                "imbo/imbo-coding-standard": "^2.1",
+                "imbo/imbo-coding-standard": "^3.0",
                 "phpstan/extension-installer": "^1.4",
                 "phpstan/phpstan-deprecation-rules": "^2.0",
                 "phpstan/phpstan-phpunit": "^2.0",
@@ -1612,9 +1612,9 @@
             ],
             "support": {
                 "issues": "https://github.com/christeredvartsen/testfs/issues",
-                "source": "https://github.com/christeredvartsen/testfs/tree/v0.6.0"
+                "source": "https://github.com/christeredvartsen/testfs/tree/v0.8.0"
             },
-            "time": "2026-01-02T17:45:04+00:00"
+            "time": "2026-01-10T20:45:33+00:00"
         },
         {
             "name": "clue/ndjson-react",
@@ -2460,16 +2460,16 @@
         },
         {
             "name": "imbo/imbo-coding-standard",
-            "version": "dev-main",
+            "version": "v3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-coding-standard.git",
-                "reference": "3562dd661d5ad3b4f7a9e09e4078f11f2ec17b21"
+                "reference": "c692bf7c76dd4ce35a78fd1a91f7be16b238e86c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-coding-standard/zipball/3562dd661d5ad3b4f7a9e09e4078f11f2ec17b21",
-                "reference": "3562dd661d5ad3b4f7a9e09e4078f11f2ec17b21",
+                "url": "https://api.github.com/repos/imbo/imbo-coding-standard/zipball/c692bf7c76dd4ce35a78fd1a91f7be16b238e86c",
+                "reference": "c692bf7c76dd4ce35a78fd1a91f7be16b238e86c",
                 "shasum": ""
             },
             "require": {
@@ -2479,7 +2479,6 @@
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.92"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -2507,9 +2506,9 @@
             ],
             "support": {
                 "issues": "https://github.com/imbo/imbo-coding-standard/issues",
-                "source": "https://github.com/imbo/imbo-coding-standard/tree/main"
+                "source": "https://github.com/imbo/imbo-coding-standard/tree/v3.0.1"
             },
-            "time": "2026-01-10T16:05:59+00:00"
+            "time": "2026-01-10T20:35:48+00:00"
         },
         {
             "name": "kubawerlos/php-cs-fixer-custom-fixers",
@@ -6609,11 +6608,9 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "dev",
-    "stability-flags": {
-        "imbo/imbo-coding-standard": 20
-    },
-    "prefer-stable": true,
+    "minimum-stability": "stable",
+    "stability-flags": {},
+    "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": ">=8.3",

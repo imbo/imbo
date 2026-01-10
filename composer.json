@@ -35,10 +35,10 @@
   },
   "require-dev": {
     "ext-mongodb": "^2.0",
-    "christeredvartsen/testfs": "^0.6",
+    "christeredvartsen/testfs": "^0.8.0",
     "friendsofphp/php-cs-fixer": "^3.92",
     "imbo/behat-api-extension": "^6.0",
-    "imbo/imbo-coding-standard": "dev-main",
+    "imbo/imbo-coding-standard": "^3.0",
     "mongodb/mongodb": "^2.1",
     "phpstan/extension-installer": "^1.4",
     "phpstan/phpstan": "^2.1",
@@ -120,7 +120,5 @@
     "allow-plugins": {
       "phpstan/extension-installer": true
     }
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true
+  }
 }
