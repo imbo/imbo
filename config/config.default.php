@@ -363,7 +363,7 @@ return [
     /**
      * Custom resources for Imbo.
      *
-     * @see http://docs.imbo-project.org
+     * @see https://docs.imbo.io
      *
      * @var array
      */
@@ -372,7 +372,7 @@ return [
     /**
      * Custom routes for Imbo.
      *
-     * @see http://docs.imbo-project.org
+     * @see https://docs.imbo.io
      *
      * @var array
      */

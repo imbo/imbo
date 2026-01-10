@@ -98,7 +98,11 @@ Feature: Imbo provides a way to access control resources on a per-public key bas
         Then the response status line is "200 OK"
         And the response body contains JSON:
             """
-            {"user":"public","numImages":0,"lastModified":"@isDate()"}
+            {
+                "user": "public",
+                "numImages": 0,
+                "lastModified": "@isDate()"
+            }
             """
 
     Scenario Outline: Request open resources with default configuration
@@ -106,11 +110,11 @@ Feature: Imbo provides a way to access control resources on a per-public key bas
         When I request "<url>"
         Then the response status line is "<status>"
         And the response body contains JSON:
-          """
-          <response>
-          """
+            """
+            <response>
+            """
 
         Examples:
-            | url          | status           | response |
-            | /            | 200 Hell Yeah    | {"site": "http://imbo.io"} |
-            | /status.json | 200 OK           | {"date": "@isDate()", "database": true, "storage": true} |
+            | url          | status        | response                                                 |
+            | /            | 200 Hell Yeah | {"site": "https://imbo.io"}                              |
+            | /status.json | 200 OK        | {"date": "@isDate()", "database": true, "storage": true} |

@@ -44,10 +44,10 @@ class Index implements ResourceInterface
 
         $model = new Model\ArrayModel();
         $model->setData([
-            'site' => 'http://imbo.io',
+            'site' => 'https://imbo.io',
             'source' => 'https://github.com/imbo/imbo',
             'issues' => 'https://github.com/imbo/imbo/issues',
-            'docs' => 'http://docs.imbo.io',
+            'docs' => 'https://docs.imbo.io',
         ]);
 
         $response->setModel($model);
