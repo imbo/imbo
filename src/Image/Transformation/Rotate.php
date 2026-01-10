@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use ImagickException;
@@ -8,20 +9,17 @@ use Imbo\Http\Response\Response;
 use Imbo\Image\InputSizeConstraint;
 
 /**
- * Rotate transformation
+ * Rotate transformation.
  */
 class Rotate extends Transformation implements InputSizeConstraint
 {
     /**
-     * Background color of the image
+     * Background color of the image.
      *
      * @var string
      */
     private $bg = '#000';
 
-    /**
-     * {@inheritdoc}
-     */
     public function transform(array $params)
     {
         if (empty($params['angle'])) {
@@ -46,9 +44,6 @@ class Rotate extends Transformation implements InputSizeConstraint
                     ->setHasBeenTransformed(true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMinimumInputSize(array $params, array $imageSize)
     {
         if (empty($params['angle'])) {
@@ -60,7 +55,7 @@ class Rotate extends Transformation implements InputSizeConstraint
         // If the angle of the rotation is dividable by 90, we can calculate the input
         // size for the transformation that follow. Otherwise, this will be hard, so we
         // return false to signal that we can't make any assumptions from this point on
-        if ($angle % 90 === 0) {
+        if (0 === $angle % 90) {
             return ['rotation' => $angle];
         }
 

@@ -1,18 +1,20 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Http;
 
 /**
- * Content negotiation
+ * Content negotiation.
  */
 class ContentNegotiation
 {
     /**
-     * Pick the best match from a set of mime types matched against acceptable types
+     * Pick the best match from a set of mime types matched against acceptable types.
      *
-     * @param array $mimeTypes The mime types to find the best match from
+     * @param array $mimeTypes  The mime types to find the best match from
      * @param array $acceptable Acceptable types to match against
-     * @return boolean|string Returns false if none of the $mimetypes are acceptable or the best
-     *                        match on success
+     *
+     * @return bool|string Returns false if none of the $mimetypes are acceptable or the best
+     *                     match on success
      */
     public function bestMatch(array $mimeTypes, array $acceptable)
     {
@@ -30,18 +32,19 @@ class ContentNegotiation
     }
 
     /**
-     * See if a mime type is accepted
+     * See if a mime type is accepted.
      *
-     * @param string $mimeType The mime type to check, for instance "image/png"
-     * @param array $acceptable An array of acceptable content types as keys and the quality as
-     *                          value
-     * @return boolean|double Returns the quality of the mime type if it is accepted, or false
-     *                        otherwise
+     * @param string $mimeType   The mime type to check, for instance "image/png"
+     * @param array  $acceptable An array of acceptable content types as keys and the quality as
+     *                           value
+     *
+     * @return bool|float Returns the quality of the mime type if it is accepted, or false
+     *                    otherwise
      */
     public function isAcceptable($mimeType, array $acceptable)
     {
         foreach ($acceptable as $type => $q) {
-            $pattern = '#^' . str_replace('*', '.*', $type) . '#';
+            $pattern = '#^'.str_replace('*', '.*', $type).'#';
 
             if (preg_match($pattern, $mimeType)) {
                 return $q;

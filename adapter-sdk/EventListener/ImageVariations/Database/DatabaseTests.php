@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace ImboSDK\EventListener\ImageVariations\Database;
 
 use Imbo\EventListener\ImageVariations\Database\DatabaseInterface;

@@ -1,43 +1,47 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Model;
+
+use function count;
 
 class Groups implements ModelInterface
 {
     /**
-     * An array of groups
+     * An array of groups.
      *
      * @var array<string,mixed>
      */
     private array $groups = [];
 
     /**
-     * Query hits
+     * Query hits.
      */
     private ?int $hits = null;
 
     /**
-     * Limit the number of groups
+     * Limit the number of groups.
      */
     private ?int $limit = null;
 
     /**
-     * The page number
+     * The page number.
      */
     private ?int $page = null;
 
     /**
-     * Set the array of groups
+     * Set the array of groups.
      *
      * @param array<string,mixed> $groups An array of groups
      */
     public function setGroups(array $groups): self
     {
         $this->groups = $groups;
+
         return $this;
     }
 
     /**
-     * Get the groups
+     * Get the groups.
      *
      * @return array<string,mixed>
      */
@@ -47,7 +51,7 @@ class Groups implements ModelInterface
     }
 
     /**
-     * Get the number of groups
+     * Get the number of groups.
      */
     public function getCount(): int
     {
@@ -55,16 +59,17 @@ class Groups implements ModelInterface
     }
 
     /**
-     * Set the hits property
+     * Set the hits property.
      */
     public function setHits(int $hits): self
     {
         $this->hits = $hits;
+
         return $this;
     }
 
     /**
-     * Get the hits property
+     * Get the hits property.
      */
     public function getHits(): ?int
     {
@@ -72,16 +77,17 @@ class Groups implements ModelInterface
     }
 
     /**
-     * Set the limit
+     * Set the limit.
      */
     public function setLimit(int $limit): self
     {
         $this->limit = $limit;
+
         return $this;
     }
 
     /**
-     * Get the limit
+     * Get the limit.
      */
     public function getLimit(): ?int
     {
@@ -89,16 +95,17 @@ class Groups implements ModelInterface
     }
 
     /**
-     * Set the page
+     * Set the page.
      */
     public function setPage(int $page): self
     {
         $this->page = $page;
+
         return $this;
     }
 
     /**
-     * Get the page
+     * Get the page.
      */
     public function getPage(): ?int
     {

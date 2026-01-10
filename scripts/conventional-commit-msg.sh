@@ -33,7 +33,7 @@ feat     | Introduces a new feature
 fix      | Patches a bug
 refactor | Neither bugfix nor adds a feature (i.e. rename classes, move code)
 revert   | Reverts a previous commit
-style    | Changes to output formatting / colors
+style    | Changes to output formatting / colors / coding style
 test     | Adding / correcting tests
 
 An optional scope may be provided in parentheses after type. A scope can

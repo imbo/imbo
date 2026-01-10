@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
@@ -7,7 +8,7 @@ use Imbo\Http\Response\Response;
 use Symfony\Component\HttpFoundation\InputBag;
 
 /**
- * Global short URL resource
+ * Global short URL resource.
  */
 class GlobalShortUrl implements ResourceInterface
 {
@@ -26,9 +27,7 @@ class GlobalShortUrl implements ResourceInterface
     }
 
     /**
-     * Fetch an image via a short URL
-     *
-     * @param EventInterface $event
+     * Fetch an image via a short URL.
      */
     public function getImage(EventInterface $event): void
     {

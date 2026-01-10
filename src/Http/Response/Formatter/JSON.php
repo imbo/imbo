@@ -1,11 +1,12 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Http\Response\Formatter;
 
 use Imbo\Model;
 use stdClass;
 
 /**
- * JSON formatter
+ * JSON formatter.
  */
 class JSON extends Formatter implements FormatterInterface
 {
@@ -177,7 +178,7 @@ class JSON extends Formatter implements FormatterInterface
     }
 
     /**
-     * JSON encode an array
+     * JSON encode an array.
      *
      * @param mixed $data The data to encode
      */

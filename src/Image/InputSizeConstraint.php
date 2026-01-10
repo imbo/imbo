@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image;
 
 /**
@@ -25,8 +26,9 @@ interface InputSizeConstraint
      * calculation of the resulting image hard - due to other transformations being applied
      * further down the transformation chain.
      *
-     * @param array $params Transformation parameters
+     * @param array $params    Transformation parameters
      * @param array $imageSize Size of the image
+     *
      * @return int|array Array containing `width` and `height` or one of the constants defined in
      *                   this interface
      */
@@ -34,10 +36,11 @@ interface InputSizeConstraint
 
     /**
      * Adjust the parameters for this transformation, in the event that the size of the
-     * input image has changed, for instance if the `ImageVariations`-listener is in place
+     * input image has changed, for instance if the `ImageVariations`-listener is in place.
      *
-     * @param float $ratio Ratio (input image width / original image width)
+     * @param float $ratio      Ratio (input image width / original image width)
      * @param array $parameters Transformation parameters
+     *
      * @return array Adjusted parameters
      */
     public function adjustParameters(float $ratio, array $parameters): array;

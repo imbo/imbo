@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\Database\DatabaseInterface;
@@ -14,6 +15,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
+use function array_key_exists;
+
 #[CoversClass(Image::class)]
 class ImageTest extends ResourceTests
 {
@@ -28,7 +31,7 @@ class ImageTest extends ResourceTests
         return new Image();
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
@@ -52,6 +55,7 @@ class ImageTest extends ResourceTests
                 static function (string $event): bool {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $event]) {
                         [0, 'db.image.delete'],
                         [1, 'storage.image.delete'] => true,
@@ -101,6 +105,7 @@ class ImageTest extends ResourceTests
                 static function (string $event): bool {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $event]) {
                         [0, 'db.image.load'],
                         [1, 'storage.image.load'],
@@ -119,8 +124,7 @@ class ImageTest extends ResourceTests
             ->expects($this->once())
             ->method('add')
             ->with($this->callback(
-                fn (array $headers): bool =>
-                    array_key_exists('X-Imbo-OriginalMimeType', $headers)
+                fn (array $headers): bool => array_key_exists('X-Imbo-OriginalMimeType', $headers)
                     && array_key_exists('X-Imbo-OriginalWidth', $headers)
                     && array_key_exists('X-Imbo-OriginalHeight', $headers)
                     && array_key_exists('X-Imbo-OriginalFileSize', $headers)

@@ -1,10 +1,11 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener\Initializer;
 
 use Imbo\EventListener\ListenerInterface;
 
 /**
- * Event listener initializer interface
+ * Event listener initializer interface.
  */
 interface InitializerInterface
 {

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
@@ -21,7 +22,7 @@ class StatsTest extends ResourceTests
         return new Stats();
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->response = $this->createMock(Response::class);
         $this->eventManager = $this->createMock(EventManager::class);

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventManager;
 
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -11,7 +12,7 @@ class PriorityQueueTest extends TestCase
     {
         $queue = new PriorityQueue();
 
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 10; ++$i) {
             $queue->insert((string) $i, 10);
         }
 

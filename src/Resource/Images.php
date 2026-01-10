@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
@@ -8,8 +9,10 @@ use Imbo\Http\Response\Response;
 use Imbo\Image\Identifier\Generator\GeneratorInterface;
 use Imbo\Model;
 
+use function is_callable;
+
 /**
- * Images resource
+ * Images resource.
  *
  * This resource will let users fetch images based on queries. The following query parameters can
  * be used:
@@ -38,7 +41,7 @@ class Images implements ResourceInterface
     }
 
     /**
-     * Handle GET and HEAD requests
+     * Handle GET and HEAD requests.
      *
      * @param EventInterface $event The current event
      */
@@ -48,9 +51,7 @@ class Images implements ResourceInterface
     }
 
     /**
-     * Handle POST requests
-     *
-     * @param EventInterface $event
+     * Handle POST requests.
      */
     public function addImage(EventInterface $event): void
     {
@@ -65,12 +66,12 @@ class Images implements ResourceInterface
         // retrieve and instantiate if necessary the image identifier generator
         $imageIdentifierGenerator = $config['imageIdentifierGenerator'];
 
-        if (is_callable($imageIdentifierGenerator) &&
-            !($imageIdentifierGenerator instanceof GeneratorInterface)) {
+        if (is_callable($imageIdentifierGenerator)
+            && !($imageIdentifierGenerator instanceof GeneratorInterface)) {
             $imageIdentifierGenerator = $imageIdentifierGenerator();
         }
 
-        for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
+        for ($attempt = 0; $attempt < $maxAttempts; ++$attempt) {
             try {
                 $image->setImageIdentifier($imageIdentifierGenerator->generate($image));
                 $event->getManager()->trigger('db.image.insert', ['updateIfDuplicate' => $imageIdentifierGenerator->isDeterministic()]);

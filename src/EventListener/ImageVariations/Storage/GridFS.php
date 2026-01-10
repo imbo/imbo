@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener\ImageVariations\Storage;
 
 use Imbo\Exception\StorageException;
@@ -12,23 +13,24 @@ class GridFS implements StorageInterface
     private Bucket $bucket;
 
     /**
-     * Create a new GridFS storage adapter
+     * Create a new GridFS storage adapter.
      *
-     * @param string $databaseName The name of the database to use
-     * @param string $uri The URI to use when connecting to MongoDB
-     * @param array<mixed> $uriOptions Options for the URI, sent to the MongoDB\Client instance
+     * @param string       $databaseName  The name of the database to use
+     * @param string       $uri           The URI to use when connecting to MongoDB
+     * @param array<mixed> $uriOptions    Options for the URI, sent to the MongoDB\Client instance
      * @param array<mixed> $driverOptions Additional options for the MongoDB\Client instance
      * @param array<mixed> $bucketOptions Options for the bucket operations
-     * @param ?Client $client Pre-configured MongoDB client. When specified $uri, $uriOptions and $driverOptions are ignored
+     * @param ?Client      $client        Pre-configured MongoDB client. When specified $uri, $uriOptions and $driverOptions are ignored
+     *
      * @throws StorageException
      */
     public function __construct(
         string $databaseName = 'imbo_imagevariation_storage',
-        string $uri          = 'mongodb://localhost:27017',
-        array $uriOptions    = [],
+        string $uri = 'mongodb://localhost:27017',
+        array $uriOptions = [],
         array $driverOptions = [],
         array $bucketOptions = [],
-        ?Client $client      = null,
+        ?Client $client = null,
     ) {
         try {
             $client = $client ?: new Client($uri, $uriOptions, $driverOptions);
@@ -51,10 +53,10 @@ class GridFS implements StorageInterface
                 $this->createStream($blob),
                 [
                     'metadata' => [
-                        'added'           => time(),
-                        'user'            => $user,
+                        'added' => time(),
+                        'user' => $user,
                         'imageIdentifier' => $imageIdentifier,
-                        'width'           => $width,
+                        'width' => $width,
                     ],
                 ],
             );
@@ -89,7 +91,7 @@ class GridFS implements StorageInterface
     public function deleteImageVariations(string $user, string $imageIdentifier, ?int $width = null): void
     {
         $filter = [
-            'metadata.user'            => $user,
+            'metadata.user' => $user,
             'metadata.imageIdentifier' => $imageIdentifier,
         ];
 
@@ -112,14 +114,15 @@ class GridFS implements StorageInterface
     }
 
     /**
-     * Create a stream for a string
+     * Create a stream for a string.
+     *
+     * @return resource
      *
      * @throws StorageException
-     * @return resource
      */
     private function createStream(string $data)
     {
-        $stream = fopen('php://temp', 'w+b');
+        $stream = fopen('php://temp', 'w+');
 
         if (false === $stream) {
             throw new StorageException('Unable to open stream', 500);
@@ -133,6 +136,6 @@ class GridFS implements StorageInterface
 
     private function getImageFilename(string $user, string $imageIdentifier, int $width): string
     {
-        return $user . '.' . $imageIdentifier . '.' . $width;
+        return $user.'.'.$imageIdentifier.'.'.$width;
     }
 }

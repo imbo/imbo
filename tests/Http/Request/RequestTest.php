@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Http\Request;
 
 use Imbo\Exception\InvalidArgumentException;
@@ -9,12 +10,14 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+use function count;
+
 #[CoversClass(Request::class)]
 class RequestTest extends TestCase
 {
     private Request $request;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->request = new Request();
     }
@@ -135,7 +138,6 @@ class RequestTest extends TestCase
         if (null !== $routeUser) {
             $route->set('user', $routeUser);
         }
-
 
         $this->request->setRoute($route);
         if (null !== $queryUsers) {

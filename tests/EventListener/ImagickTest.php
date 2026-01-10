@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imagick as I;
@@ -23,7 +24,7 @@ class ImagickTest extends ListenerTests
     private TransformationManager&MockObject $transformationManager;
     private InputLoaderManager&MockObject $inputLoaderManager;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
@@ -251,6 +252,7 @@ class ImagickTest extends ListenerTests
                 static function (string $arg, int $value) use ($event): EventInterface&MockObject {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $arg, $value]) {
                         [0, 'ratio', 4],
                         [1, 'transformationIndex', 0] => $event,

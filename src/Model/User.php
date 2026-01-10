@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Model;
 
 use DateTime;
@@ -6,31 +7,32 @@ use DateTime;
 class User implements ModelInterface
 {
     /**
-     * User ID
+     * User ID.
      */
     private ?string $user = null;
 
     /**
-     * Number of images
+     * Number of images.
      */
     private ?int $numImages = null;
 
     /**
-     * Last modified
+     * Last modified.
      */
     private ?DateTime $lastModified = null;
 
     /**
-     * Set the user ID
+     * Set the user ID.
      */
     public function setUserId(string $user): self
     {
         $this->user = $user;
+
         return $this;
     }
 
     /**
-     * Get the user ID
+     * Get the user ID.
      */
     public function getUserId(): ?string
     {
@@ -38,16 +40,17 @@ class User implements ModelInterface
     }
 
     /**
-     * Set the number of images
+     * Set the number of images.
      */
     public function setNumImages(int $num): self
     {
         $this->numImages = $num;
+
         return $this;
     }
 
     /**
-     * Get the number of images
+     * Get the number of images.
      */
     public function getNumImages(): ?int
     {
@@ -55,16 +58,17 @@ class User implements ModelInterface
     }
 
     /**
-     * Set the last modified date
+     * Set the last modified date.
      */
     public function setLastModified(DateTime $date): self
     {
         $this->lastModified = $date;
+
         return $this;
     }
 
     /**
-     * Get the last modified date
+     * Get the last modified date.
      */
     public function getLastModified(): ?DateTime
     {

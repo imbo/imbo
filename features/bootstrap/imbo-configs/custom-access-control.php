@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Behat;
 
 use Imbo\Auth\AccessControl\Adapter\AbstractAdapter;
@@ -10,7 +11,7 @@ class StaticAccessControl extends AbstractAdapter implements AdapterInterface
 {
     public function hasAccess(string $publicKey, string $resource, ?string $user = null): bool
     {
-        return $publicKey === 'public';
+        return 'public' === $publicKey;
     }
 
     public function getPrivateKey(string $publicKey): ?string
@@ -35,7 +36,7 @@ class StaticAccessControl extends AbstractAdapter implements AdapterInterface
 
     public function publicKeyExists(string $publicKey): bool
     {
-        return $publicKey === 'public';
+        return 'public' === $publicKey;
     }
 
     public function getAccessListForPublicKey(string $publicKey): array

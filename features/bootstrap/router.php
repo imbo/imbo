@@ -5,10 +5,9 @@
  *
  * php -S localhost:8080 -t public tests/behat/router.php
  */
-
 assert(array_key_exists('SCRIPT_NAME', $_SERVER));
 assert(array_key_exists('DOCUMENT_ROOT', $_SERVER));
-$indexPath = $_SERVER['DOCUMENT_ROOT'] . '/index.php';
+$indexPath = $_SERVER['DOCUMENT_ROOT'].'/index.php';
 assert(file_exists($indexPath));
 
 // Hack to bypass limited support for non-standard HTTP verbs in the built-in PHP HTTP server
@@ -21,14 +20,14 @@ if (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
 }
 
 // Define a custom configuration file
-define('IMBO_CONFIG_PATH', __DIR__ . '/imbo-configs/config.testing.php');
+define('IMBO_CONFIG_PATH', __DIR__.'/imbo-configs/config.testing.php');
 
-if (file_exists($_SERVER['DOCUMENT_ROOT'] . $_SERVER['SCRIPT_NAME'])) {
+if (file_exists($_SERVER['DOCUMENT_ROOT'].$_SERVER['SCRIPT_NAME'])) {
     // The file exists, serve the file as is
     return false;
 }
 
 // Imbo uses SCRIPT_FILENAME for path resolution, so set that to the expected value
-$_SERVER['SCRIPT_FILENAME'] = $_SERVER['DOCUMENT_ROOT'] . '/index.php';
+$_SERVER['SCRIPT_FILENAME'] = $_SERVER['DOCUMENT_ROOT'].'/index.php';
 
 require $indexPath;

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\CliCommand;
 
 use Exception;
@@ -14,6 +15,11 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
+use function count;
+use function in_array;
+use function is_array;
+use function is_string;
+
 #[CoversClass(AddPublicKey::class)]
 class AddPublicKeyTest extends TestCase
 {
@@ -21,7 +27,7 @@ class AddPublicKeyTest extends TestCase
     private AddPublicKey $command;
     private MutableAdapterInterface&MockObject $adapter;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->adapter = $this->createMock(MutableAdapterInterface::class);
 
@@ -128,35 +134,38 @@ class AddPublicKeyTest extends TestCase
                     /** @var int */
                     static $i = 0;
                     switch ($i++) {
-                        case 0: {
+                        case 0:
                             $diff = array_diff($accessRule['resources'], Resource::getReadOnlyResources());
-                            return (
-                                is_array($accessRule['users']) &&
-                                count($accessRule['users']) === 2 &&
-                                in_array('espenh', $accessRule['users']) &&
-                                in_array('kribrabr', $accessRule['users']) &&
-                                empty($diff)
-                            );
-                        }
-                        case 1: {
+
+                            return
+                                is_array($accessRule['users'])
+                                && 2 === count($accessRule['users'])
+                                && in_array('espenh', $accessRule['users'])
+                                && in_array('kribrabr', $accessRule['users'])
+                                && empty($diff)
+                            ;
+
+                        case 1:
                             $diff = array_diff($accessRule['resources'], Resource::getReadWriteResources());
-                            return (
-                                is_array($accessRule['users']) &&
-                                count($accessRule['users']) === 2 &&
-                                in_array('rexxars', $accessRule['users']) &&
-                                in_array('kbrabrand', $accessRule['users']) &&
-                                empty($diff)
-                            );
-                        }
-                        case 2: {
+
+                            return
+                                is_array($accessRule['users'])
+                                && 2 === count($accessRule['users'])
+                                && in_array('rexxars', $accessRule['users'])
+                                && in_array('kbrabrand', $accessRule['users'])
+                                && empty($diff)
+                            ;
+
+                        case 2:
                             $diff = array_diff($accessRule['resources'], Resource::getAllResources());
-                            return (
-                                is_string($accessRule['users']) &&
-                                $accessRule['users'] === '*' &&
-                                empty($diff)
-                            );
-                        }
+
+                            return
+                                is_string($accessRule['users'])
+                                && '*' === $accessRule['users']
+                                && empty($diff)
+                            ;
                     }
+
                     return false;
                 },
             ));
@@ -190,11 +199,11 @@ class AddPublicKeyTest extends TestCase
                 /**
                  * @param array{users:string,resources:array} $rule
                  */
-                fn (array $rule): bool => (
-                    $rule['users'] === '*' &&
-                    $rule['resources'][0] === $allResources[0] &&
-                    $rule['resources'][1] === $allResources[5]
-                ),
+                fn (array $rule): bool =>
+                    '*' === $rule['users']
+                    && $rule['resources'][0] === $allResources[0]
+                    && $rule['resources'][1] === $allResources[5]
+                ,
             ));
 
         $this->adapter

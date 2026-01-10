@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -70,7 +71,7 @@ class MaxSizeTest extends TransformationTests
     {
         return [
             'landscape image with only width in params' => [
-                'file' => FIXTURES_DIR . '/image.png',
+                'file' => FIXTURES_DIR.'/image.png',
                 'params' => ['width' => 200],
                 'width' => 665,
                 'height' => 463,
@@ -78,7 +79,7 @@ class MaxSizeTest extends TransformationTests
                 'transformedHeight' => 139,
             ],
             'landscape image with only height in params' => [
-                'file' => FIXTURES_DIR . '/image.png',
+                'file' => FIXTURES_DIR.'/image.png',
                 'params' => ['height' => 100],
                 'width' => 665,
                 'height' => 463,
@@ -86,7 +87,7 @@ class MaxSizeTest extends TransformationTests
                 'transformedHeight' => 100,
             ],
             'landscape image both width and height in params' => [
-                'file' => FIXTURES_DIR . '/image.png',
+                'file' => FIXTURES_DIR.'/image.png',
                 'params' => ['width' => 100, 'height' => 100],
                 'width' => 665,
                 'height' => 463,
@@ -94,7 +95,7 @@ class MaxSizeTest extends TransformationTests
                 'transformedHeight' => 70,
             ],
             'landscape image smaller than width and height params' => [
-                'file' => FIXTURES_DIR . '/image.png',
+                'file' => FIXTURES_DIR.'/image.png',
                 'params' => ['width' => 1000, 'height' => 1000],
                 'width' => 665,
                 'height' => 463,
@@ -103,7 +104,7 @@ class MaxSizeTest extends TransformationTests
                 'transformation' => false,
             ],
             'portrait image with only width in params' => [
-                'file' => FIXTURES_DIR . '/tall-image.png',
+                'file' => FIXTURES_DIR.'/tall-image.png',
                 'params' => ['width' => 200],
                 'width' => 463,
                 'height' => 665,
@@ -111,7 +112,7 @@ class MaxSizeTest extends TransformationTests
                 'transformedHeight' => 287,
             ],
             'portrait image with only height in params' => [
-                'file' => FIXTURES_DIR . '/tall-image.png',
+                'file' => FIXTURES_DIR.'/tall-image.png',
                 'params' => ['height' => 100],
                 'width' => 463,
                 'height' => 665,
@@ -119,7 +120,7 @@ class MaxSizeTest extends TransformationTests
                 'transformedHeight' => 100,
             ],
             'portrait image both width and height in params' => [
-                'file' => FIXTURES_DIR . '/tall-image.png',
+                'file' => FIXTURES_DIR.'/tall-image.png',
                 'params' => ['width' => 100, 'height' => 100],
                 'width' => 463,
                 'height' => 665,
@@ -127,7 +128,7 @@ class MaxSizeTest extends TransformationTests
                 'transformedHeight' => 100,
             ],
             'portrait image smaller than width and height params' => [
-                'file' => FIXTURES_DIR . '/tall-image.png',
+                'file' => FIXTURES_DIR.'/tall-image.png',
                 'params' => ['width' => 1000, 'height' => 1000],
                 'width' => 463,
                 'height' => 665,

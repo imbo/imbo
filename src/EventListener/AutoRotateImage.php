@@ -1,10 +1,11 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
 
 /**
- * Auto rotate event listener
+ * Auto rotate event listener.
  */
 class AutoRotateImage implements ListenerInterface
 {
@@ -16,7 +17,7 @@ class AutoRotateImage implements ListenerInterface
     }
 
     /**
-     * Autorotate images when new images are added to Imbo
+     * Autorotate images when new images are added to Imbo.
      *
      * @param EventInterface $event The triggered event
      */

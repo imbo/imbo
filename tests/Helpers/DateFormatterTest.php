@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Helpers;
 
 use DateTime;
@@ -11,7 +12,7 @@ class DateFormatterTest extends TestCase
 {
     private DateFormatter $helper;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->helper = new DateFormatter();
     }

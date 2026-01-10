@@ -1,13 +1,14 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener\AccessToken;
 
 /**
- * Abstract class for Access Token Generation
+ * Abstract class for Access Token Generation.
  */
 abstract class AccessTokenGenerator implements AccessTokenInterface
 {
     /**
-     * Parameters for the generator
+     * Parameters for the generator.
      *
      * @var array<string,mixed>
      */
@@ -18,7 +19,7 @@ abstract class AccessTokenGenerator implements AccessTokenInterface
     abstract public function generateSignature(string $argumentKey, string $data, string $privateKey): string;
 
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param array<string,mixed> $params Parameters for the listener
      */
@@ -48,6 +49,7 @@ abstract class AccessTokenGenerator implements AccessTokenInterface
     public function setArgumentKeys(array $argumentKeys): self
     {
         $this->params['argumentKeys'] = $argumentKeys;
+
         return $this;
     }
 }

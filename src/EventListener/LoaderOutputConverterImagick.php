@@ -1,11 +1,12 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imagick;
 use Imbo\EventManager\EventInterface;
 
 /**
- * Add the current Imagick instance to the active LoaderManager and OutputConverterManager
+ * Add the current Imagick instance to the active LoaderManager and OutputConverterManager.
  */
 class LoaderOutputConverterImagick implements ListenerInterface, ImagickAware
 {
@@ -29,9 +30,7 @@ class LoaderOutputConverterImagick implements ListenerInterface, ImagickAware
     }
 
     /**
-     * Set the Imagick instance in the loader manager and the output converter manager
-     *
-     * @param EventInterface $event
+     * Set the Imagick instance in the loader manager and the output converter manager.
      */
     public function populateImagickInstance(EventInterface $event): void
     {

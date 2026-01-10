@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
@@ -23,7 +24,7 @@ class HttpCache implements ListenerInterface
 
         $response = $event->getResponse();
 
-        if ($response->headers->get('Cache-Control') !== 'public') {
+        if ('public' !== $response->headers->get('Cache-Control')) {
             return;
         }
 

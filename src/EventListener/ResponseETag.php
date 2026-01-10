@@ -1,10 +1,13 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
 
+use function strlen;
+
 /**
- * Generate an ETag for the response
+ * Generate an ETag for the response.
  */
 class ResponseETag implements ListenerInterface
 {
@@ -19,7 +22,7 @@ class ResponseETag implements ListenerInterface
     }
 
     /**
-     * Clean up a possibly tainted If-None-Match request header
+     * Clean up a possibly tainted If-None-Match request header.
      *
      * Apache for instance can add "-gzip" to the ETag response header value, causing the matching
      * in Imbo to fail when this value comes back with a "-gzip" appended to it.
@@ -37,12 +40,12 @@ class ResponseETag implements ListenerInterface
 
             // Remove everything beyond char 32, that has possibly been added by web servers, and
             // set the header
-            $request->headers->set('if-none-match', '"' . substr($ifNoneMatch, 0, 32) . '"');
+            $request->headers->set('if-none-match', '"'.substr($ifNoneMatch, 0, 32).'"');
         }
     }
 
     /**
-     * Set the correct ETag for the response
+     * Set the correct ETag for the response.
      *
      * @param EventInterface $event The current event
      */
@@ -66,7 +69,7 @@ class ResponseETag implements ListenerInterface
         }
 
         if ($response->isOk()) {
-            $response->setETag('"' . md5($response->getContent()) . '"');
+            $response->setETag('"'.md5($response->getContent()).'"');
         }
     }
 }

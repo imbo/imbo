@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -29,7 +30,7 @@ class CompressTest extends TransformationTests
         $event = $this->createStub(EventInterface::class);
 
         $imagick = new Imagick();
-        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.png'));
+        $imagick->readImageBlob(file_get_contents(FIXTURES_DIR.'/image.png'));
 
         $transformation = $this->getTransformation();
         $transformation
@@ -39,7 +40,7 @@ class CompressTest extends TransformationTests
             ->transform(['level' => 50]);
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->transformation = new Compress();
     }

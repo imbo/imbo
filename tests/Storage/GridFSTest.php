@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Storage;
 
 use DateTime;
@@ -16,10 +17,12 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+use function is_int;
+
 #[CoversClass(GridFS::class)]
 class GridFSTest extends TestCase
 {
-    private string $user    = 'user';
+    private string $user = 'user';
     private string $imageId = 'image-id';
 
     public function testThrowsExceptionWhenInvalidUriIsSpecified(): void
@@ -37,7 +40,7 @@ class GridFSTest extends TestCase
             ->expects($this->once())
             ->method('findOne')
             ->with([
-                'metadata.user'            => $this->user,
+                'metadata.user' => $this->user,
                 'metadata.imageIdentifier' => $this->imageId,
             ])
             ->willReturn(null);
@@ -50,9 +53,9 @@ class GridFSTest extends TestCase
                 $this->isResource(),
                 $this->callback(function (array $data): bool {
                     return
-                        $this->user === ($data['metadata']['user'] ?? null) &&
-                        $this->imageId === ($data['metadata']['imageIdentifier'] ?? null) &&
-                        is_int($data['metadata']['updated'] ?? null);
+                        $this->user === ($data['metadata']['user'] ?? null)
+                        && $this->imageId === ($data['metadata']['imageIdentifier'] ?? null)
+                        && is_int($data['metadata']['updated'] ?? null);
                 }),
             );
 
@@ -85,7 +88,7 @@ class GridFSTest extends TestCase
             ->expects($this->once())
             ->method('findOne')
             ->with([
-                'metadata.user'            => $this->user,
+                'metadata.user' => $this->user,
                 'metadata.imageIdentifier' => $this->imageId,
             ])
             ->willReturn($this->createStub(BSONDocument::class));
@@ -135,7 +138,7 @@ class GridFSTest extends TestCase
             ->expects($this->once())
             ->method('findOne')
             ->with([
-                'metadata.user'            => $this->user,
+                'metadata.user' => $this->user,
                 'metadata.imageIdentifier' => $this->imageId,
             ])
             ->willReturn(new BSONDocument(['_id' => 'document id']));
@@ -162,7 +165,7 @@ class GridFSTest extends TestCase
             ->expects($this->once())
             ->method('findOne')
             ->with([
-                'metadata.user'            => $this->user,
+                'metadata.user' => $this->user,
                 'metadata.imageIdentifier' => $this->imageId,
             ])
             ->willReturn(null);
@@ -244,7 +247,7 @@ class GridFSTest extends TestCase
 
         $adapter = new GridFS('database-name', client: $client);
         $this->assertEquals(
-            new DateTime('@' . $time, new DateTimeZone('UTC')),
+            new DateTime('@'.$time, new DateTimeZone('UTC')),
             $adapter->getLastModified($this->user, $this->imageId),
         );
     }

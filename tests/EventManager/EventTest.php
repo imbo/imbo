@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventManager;
 
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
@@ -14,12 +15,14 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+use function is_string;
+
 #[CoversClass(Event::class)]
 class EventTest extends TestCase
 {
     private Event $event;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->event = new Event();
     }

@@ -1,15 +1,22 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Storage;
 
 use DateTime;
 use Imbo\Exception\StorageException;
+
+use function dirname;
+use function strlen;
+
+use const DIRECTORY_SEPARATOR;
+use const STR_PAD_LEFT;
 
 class Filesystem implements StorageInterface
 {
     private string $dataDir;
 
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param string $dataDir Directory to store the files in
      */
@@ -37,17 +44,17 @@ class Filesystem implements StorageInterface
 
         umask($oldUmask);
 
-        $imagePath = $imageDir . '/' . $imageIdentifier;
+        $imagePath = $imageDir.'/'.$imageIdentifier;
 
         // write the file to .tmp, so we can do an atomic rename later to avoid possibly serving partly written files
-        $bytesWritten = file_put_contents($imagePath . '.tmp', $imageData);
+        $bytesWritten = file_put_contents($imagePath.'.tmp', $imageData);
 
         // if write failed or 0 bytes were written (0 byte input == fail), or we wrote less than expected
         if (!$bytesWritten || ($bytesWritten < strlen($imageData))) {
-            throw new StorageException('Failed writing file to disk: ' . $imagePath, 507);
+            throw new StorageException('Failed writing file to disk: '.$imagePath, 507);
         }
 
-        rename($imagePath . '.tmp', $imagePath);
+        rename($imagePath.'.tmp', $imagePath);
 
         return true;
     }
@@ -84,7 +91,7 @@ class Filesystem implements StorageInterface
 
         $timestamp = filemtime($path);
 
-        return new DateTime('@' . $timestamp);
+        return new DateTime('@'.$timestamp);
     }
 
     public function getStatus(): bool
@@ -100,11 +107,10 @@ class Filesystem implements StorageInterface
     }
 
     /**
-     * Get the path to an image
+     * Get the path to an image.
      *
-     * @param string $user The user which the image belongs to
+     * @param string $user            The user which the image belongs to
      * @param string $imageIdentifier Image identifier
-     * @return string
      */
     protected function getImagePath(string $user, string $imageIdentifier): string
     {

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Http\Response;
 
 use Imbo\Model\Error;
@@ -6,7 +7,7 @@ use Imbo\Model\ModelInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
- * Response object from the server to the client
+ * Response object from the server to the client.
  */
 class Response extends SymfonyResponse
 {
@@ -20,6 +21,7 @@ class Response extends SymfonyResponse
     public function setModel(?ModelInterface $model = null): self
     {
         $this->model = $model;
+
         return $this;
     }
 
@@ -30,7 +32,7 @@ class Response extends SymfonyResponse
         $this->headers->add([
             'X-Imbo-Error-Message' => $errorMessage,
             'X-Imbo-Error-InternalCode' => $error->getImboErrorCode(),
-            'X-Imbo-Error-Date' => $error->getDate()->format('D, d M Y H:i:s') . ' GMT',
+            'X-Imbo-Error-Date' => $error->getDate()->format('D, d M Y H:i:s').' GMT',
         ]);
 
         $this->setStatusCode($error->getHttpCode(), $errorMessage)

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\Event;
@@ -15,6 +16,9 @@ use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use TestFs\StreamWrapper as TestFs;
 
+use function dirname;
+use function sprintf;
+
 #[CoversClass(ImageTransformationCache::class)]
 class ImageTransformationCacheTest extends ListenerTests
 {
@@ -27,7 +31,7 @@ class ImageTransformationCacheTest extends ListenerTests
     private ResponseHeaderBag&MockObject $responseHeaders;
     private HeaderBag&MockObject $requestHeaders;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->responseHeaders = $this->createMock(ResponseHeaderBag::class);
         $this->requestHeaders = $this->createMock(HeaderBag::class);
@@ -51,7 +55,7 @@ class ImageTransformationCacheTest extends ListenerTests
         $this->listener = new ImageTransformationCache(['path' => TestFs::url('cacheDir')]);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         TestFs::unregister();
     }
@@ -92,7 +96,7 @@ class ImageTransformationCacheTest extends ListenerTests
 
         $dir = TestFs::url('cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6');
         $file = 'bc6ffe312a5741a5705afe8639c08835';
-        $fullPath = $dir . '/' . $file;
+        $fullPath = $dir.'/'.$file;
 
         mkdir($dir, 0775, true);
         file_put_contents($fullPath, $cachedData);
@@ -118,7 +122,7 @@ class ImageTransformationCacheTest extends ListenerTests
 
         $dir = TestFs::url('cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6');
         $file = 'bc6ffe312a5741a5705afe8639c08835';
-        $fullPath = $dir . '/' . $file;
+        $fullPath = $dir.'/'.$file;
 
         mkdir($dir, 0775, true);
         file_put_contents($fullPath, 'corrupt data');
@@ -226,7 +230,7 @@ class ImageTransformationCacheTest extends ListenerTests
 
         $dir = TestFs::url('cacheDir/u/s/e/user/7/b/f/7bf2e67f09de203da740a86cd37bbe8d/b/c/6');
         $file = 'bc6ffe312a5741a5705afe8639c08835';
-        $fullPath = $dir . '/' . $file;
+        $fullPath = $dir.'/'.$file;
 
         mkdir($dir, 0775, true);
         file_put_contents($fullPath, $cachedData);

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Database;
 
 use Imbo\Exception\DatabaseException;
@@ -19,7 +20,7 @@ class MySQLIntegrationTest extends DatabaseTests
                 (string) getenv('MYSQL_PASSWORD'),
             );
         } catch (DatabaseException $e) {
-            $this->markTestSkipped('Unable to connect to MySQL database: ' . $e->getMessage());
+            $this->markTestSkipped('Unable to connect to MySQL database: '.$e->getMessage());
         }
     }
 
@@ -45,7 +46,7 @@ class MySQLIntegrationTest extends DatabaseTests
             try {
                 $pdo->exec("DELETE FROM `{$table}`");
             } catch (PDOException $e) {
-                $this->markTestSkipped('MySQL database have not been initialized: ' . $e->getMessage());
+                $this->markTestSkipped('MySQL database have not been initialized: '.$e->getMessage());
             }
         }
     }

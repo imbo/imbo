@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image;
 
 use Imbo\EventListener\Initializer\InitializerInterface;
@@ -10,24 +11,29 @@ use Imbo\Http\Response\Response;
 use Imbo\Image\Transformation\Transformation;
 use Imbo\Model\Image;
 
+use function is_array;
+use function is_callable;
+use function is_int;
+use function is_string;
+
 class TransformationManager implements ListenerInterface
 {
     /**
-     * Uninitialized image transformations
+     * Uninitialized image transformations.
      *
      * @var array<string,TLiteralClassString|Closure:Transformation>
      */
     protected array $transformations = [];
 
     /**
-     * Initialized transformation handlers
+     * Initialized transformation handlers.
      *
      * @var array<string,Transformation>
      */
     protected array $handlers = [];
 
     /**
-     * Image transformation initializers
+     * Image transformation initializers.
      *
      * @var array<InitializerInterface>
      */
@@ -53,7 +59,7 @@ class TransformationManager implements ListenerInterface
     }
 
     /**
-     * Add a transformation to the manager
+     * Add a transformation to the manager.
      *
      * @param TLiteralClassString|Closure:Transformation|Transformation $transformation Class name, Transformation instance or callable that returns one
      */
@@ -69,7 +75,7 @@ class TransformationManager implements ListenerInterface
     }
 
     /**
-     * Add a transformation to the manager
+     * Add a transformation to the manager.
      *
      * @param array<string,TLiteralClassString|Closure:Transformation|Transformation> $transformations Array of transformations, keys being the transformation names
      */
@@ -83,16 +89,17 @@ class TransformationManager implements ListenerInterface
     }
 
     /**
-     * Add an event listener/transformation initializer
+     * Add an event listener/transformation initializer.
      */
     public function addInitializer(InitializerInterface $initializer): self
     {
         $this->initializers[] = $initializer;
+
         return $this;
     }
 
     /**
-     * Get the transformation registered for the given transformation name
+     * Get the transformation registered for the given transformation name.
      *
      * @return Transformation|false
      */
@@ -125,7 +132,7 @@ class TransformationManager implements ListenerInterface
     }
 
     /**
-     * Apply image transformations
+     * Apply image transformations.
      */
     public function applyTransformations(EventInterface $event): void
     {
@@ -175,8 +182,9 @@ class TransformationManager implements ListenerInterface
      * in cases where we need to adjust the transformation parameters to account for the new size
      * of the input image.
      *
-     * @throws InvalidArgumentException
      * @return array{width:int,height:int,index:int}|false `false` if we need the full size of the input image, array otherwise
+     *
+     * @throws InvalidArgumentException
      */
     public function getMinimumImageInputSize(EventInterface $event): array|false
     {
@@ -215,9 +223,9 @@ class TransformationManager implements ListenerInterface
             if ($handler instanceof InputSizeConstraint) {
                 $minSize = $handler->setImage($image)->getMinimumInputSize($params, $inputSize);
 
-                if ($minSize === InputSizeConstraint::NO_TRANSFORMATION) {
+                if (InputSizeConstraint::NO_TRANSFORMATION === $minSize) {
                     continue;
-                } elseif ($minSize === InputSizeConstraint::STOP_RESOLVING) {
+                } elseif (InputSizeConstraint::STOP_RESOLVING === $minSize) {
                     break;
                 } elseif (!is_array($minSize)) {
                     throw new InvalidArgumentException('Invalid return value from getMinimumInputSize', Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -245,9 +253,9 @@ class TransformationManager implements ListenerInterface
                 // divisable by 90, but not by 180, exchange the values provided as width/height
                 // for the next transformations in the chain
                 $rotation = isset($minSize['rotation']) ? $minSize['rotation'] : false;
-                if ($rotation && $rotation % 180 !== 0 && $rotation % 90 === 0) {
+                if ($rotation && 0 !== $rotation % 180 && 0 === $rotation % 90) {
                     $inputSize = [
-                        'width'  => $inputSize['height'],
+                        'width' => $inputSize['height'],
                         'height' => $inputSize['width'],
                     ];
 
@@ -261,13 +269,13 @@ class TransformationManager implements ListenerInterface
             $originalRatio = $image->getWidth() / $image->getHeight();
             $regionRatio = $image->getWidth() / $region['width'];
 
-            $minimum['width'] = $minimum['width'] * $regionRatio;
+            $minimum['width'] *= $regionRatio;
             $minimum['height'] = $minimum['width'] / $originalRatio;
         } elseif ($flipDimensions) {
             $minimum = [
-                'width'  => $minimum['height'],
+                'width' => $minimum['height'],
                 'height' => $minimum['width'],
-                'index'  => $minimum['index'],
+                'index' => $minimum['index'],
             ];
         }
 
@@ -279,14 +287,14 @@ class TransformationManager implements ListenerInterface
         }
 
         return [
-            'width'  => (int) ceil($minimum['width']),
+            'width' => (int) ceil($minimum['width']),
             'height' => (int) ceil($minimum['height']),
-            'index'  => $minimum['index'],
+            'index' => $minimum['index'],
         ];
     }
 
     /**
-     * Adjust image transformations
+     * Adjust image transformations.
      */
     public function adjustImageTransformations(EventInterface $event): void
     {
@@ -304,7 +312,7 @@ class TransformationManager implements ListenerInterface
         $transformationIndex = $event->getArgument('transformationIndex');
 
         // Adjust coordinates according to the ratio between the original and the variation
-        for ($i = 0; $i <= $transformationIndex; $i++) {
+        for ($i = 0; $i <= $transformationIndex; ++$i) {
             $name = $transformations[$i]['name'];
             $params = $transformations[$i]['params'];
             $handler = $this->getTransformation($name);
@@ -320,9 +328,10 @@ class TransformationManager implements ListenerInterface
     }
 
     /**
-     * Trigger transformation with the given name, with the given parameters
+     * Trigger transformation with the given name, with the given parameters.
      *
      * @param array $params Transformation parameters
+     *
      * @throws TransformationException If the transformation fails or is not registered
      */
     protected function triggerTransformation(string $name, array $params, EventInterface $event)
@@ -330,7 +339,7 @@ class TransformationManager implements ListenerInterface
         $transformation = $this->getTransformation($name);
 
         if (!$transformation) {
-            throw new TransformationException('Transformation "' . $name . '" not registered', Response::HTTP_BAD_REQUEST);
+            throw new TransformationException('Transformation "'.$name.'" not registered', Response::HTTP_BAD_REQUEST);
         }
 
         $transformation

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
@@ -19,7 +20,7 @@ class StatsAccessTest extends ListenerTests
     private EventInterface $event;
     private Request&MockObject $request;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->request = $this->createMock(Request::class);
 

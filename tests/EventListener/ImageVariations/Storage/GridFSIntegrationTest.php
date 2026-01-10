@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener\ImageVariations\Storage;
 
 use ImboSDK\EventListener\ImageVariations\Storage\StorageTests;
@@ -40,7 +41,7 @@ class GridFSIntegrationTest extends StorageTests
         try {
             $client->getDatabase($this->databaseName)->command(['ping' => 1]);
         } catch (RuntimeException) {
-            $this->markTestSkipped('MongoDB is not running, start it with `docker compose up -d`', );
+            $this->markTestSkipped('MongoDB is not running, start it with `docker compose up -d`');
         }
 
         $client->dropDatabase($this->databaseName);

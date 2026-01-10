@@ -1,28 +1,30 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Model;
 
 class ArrayModel implements ModelInterface
 {
     /**
-     * Data
+     * Data.
      *
      * @var array<string,mixed>
      */
     private array $data = [];
 
     /**
-     * Title of the model, used in representations
+     * Title of the model, used in representations.
      */
     private ?string $title = null;
 
     /**
-     * Set the data
+     * Set the data.
      *
      * @param array<string,mixed> $data The data to set
      */
     public function setData(array $data): self
     {
         $this->data = $data;
+
         return $this;
     }
 
@@ -35,16 +37,17 @@ class ArrayModel implements ModelInterface
     }
 
     /**
-     * Set the title of the model
+     * Set the title of the model.
      */
     public function setTitle(string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
     /**
-     * Get the title of the model
+     * Get the title of the model.
      */
     public function getTitle(): ?string
     {

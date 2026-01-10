@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Database;
 
 use ImboSDK\Database\DatabaseTests;
@@ -34,7 +35,7 @@ class SQLiteIntegrationTest extends DatabaseTests
             try {
                 $this->pdo->exec("DELETE FROM `{$table}`");
             } catch (PDOException $e) {
-                $this->markTestSkipped('SQLite database have not been initialized: ' . $e->getMessage());
+                $this->markTestSkipped('SQLite database have not been initialized: '.$e->getMessage());
             }
         }
     }

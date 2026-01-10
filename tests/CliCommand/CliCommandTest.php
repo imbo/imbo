@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\CliCommand;
 
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -9,7 +10,7 @@ class CliCommandTest extends TestCase
 {
     private Command $command;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->command = new Command();
     }
@@ -23,7 +24,7 @@ class CliCommandTest extends TestCase
 
     public function testFetchesTheDefaultConfigurationIfNoneHasBeenSet(): void
     {
-        $this->assertEquals(require __DIR__ . '/../../config/config.default.php', $this->command->getConfig());
+        $this->assertEquals(require __DIR__.'/../../config/config.default.php', $this->command->getConfig());
     }
 
     public function testCanSetConfig(): void

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -12,7 +13,7 @@ class TransformationTest extends TestCase
 {
     private Border $transformation;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->transformation = new Border();
     }
@@ -26,7 +27,7 @@ class TransformationTest extends TestCase
 
         $imagick = $this->createConfiguredMock(Imagick::class, [
             'getImageGeometry' => [
-                'width'  => 100,
+                'width' => 100,
                 'height' => 100,
             ],
             'getImageAlphaChannel' => false,

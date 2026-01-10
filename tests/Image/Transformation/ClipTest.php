@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -21,17 +22,17 @@ class ClipTest extends TestCase
     private Clip $transformation;
     private Imagick $imagick;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->transformation = new Clip();
 
         $user = 'user';
         $imageIdentifier = 'imageIdentifier';
-        $blob = file_get_contents(FIXTURES_DIR . '/jpeg-with-multiple-paths.jpg');
+        $blob = file_get_contents(FIXTURES_DIR.'/jpeg-with-multiple-paths.jpg');
 
         $this->image = $this->createConfiguredMock(Image::class, [
             'getImageIdentifier' => $imageIdentifier,
-            'getUser'            => $user,
+            'getUser' => $user,
         ]);
 
         $database = $this->createStub(DatabaseInterface::class);
@@ -97,7 +98,7 @@ class ClipTest extends TestCase
 
     public function testTransformationDoesntHappenWhenNoPathIsPresent(): void
     {
-        $this->imagick->readImageBlob(file_get_contents(FIXTURES_DIR . '/image.jpg'));
+        $this->imagick->readImageBlob(file_get_contents(FIXTURES_DIR.'/image.jpg'));
         $this->image
             ->expects($this->never())
             ->method('setHasBeenTransformed');
@@ -119,6 +120,7 @@ class ClipTest extends TestCase
                 static function (int $option): bool {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $option]) {
                         [0, Imagick::ALPHACHANNEL_TRANSPARENT],
                         [1, Imagick::ALPHACHANNEL_ACTIVATE] => true,

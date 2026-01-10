@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Database;
 
 use ImboSDK\Database\DatabaseTests;
@@ -40,12 +41,12 @@ class MongoDBIntegrationTest extends DatabaseTests
         try {
             $client->getDatabase($this->databaseName)->command(['ping' => 1]);
         } catch (RuntimeException) {
-            $this->markTestSkipped('MongoDB is not running, start it with `docker compose up -d`', );
+            $this->markTestSkipped('MongoDB is not running, start it with `docker compose up -d`');
         }
 
         $client->dropDatabase($this->databaseName);
         $client->selectCollection($this->databaseName, MongoDB::IMAGE_COLLECTION_NAME)->createIndex([
-            'user'            => 1,
+            'user' => 1,
             'imageIdentifier' => 1,
         ], [
             'unique' => true,

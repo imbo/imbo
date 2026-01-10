@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use ImagickException;
@@ -6,13 +7,10 @@ use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 
 /**
- * Modulate transformation
+ * Modulate transformation.
  */
 class Modulate extends Transformation
 {
-    /**
-     * {@inheritdoc}
-     */
     public function transform(array $params)
     {
         $brightness = isset($params['b']) ? (int) $params['b'] : 100;

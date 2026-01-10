@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Database;
 
 /**
- * PostgreSQL database driver
+ * PostgreSQL database driver.
  */
 class PostgreSQL extends PDOAdapter
 {

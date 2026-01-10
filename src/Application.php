@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo;
 
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface as AccessControlInterface;
@@ -26,6 +27,11 @@ use Imbo\Model\Error;
 use Imbo\Resource\ResourceInterface;
 use Imbo\Storage\StorageInterface;
 
+use function is_array;
+use function is_callable;
+use function is_int;
+use function is_string;
+
 class Application
 {
     private array $config;
@@ -33,9 +39,7 @@ class Application
     private Response $response;
 
     /**
-     * Class constructor
-     *
-     * @param array $config
+     * Class constructor.
      */
     public function __construct(array $config)
     {
@@ -185,7 +189,6 @@ class Application
             ->addEventHandler(TransformationManager::class, $transformationManager)
             ->addCallbacks(TransformationManager::class, TransformationManager::getSubscribedEvents());
 
-
         // Event listener initializers
         foreach ($this->config['eventListenerInitializers'] as $name => $initializer) {
             if (!$initializer) {
@@ -200,7 +203,7 @@ class Application
             }
 
             if (!($initializer instanceof InitializerInterface)) {
-                throw new InvalidArgumentException('Invalid event listener initializer: ' . $name, Response::HTTP_INTERNAL_SERVER_ERROR);
+                throw new InvalidArgumentException('Invalid event listener initializer: '.$name, Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
             $eventManager->addInitializer($initializer);
@@ -309,10 +312,10 @@ class Application
                 }
 
                 if (!$resource instanceof ResourceInterface) {
-                    throw new InvalidArgumentException('Invalid resource class for route: ' . $routeName, Response::HTTP_INTERNAL_SERVER_ERROR);
+                    throw new InvalidArgumentException('Invalid resource class for route: '.$routeName, Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
             } else {
-                $className = 'Imbo\Resource\\' . ucfirst($routeName);
+                $className = 'Imbo\Resource\\'.ucfirst($routeName);
                 $resource = new $className();
             }
 
@@ -322,7 +325,7 @@ class Application
             $methodName = strtolower($this->request->getMethod());
 
             // Generate the event name based on the accessed resource and the HTTP method
-            $eventName = $routeName . '.' . $methodName;
+            $eventName = $routeName.'.'.$methodName;
 
             if (!$eventManager->hasListenersForEvent($eventName)) {
                 throw new RuntimeException('Method not allowed', Response::HTTP_METHOD_NOT_ALLOWED);

@@ -1,21 +1,27 @@
 <?php declare(strict_types=1);
+
 namespace Imbo;
 
 use Exception as BaseException;
 
-$installedByComposer = is_file(__DIR__ . '/../../../autoload.php');
+use function defined;
+use function is_array;
+
+use const E_USER_ERROR;
+
+$installedByComposer = is_file(__DIR__.'/../../../autoload.php');
 
 if ($installedByComposer) {
     // Imbo has been installed by Composer (composer reqiure imbo/imbo)
-    $appDirectory = __DIR__ . '/../../../..';
+    $appDirectory = __DIR__.'/../../../..';
 } else {
     // Assume this is a direct install (git clone https://github.com/imbo/imbo)
-    $appDirectory = __DIR__ . '/..';
+    $appDirectory = __DIR__.'/..';
 }
 
-require $appDirectory . '/vendor/autoload.php';
+require $appDirectory.'/vendor/autoload.php';
 
-$defaultConfig = require __DIR__ . '/../config/config.default.php';
+$defaultConfig = require __DIR__.'/../config/config.default.php';
 $extraConfig = [];
 
 if (defined('IMBO_CONFIG_PATH') && is_file(IMBO_CONFIG_PATH)) {
@@ -23,10 +29,11 @@ if (defined('IMBO_CONFIG_PATH') && is_file(IMBO_CONFIG_PATH)) {
 } else {
     $configLoader = function (string $path): array {
         $config = require $path;
+
         return is_array($config) ? $config : [];
     };
 
-    foreach (glob($appDirectory . '/config/*.php') as $file) {
+    foreach (glob($appDirectory.'/config/*.php') as $file) {
         if ('config.default.php' === basename($file)) {
             continue;
         }
@@ -53,6 +60,6 @@ try {
     if (true === $config['rethrowFinalException']) {
         throw $e;
     } else {
-        trigger_error('Uncaught Exception (' . get_class($e) . ') with message: ' . $e->getMessage(), E_USER_ERROR);
+        trigger_error('Uncaught Exception ('.$e::class.') with message: '.$e->getMessage(), E_USER_ERROR);
     }
 }

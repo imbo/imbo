@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Http\Response\Formatter;
 
 use Imbo\Exception\InvalidArgumentException;

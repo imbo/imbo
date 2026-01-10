@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Auth\AccessControl\Adapter;
 
 use Imbo\Exception\DatabaseException;
@@ -10,6 +11,8 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+
+use function sprintf;
 
 #[CoversClass(MongoDB::class)]
 class MongoDBTest extends TestCase
@@ -27,8 +30,7 @@ class MongoDBTest extends TestCase
         $database
             ->method('selectCollection')
             ->willReturnCallback(
-                fn (string $collectionName): Collection&MockObject =>
-                match ($collectionName) {
+                fn (string $collectionName): Collection&MockObject => match ($collectionName) {
                     MongoDB::ACL_COLLECTION_NAME => $this->aclCollection,
                     MongoDB::ACL_GROUP_COLLECTION_NAME => $this->aclGroupCollection,
                     default => $this->fail(sprintf('Unknown collection name: %s', $collectionName)),

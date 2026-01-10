@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener\ImageVariations\Database;
 
 use ImboSDK\EventListener\ImageVariations\Database\DatabaseTests;
@@ -38,7 +39,7 @@ class MongoDBIntegrationTest extends DatabaseTests
         try {
             $client->getDatabase($this->databaseName)->command(['ping' => 1]);
         } catch (RuntimeException) {
-            $this->markTestSkipped('MongoDB is not running, start it with `docker compose up -d`', );
+            $this->markTestSkipped('MongoDB is not running, start it with `docker compose up -d`');
         }
 
         $client->dropDatabase($this->databaseName);

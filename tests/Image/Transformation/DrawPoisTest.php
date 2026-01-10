@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -158,19 +159,19 @@ class DrawPoisTest extends TestCase
         $database = $this->createConfiguredStub(DatabaseInterface::class, [
             'getMetadata' => [
                 'poi' => [[
-                    'width'  => 100,
+                    'width' => 100,
                     'height' => 100,
-                    'x'      => 0,
-                    'y'      => 0,
+                    'x' => 0,
+                    'y' => 0,
                 ]],
             ],
         ]);
 
         $image = $this->createConfiguredStub(Image::class, [
-            'getUser'            => 'user',
+            'getUser' => 'user',
             'getImageIdentifier' => 'image identifier',
-            'getWidth'           => 1000,
-            'getHeight'          => 800,
+            'getWidth' => 1000,
+            'getHeight' => 800,
         ]);
 
         $event = $this->createConfiguredStub(Event::class, [

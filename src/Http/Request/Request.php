@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Http\Request;
 
 use Imbo\Exception\InvalidArgumentException;
@@ -8,36 +9,41 @@ use Imbo\Router\Route;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
+use function is_string;
+
+use const PREG_OFFSET_CAPTURE;
+
 /**
- * Request class
+ * Request class.
  */
 class Request extends SymfonyRequest
 {
     /**
-     * Image instance
+     * Image instance.
      *
      * @var Image
      */
     private $image;
 
     /**
-     * Array of transformations
+     * Array of transformations.
      *
      * @var array
      */
     private $transformations;
 
     /**
-     * The current route
+     * The current route.
      *
      * @var Route
      */
     private $route;
 
     /**
-     * Set an image model
+     * Set an image model.
      *
      * @param Image $image An image model instance
+     *
      * @return Request
      */
     public function setImage(Image $image)
@@ -48,9 +54,9 @@ class Request extends SymfonyRequest
     }
 
     /**
-     * Get an image model attached to the request (on POST)
+     * Get an image model attached to the request (on POST).
      *
-     * @return null|Image
+     * @return Image|null
      */
     public function getImage()
     {
@@ -58,21 +64,21 @@ class Request extends SymfonyRequest
     }
 
     /**
-     * Get the public key found in the request
+     * Get the public key found in the request.
      *
      * @return string
      */
     public function getPublicKey()
     {
-        return (
+        return
             $this->headers->get('X-Imbo-PublicKey', null) ?:
             $this->query->get('publicKey', null) ?:
             ($this->route ? $this->route->get('user') : null)
-        );
+        ;
     }
 
     /**
-     * Get the user found in the request
+     * Get the user found in the request.
      */
     public function getUser(): ?string
     {
@@ -80,7 +86,7 @@ class Request extends SymfonyRequest
     }
 
     /**
-     * Get users specified in the request
+     * Get users specified in the request.
      *
      * @return array Users specified in the request
      */
@@ -101,13 +107,13 @@ class Request extends SymfonyRequest
     }
 
     /**
-     * Get image transformations from the request
+     * Get image transformations from the request.
      *
      * @return array<array{name:string,params:array}>
      */
     public function getTransformations(): array
     {
-        if ($this->transformations === null) {
+        if (null === $this->transformations) {
             $this->transformations = [];
 
             try {
@@ -125,7 +131,7 @@ class Request extends SymfonyRequest
                 $pos = strpos($transformation, ':');
                 $urlParams = '';
 
-                if ($pos === false) {
+                if (false === $pos) {
                     // No params exist
                     $name = $transformation;
                 } else {
@@ -146,7 +152,7 @@ class Request extends SymfonyRequest
                 }
 
                 $this->transformations[] = [
-                    'name'   => $name,
+                    'name' => $name,
                     'params' => $params,
                 ];
             }
@@ -156,9 +162,10 @@ class Request extends SymfonyRequest
     }
 
     /**
-     * Set the transformation chain
+     * Set the transformation chain.
      *
      * @param array $transformations The image transformations
+     *
      * @return self
      */
     public function setTransformations(array $transformations)
@@ -169,7 +176,7 @@ class Request extends SymfonyRequest
     }
 
     /**
-     * Get the image identifier from the URL
+     * Get the image identifier from the URL.
      *
      * @return string|null
      */
@@ -179,7 +186,7 @@ class Request extends SymfonyRequest
     }
 
     /**
-     * Get the current requested extension (if any)
+     * Get the current requested extension (if any).
      *
      * @return string|null
      */
@@ -189,7 +196,7 @@ class Request extends SymfonyRequest
     }
 
     /**
-     * Get the URI with no changes to the incoming formatting ("as is")
+     * Get the URI with no changes to the incoming formatting ("as is").
      *
      * @return string
      */
@@ -198,14 +205,14 @@ class Request extends SymfonyRequest
         $query = $this->server->get('QUERY_STRING');
 
         if (!empty($query)) {
-            $query = '?' . $query;
+            $query = '?'.$query;
         }
 
-        return $this->getSchemeAndHttpHost() . $this->getBaseUrl() . $this->getPathInfo() . $query;
+        return $this->getSchemeAndHttpHost().$this->getBaseUrl().$this->getPathInfo().$query;
     }
 
     /**
-     * Get the URI without the Symfony normalization applied to the query string, un-encoded
+     * Get the URI without the Symfony normalization applied to the query string, un-encoded.
      *
      * @return string
      */
@@ -214,14 +221,14 @@ class Request extends SymfonyRequest
         $query = $this->server->get('QUERY_STRING');
 
         if (!empty($query)) {
-            $query = '?' . urldecode($query);
+            $query = '?'.urldecode($query);
         }
 
-        return $this->getSchemeAndHttpHost() . $this->getBaseUrl() . $this->getPathInfo() . $query;
+        return $this->getSchemeAndHttpHost().$this->getBaseUrl().$this->getPathInfo().$query;
     }
 
     /**
-     * Get the current route
+     * Get the current route.
      *
      * @return Route
      */
@@ -231,9 +238,10 @@ class Request extends SymfonyRequest
     }
 
     /**
-     * Set the route
+     * Set the route.
      *
      * @param Route $route The current route
+     *
      * @return self
      */
     public function setRoute(Route $route)

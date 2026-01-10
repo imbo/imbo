@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventListener\ImageVariations\Database\DatabaseInterface;
@@ -10,8 +11,14 @@ use Imbo\Exception\StorageException;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 
+use function is_callable;
+use function is_string;
+use function sprintf;
+
+use const E_USER_WARNING;
+
 /**
- * Image variations generator
+ * Image variations generator.
  */
 class ImageVariations implements ListenerInterface
 {
@@ -19,7 +26,7 @@ class ImageVariations implements ListenerInterface
     private StorageInterface $storage;
 
     /**
-     * Parameters for the event listener
+     * Parameters for the event listener.
      */
     private array $params = [
         // Flip to true to converts variations to a lossless format (PNG) before saving
@@ -45,9 +52,10 @@ class ImageVariations implements ListenerInterface
     ];
 
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param array $params Parameters for the event listener
+     *
      * @throws InvalidArgumentException
      */
     public function __construct(array $params = [])
@@ -78,7 +86,7 @@ class ImageVariations implements ListenerInterface
     }
 
     /**
-     * Choose an image variation based on the transformations and the original size of the image
+     * Choose an image variation based on the transformations and the original size of the image.
      */
     public function chooseVariation(EventInterface $event): void
     {
@@ -141,6 +149,7 @@ class ImageVariations implements ListenerInterface
             // The image blob does not exist in the storage, which it should. Trigger an error and
             // return
             trigger_error('Image variation storage is not in sync with the image variation database', E_USER_WARNING);
+
             return;
         }
 
@@ -157,7 +166,7 @@ class ImageVariations implements ListenerInterface
 
         // Set a HTTP header that informs the user agent on which image variation that was used in
         // the transformations
-        $response->headers->set('X-Imbo-ImageVariation', $variation['width'] . 'x' . $variation['height']);
+        $response->headers->set('X-Imbo-ImageVariation', $variation['width'].'x'.$variation['height']);
 
         // Stop the propagation of this event
         $event->stopPropagation();
@@ -165,7 +174,7 @@ class ImageVariations implements ListenerInterface
     }
 
     /**
-     * Generate multiple variations based on the configuration
+     * Generate multiple variations based on the configuration.
      *
      * If any of the operations fail Imbo will trigger errors
      */
@@ -192,7 +201,7 @@ class ImageVariations implements ListenerInterface
             return $value < $originalWidth;
         });
 
-        if ($this->params['autoScale'] === true) {
+        if (true === $this->params['autoScale']) {
             // Have Imbo figure out the widths to generate in addition to the ones in the "width"
             // configuration parameter
             $variationWidth = $previousWidth = $originalWidth;
@@ -233,7 +242,7 @@ class ImageVariations implements ListenerInterface
                 ]);
 
                 // If configured, use a lossless variation format
-                if ($this->params['lossless'] === true) {
+                if (true === $this->params['lossless']) {
                     $transformationManager
                         ->getTransformation('convert')
                         ->setImage($image)
@@ -278,7 +287,7 @@ class ImageVariations implements ListenerInterface
     }
 
     /**
-     * Delete all image variations attached to an image
+     * Delete all image variations attached to an image.
      *
      * If any of the delete operations fail Imbo will trigger an error
      */
@@ -302,9 +311,10 @@ class ImageVariations implements ListenerInterface
     }
 
     /**
-     * Configure the database adapter
+     * Configure the database adapter.
      *
      * @param array $config The event listener configuration
+     *
      * @throws InvalidArgumentException
      */
     private function configureDatabase(array $config): void
@@ -331,9 +341,10 @@ class ImageVariations implements ListenerInterface
     }
 
     /**
-     * Configure the storage adapter
+     * Configure the storage adapter.
      *
      * @param array $config The event listener configuration
+     *
      * @throws InvalidArgumentException
      */
     private function configureStorage(array $config): void

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo;
 
 use Symfony\Component\Console\Application as BaseApplication;
@@ -6,7 +7,7 @@ use Symfony\Component\Console\Application as BaseApplication;
 class CliApplication extends BaseApplication
 {
     /**
-     * Class constructor
+     * Class constructor.
      */
     public function __construct()
     {

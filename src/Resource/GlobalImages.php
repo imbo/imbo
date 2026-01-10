@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
@@ -6,7 +7,7 @@ use Imbo\Exception\RuntimeException;
 use Imbo\Http\Response\Response;
 
 /**
- * Global images resource
+ * Global images resource.
  *
  * This resource will let users fetch images based on queries. The following query parameters can
  * be used:
@@ -27,13 +28,13 @@ class GlobalImages implements ResourceInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'globalimages.get'    => 'getImages',
-            'globalimages.head'   => 'getImages',
+            'globalimages.get' => 'getImages',
+            'globalimages.head' => 'getImages',
         ];
     }
 
     /**
-     * Handle GET and HEAD requests
+     * Handle GET and HEAD requests.
      *
      * @param EventInterface $event The current event
      */
@@ -57,12 +58,7 @@ class GlobalImages implements ResourceInterface
         }
 
         if (!empty($missingAccess)) {
-            throw new RuntimeException(
-                'Public key does not have access to the users: [' .
-                implode(', ', $missingAccess) .
-                ']',
-                Response::HTTP_BAD_REQUEST,
-            );
+            throw new RuntimeException('Public key does not have access to the users: ['.implode(', ', $missingAccess).']', Response::HTTP_BAD_REQUEST);
         }
 
         $event->getManager()->trigger('db.images.load', [

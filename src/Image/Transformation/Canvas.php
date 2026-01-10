@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -9,12 +10,12 @@ use Imbo\Http\Response\Response;
 use Imbo\Image\InputSizeConstraint;
 
 /**
- * Canvas transformation
+ * Canvas transformation.
  */
 class Canvas extends Transformation implements InputSizeConstraint
 {
     /**
-     * Canvas mode
+     * Canvas mode.
      *
      * Supported modes:
      *
@@ -28,12 +29,12 @@ class Canvas extends Transformation implements InputSizeConstraint
     private string $mode = 'free';
 
     /**
-     * X coordinate of the placement of the upper left corner of the existing image
+     * X coordinate of the placement of the upper left corner of the existing image.
      */
     private int $x = 0;
 
     /**
-     * X coordinate of the placement of the upper left corner of the existing image
+     * X coordinate of the placement of the upper left corner of the existing image.
      */
     private int $y = 0;
 
@@ -46,12 +47,12 @@ class Canvas extends Transformation implements InputSizeConstraint
     {
         $image = $this->image;
 
-        $width  = !empty($params['width']) ? (int) $params['width'] : $image->getWidth();
+        $width = !empty($params['width']) ? (int) $params['width'] : $image->getWidth();
         $height = !empty($params['height']) ? (int) $params['height'] : $image->getHeight();
-        $mode   = !empty($params['mode']) ? $params['mode'] : $this->mode;
-        $x      = !empty($params['x']) ? (int) $params['x'] : $this->x;
-        $y      = !empty($params['y']) ? (int) $params['y'] : $this->y;
-        $bg     = !empty($params['bg']) ? $this->formatColor($params['bg']) : $this->bg;
+        $mode = !empty($params['mode']) ? $params['mode'] : $this->mode;
+        $x = !empty($params['x']) ? (int) $params['x'] : $this->x;
+        $y = !empty($params['y']) ? (int) $params['y'] : $this->y;
+        $bg = !empty($params['bg']) ? $this->formatColor($params['bg']) : $this->bg;
 
         try {
             // Clone the original that we will move back onto the canvas
@@ -77,7 +78,7 @@ class Canvas extends Transformation implements InputSizeConstraint
                 $cropHeight = $height;
 
                 if ($existingWidth > $width) {
-                    if ($mode === 'center' || $mode === 'center-x') {
+                    if ('center' === $mode || 'center-x' === $mode) {
                         $cropX = (int) (($existingWidth - $width) / 2);
                     }
                 } else {
@@ -85,7 +86,7 @@ class Canvas extends Transformation implements InputSizeConstraint
                 }
 
                 if ($existingHeight > $height) {
-                    if ($mode === 'center' || $mode === 'center-y') {
+                    if ('center' === $mode || 'center-y' === $mode) {
                         $cropY = (int) (($existingHeight - $height) / 2);
                     }
                 } else {
@@ -101,12 +102,12 @@ class Canvas extends Transformation implements InputSizeConstraint
             // above.
             $existingSize = $original->getImageGeometry();
 
-            if ($mode === 'center') {
+            if ('center' === $mode) {
                 $x = ($width - $existingSize['width']) / 2;
                 $y = ($height - $existingSize['height']) / 2;
-            } elseif ($mode === 'center-x') {
+            } elseif ('center-x' === $mode) {
                 $x = ($width - $existingSize['width']) / 2;
-            } elseif ($mode === 'center-y') {
+            } elseif ('center-y' === $mode) {
                 $y = ($height - $existingSize['height']) / 2;
             }
 

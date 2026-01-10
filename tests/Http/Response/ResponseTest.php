@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Http\Response;
 
 use DateTime;
@@ -13,7 +14,7 @@ class ResponseTest extends TestCase
 {
     private Response $response;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->response = new Response();
     }

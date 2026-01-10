@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo;
 
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface as AccessControlAdapter;
@@ -12,7 +13,7 @@ use Imbo\Storage\StorageInterface as StorageAdapter;
 
 return [
     /**
-     * Access Control adapter
+     * Access Control adapter.
      *
      * See the different adapter implementations for possible configuration parameters.
      * The value must be set to a closure returning an instance of
@@ -23,7 +24,7 @@ return [
     'accessControl' => null,
 
     /**
-     * Database adapter
+     * Database adapter.
      *
      * See the different adapter implementations for possible configuration parameters. The value
      * must be set to a closure returning an instance of Imbo\Database\DatabaseInterface, or an
@@ -34,7 +35,7 @@ return [
     'database' => null,
 
     /**
-     * Storage adapter
+     * Storage adapter.
      *
      * See the different adapter implementations for possible configuration parameters. The value
      * must be set to a closure returning an instance of Imbo\Storage\StorageInterface, or an
@@ -45,7 +46,7 @@ return [
     'storage' => null,
 
     /**
-     * Image identifier generator
+     * Image identifier generator.
      *
      * See the different adapter implementations for possible configuration parameters.
      * The value must be set to a closure returning an instance of
@@ -56,7 +57,7 @@ return [
     'imageIdentifierGenerator' => new RandomString(),
 
     /**
-     * Keep errors as exceptions
+     * Keep errors as exceptions.
      *
      * By default Imbo will catch any exceptions thrown internally and instead trigger a
      * user error with the exception message. If you set this option to `true`, Imbo will
@@ -81,7 +82,7 @@ return [
     /**
      * Various optimizations that might be enabled or disabled. Most of the configuration-
      * exposed optimizations have some trade, be it speed or image quality, which is why
-     * it's possible to disable them through configuration
+     * it's possible to disable them through configuration.
      *
      * @var array
      */
@@ -105,7 +106,7 @@ return [
      * other values. For instance, the `image` resource sets a very long `max-age`, as it
      * shouldn't change over time. The `metadata` resource however could potentially change
      * much more often. To ensure that clients get fresh responses, the default is to ask
-     * the client to always revalidate (ask if there has been any changes since last fetch)
+     * the client to always revalidate (ask if there has been any changes since last fetch).
      *
      * @var array
      */
@@ -125,7 +126,7 @@ return [
          * Imbo generates access tokens and authentication signatures based on the incoming URL,
          * and includes the protocol (by default). This can sometimes be problematic, for instance
          * when Imbo is behind a load balancer which doesn't send `X-Forwarded-Proto` header, or
-         * if you want to use protocol-less image URLs (`//imbo.host/users/some-user/images/img`)
+         * if you want to use protocol-less image URLs (`//imbo.host/users/some-user/images/img`).
          *
          * This option allows you to control how Imbo's authentication should behave:
          *
@@ -152,7 +153,7 @@ return [
     ],
 
     /**
-     * Image transformations
+     * Image transformations.
      *
      * An associative array where the keys identify the name used in URLs to trigger the
      * transformation. The value of each element in this array can be on of the following:
@@ -169,39 +170,39 @@ return [
      * @var array
      */
     'transformations' => [
-        'autoRotate'       => Transformation\AutoRotate::class,
-        'blur'             => Transformation\Blur::class,
-        'border'           => Transformation\Border::class,
-        'canvas'           => Transformation\Canvas::class,
-        'clip'             => Transformation\Clip::class,
-        'compress'         => Transformation\Compress::class,
-        'contrast'         => Transformation\Contrast::class,
-        'convert'          => Transformation\Convert::class,
-        'crop'             => Transformation\Crop::class,
-        'desaturate'       => Transformation\Desaturate::class,
-        'drawPois'         => Transformation\DrawPois::class,
+        'autoRotate' => Transformation\AutoRotate::class,
+        'blur' => Transformation\Blur::class,
+        'border' => Transformation\Border::class,
+        'canvas' => Transformation\Canvas::class,
+        'clip' => Transformation\Clip::class,
+        'compress' => Transformation\Compress::class,
+        'contrast' => Transformation\Contrast::class,
+        'convert' => Transformation\Convert::class,
+        'crop' => Transformation\Crop::class,
+        'desaturate' => Transformation\Desaturate::class,
+        'drawPois' => Transformation\DrawPois::class,
         'flipHorizontally' => Transformation\FlipHorizontally::class,
-        'flipVertically'   => Transformation\FlipVertically::class,
-        'histogram'        => Transformation\Histogram::class,
-        'level'            => Transformation\Level::class,
-        'maxSize'          => Transformation\MaxSize::class,
-        'modulate'         => Transformation\Modulate::class,
-        'progressive'      => Transformation\Progressive::class,
-        'resize'           => Transformation\Resize::class,
-        'rotate'           => Transformation\Rotate::class,
-        'sepia'            => Transformation\Sepia::class,
-        'sharpen'          => Transformation\Sharpen::class,
-        'smartSize'        => Transformation\SmartSize::class,
-        'strip'            => Transformation\Strip::class,
-        'thumbnail'        => Transformation\Thumbnail::class,
-        'transpose'        => Transformation\Transpose::class,
-        'transverse'       => Transformation\Transverse::class,
-        'vignette'         => Transformation\Vignette::class,
-        'watermark'        => Transformation\Watermark::class,
+        'flipVertically' => Transformation\FlipVertically::class,
+        'histogram' => Transformation\Histogram::class,
+        'level' => Transformation\Level::class,
+        'maxSize' => Transformation\MaxSize::class,
+        'modulate' => Transformation\Modulate::class,
+        'progressive' => Transformation\Progressive::class,
+        'resize' => Transformation\Resize::class,
+        'rotate' => Transformation\Rotate::class,
+        'sepia' => Transformation\Sepia::class,
+        'sharpen' => Transformation\Sharpen::class,
+        'smartSize' => Transformation\SmartSize::class,
+        'strip' => Transformation\Strip::class,
+        'thumbnail' => Transformation\Thumbnail::class,
+        'transpose' => Transformation\Transpose::class,
+        'transverse' => Transformation\Transverse::class,
+        'vignette' => Transformation\Vignette::class,
+        'watermark' => Transformation\Watermark::class,
     ],
 
     /**
-     * Event listeners
+     * Event listeners.
      *
      * An associative array where the keys are short names for the event listeners (not really used
      * for anything, but exists so you can override/unset some helpers from config.php). The values
@@ -321,7 +322,7 @@ return [
     ],
 
     /**
-     * Initializers for event listeners
+     * Initializers for event listeners.
      *
      * If some of your event handlers requires extra initializing you can create initializer
      * classes. These classes must implement the Imbo\EventListener\Initializer\InitializerInterface
@@ -334,7 +335,7 @@ return [
     ],
 
     /**
-     * Transformation presets
+     * Transformation presets.
      *
      * If you want to make custom transformation presets (or transformation collections) you can do
      * so here. The keys used will be the name of the transformation as used in the URI, and the
@@ -360,23 +361,25 @@ return [
     'transformationPresets' => [],
 
     /**
-     * Custom resources for Imbo
+     * Custom resources for Imbo.
      *
-     * @link http://docs.imbo-project.org
+     * @see http://docs.imbo-project.org
+     *
      * @var array
      */
     'resources' => [],
 
     /**
-     * Custom routes for Imbo
+     * Custom routes for Imbo.
      *
-     * @link http://docs.imbo-project.org
+     * @see http://docs.imbo-project.org
+     *
      * @var array
      */
     'routes' => [],
 
     /**
-     * Trusted proxies
+     * Trusted proxies.
      *
      * If you find yourself behind some sort of proxy - like a load balancer - then certain header
      * information may be sent to you using special X-Forwarded-* headers. For example, the Host
@@ -399,7 +402,7 @@ return [
     'trustedProxies' => [],
 
     /**
-     * Index redirect
+     * Index redirect.
      *
      * Set this to a URL if you want the front page to do a redirect instead of showing generic
      * information regarding the Imbo-project.
@@ -409,7 +412,7 @@ return [
     'indexRedirect' => null,
 
     /**
-     * Input loaders
+     * Input loaders.
      *
      * Each input loader must implement Imbo\Image\InputLoader\InputLoaderInterface.
      *
@@ -423,7 +426,7 @@ return [
     ],
 
     /**
-     * Custom output converters
+     * Custom output converters.
      *
      * An output converter must implement Imbo\Image\OutputConverter\OutputConverterInterface.
      *

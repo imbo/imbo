@@ -1,10 +1,13 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Behat;
 
 use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
 use Imbo\Resource;
 use InvalidArgumentException;
 use RuntimeException;
+
+use function is_array;
 
 if (empty($_SERVER['HTTP_X_BEHAT_DATABASE_TEST'])) {
     throw new RuntimeException('Missing X-Behat-Database-Test request header');
@@ -66,13 +69,13 @@ $testConfig = [
 $customConfig = [];
 
 if (isset($_SERVER['HTTP_X_IMBO_TEST_CONFIG_FILE'])) {
-    $customConfig = require __DIR__ . '/' . basename($_SERVER['HTTP_X_IMBO_TEST_CONFIG_FILE']);
+    $customConfig = require __DIR__.'/'.basename($_SERVER['HTTP_X_IMBO_TEST_CONFIG_FILE']);
 }
 
 // Return the merged configuration, having the custom config overwrite the default testing config,
 // which in turn overwrites the default config
 return array_replace_recursive(
-    require __DIR__ . '/../../../config/config.default.php',
+    require __DIR__.'/../../../config/config.default.php',
     $testConfig,
     $customConfig,
 );

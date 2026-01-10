@@ -1,10 +1,11 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
 
 /**
- * Imagick event listener
+ * Imagick event listener.
  *
  * This event listener is responsible for reading the initial image data, and updating the model
  * before sending back transformed images to the client, or when storing transformed images in the
@@ -13,7 +14,7 @@ use Imbo\EventManager\EventInterface;
 class Imagick implements ListenerInterface, ImagickAware
 {
     /**
-     * Imagick instance that is injected by an initializer
+     * Imagick instance that is injected by an initializer.
      *
      * @var \Imagick
      */
@@ -48,7 +49,7 @@ class Imagick implements ListenerInterface, ImagickAware
     }
 
     /**
-     * Inject the image blob from the image model into the shared imagick instance
+     * Inject the image blob from the image model into the shared imagick instance.
      *
      * @param EventInterface $event The event instance
      */
@@ -61,7 +62,7 @@ class Imagick implements ListenerInterface, ImagickAware
         if ($event->hasArgument('image')) {
             // The image has been specified as an argument to the event
             $image = $event->getArgument('image');
-        } elseif ($eventName === 'images.post') {
+        } elseif ('images.post' === $eventName) {
             // The image is found in the request
             $image = $event->getRequest()->getImage();
         } else {
@@ -71,12 +72,12 @@ class Imagick implements ListenerInterface, ImagickAware
 
         $shouldOptimize = $jpegSizeHintEnabled && !$event->hasArgument('skipOptimization');
 
-        if ($shouldOptimize && $eventName === 'image.loaded') {
+        if ($shouldOptimize && 'image.loaded' === $eventName) {
             // See if we can hint to imagick that we expect a smaller output
             $minSize = $event->getTransformationManager()->getMinimumImageInputSize($event);
 
             if ($minSize) {
-                $inputSize = $minSize['width'] . 'x' . $minSize['height'];
+                $inputSize = $minSize['width'].'x'.$minSize['height'];
                 $this->imagick->setOption('jpeg:size', $inputSize);
             }
         }
@@ -96,7 +97,7 @@ class Imagick implements ListenerInterface, ImagickAware
 
     /**
      * Update the image model blob before storing it in case an event listener has changed the
-     * image
+     * image.
      *
      * @param EventInterface $event The event instance
      */
@@ -110,7 +111,7 @@ class Imagick implements ListenerInterface, ImagickAware
     }
 
     /**
-     * Update the model data if the image has been changed
+     * Update the model data if the image has been changed.
      *
      * @param EventInterface $event The event instance
      */

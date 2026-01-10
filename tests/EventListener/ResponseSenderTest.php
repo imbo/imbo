@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
@@ -13,7 +14,7 @@ class ResponseSenderTest extends ListenerTests
 {
     private ResponseSender $listener;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->listener = new ResponseSender();
     }

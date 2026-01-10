@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -7,13 +8,10 @@ use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 
 /**
- * Progressive image transformation
+ * Progressive image transformation.
  */
 class Progressive extends Transformation
 {
-    /**
-     * {@inheritdoc}
-     */
     public function transform(array $params)
     {
         try {

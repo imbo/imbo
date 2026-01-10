@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Model;
 
 use ArrayAccess;
@@ -18,6 +19,7 @@ class Stats implements ModelInterface, ArrayAccess
     public function setNumUsers(int $numUsers): self
     {
         $this->numUsers = $numUsers;
+
         return $this;
     }
 
@@ -29,6 +31,7 @@ class Stats implements ModelInterface, ArrayAccess
     public function setNumBytes(int $numBytes): self
     {
         $this->numBytes = $numBytes;
+
         return $this;
     }
 
@@ -40,6 +43,7 @@ class Stats implements ModelInterface, ArrayAccess
     public function setNumImages(int $numImages): self
     {
         $this->numImages = $numImages;
+
         return $this;
     }
 
@@ -65,7 +69,7 @@ class Stats implements ModelInterface, ArrayAccess
 
     public function offsetSet($offset, $value): void
     {
-        if ($offset === null) {
+        if (null === $offset) {
             throw new InvalidArgumentException('Custom statistics requires a key to be set', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 

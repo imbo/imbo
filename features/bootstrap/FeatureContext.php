@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Behat;
 
 use Assert\Assertion;
@@ -24,10 +25,23 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RuntimeException;
 
+use function array_key_exists;
+use function array_slice;
+use function count;
+use function dirname;
+use function in_array;
+use function is_array;
+use function sprintf;
+use function strlen;
+
+use const DIRECTORY_SEPARATOR;
+use const JSON_ERROR_NONE;
+use const STR_PAD_LEFT;
+
 class FeatureContext extends ApiContext
 {
     /**
-     * Names for middlewares
+     * Names for middlewares.
      *
      * @var string
      */
@@ -37,38 +51,38 @@ class FeatureContext extends ApiContext
     public const MIDDLEWARE_BEHAT_CONTEXT_CLASS = 'imbo-behat-context-class';
 
     /**
-     * The public key used by the client
+     * The public key used by the client.
      */
     private ?string $publicKey = null;
 
     /**
-     * The private key used by the client
+     * The private key used by the client.
      */
     private ?string $privateKey = null;
 
     /**
-     * An array of urls for added images, keyed by local file path
+     * An array of urls for added images, keyed by local file path.
      *
      * @var array
      */
     private $imageUrls = [];
 
     /**
-     * An array of image identifiers for added images, keyed by local file path
+     * An array of image identifiers for added images, keyed by local file path.
      *
      * @var array
      */
     private $imageIdentifiers = [];
 
     /**
-     * Array container for the history middleware
+     * Array container for the history middleware.
      *
      * @var array
      */
     private $history = [];
 
     /**
-     * Keys for the users
+     * Keys for the users.
      *
      * @var array
      */
@@ -84,58 +98,57 @@ class FeatureContext extends ApiContext
     ];
 
     /**
-     * Whether or not the access token handler is currently active
+     * Whether or not the access token handler is currently active.
      *
-     * @var boolean
+     * @var bool
      */
     private $accessTokenHandlerIsActive = false;
 
     /**
-     * Whether or not the authentication handler is currently active
+     * Whether or not the authentication handler is currently active.
      *
-     * @var boolean
+     * @var bool
      */
     private $authenticationHandlerIsActive = false;
 
     /**
-     * FQCN of the database adapter test class
+     * FQCN of the database adapter test class.
      *
      * @var string
      */
     private static $databaseTest;
 
     /**
-     * FQCN of the storage adapter test class
+     * FQCN of the storage adapter test class.
      *
      * @var string
      */
     private static $storageTest;
 
     /**
-     * Configuration for the database adapter test
+     * Configuration for the database adapter test.
      *
      * @var array
      */
     private static $databaseTestConfig;
 
     /**
-     * Configuration for the storage adapter test
+     * Configuration for the storage adapter test.
      *
      * @var array
      */
     private static $storageTestConfig;
 
     /**
-     * Handler stack for the internal Guzzle client
+     * Handler stack for the internal Guzzle client.
      */
     private HandlerStack $handlerStack;
 
     /**
-     * Set up adapters for the suite
+     * Set up adapters for the suite.
      *
      * @BeforeScenario
      *
-     * @param BeforeScenarioScope $scope
      * @throws InvalidArgumentException
      */
     public static function setUpAdapters(BeforeScenarioScope $scope)
@@ -145,20 +158,12 @@ class FeatureContext extends ApiContext
 
         // Generate FQCNs for the adapter tests
         $database = sprintf('Imbo\Behat\DatabaseTest\%s', $suiteSettings['database']);
-        $storage  = sprintf('Imbo\Behat\StorageTest\%s', $suiteSettings['storage']);
+        $storage = sprintf('Imbo\Behat\StorageTest\%s', $suiteSettings['storage']);
 
         if (!class_exists($database)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Database test class "%s" does not exist.',
-                    $database,
-                ),
-            );
+            throw new InvalidArgumentException(sprintf('Database test class "%s" does not exist.', $database));
         } elseif (!class_exists($storage)) {
-            throw new InvalidArgumentException(sprintf(
-                'Storage test class "%s" does not exist.',
-                $storage,
-            ));
+            throw new InvalidArgumentException(sprintf('Storage test class "%s" does not exist.', $storage));
         }
 
         self::$databaseTest = $database;
@@ -169,11 +174,9 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Tear down adapters for the suite
+     * Tear down adapters for the suite.
      *
      * @AfterScenario
-     *
-     * @param AfterScenarioScope $scope
      */
     public static function tearDownAdapters(AfterScenarioScope $scope)
     {
@@ -185,7 +188,7 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Manipulate the handler stack of the client for all tests
+     * Manipulate the handler stack of the client for all tests.
      *
      * - Add the history middleware to record all request / responses in the $this->history array
      * - Set the request header that informs Imbo which class is responsible for configuring the
@@ -199,8 +202,7 @@ class FeatureContext extends ApiContext
         $this->handlerStack->push(Middleware::history($this->history), self::MIDDLEWARE_HISTORY);
         $this->handlerStack->push(
             Middleware::mapRequest(
-                fn (RequestInterface $request): RequestInterface =>
-                    $request
+                fn (RequestInterface $request): RequestInterface => $request
                         ->withHeader('X-Behat-Database-Test', self::$databaseTest)
                         ->withHeader('X-Behat-Storage-Test', self::$storageTest)
                         ->withHeader('X-Behat-Database-Test-Config', urlencode(json_encode(self::$databaseTestConfig)))
@@ -209,11 +211,12 @@ class FeatureContext extends ApiContext
             self::MIDDLEWARE_BEHAT_CONTEXT_CLASS,
         );
         $config['handler'] = $this->handlerStack;
+
         return parent::initializeClient($config);
     }
 
     /**
-     * Add custom functions to the comparator
+     * Add custom functions to the comparator.
      *
      * The following functions are added and can be used with the
      * `Then the response body contains JSON:` step:
@@ -229,7 +232,7 @@ class FeatureContext extends ApiContext
 
     public function setRequestHeader($header, $value): static
     {
-        if ($value === 'current-timestamp') {
+        if ('current-timestamp' === $value) {
             $value = gmdate('Y-m-d\TH:i:s\Z');
         }
 
@@ -237,37 +240,35 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Function for the array contains comparator to validate a date string
+     * Function for the array contains comparator to validate a date string.
      *
      * Validates the following date format:
      *
      * 'D, d M Y H:i:s GMT'
      *
      * @param string $date The string to validate
-     * @throws InvalidArgumentException
+     *
      * @return void
+     *
+     * @throws InvalidArgumentException
      */
     public function isDate($date)
     {
         if (!preg_match('/^[A-Z][a-z]{2}, [\d]{2} [A-Z][a-z]{2} [\d]{4} [\d]{2}:[\d]{2}:[\d]{2} GMT$/', $date)) {
-            throw new InvalidArgumentException(sprintf(
-                'Date is not properly formatted: "%s".',
-                $date,
-            ));
+            throw new InvalidArgumentException(sprintf('Date is not properly formatted: "%s".', $date));
         }
     }
 
     /**
-     * Empty the image transformation cache directory along with the test database (mongodb)
-     *
-     * @param BeforeScenarioScope $scope
+     * Empty the image transformation cache directory along with the test database (mongodb).
      *
      * @BeforeScenario
+     *
      * @codeCoverageIgnore
      */
     public static function removeImageTransformationCache(BeforeScenarioScope $scope)
     {
-        $cachePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'imbo-behat-image-transformation-cache';
+        $cachePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'imbo-behat-image-transformation-cache';
 
         if (is_dir($cachePath)) {
             $iterator = new RecursiveIteratorIterator(
@@ -278,7 +279,7 @@ class FeatureContext extends ApiContext
             foreach ($iterator as $file) {
                 $name = $file->getPathname();
 
-                if (substr($name, -1) === '.') {
+                if ('.' === substr($name, -1)) {
                     continue;
                 }
 
@@ -297,37 +298,36 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Set a request header that will have Imbo load a custom configuration file
+     * Set a request header that will have Imbo load a custom configuration file.
      *
      * @param string $configFile Custom configuration file to use for the next request (file must
      *                           reside in the tests/behat/imbo-configs directory)
-     * @throws InvalidArgumentException
+     *
      * @return self
+     *
+     * @throws InvalidArgumentException
      *
      * @Given Imbo uses the :configFile configuration
      */
     public function setImboConfigHeader($configFile)
     {
-        $dir = __DIR__ . '/imbo-configs';
+        $dir = __DIR__.'/imbo-configs';
 
-        if (!is_file($dir . '/' . $configFile)) {
-            throw new InvalidArgumentException(sprintf(
-                'Configuration file "%s" does not exist in the "%s" directory.',
-                $configFile,
-                $dir,
-            ));
+        if (!is_file($dir.'/'.$configFile)) {
+            throw new InvalidArgumentException(sprintf('Configuration file "%s" does not exist in the "%s" directory.', $configFile, $dir));
         }
 
         return $this->setRequestHeader('X-Imbo-Test-Config-File', $configFile);
     }
 
     /**
-     * Allow IPs to view stats by specifying a net mask
+     * Allow IPs to view stats by specifying a net mask.
      *
      * This feature is implemented in the stats-access-and-custom-stats.php custom configuration
      * file.
      *
      * @param string $mask Specify which subnet mask who are allowed to view stats
+     *
      * @return self
      *
      * @Given the stats are allowed by :mask
@@ -338,11 +338,12 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Send a request header with the next request, informing Imbo which adapter to take down
+     * Send a request header with the next request, informing Imbo which adapter to take down.
      *
      * This feature is implemented in the status.php custom configuration file.
      *
      * @param string $adapter Which adapter to take down
+     *
      * @throws InvalidArgumentException
      *
      * @Given /^the (storage|database) is down$/
@@ -353,7 +354,7 @@ class FeatureContext extends ApiContext
             throw new InvalidArgumentException(sprintf('Invalid adapter: "%s".', $adapter));
         }
 
-        if ($adapter === 'storage') {
+        if ('storage' === $adapter) {
             $header = 'X-Imbo-Status-Storage-Failure';
         } else {
             $header = 'X-Imbo-Status-Database-Failure';
@@ -363,7 +364,7 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Sign the request using HTTP headers
+     * Sign the request using HTTP headers.
      *
      * @return self
      *
@@ -375,12 +376,13 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Sign the request
+     * Sign the request.
      *
      * This step adds a "sign-request" middleware to the request. The middleware should be executed
      * last.
      *
-     * @param boolean $useHeaders Whether or not to put the signature in the request HTTP headers
+     * @param bool $useHeaders Whether or not to put the signature in the request HTTP headers
+     *
      * @return self
      *
      * @Given I sign the request
@@ -388,13 +390,9 @@ class FeatureContext extends ApiContext
     public function signRequest($useHeaders = false)
     {
         if ($this->authenticationHandlerIsActive) {
-            throw new RuntimeException(
-                'The authentication handler is currently added to the stack. It can not be added more than once.',
-            );
+            throw new RuntimeException('The authentication handler is currently added to the stack. It can not be added more than once.');
         } elseif ($this->accessTokenHandlerIsActive) {
-            throw new RuntimeException(
-                'The access token handler is currently added to the stack. These handlers should not be added to the same request.',
-            );
+            throw new RuntimeException('The access token handler is currently added to the stack. These handlers should not be added to the same request.');
         }
 
         // Set the token handler as active
@@ -462,24 +460,22 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Append an access token as a query parameter
+     * Append an access token as a query parameter.
      *
-     * @param boolean $allRequests Whether or not to keep the handler for all requests or not
-     * @throws RuntimeException Method can not be called if the handler is still active
+     * @param bool $allRequests Whether or not to keep the handler for all requests or not
+     *
      * @return self
+     *
+     * @throws RuntimeException Method can not be called if the handler is still active
      *
      * @Given /^I include an access token in the query string( for all requests)?$/
      */
     public function appendAccessToken($allRequests = false)
     {
         if ($this->accessTokenHandlerIsActive) {
-            throw new RuntimeException(
-                'The access token handler is currently added to the stack. It can not be added more than once.',
-            );
+            throw new RuntimeException('The access token handler is currently added to the stack. It can not be added more than once.');
         } elseif ($this->authenticationHandlerIsActive) {
-            throw new RuntimeException(
-                'The authentication handler is currently added to the stack. These handlers should not be added to the same request.',
-            );
+            throw new RuntimeException('The authentication handler is currently added to the stack. These handlers should not be added to the same request.');
         }
 
         // Set the token handler as active
@@ -513,7 +509,7 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Add an image to Imbo for a given user
+     * Add an image to Imbo for a given user.
      *
      * This is a convenience step mostly used for backgrounds in tests. It combines a few other
      * steps:
@@ -529,11 +525,13 @@ class FeatureContext extends ApiContext
      * of the client after this step is finished, so we need to clean up after we're done by
      * resetting the request and request options.
      *
-     * @param string $imagePath Path to the image, relative to the project root path
-     * @param string $user The user who will own the image
-     * @param PyStringNode $metadata Metadata to add to the image
-     * @throws InvalidArgumentException Throws an exception if the user specified does not have a
-     *                                  set of keys.
+     * @param string       $imagePath Path to the image, relative to the project root path
+     * @param string       $user      The user who will own the image
+     * @param PyStringNode $metadata  Metadata to add to the image
+     *
+     * @throws InvalidArgumentException throws an exception if the user specified does not have a
+     *                                  set of keys
+     *
      * @Given :imagePath exists for user :user
      * @Given :imagePath exists for user :user with the following metadata:
      */
@@ -569,10 +567,7 @@ class FeatureContext extends ApiContext
         $responseBody = json_decode((string) $this->response->getBody(), true);
 
         if (empty($responseBody['imageIdentifier'])) {
-            throw new RuntimeException(sprintf(
-                'Image was not successfully added. Response body: %s',
-                print_r($responseBody, true),
-            ));
+            throw new RuntimeException(sprintf('Image was not successfully added. Response body: %s', print_r($responseBody, true)));
         }
 
         $imageIdentifier = $responseBody['imageIdentifier'];
@@ -580,7 +575,7 @@ class FeatureContext extends ApiContext
         $this->imageUrls[$imagePath] = sprintf('/users/%s/images/%s', $user, $imageIdentifier);
 
         // Attach metadata
-        if ($metadata !== null) {
+        if (null !== $metadata) {
             $this
                 // Attach the file to the request body
                 ->setRequestBody((string) $metadata)
@@ -607,9 +602,10 @@ class FeatureContext extends ApiContext
 
     /**
      * Set a request header that is picked up by the "stats-access-and-custom-stats.php" custom
-     * configuration file to test the access part of the event listener
+     * configuration file to test the access part of the event listener.
      *
      * @param string $ip The IP address to set
+     *
      * @return self
      *
      * @Given the client IP is :ip
@@ -620,9 +616,10 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Add a transformation to the query parameter for the next request
+     * Add a transformation to the query parameter for the next request.
      *
      * @param string $transformation The value of the transformation, for instance "border"
+     *
      * @return self
      *
      * @Given I specify :transformation as transformation
@@ -633,9 +630,8 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Add one or more transformations to the query parameter for the next request
+     * Add one or more transformations to the query parameter for the next request.
      *
-     * @param PyStringNode $transformations
      * @return self
      *
      * @Given I specify the following transformations:
@@ -650,15 +646,18 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Prive the database with content from a PHP script
+     * Prive the database with content from a PHP script.
      *
-     * @param string $fixture Name of a PHP file in the tests/behat/fixtures directory that returns
-     *                        an array.
-     * @throws InvalidArgumentException Throws an exception if $fixture does not exist, or if it
-     *                                  does not return an array.
+     * @param string $fixture name of a PHP file in the tests/behat/fixtures directory that returns
+     *                        an array
+     *
      * @return self
      *
+     * @throws InvalidArgumentException throws an exception if $fixture does not exist, or if it
+     *                                  does not return an array
+     *
      * @codeCoverageIgnore
+     *
      * @Given I prime the database with :fixture
      */
     public function primeDatabase($fixture)
@@ -667,23 +666,16 @@ class FeatureContext extends ApiContext
             dirname(__DIR__),
             'fixtures',
         ]));
-        $fixturePath = $fixtureDir . DIRECTORY_SEPARATOR . $fixture;
+        $fixturePath = $fixtureDir.DIRECTORY_SEPARATOR.$fixture;
 
         if (!is_file($fixturePath)) {
-            throw new InvalidArgumentException(sprintf(
-                'Fixture file "%s" does not exist in "%s".',
-                $fixture,
-                $fixtureDir,
-            ));
+            throw new InvalidArgumentException(sprintf('Fixture file "%s" does not exist in "%s".', $fixture, $fixtureDir));
         }
 
         $fixtures = require $fixturePath;
 
         if (!is_array($fixtures)) {
-            throw new InvalidArgumentException(sprintf(
-                'Fixture "%s" does not return an array.',
-                $fixturePath,
-            ));
+            throw new InvalidArgumentException(sprintf('Fixture "%s" does not return an array.', $fixturePath));
         }
 
         $client = new MongoClient('mongodb://localhost:27017', ['username' => 'admin', 'password' => 'password']);
@@ -701,36 +693,36 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Authenticate the request using some authentication method
+     * Authenticate the request using some authentication method.
      *
      * @param string $method The method of authentication
-     * @throws InvalidArgumentException Throws an exception if an invalid method is used
+     *
      * @return self
+     *
+     * @throws InvalidArgumentException Throws an exception if an invalid method is used
      *
      * @Given I authenticate using :method
      */
     public function authenticateRequest($method)
     {
-        if ($method === 'access-token') {
+        if ('access-token' === $method) {
             return $this->appendAccessToken();
-        } elseif ($method === 'signature') {
+        } elseif ('signature' === $method) {
             return $this->signRequest();
-        } elseif ($method === 'signature (headers)') {
+        } elseif ('signature (headers)' === $method) {
             return $this->signRequestUsingHttpHeaders();
         }
 
-        throw new InvalidArgumentException(sprintf(
-            'Invalid authentication method: "%s".',
-            $method,
-        ));
+        throw new InvalidArgumentException(sprintf('Invalid authentication method: "%s".', $method));
     }
 
     /**
      * Set the public and private keys to be used for signing the request / generating the access
-     * token
+     * token.
      *
-     * @param string $publicKey The public key to set
+     * @param string $publicKey  The public key to set
      * @param string $privateKey The private key to set
+     *
      * @return self
      *
      * @Given I use :publicKey and :privateKey for public and private keys
@@ -747,10 +739,11 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Set a query string parameter
+     * Set a query string parameter.
      *
-     * @param string $name The name of the parameter
-     * @param mixed $value The value for the parameter
+     * @param string $name  The name of the parameter
+     * @param mixed  $value The value for the parameter
+     *
      * @return self
      *
      * @Given the query string parameter :name is set to :value
@@ -762,15 +755,12 @@ class FeatureContext extends ApiContext
         }
 
         // If the name ends with [] we remove that from the name, and convert the value to an array
-        if (substr($name, -2) === '[]') {
+        if ('[]' === substr($name, -2)) {
             $name = substr($name, 0, -2);
 
             if (isset($this->requestOptions['query'][$name]) && !is_array($this->requestOptions['query'][$name])) {
                 // The field already exists, but not as an array
-                throw new InvalidArgumentException(sprintf(
-                    'The "%s" query parameter already exists and it\'s not an array, so can\'t append more values to it.',
-                    $name,
-                ));
+                throw new InvalidArgumentException(sprintf('The "%s" query parameter already exists and it\'s not an array, so can\'t append more values to it.', $name));
             } elseif (!isset($this->requestOptions['query'][$name])) {
                 // The field does not exist, set it to an empty array
                 $this->requestOptions['query'][$name] = [];
@@ -787,44 +777,41 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Set a query parameter to the image identifier of a specific image already added to Imbo
+     * Set a query parameter to the image identifier of a specific image already added to Imbo.
      *
      * @param string $name Name of the query parameter
      * @param string $path Path of a local image that exists in Imbo
-     * @throws InvalidArgumentException
+     *
      * @return self
+     *
+     * @throws InvalidArgumentException
      *
      * @Given the query string parameter :name is set to the image identifier of :path
      */
     public function setRequestParameterToImageIdentifier($name, $path)
     {
         if (!isset($this->imageIdentifiers[$path])) {
-            throw new InvalidArgumentException(sprintf(
-                'No image identifier exists for image: "%s".',
-                $path,
-            ));
+            throw new InvalidArgumentException(sprintf('No image identifier exists for image: "%s".', $path));
         }
 
         return $this->setRequestQueryParameter($name, $this->imageIdentifiers[$path]);
     }
 
     /**
-     * Generate a short URL with some parameters for a given image path
+     * Generate a short URL with some parameters for a given image path.
      *
      * @param string $path
-     * @param PyStringNode $params
-     * @throws InvalidArgumentException
+     *
      * @return self
+     *
+     * @throws InvalidArgumentException
      *
      * @Given I generate a short URL for :path with the following parameters:
      */
     public function generateShortImageUrl($path, PyStringNode $params)
     {
         if (!isset($this->imageIdentifiers[$path])) {
-            throw new InvalidArgumentException(sprintf(
-                'No image identifier exists for path: "%s".',
-                $path,
-            ));
+            throw new InvalidArgumentException(sprintf('No image identifier exists for path: "%s".', $path));
         }
 
         $imageIdentifier = $this->imageIdentifiers[$path];
@@ -843,12 +830,14 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Specify a watermark image based on a local path
+     * Specify a watermark image based on a local path.
      *
      * @param string $localPath
      * @param string $params
-     * @throws InvalidArgumentException
+     *
      * @return self
+     *
+     * @throws InvalidArgumentException
      *
      * @Given I use :localPath as the watermark image
      * @Given I use :localPath as the watermark image with :params as parameters
@@ -856,25 +845,23 @@ class FeatureContext extends ApiContext
     public function specifyAsTheWatermarkImage($localPath, $params = null)
     {
         if (!isset($this->imageIdentifiers[$localPath])) {
-            throw new InvalidArgumentException(sprintf(
-                'No image exists for path: "%s".',
-                $localPath,
-            ));
+            throw new InvalidArgumentException(sprintf('No image exists for path: "%s".', $localPath));
         }
 
         $imageIdentifier = $this->imageIdentifiers[$localPath];
-        $transformation = 'watermark:img=' . $imageIdentifier . ($params ? ',' . $params : '');
+        $transformation = 'watermark:img='.$imageIdentifier.($params ? ','.$params : '');
 
         return $this->applyTransformation($transformation);
     }
 
     /**
-     * Make a request to the previously added image (in the same scenario)
+     * Make a request to the previously added image (in the same scenario).
      *
      * This method will loop through the history in reverse order and look for responses which
      * contains image identifiers. The first one found will be requested.
      *
      * @param string $method The HTTP method to use
+     *
      * @return self
      *
      * @When I request the previously added image
@@ -889,11 +876,13 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Request the previously added image as a specific extension
+     * Request the previously added image as a specific extension.
      *
      * @param string $extension Extension of the image: jpg, gif or png
-     * @throws InvalidArgumentException Throws an extension if the given extension is invalid
+     *
      * @return self
+     *
+     * @throws InvalidArgumentException Throws an extension if the given extension is invalid
      *
      * @When I request the previously added image as a :extension
      * @When I request the previously added image as a :extension using HTTP :method
@@ -904,22 +893,24 @@ class FeatureContext extends ApiContext
         $path = sprintf('/users/%s/images/%s', $image['user'], $image['imageIdentifier']);
 
         if ($extension) {
-            $path .= '.' . $extension;
+            $path .= '.'.$extension;
         }
 
         return $this->requestPath($path, $method);
     }
 
     /**
-     * Replay the last request
+     * Replay the last request.
      *
      * This method can be used to replay a request, with or without a different HTTP method. If the
      * public and private keys have been set the method will append an access token.
      *
      * @param string $method Optional HTTP method. If not set the HTTP method from the previous
      *                       request will be used.
-     * @throws RuntimeException Throws an exception if no request have been made yet.
+     *
      * @return self
+     *
+     * @throws RuntimeException throws an exception if no request have been made yet
      *
      * @When I replay the last request
      * @When I replay the last request using HTTP :method
@@ -940,9 +931,10 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Request the metadata of the previously added image
+     * Request the metadata of the previously added image.
      *
      * @param string $method The HTTP method to use when fetching the metadata
+     *
      * @return self
      *
      * @When I request the metadata of the previously added image
@@ -957,40 +949,39 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Request an image using a local file path
+     * Request an image using a local file path.
      *
      * This method can be used to fetch images that has been added to Imbo earlier via the
      * `addUserImageToImbo` method, that is triggered by `Given :imagePath exists for user :user`.
      *
      * @param string $localPath The local path for the image that was added earlier
      * @param string $extension Optional extension of the image (png|gif|jpg)
-     * @param string $method Optional HTTP method to use
-     * @throws InvalidArgumentException
+     * @param string $method    Optional HTTP method to use
+     *
      * @return self
+     *
+     * @throws InvalidArgumentException
      *
      * @When /^I request the image resource for "([^"]*)"(?: as a "(png|gif|jpg)")?(?: using HTTP "([^"]*)")?$/
      */
     public function requestImageResourceForLocalImage($localPath, $extension = null, $method = 'GET')
     {
         if (!isset($this->imageUrls[$localPath])) {
-            throw new InvalidArgumentException(sprintf(
-                'Image URL for image with path "%s" can not be found.',
-                $localPath,
-            ));
+            throw new InvalidArgumentException(sprintf('Image URL for image with path "%s" can not be found.', $localPath));
         }
 
         $url = $this->imageUrls[$localPath];
 
         if ($extension) {
             // Append extension if specified
-            $url .= '.' . $extension;
+            $url .= '.'.$extension;
         }
 
         return $this->requestPath($url, $method);
     }
 
     /**
-     * Perform a series of requests
+     * Perform a series of requests.
      *
      * The $table parameter must be a table with the following columns:
      *
@@ -1008,8 +999,10 @@ class FeatureContext extends ApiContext
      * - (string) request body: Set the request body to this value
      *
      * @param TableNode $table Information about the requests to make
-     * @throws InvalidArgumentException
+     *
      * @return self
+     *
+     * @throws InvalidArgumentException
      *
      * @When I request:
      */
@@ -1033,19 +1026,17 @@ class FeatureContext extends ApiContext
             }
 
             if (
-                !empty($row['access token']) && $row['access token'] === 'yes' &&
-                !empty($row['sign request']) && $row['sign request'] === 'yes'
+                !empty($row['access token']) && 'yes' === $row['access token']
+                && !empty($row['sign request']) && 'yes' === $row['sign request']
             ) {
-                throw new InvalidArgumentException(
-                    'Both "sign request" and "access token" can not be set to "yes".',
-                );
+                throw new InvalidArgumentException('Both "sign request" and "access token" can not be set to "yes".');
             }
 
-            if (!empty($row['access token']) && $row['access token'] === 'yes') {
+            if (!empty($row['access token']) && 'yes' === $row['access token']) {
                 $this->appendAccessToken();
             }
 
-            if (!empty($row['sign request']) && $row['sign request'] === 'yes') {
+            if (!empty($row['sign request']) && 'yes' === $row['sign request']) {
                 $this->signRequest();
             }
 
@@ -1053,13 +1044,13 @@ class FeatureContext extends ApiContext
                 $this->setRequestBody($row['request body']);
             }
 
-            if ($path === 'previously added image') {
+            if ('previously added image' === $path) {
                 if (!empty($row['extension'])) {
                     $this->requestPreviouslyAddedImageAsType($row['extension'], $method);
                 } else {
                     $this->requestPreviouslyAddedImage($method);
                 }
-            } elseif ($path === 'metadata of previously added image') {
+            } elseif ('metadata of previously added image' === $path) {
                 $this->requestMetadataOfPreviouslyAddedImage($method);
             } else {
                 $this->requestPath($path, $method);
@@ -1074,10 +1065,11 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Make a request to the short URL generated in the previous request
+     * Make a request to the short URL generated in the previous request.
+     *
+     * @return self
      *
      * @throws RuntimeException
-     * @return self
      *
      * @When I request the image using the generated short URL
      */
@@ -1086,23 +1078,21 @@ class FeatureContext extends ApiContext
         $this->requireResponse();
         $body = json_decode((string) $this->response->getBody(), true);
 
-        if (!is_array($body) || json_last_error() !== JSON_ERROR_NONE) {
+        if (!is_array($body) || JSON_ERROR_NONE !== json_last_error()) {
             throw new RuntimeException('Invalid response body in the current response instance');
         } elseif (empty($body['id'])) {
-            throw new RuntimeException(sprintf(
-                'Missing "id" from body: "%s".',
-                (string) $this->response->getBody(),
-            ));
+            throw new RuntimeException(sprintf('Missing "id" from body: "%s".', (string) $this->response->getBody()));
         }
 
         return $this->requestPath(sprintf('/s/%s', $body['id']), 'GET');
     }
 
     /**
-     * Make a request for the short URL parameters generated in the previous request
+     * Make a request for the short URL parameters generated in the previous request.
+     *
+     * @return self
      *
      * @throws RuntimeException
-     * @return self
      *
      * @When I request the shorturl params using the generated short URL
      */
@@ -1111,13 +1101,10 @@ class FeatureContext extends ApiContext
         $this->requireResponse();
         $body = json_decode((string) $this->response->getBody(), true);
 
-        if (!is_array($body) || json_last_error() !== JSON_ERROR_NONE) {
+        if (!is_array($body) || JSON_ERROR_NONE !== json_last_error()) {
             throw new RuntimeException('Invalid response body in the current response instance');
         } elseif (empty($body['id'])) {
-            throw new RuntimeException(sprintf(
-                'Missing "id" from body: "%s".',
-                (string) $this->response->getBody(),
-            ));
+            throw new RuntimeException(sprintf('Missing "id" from body: "%s".', (string) $this->response->getBody()));
         }
 
         $params = $this->getUserAndImageIdentifierOfPreviouslyAddedImage();
@@ -1131,12 +1118,14 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Assert the contents of an imbo error message
+     * Assert the contents of an imbo error message.
      *
      * @param string $message The error message
-     * @param int $code The error code
-     * @throws InvalidArgumentException
+     * @param int    $code    The error code
+     *
      * @return self
+     *
+     * @throws InvalidArgumentException
      *
      * @Then the Imbo error message is :message
      * @Then the Imbo error message is :message and the error code is :code
@@ -1146,9 +1135,7 @@ class FeatureContext extends ApiContext
         $this->requireResponse();
 
         if ($this->response->getStatusCode() < 400) {
-            throw new InvalidArgumentException(
-                'The status code of the last response is lower than 400, so it is not considered an error.',
-            );
+            throw new InvalidArgumentException('The status code of the last response is lower than 400, so it is not considered an error.');
         }
 
         $body = json_decode((string) $this->response->getBody());
@@ -1161,7 +1148,7 @@ class FeatureContext extends ApiContext
             sprintf('Expected error message "%s", got "%s".', $message, $actualMessage),
         );
 
-        if ($code !== null) {
+        if (null !== $code) {
             $code = (int) $code;
             $actualCode = (int) $actualCode;
 
@@ -1176,9 +1163,10 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Assert the width of the image in the current response
+     * Assert the width of the image in the current response.
      *
      * @param int|string $width
+     *
      * @return self
      *
      * @Then the image width is :width
@@ -1194,9 +1182,10 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Assert the height of image in the current response
+     * Assert the height of image in the current response.
      *
      * @param int|string $height
+     *
      * @return self
      *
      * @Then the image height is :height
@@ -1212,11 +1201,13 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Assert the dimensions of the image in the current response
+     * Assert the dimensions of the image in the current response.
      *
      * @param string $dimension Image dimension as "<width>x<height>", for instance "1024x768"
-     * @throws InvalidArgumentException
+     *
      * @return self
+     *
+     * @throws InvalidArgumentException
      *
      * @Then the image dimension is :dimension
      */
@@ -1228,10 +1219,7 @@ class FeatureContext extends ApiContext
         preg_match('/^(?<width>[\d]+(±[\d]+)?)x(?<height>[\d]+(±[\d]+)?)$/', $dimension, $match);
 
         if (!$match) {
-            throw new InvalidArgumentException(sprintf(
-                'Invalid dimension value: "%s". Specify "<width>x<height>".',
-                $dimension,
-            ));
+            throw new InvalidArgumentException(sprintf('Invalid dimension value: "%s". Specify "<width>x<height>".', $dimension));
         }
 
         $size = getimagesizefromstring((string) $this->response->getBody());
@@ -1241,10 +1229,11 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Assert the hex value of a given coordinate in the image found in the current response
+     * Assert the hex value of a given coordinate in the image found in the current response.
      *
      * @param string $coordinates X and Y coordinates, separated by a comma
-     * @param string $color Hex color value
+     * @param string $color       Hex color value
+     *
      * @return self
      *
      * @Then the pixel at coordinate :coordinates has a color of :color
@@ -1271,10 +1260,11 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Assert the hex value of a given coordinate in the image found in the current response has an approximate color
+     * Assert the hex value of a given coordinate in the image found in the current response has an approximate color.
      *
      * @param string $coordinates X and Y coordinates, separated by a comma
-     * @param string $color Hex color value
+     * @param string $color       Hex color value
+     *
      * @return self
      *
      * @Then the pixel at coordinate :coordinates has an approximate color of :color
@@ -1308,10 +1298,11 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Assert the alpha value of a given coordinate in the image found in the current response
+     * Assert the alpha value of a given coordinate in the image found in the current response.
      *
      * @param string $coordinates X and Y coordinates, separated by a comma
-     * @param float $alpha Alpha value
+     * @param float  $alpha       Alpha value
+     *
      * @return self
      *
      * @Then the pixel at coordinate :coordinates has an alpha of :alpha
@@ -1338,10 +1329,11 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Make sure an ACL rule has been deleted
+     * Make sure an ACL rule has been deleted.
      *
      * @param string $publicKey The public key
-     * @param string $aclId The ACL ID to check
+     * @param string $aclId     The ACL ID to check
+     *
      * @return self
      *
      * @Then the ACL rule under public key :publicKey with ID :aclId no longer exists
@@ -1377,9 +1369,10 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Make sure a public does not exist
+     * Make sure a public does not exist.
      *
      * @param string $publicKey The public key to check for
+     *
      * @return self
      *
      * @Then the :publicKey public key no longer exists
@@ -1414,10 +1407,7 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Check if the response is cacheable
-     *
-     * @param ResponseInterface $response
-     * @return bool
+     * Check if the response is cacheable.
      */
     private function isCacheable(ResponseInterface $response): bool
     {
@@ -1438,9 +1428,10 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Check whether or not the response can be cached
+     * Check whether or not the response can be cached.
      *
-     * @param boolean $cacheable
+     * @param bool $cacheable
+     *
      * @return self
      *
      * @Then /^the response can (not )?be cached$/
@@ -1449,7 +1440,7 @@ class FeatureContext extends ApiContext
     {
         $this->requireResponse();
 
-        if ($cacheable !== true) {
+        if (true !== $cacheable) {
             $cacheable = false;
         }
 
@@ -1465,11 +1456,13 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Validate the max-age directive of the cache-control response header
+     * Validate the max-age directive of the cache-control response header.
      *
      * @param int $expected Expected max-age
-     * @throws RuntimeException
+     *
      * @return self
+     *
+     * @throws RuntimeException
      *
      * @Then the response has a max-age of :max seconds
      */
@@ -1487,10 +1480,7 @@ class FeatureContext extends ApiContext
         preg_match('/max-age=(?<maxAge>[\d]+)/i', $cacheControl, $match);
 
         if (!$match) {
-            throw new RuntimeException(sprintf(
-                'Response cache-control header does not include a max-age directive: "%s".',
-                $cacheControl,
-            ));
+            throw new RuntimeException(sprintf('Response cache-control header does not include a max-age directive: "%s".', $cacheControl));
         }
 
         $expected = (int) $expected;
@@ -1511,12 +1501,14 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Verify that the response has a specific cache-control directive
+     * Verify that the response has a specific cache-control directive.
      *
      * @param string $directive
+     *
+     * @return self
+     *
      * @throws RuntimeException Throws an exception if the response does not have a cache-control
      *                          directive, or if the validation fails
-     * @return self
      *
      * @Then the response has a :directive cache-control directive
      */
@@ -1544,12 +1536,14 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Verify that the response does not have a given cache-control directive
+     * Verify that the response does not have a given cache-control directive.
      *
      * @param string $directive
+     *
+     * @return self
+     *
      * @throws RuntimeException Throws an exception if the response does not have a cache-control
      *                          directive, or if the validation fails
-     * @return self
      *
      * @Then the response does not have a :directive cache-control directive
      */
@@ -1563,27 +1557,23 @@ class FeatureContext extends ApiContext
             throw new RuntimeException('Response does not have a cache-control header.');
         }
 
-        if (strpos($cacheControl, $directive) !== false) {
-            throw new RuntimeException(
-                sprintf(
-                    'The cache-control header contains the "%s" directive when it should not. Complete cache-control header: "%s".',
-                    $directive,
-                    $cacheControl,
-                ),
-            );
+        if (str_contains($cacheControl, $directive)) {
+            throw new RuntimeException(sprintf('The cache-control header contains the "%s" directive when it should not. Complete cache-control header: "%s".', $directive, $cacheControl));
         }
 
         return $this;
     }
 
     /**
-     * Compare a specific header in the last $num responses
+     * Compare a specific header in the last $num responses.
      *
-     * @param int $num The number of responses to compare. Must be at least 2.
+     * @param int    $num    The number of responses to compare. Must be at least 2.
      * @param string $header The response header to compare
-     * @param boolean $unique Whether or not the values should be unique
-     * @throws InvalidArgumentException|RuntimeException
+     * @param bool   $unique Whether or not the values should be unique
+     *
      * @return self
+     *
+     * @throws InvalidArgumentException|RuntimeException
      *
      * @Then /^the last ([\d]+) "([^"]+)" response headers are (not )?the same$/
      */
@@ -1592,20 +1582,13 @@ class FeatureContext extends ApiContext
         $num = (int) $num;
 
         if ($num < 2) {
-            throw new InvalidArgumentException(sprintf(
-                'Need to compare at least 2 responses, got %d.',
-                $num,
-            ));
+            throw new InvalidArgumentException(sprintf('Need to compare at least 2 responses, got %d.', $num));
         }
 
         $numResponses = count($this->history);
 
         if ($numResponses < $num) {
-            throw new InvalidArgumentException(sprintf(
-                'Not enough responses in the history. Need at least %d, there are currently %d.',
-                $num,
-                $numResponses,
-            ));
+            throw new InvalidArgumentException(sprintf('Not enough responses in the history. Need at least %d, there are currently %d.', $num, $numResponses));
         }
 
         $values = [];
@@ -1614,11 +1597,7 @@ class FeatureContext extends ApiContext
             $response = $transaction['response'];
 
             if (!$response->hasHeader($header)) {
-                throw new RuntimeException(sprintf(
-                    'The "%s" header is not present in all of the last %d response headers.',
-                    $header,
-                    $num,
-                ));
+                throw new RuntimeException(sprintf('The "%s" header is not present in all of the last %d response headers.', $header, $num));
             }
 
             $values[] = $response->getHeaderLine($header);
@@ -1650,7 +1629,7 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Match a series of responses against a data set represented as a TableNode
+     * Match a series of responses against a data set represented as a TableNode.
      *
      * This step can be used to match requests typically made with the `@When I request:` step.
      *
@@ -1666,8 +1645,10 @@ class FeatureContext extends ApiContext
      * - (int) image height: Match the height of the image in the reqeust with this value
      *
      * @param TableNode $table The data to match against
-     * @throws RuntimeException|InvalidArgumentException
+     *
      * @return self
+     *
+     * @throws RuntimeException|InvalidArgumentException
      *
      * @Then the last responses match:
      */
@@ -1684,13 +1665,7 @@ class FeatureContext extends ApiContext
         $num = max($num);
 
         if (count($this->history) < $num) {
-            throw new RuntimeException(
-                sprintf(
-                    'Not enough transactions in the history. Needs at least %d, actual: %d.',
-                    $num,
-                    count($this->history),
-                ),
-            );
+            throw new RuntimeException(sprintf('Not enough transactions in the history. Needs at least %d, actual: %d.', $num, count($this->history)));
         }
 
         // First, reverse the history and slice $num elements off. Then reverse those, and pick
@@ -1712,18 +1687,13 @@ class FeatureContext extends ApiContext
 
         foreach (array_keys($table->getColumnsHash()[0]) as $column) {
             if (!in_array($column, $validKeys)) {
-                throw new InvalidArgumentException(sprintf(
-                    'Invalid column name: "%s".',
-                    $column,
-                ));
+                throw new InvalidArgumentException(sprintf('Invalid column name: "%s".', $column));
             }
         }
 
         foreach ($table as $i => $row) {
             if (empty($row['response'])) {
-                throw new InvalidArgumentException(
-                    'Each row must refer to a response by using the "response" column.',
-                );
+                throw new InvalidArgumentException('Each row must refer to a response by using the "response" column.');
             }
 
             $index = $row['response'] - 1;
@@ -1829,11 +1799,13 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Assert that the image does not have any properties with a specific prefix
+     * Assert that the image does not have any properties with a specific prefix.
      *
      * @param string $prefix
-     * @throws AssertionFailedException|RuntimeException
+     *
      * @return self
+     *
+     * @throws AssertionFailedException|RuntimeException
      *
      * @Then the image should not have any :prefix properties
      */
@@ -1844,19 +1816,12 @@ class FeatureContext extends ApiContext
         try {
             $imagick->readImageBlob((string) $this->response->getBody());
         } catch (ImagickException $e) {
-            throw new RuntimeException(sprintf(
-                'Imagick could not read response body: "%s".',
-                $e->getMessage(),
-            ));
+            throw new RuntimeException(sprintf('Imagick could not read response body: "%s".', $e->getMessage()));
         }
 
         foreach ($imagick->getImageProperties() as $key => $value) {
-            if (strpos($key, $prefix) === 0) {
-                throw new AssertionFailedException(sprintf(
-                    'Image properties have not been properly stripped. Did not expect properties that starts with "%s", found: "%s".',
-                    $prefix,
-                    $key,
-                ));
+            if (str_starts_with($key, $prefix)) {
+                throw new AssertionFailedException(sprintf('Image properties have not been properly stripped. Did not expect properties that starts with "%s", found: "%s".', $prefix, $key));
             }
         }
 
@@ -1864,9 +1829,10 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Check the size of the response body (not the Content-Length response header)
+     * Check the size of the response body (not the Content-Length response header).
      *
      * @param int $expectedSize The size we are expecting
+     *
      * @return self
      *
      * @Then the response body size is :expectedSize
@@ -1885,13 +1851,15 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Get the pixel info for given coordinates from the image in the current response
+     * Get the pixel info for given coordinates from the image in the current response.
      *
      * @param string $coordinates
-     * @throws InvalidArgumentException Throws an exception if the coordinates value is invalid
+     *
      * @return array Returns an array with two keys:
      *               - `color`: Hex color of the pixel.
      *               - `alpha`: Alpha value of the pixel.
+     *
+     * @throws InvalidArgumentException Throws an exception if the coordinates value is invalid
      */
     private function getImagePixelInfo($coordinates)
     {
@@ -1901,10 +1869,7 @@ class FeatureContext extends ApiContext
         preg_match('/^(?<x>[\d]+),(?<y>[\d]+)$/', $coordinates, $match);
 
         if (!$match) {
-            throw new InvalidArgumentException(sprintf(
-                'Invalid coordinates: "%s". Format is "<w>x<h>", no spaces allowed.',
-                $coordinates,
-            ));
+            throw new InvalidArgumentException(sprintf('Invalid coordinates: "%s". Format is "<w>x<h>", no spaces allowed.', $coordinates));
         }
 
         $x = (int) $match['x'];
@@ -1920,7 +1885,7 @@ class FeatureContext extends ApiContext
             return str_pad(dechex($col), 2, '0', STR_PAD_LEFT);
         };
 
-        $hexColor = $toHex($color['r']) . $toHex($color['g']) . $toHex($color['b']);
+        $hexColor = $toHex($color['r']).$toHex($color['g']).$toHex($color['b']);
 
         return [
             'color' => $hexColor,
@@ -1929,10 +1894,11 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Get the user and image identifier of the previoysly added image
+     * Get the user and image identifier of the previoysly added image.
+     *
+     * @return array
      *
      * @throws RuntimeException
-     * @return array
      */
     private function getUserAndImageIdentifierOfPreviouslyAddedImage()
     {
@@ -1942,7 +1908,7 @@ class FeatureContext extends ApiContext
 
             $body = json_decode((string) $response->getBody());
 
-            if (!empty($body->imageIdentifier) && $request->getMethod() === 'POST') {
+            if (!empty($body->imageIdentifier) && 'POST' === $request->getMethod()) {
                 $match = [];
                 preg_match(
                     '|^/users/(?<user>.+?)/images$|',
@@ -1958,17 +1924,15 @@ class FeatureContext extends ApiContext
         }
 
         // No hit
-        throw new RuntimeException(
-            'Could not find any response in the history with an image identifier.',
-        );
+        throw new RuntimeException('Could not find any response in the history with an image identifier.');
     }
 
     /**
-     * Assert image dimensions
+     * Assert image dimensions.
      *
-     * @param int $actualWidth The actual width of the image
-     * @param int $actualHeight The actual height of the image
-     * @param int|string $expectedWidth Expected width of the image
+     * @param int        $actualWidth    The actual width of the image
+     * @param int        $actualHeight   The actual height of the image
+     * @param int|string $expectedWidth  Expected width of the image
      * @param int|string $expectedHeight Expected height of the image
      */
     private function validateImageDimensions($actualWidth = null, $actualHeight = null, $expectedWidth = null, $expectedHeight = null)
@@ -2037,9 +2001,8 @@ class FeatureContext extends ApiContext
     }
 
     /**
-     * Convert a hex value to RGB
+     * Convert a hex value to RGB.
      *
-     * @param string $hex
      * @return array{r: int, g: int, b: int}
      */
     private function hexToRgb(string $hex): array

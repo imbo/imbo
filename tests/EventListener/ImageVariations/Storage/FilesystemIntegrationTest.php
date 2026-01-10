@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener\ImageVariations\Storage;
 
 use ImboSDK\EventListener\ImageVariations\Storage\StorageTests;
@@ -14,9 +15,9 @@ class FilesystemIntegrationTest extends StorageTests
         return new Filesystem($this->path);
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
-        $this->path = sys_get_temp_dir() . '/imbo-eventlistener-imagevariations-storage-filesystem-integration-test-' . uniqid();
+        $this->path = sys_get_temp_dir().'/imbo-eventlistener-imagevariations-storage-filesystem-integration-test-'.uniqid();
 
         if (is_dir($this->path)) {
             $this->rmdir($this->path);
@@ -38,7 +39,7 @@ class FilesystemIntegrationTest extends StorageTests
 
     private function rmdir(string $path): void
     {
-        $paths = glob($path . '/*');
+        $paths = glob($path.'/*');
 
         if (false === $paths) {
             return;

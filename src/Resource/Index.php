@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
@@ -21,7 +22,7 @@ class Index implements ResourceInterface
     }
 
     /**
-     * Handle GET requests
+     * Handle GET requests.
      *
      * @param EventInterface $event The current event
      */
@@ -35,6 +36,7 @@ class Index implements ResourceInterface
         if ($redirectUrl) {
             $response->setStatusCode(Response::HTTP_TEMPORARY_REDIRECT);
             $response->headers->set('Location', $redirectUrl);
+
             return;
         }
 

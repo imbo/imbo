@@ -1,9 +1,12 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Identifier\Generator;
 
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+
+use function count;
 
 #[CoversClass(RandomString::class)]
 class RandomStringTest extends TestCase
@@ -16,12 +19,12 @@ class RandomStringTest extends TestCase
         $generator = new RandomString($stringLength);
         $generated = [];
 
-        for ($i = 0; $i < 100; $i++) {
+        for ($i = 0; $i < 100; ++$i) {
             $imageIdentifier = $generator->generate($image);
 
             // Does it have the right format?
             $this->assertMatchesRegularExpression(
-                '/^[A-Za-z0-9_-]{' . $stringLength . '}$/',
+                '/^[A-Za-z0-9_-]{'.$stringLength.'}$/',
                 $imageIdentifier,
             );
 

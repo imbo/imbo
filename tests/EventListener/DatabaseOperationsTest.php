@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use DateTime;
@@ -31,7 +32,7 @@ class DatabaseOperationsTest extends ListenerTests
     private Image&MockObject $image;
     private AdapterInterface $accessControl;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->response = $this->createMock(Response::class);
         $this->database = $this->createMock(DatabaseInterface::class);

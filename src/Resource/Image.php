@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
@@ -21,7 +22,7 @@ class Image implements ResourceInterface
     }
 
     /**
-     * Handle DELETE requests
+     * Handle DELETE requests.
      *
      * @param EventInterface
      */
@@ -39,7 +40,7 @@ class Image implements ResourceInterface
     }
 
     /**
-     * Handle GET and HEAD requests
+     * Handle GET and HEAD requests.
      *
      * @param EventInterface
      */

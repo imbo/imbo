@@ -1,10 +1,15 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventManager;
 
 use Imbo\EventListener\Initializer\InitializerInterface;
 use Imbo\EventListener\ListenerInterface;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Response\Response;
+
+use function is_array;
+use function is_int;
+use function is_string;
 
 class EventManager
 {
@@ -18,7 +23,7 @@ class EventManager
     private $initializers = [];
 
     /**
-     * Register an event handler
+     * Register an event handler.
      *
      * @param mixed $handler The handler itself
      */
@@ -37,7 +42,7 @@ class EventManager
     }
 
     /**
-     * Add one or more callbacks
+     * Add one or more callbacks.
      */
     public function addCallbacks($name, array $events, array $users = []): self
     {
@@ -78,10 +83,7 @@ class EventManager
                     'users' => $users,
                 ], $callback);
             } else {
-                throw new InvalidArgumentException(
-                    'Invalid event definition for listener: ' . $name,
-                    Response::HTTP_INTERNAL_SERVER_ERROR,
-                );
+                throw new InvalidArgumentException('Invalid event definition for listener: '.$name, Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         }
 
@@ -122,7 +124,7 @@ class EventManager
         return $this->initializers;
     }
 
-    public function trigger(string $eventName, array $params = []): EventManager
+    public function trigger(string $eventName, array $params = []): self
     {
         $event = clone $this->event;
         $event->setName($eventName);
@@ -161,7 +163,7 @@ class EventManager
     }
 
     /**
-     * Get all listeners that listens for an event, including wildcard listeners
+     * Get all listeners that listens for an event, including wildcard listeners.
      *
      * @return array<PriorityQueue>
      */
@@ -181,7 +183,7 @@ class EventManager
     }
 
     /**
-     * Get all parts of an event name
+     * Get all parts of an event name.
      *
      * @param array<string>
      */
@@ -191,7 +193,7 @@ class EventManager
         $offset = 0;
 
         while ($offset = strpos($event, '.', $offset + 1)) {
-            $parts[] = substr($event, 0, $offset) . '.*';
+            $parts[] = substr($event, 0, $offset).'.*';
         }
 
         $parts[] = $event;
@@ -207,6 +209,7 @@ class EventManager
     public function setEventTemplate(EventInterface $event): self
     {
         $this->event = $event;
+
         return $this;
     }
 
@@ -223,13 +226,13 @@ class EventManager
 
         if (
             // Both lists are empty
-            empty($whitelist) && empty($blacklist) ||
+            empty($whitelist) && empty($blacklist)
 
             // Whitelist is empty, and the user is not blacklisted
-            empty($whitelist) && !isset($blacklist[$user]) ||
+            || empty($whitelist) && !isset($blacklist[$user])
 
             // Blacklist is empty, and the user is whitelisted
-            empty($blacklist) && isset($whitelist[$user])
+            || empty($blacklist) && isset($whitelist[$user])
         ) {
             return true;
         }

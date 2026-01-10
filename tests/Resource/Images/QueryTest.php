@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource\Images;
 
 use Imbo\Exception\RuntimeException;
@@ -12,7 +13,7 @@ class QueryTest extends TestCase
 {
     private Query $query;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->query = new Query();
     }

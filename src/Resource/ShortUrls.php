@@ -1,10 +1,13 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\EventManager\EventInterface;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
+
+use const JSON_ERROR_NONE;
 
 class ShortUrls implements ResourceInterface
 {
@@ -26,9 +29,7 @@ class ShortUrls implements ResourceInterface
     }
 
     /**
-     * Add a short URL to the database
-     *
-     * @param EventInterface $event
+     * Add a short URL to the database.
      */
     public function createShortUrl(EventInterface $event): void
     {
@@ -40,7 +41,7 @@ class ShortUrls implements ResourceInterface
         } else {
             $image = json_decode($image, true);
 
-            if ($image === null || json_last_error() !== JSON_ERROR_NONE) {
+            if (null === $image || JSON_ERROR_NONE !== json_last_error()) {
                 throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
             }
         }
@@ -56,7 +57,7 @@ class ShortUrls implements ResourceInterface
         $extension = isset($image['extension']) ? strtolower($image['extension']) : null;
         $outputConverterManager = $event->getOutputConverterManager();
 
-        if ($extension !== null && !$outputConverterManager->supportsExtension($extension)) {
+        if (null !== $extension && !$outputConverterManager->supportsExtension($extension)) {
             throw new InvalidArgumentException('Extension provided is not a recognized format', Response::HTTP_BAD_REQUEST);
         }
 
@@ -102,9 +103,7 @@ class ShortUrls implements ResourceInterface
     }
 
     /**
-     * Delete all short URLs for a given image
-     *
-     * @param EventInterface $event
+     * Delete all short URLs for a given image.
      */
     public function deleteImageShortUrls(EventInterface $event): void
     {
@@ -117,7 +116,7 @@ class ShortUrls implements ResourceInterface
             $imageIdentifier,
         );
 
-        if ($event->getName() === 'shorturls.delete') {
+        if ('shorturls.delete' === $event->getName()) {
             // If the request is against the shorturls resource directly we need to supply a
             // response model. If this method is triggered because of an image has been deleted
             // the image resource will supply the response model
@@ -131,7 +130,7 @@ class ShortUrls implements ResourceInterface
     }
 
     /**
-     * Method for generating short URL keys
+     * Method for generating short URL keys.
      */
     private function getShortUrlId(int $len = 7): string
     {
@@ -139,7 +138,7 @@ class ShortUrls implements ResourceInterface
         $charsLen = 62;
         $key = '';
 
-        for ($i = 0; $i < $len; $i++) {
+        for ($i = 0; $i < $len; ++$i) {
             $key .= $chars[mt_rand() % $charsLen];
         }
 

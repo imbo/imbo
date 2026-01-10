@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use ImagickException;
@@ -7,26 +8,26 @@ use Imbo\Http\Response\Response;
 use Imbo\Image\InputSizeConstraint;
 
 /**
- * Thumbnail transformation
+ * Thumbnail transformation.
  */
 class Thumbnail extends Transformation implements InputSizeConstraint
 {
     /**
-     * Width of the thumbnail
+     * Width of the thumbnail.
      *
      * @var int
      */
     private $width = 50;
 
     /**
-     * Height of the thumbnail
+     * Height of the thumbnail.
      *
      * @var int
      */
     private $height = 50;
 
     /**
-     * Fit type
+     * Fit type.
      *
      * The thumbnail fit style. 'inset' or 'outbound'
      *
@@ -34,9 +35,6 @@ class Thumbnail extends Transformation implements InputSizeConstraint
      */
     private $fit = 'outbound';
 
-    /**
-     * {@inheritdoc}
-     */
     public function transform(array $params)
     {
         $width = !empty($params['width']) ? (int) $params['width'] : $this->width;
@@ -44,7 +42,7 @@ class Thumbnail extends Transformation implements InputSizeConstraint
         $fit = !empty($params['fit']) ? $params['fit'] : $this->fit;
 
         try {
-            if ($fit === 'inset') {
+            if ('inset' === $fit) {
                 $this->imagick->thumbnailImage($width, $height, true);
             } else {
                 $this->imagick->cropThumbnailImage($width, $height);
@@ -60,9 +58,6 @@ class Thumbnail extends Transformation implements InputSizeConstraint
                     ->setHasBeenTransformed(true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMinimumInputSize(array $params, array $imageSize)
     {
         $fit = isset($params['fit']) ? $params['fit'] : $this->fit;
@@ -70,14 +65,14 @@ class Thumbnail extends Transformation implements InputSizeConstraint
         $height = !empty($params['height']) ? (int) $params['height'] : $this->height;
         $ratio = $this->image->getWidth() / $this->image->getHeight();
 
-        if ($fit !== 'inset') {
+        if ('inset' !== $fit) {
             return ['width' => $width, 'height' => $height];
         }
 
         $sourceWidth = $imageSize['width'];
         $sourceHeight = $imageSize['height'];
 
-        $ratioX = $width  / $sourceWidth;
+        $ratioX = $width / $sourceWidth;
         $ratioY = $height / $sourceHeight;
 
         if ($ratioX === $ratioY) {

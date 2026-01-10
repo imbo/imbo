@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -9,27 +10,27 @@ use Imbo\Http\Response\Response;
 use Imbo\Image\InputSizeConstraint;
 
 /**
- * Watermark transformation
+ * Watermark transformation.
  */
 class Watermark extends Transformation implements InputSizeConstraint
 {
     /**
-     * Default image identifier to use for watermarks
+     * Default image identifier to use for watermarks.
      */
     private ?string $defaultImage = null;
 
     /**
-     * X coordinate of watermark relative to position parameters
+     * X coordinate of watermark relative to position parameters.
      */
     private int $x = 0;
 
     /**
-     * Y coordinate of watermark relative to position parameters
+     * Y coordinate of watermark relative to position parameters.
      */
     private int $y = 0;
 
     /**
-     * Position of watermark within original image
+     * Position of watermark within original image.
      *
      * Supported modes:
      *
@@ -46,7 +47,7 @@ class Watermark extends Transformation implements InputSizeConstraint
     private string $position = 'top-left';
 
     /**
-     * Set default image identifier to use if no identifier has been specified
+     * Set default image identifier to use if no identifier has been specified.
      */
     public function setDefaultImage(string $imageIdentifier)
     {
@@ -65,10 +66,7 @@ class Watermark extends Transformation implements InputSizeConstraint
         $image = $this->image;
 
         if (empty($imageIdentifier)) {
-            throw new TransformationException(
-                'You must specify an image identifier to use for the watermark',
-                Response::HTTP_BAD_REQUEST,
-            );
+            throw new TransformationException('You must specify an image identifier to use for the watermark', Response::HTTP_BAD_REQUEST);
         }
 
         // Try to load watermark image from storage
@@ -78,7 +76,7 @@ class Watermark extends Transformation implements InputSizeConstraint
                 $imageIdentifier,
             );
         } catch (StorageException $e) {
-            if ($e->getCode() == Response::HTTP_NOT_FOUND) {
+            if (Response::HTTP_NOT_FOUND == $e->getCode()) {
                 throw new TransformationException('Watermark image not found', Response::HTTP_BAD_REQUEST);
             }
 
@@ -117,24 +115,24 @@ class Watermark extends Transformation implements InputSizeConstraint
         }
 
         // Determine placement of the watermark
-        if ($position === 'top-right') {
+        if ('top-right' === $position) {
             $x = $image->getWidth() - $width + $x;
-        } elseif ($position === 'bottom-left') {
+        } elseif ('bottom-left' === $position) {
             $y = $image->getHeight() - $height + $y;
-        } elseif ($position === 'bottom-right') {
+        } elseif ('bottom-right' === $position) {
             $x = $image->getWidth() - $width + $x;
             $y = $image->getHeight() - $height + $y;
-        } elseif ($position === 'center') {
+        } elseif ('center' === $position) {
             $x = ($image->getWidth() / 2) - ($width / 2) + $x;
             $y = ($image->getHeight() / 2) - ($height / 2) + $y;
-        } elseif ($position === 'bottom') {
+        } elseif ('bottom' === $position) {
             $x = ($image->getWidth() / 2) - ($width / 2) + $x;
             $y = $image->getHeight() - $height + $y;
-        } elseif ($position === 'top') {
+        } elseif ('top' === $position) {
             $x = ($image->getWidth() / 2) - ($width / 2) + $x;
-        } elseif ($position === 'left') {
+        } elseif ('left' === $position) {
             $y = ($image->getHeight() / 2) - ($height / 2) + $y;
-        } elseif ($position === 'right') {
+        } elseif ('right' === $position) {
             $x = $image->getWidth() - $width + $x;
             $y = ($image->getHeight() / 2) - ($height / 2) + $y;
         }

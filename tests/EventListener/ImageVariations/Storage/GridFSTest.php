@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener\ImageVariations\Storage;
 
 use Imbo\Exception\StorageException;
@@ -12,10 +13,12 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+use function is_int;
+
 #[CoversClass(GridFS::class)]
 class GridFSTest extends TestCase
 {
-    private string $user    = 'user';
+    private string $user = 'user';
     private string $imageId = 'image-id';
 
     public function testThrowsExceptionWhenInvalidUriIsSpecified(): void
@@ -36,11 +39,10 @@ class GridFSTest extends TestCase
                 'user.image-id.100',
                 $this->isResource(),
                 $this->callback(
-                    fn (array $data): bool =>
-                        is_int($data['metadata']['added'] ?? null) &&
-                        $this->user === ($data['metadata']['user'] ?? null) &&
-                        $this->imageId === ($data['metadata']['imageIdentifier'] ?? null) &&
-                        100 === ($data['metadata']['width'] ?? null),
+                    fn (array $data): bool => is_int($data['metadata']['added'] ?? null)
+                        && $this->user === ($data['metadata']['user'] ?? null)
+                        && $this->imageId === ($data['metadata']['imageIdentifier'] ?? null)
+                        && 100 === ($data['metadata']['width'] ?? null),
                 ),
             );
 

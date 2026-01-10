@@ -1,12 +1,15 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use ImagickException;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 
+use function in_array;
+
 /**
- * Blur transformation
+ * Blur transformation.
  */
 class Blur extends Transformation
 {
@@ -17,7 +20,7 @@ class Blur extends Transformation
         $blurTypes = ['gaussian', 'adaptive', 'motion', 'radial', 'rotational'];
 
         if (!in_array($type, $blurTypes)) {
-            throw new TransformationException('Unknown blur type: ' . $type, Response::HTTP_BAD_REQUEST);
+            throw new TransformationException('Unknown blur type: '.$type, Response::HTTP_BAD_REQUEST);
         }
 
         switch ($type) {
@@ -37,26 +40,27 @@ class Blur extends Transformation
     }
 
     /**
-     * Check that all params are present
+     * Check that all params are present.
      *
-     * @param array $params Transformation parameter list
+     * @param array $params   Transformation parameter list
      * @param array $required Array with required parameters
+     *
      * @throws TransformationException
      */
     private function checkRequiredParams(array $params, array $required)
     {
         foreach ($required as $param) {
             if (!isset($params[$param])) {
-                throw new TransformationException('Missing required parameter: ' . $param, Response::HTTP_BAD_REQUEST);
+                throw new TransformationException('Missing required parameter: '.$param, Response::HTTP_BAD_REQUEST);
             }
         }
     }
 
     /**
-     * Add Gaussian or adaptive blur to the image
+     * Add Gaussian or adaptive blur to the image.
      *
-     * @param array $params The transformation parameters
-     * @param bool $adaptive Perform adaptive blur or not
+     * @param array $params   The transformation parameters
+     * @param bool  $adaptive Perform adaptive blur or not
      */
     private function blur(array $params, $adaptive = false)
     {
@@ -79,7 +83,7 @@ class Blur extends Transformation
     }
 
     /**
-     * Add motion blur to the image
+     * Add motion blur to the image.
      *
      * @param array $params The transformation parameters
      */
@@ -101,7 +105,7 @@ class Blur extends Transformation
     }
 
     /**
-     * Add rotational blur to the image
+     * Add rotational blur to the image.
      *
      * @param array $params The transformation parameters
      */

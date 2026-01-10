@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\Database\DatabaseInterface;
@@ -29,7 +30,7 @@ class MetadataTest extends ResourceTests
         return new Metadata();
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
@@ -76,6 +77,7 @@ class MetadataTest extends ResourceTests
                 static function (string $event, array $params = []) use ($metadata, $manager) {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $event, $params]) {
                         [0, 'db.metadata.delete', []],
                         [1, 'db.metadata.update', ['metadata' => $metadata]] => $manager,

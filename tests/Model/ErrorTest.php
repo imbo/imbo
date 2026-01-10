@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Model;
 
 use DateTime;
@@ -14,7 +15,7 @@ class ErrorTest extends TestCase
 {
     private Error $model;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->model = new Error();
     }

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Database;
 
 use DateTime;
@@ -18,6 +19,12 @@ use MongoDB\Driver\Exception\Exception as MongoDBException;
 use MongoDB\Model\BSONArray;
 use MongoDB\Model\BSONDocument;
 
+use function array_key_exists;
+use function count;
+use function is_int;
+use function is_string;
+use function sprintf;
+
 /**
  * @phpstan-type ImageData array{
  *     _id:MongoId,
@@ -33,7 +40,7 @@ use MongoDB\Model\BSONDocument;
  */
 class MongoDB implements DatabaseInterface
 {
-    public const IMAGE_COLLECTION_NAME      = 'image';
+    public const IMAGE_COLLECTION_NAME = 'image';
     public const SHORT_URLS_COLLECTION_NAME = 'shortUrl';
 
     private Database $database;
@@ -41,21 +48,22 @@ class MongoDB implements DatabaseInterface
     private Collection $shortUrlCollection;
 
     /**
-     * Create a new MongoDB database adapter
+     * Create a new MongoDB database adapter.
      *
-     * @param string $databaseName The name of the database to use
-     * @param string $uri The URI to use when connecting to MongoDB
-     * @param array<mixed> $uriOptions Options for the URI, sent to the MongoDB\Client instance
+     * @param string       $databaseName  The name of the database to use
+     * @param string       $uri           The URI to use when connecting to MongoDB
+     * @param array<mixed> $uriOptions    Options for the URI, sent to the MongoDB\Client instance
      * @param array<mixed> $driverOptions Additional options for the MongoDB\Client instance
-     * @param ?Client $client Pre-configured MongoDB client. When specified $uri, $uriOptions and $driverOptions are ignored
+     * @param ?Client      $client        Pre-configured MongoDB client. When specified $uri, $uriOptions and $driverOptions are ignored
+     *
      * @throws DatabaseException
      */
     public function __construct(
         private string $databaseName = 'imbo',
-        string $uri                  = 'mongodb://localhost:27017',
-        array $uriOptions            = [],
-        array $driverOptions         = [],
-        ?Client $client              = null,
+        string $uri = 'mongodb://localhost:27017',
+        array $uriOptions = [],
+        array $driverOptions = [],
+        ?Client $client = null,
     ) {
         try {
             $client = $client ?: new Client($uri, $uriOptions, $driverOptions);
@@ -76,7 +84,7 @@ class MongoDB implements DatabaseInterface
             try {
                 $this->imageCollection->updateOne(
                     [
-                        'user'            => $user,
+                        'user' => $user,
                         'imageIdentifier' => $imageIdentifier,
                     ],
                     [
@@ -92,21 +100,21 @@ class MongoDB implements DatabaseInterface
             return true;
         }
 
-        $added   = $image->getAddedDate();
+        $added = $image->getAddedDate();
         $updated = $image->getUpdatedDate();
 
         $data = [
-            'size'             => $image->getFilesize(),
-            'user'             => $user,
-            'imageIdentifier'  => $imageIdentifier,
-            'extension'        => $image->getExtension(),
-            'mime'             => $image->getMimeType(),
-            'metadata'         => [],
-            'added'            => $added ? $added->getTimestamp() : $now,
-            'updated'          => $updated ? $updated->getTimestamp() : $now,
-            'width'            => $image->getWidth(),
-            'height'           => $image->getHeight(),
-            'checksum'         => $image->getChecksum(),
+            'size' => $image->getFilesize(),
+            'user' => $user,
+            'imageIdentifier' => $imageIdentifier,
+            'extension' => $image->getExtension(),
+            'mime' => $image->getMimeType(),
+            'metadata' => [],
+            'added' => $added ? $added->getTimestamp() : $now,
+            'updated' => $updated ? $updated->getTimestamp() : $now,
+            'width' => $image->getWidth(),
+            'height' => $image->getHeight(),
+            'checksum' => $image->getChecksum(),
             'originalChecksum' => $image->getOriginalChecksum(),
         ];
 
@@ -114,10 +122,7 @@ class MongoDB implements DatabaseInterface
             $this->imageCollection->insertOne($data);
         } catch (BulkWriteException $e) {
             if (11000 === $e->getCode()) {
-                throw new DuplicateImageIdentifierException(
-                    'Duplicate image identifier when attempting to insert image into DB.',
-                    503,
-                );
+                throw new DuplicateImageIdentifierException('Duplicate image identifier when attempting to insert image into DB.', 503);
             }
 
             throw new DatabaseException('Unable to save image data', 500, $e);
@@ -135,7 +140,7 @@ class MongoDB implements DatabaseInterface
 
         try {
             $this->imageCollection->deleteOne([
-                'user'            => $user,
+                'user' => $user,
                 'imageIdentifier' => $imageIdentifier,
             ]);
         } catch (MongoDBException $e) {
@@ -150,7 +155,7 @@ class MongoDB implements DatabaseInterface
         try {
             $this->imageCollection->updateOne(
                 [
-                    'user'            => $user,
+                    'user' => $user,
                     'imageIdentifier' => $imageIdentifier,
                 ],
                 [
@@ -185,7 +190,7 @@ class MongoDB implements DatabaseInterface
         try {
             $this->imageCollection->updateOne(
                 [
-                    'user'            => $user,
+                    'user' => $user,
                     'imageIdentifier' => $imageIdentifier,
                 ],
                 [
@@ -203,7 +208,7 @@ class MongoDB implements DatabaseInterface
 
     public function getImages(array $users, Query $query, Images $model): array
     {
-        $images    = [];
+        $images = [];
         $queryData = [];
 
         if (!empty($users)) {
@@ -211,7 +216,7 @@ class MongoDB implements DatabaseInterface
         }
 
         $from = $query->getFrom();
-        $to   = $query->getTo();
+        $to = $query->getTo();
 
         if ($from || $to) {
             $tmp = [];
@@ -281,8 +286,8 @@ class MongoDB implements DatabaseInterface
         try {
             $options = [
                 'projection' => $fields,
-                'limit'      => $query->getLimit(),
-                'sort'       => $sort,
+                'limit' => $query->getLimit(),
+                'sort' => $sort,
             ];
 
             if (($page = $query->getPage()) > 1) {
@@ -302,8 +307,8 @@ class MongoDB implements DatabaseInterface
         }
 
         foreach ($result as $image) {
-            $image['added']   = new DateTime('@' . $image['added']);
-            $image['updated'] = new DateTime('@' . $image['updated']);
+            $image['added'] = new DateTime('@'.$image['added']);
+            $image['updated'] = new DateTime('@'.$image['updated']);
             $images[] = (new BSONToArray())->toArray($image);
         }
 
@@ -315,13 +320,13 @@ class MongoDB implements DatabaseInterface
         $data = $this->getImageData($user, $imageIdentifier);
 
         return [
-            'size'      => $data['size'],
-            'width'     => $data['width'],
-            'height'    => $data['height'],
-            'mime'      => $data['mime'],
+            'size' => $data['size'],
+            'width' => $data['width'],
+            'height' => $data['height'],
+            'mime' => $data['mime'],
             'extension' => $data['extension'],
-            'added'     => $data['added'],
-            'updated'   => $data['updated'],
+            'added' => $data['added'],
+            'updated' => $data['updated'],
         ];
     }
 
@@ -335,8 +340,8 @@ class MongoDB implements DatabaseInterface
             ->setFilesize($data['size'])
             ->setMimeType($data['mime'])
             ->setExtension($data['extension'])
-            ->setAddedDate(new DateTime('@' . $data['added']))
-            ->setUpdatedDate(new DateTime('@' . $data['updated']));
+            ->setAddedDate(new DateTime('@'.$data['added']))
+            ->setUpdatedDate(new DateTime('@'.$data['updated']));
 
         return true;
     }
@@ -373,12 +378,12 @@ class MongoDB implements DatabaseInterface
 
         $updated = null === $document ? time() : $document['updated'];
 
-        return new DateTime('@' . $updated);
+        return new DateTime('@'.$updated);
     }
 
     public function setLastModifiedNow(string $user, string $imageIdentifier): DateTime
     {
-        return $this->setLastModifiedTime($user, $imageIdentifier, new DateTime('@' . time()));
+        return $this->setLastModifiedTime($user, $imageIdentifier, new DateTime('@'.time()));
     }
 
     public function setLastModifiedTime(string $user, string $imageIdentifier, DateTime $time): DateTime
@@ -390,7 +395,7 @@ class MongoDB implements DatabaseInterface
         // @todo Check if mongodb throws not found exception on updateOne
         $this->imageCollection->updateOne(
             [
-                'user'            => $user,
+                'user' => $user,
                 'imageIdentifier' => $imageIdentifier,
             ],
             [
@@ -501,11 +506,11 @@ class MongoDB implements DatabaseInterface
     {
         try {
             $this->shortUrlCollection->insertOne([
-                'shortUrlId'      => $shortUrlId,
-                'user'            => $user,
+                'shortUrlId' => $shortUrlId,
+                'user' => $user,
                 'imageIdentifier' => $imageIdentifier,
-                'extension'       => $extension,
-                'query'           => serialize($query),
+                'extension' => $extension,
+                'query' => serialize($query),
             ]);
         } catch (MongoDBException $e) {
             throw new DatabaseException('Unable to create short URL', 500, $e);
@@ -519,10 +524,10 @@ class MongoDB implements DatabaseInterface
         try {
             /** @var ?array{shortUrlId:string} */
             $document = $this->shortUrlCollection->findOne([
-                'user'            => $user,
+                'user' => $user,
                 'imageIdentifier' => $imageIdentifier,
-                'extension'       => $extension,
-                'query'           => serialize($query),
+                'extension' => $extension,
+                'query' => serialize($query),
             ], [
                 'shortUrlId' => 1,
             ]);
@@ -558,17 +563,17 @@ class MongoDB implements DatabaseInterface
         $query = unserialize($document['query']);
 
         return [
-            'user'            => $document['user'],
+            'user' => $document['user'],
             'imageIdentifier' => $document['imageIdentifier'],
-            'extension'       => $document['extension'],
-            'query'           => $query,
+            'extension' => $document['extension'],
+            'query' => $query,
         ];
     }
 
     public function deleteShortUrls(string $user, string $imageIdentifier, ?string $shortUrlId = null): bool
     {
         $query = [
-            'user'            => $user,
+            'user' => $user,
             'imageIdentifier' => $imageIdentifier,
         ];
 
@@ -592,16 +597,17 @@ class MongoDB implements DatabaseInterface
     }
 
     /**
-     * Get image data
+     * Get image data.
      *
      * @return ImageData
+     *
      * @throws DatabaseException
      */
     private function getImageData(string $user, string $imageIdentifier): array
     {
         try {
             $image = $this->imageCollection->findOne([
-                'user'            => $user,
+                'user' => $user,
                 'imageIdentifier' => $imageIdentifier,
             ]);
         } catch (MongoDBException $e) {
@@ -616,10 +622,11 @@ class MongoDB implements DatabaseInterface
     }
 
     /**
-     * Convert a BSONDocument to a known associative array
+     * Convert a BSONDocument to a known associative array.
+     *
+     * @return ImageData
      *
      * @throws InvalidArgumentException
-     * @return ImageData
      */
     private function toImageData(BSONDocument $document): array
     {
@@ -660,15 +667,15 @@ class MongoDB implements DatabaseInterface
         }
 
         return [
-            '_id'       => $document['_id'],
-            'size'      => $document['size'],
-            'width'     => $document['width'],
-            'height'    => $document['height'],
-            'metadata'  => $document['metadata'],
-            'mime'      => $document['mime'],
+            '_id' => $document['_id'],
+            'size' => $document['size'],
+            'width' => $document['width'],
+            'height' => $document['height'],
+            'metadata' => $document['metadata'],
+            'mime' => $document['mime'],
             'extension' => $document['extension'],
-            'added'     => $document['added'],
-            'updated'   => $document['updated'],
+            'added' => $document['added'],
+            'updated' => $document['updated'],
         ];
     }
 }

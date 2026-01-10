@@ -1,16 +1,19 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Model;
 
 use DateTime;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+use function strlen;
+
 #[CoversClass(Image::class)]
 class ImageTest extends TestCase
 {
     private Image $image;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->image = new Image();
     }
@@ -107,7 +110,6 @@ class ImageTest extends TestCase
         $this->assertSame('identifier', $this->image->getImageIdentifier());
     }
 
-
     public function testCanUpdateTransformationFlag(): void
     {
         $this->assertFalse($this->image->getHasBeenTransformed());
@@ -166,19 +168,19 @@ class ImageTest extends TestCase
             ->setOutputQualityCompression($compression);
 
         $this->assertSame([
-            'filesize'                 => $filesize,
-            'mimeType'                 => $mimeType,
-            'extension'                => $extension,
-            'metadata'                 => $metadata,
-            'width'                    => $width,
-            'height'                   => $height,
-            'addedDate'                => $added,
-            'updatedDate'              => $updated,
-            'user'                     => $user,
-            'imageIdentifier'          => $identifier,
-            'checksum'                 => $checksum,
-            'originalChecksum'         => $checksum,
-            'hasBeenTransformed'       => true,
+            'filesize' => $filesize,
+            'mimeType' => $mimeType,
+            'extension' => $extension,
+            'metadata' => $metadata,
+            'width' => $width,
+            'height' => $height,
+            'addedDate' => $added,
+            'updatedDate' => $updated,
+            'user' => $user,
+            'imageIdentifier' => $identifier,
+            'checksum' => $checksum,
+            'originalChecksum' => $checksum,
+            'hasBeenTransformed' => true,
             'outputQualityCompression' => $compression,
         ], $this->image->getData());
     }

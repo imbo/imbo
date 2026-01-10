@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use ImagickException;
@@ -6,7 +7,7 @@ use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 
 /**
- * Contrast transformation
+ * Contrast transformation.
  */
 class Contrast extends Transformation
 {
@@ -17,7 +18,7 @@ class Contrast extends Transformation
         $beta = isset($params['beta']) ? (float) $params['beta'] : 0.5;
         $sharpen = $alpha > 0;
 
-        if ($alpha == 0) {
+        if (0 == $alpha) {
             return;
         }
 

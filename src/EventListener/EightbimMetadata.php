@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imagick;
@@ -8,7 +9,7 @@ use Imbo\Exception\RuntimeException;
 use Imbo\Http\Response\Response;
 
 /**
- * 8BIM metadata event listener
+ * 8BIM metadata event listener.
  *
  * This listener will look for properties stored in the image, and store certain metadata (at the
  * moment, the available clipping paths) in Imbo.
@@ -35,7 +36,7 @@ class EightbimMetadata implements ListenerInterface, ImagickAware
     }
 
     /**
-     * Read 8BIM data from incoming image
+     * Read 8BIM data from incoming image.
      */
     public function populate(EventInterface $event): array
     {
@@ -68,7 +69,7 @@ class EightbimMetadata implements ListenerInterface, ImagickAware
     }
 
     /**
-     * Save metadata to database
+     * Save metadata to database.
      *
      * @throws RuntimeException
      */

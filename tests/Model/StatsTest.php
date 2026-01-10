@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Model;
 
 use Imbo\Exception\InvalidArgumentException;
@@ -12,7 +13,7 @@ class StatsTest extends TestCase
 {
     private Stats $model;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->model = new Stats();
     }

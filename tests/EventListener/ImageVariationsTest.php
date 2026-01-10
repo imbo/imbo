@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use DateTime;
@@ -25,6 +26,10 @@ use PHPUnit\Framework\MockObject\MockObject;
 use stdClass;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+
+use function sprintf;
+
+use const E_USER_WARNING;
 
 #[CoversClass(ImageVariations::class)]
 class ImageVariationsTest extends ListenerTests
@@ -56,12 +61,12 @@ class ImageVariationsTest extends ListenerTests
         ]);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         restore_error_handler();
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         set_error_handler(
             function (int $errno, string $errstr) {
@@ -71,9 +76,9 @@ class ImageVariationsTest extends ListenerTests
             },
         );
 
-        $this->db         = $this->createMock(DatabaseInterface::class);
-        $this->storage    = $this->createMock(StorageInterface::class);
-        $this->query      = new InputBag();
+        $this->db = $this->createMock(DatabaseInterface::class);
+        $this->storage = $this->createMock(StorageInterface::class);
+        $this->query = new InputBag();
         $this->imageModel = $this->createConfiguredMock(Image::class, [
             'getImageIdentifier' => $this->imageIdentifier,
         ]);
@@ -94,24 +99,24 @@ class ImageVariationsTest extends ListenerTests
         $this->imageStorage = $this->createMock(MainStorageInterface::class);
 
         $this->transformationManager = $this->createMock(TransformationManager::class);
-        $this->request               = $this->createConfiguredMock(Request::class, [
-            'getUser'            => $this->user,
+        $this->request = $this->createConfiguredMock(Request::class, [
+            'getUser' => $this->user,
             'getImageIdentifier' => $this->imageIdentifier,
-            'getImage'           => $this->imageModel,
+            'getImage' => $this->imageModel,
         ]);
         $this->request->query = $this->query;
 
         $this->responseHeaders = $this->createMock(ResponseHeaderBag::class);
-        $this->response        = $this->createConfiguredMock(Response::class, [
+        $this->response = $this->createConfiguredMock(Response::class, [
             'getModel' => $this->imageModel,
         ]);
         $this->response->headers = $this->responseHeaders;
 
         $this->event = $this->createConfiguredMock(EventInterface::class, [
-            'getRequest'               => $this->request,
-            'getResponse'              => $this->response,
-            'getManager'               => $this->eventManager,
-            'getStorage'               => $this->imageStorage,
+            'getRequest' => $this->request,
+            'getResponse' => $this->response,
+            'getManager' => $this->eventManager,
+            'getStorage' => $this->imageStorage,
             'getTransformationManager' => $this->transformationManager,
         ]);
 
@@ -205,7 +210,7 @@ class ImageVariationsTest extends ListenerTests
             Response::HTTP_INTERNAL_SERVER_ERROR,
         ));
         new ImageVariations([
-            'storage'  => [
+            'storage' => [
                 'adapter' => function () {
                     return null;
                 },
@@ -224,7 +229,7 @@ class ImageVariationsTest extends ListenerTests
             Response::HTTP_INTERNAL_SERVER_ERROR,
         ));
         new ImageVariations([
-            'storage'  => [
+            'storage' => [
                 'adapter' => stdClass::class,
             ],
             'database' => [
@@ -250,11 +255,11 @@ class ImageVariationsTest extends ListenerTests
     #[AllowMockObjectsWithoutExpectations]
     public function testFallsBackIfNoRelevantTransformationsApplied(): void
     {
-        $width  = 1024;
+        $width = 1024;
         $height = 768;
         $transformations = [
             [
-                'name'   => 'desaturate',
+                'name' => 'desaturate',
                 'params' => [],
             ],
         ];
@@ -286,11 +291,11 @@ class ImageVariationsTest extends ListenerTests
     #[AllowMockObjectsWithoutExpectations]
     public function testFallsBackIfSizeIsLargerThanOriginal(): void
     {
-        $width  = 1024;
+        $width = 1024;
         $height = 768;
         $transformations = [
             [
-                'name'   => 'maxSize',
+                'name' => 'maxSize',
                 'params' => ['width' => 2048],
             ],
         ];
@@ -325,11 +330,11 @@ class ImageVariationsTest extends ListenerTests
     #[AllowMockObjectsWithoutExpectations]
     public function testFallsBackIfDatabaseDoesNotReturnAnyVariation(): void
     {
-        $width  = 1024;
+        $width = 1024;
         $height = 768;
         $transformations = [
             [
-                'name'   => 'maxSize',
+                'name' => 'maxSize',
                 'params' => ['width' => 512],
             ],
         ];
@@ -374,17 +379,17 @@ class ImageVariationsTest extends ListenerTests
     #[AllowMockObjectsWithoutExpectations]
     public function testTriggersWarningIfVariationFoundInDbButNotStorage(): void
     {
-        $width               = 1024;
-        $height              = 768;
+        $width = 1024;
+        $height = 768;
         $transformationWidth = 512;
-        $variationWidth      = 800;
-        $transformations     = [
+        $variationWidth = 800;
+        $transformations = [
             [
-                'name'   => 'desaturate',
+                'name' => 'desaturate',
                 'params' => [],
             ],
             [
-                'name'   => 'maxSize',
+                'name' => 'maxSize',
                 'params' => ['width' => $transformationWidth],
             ],
         ];
@@ -459,20 +464,20 @@ class ImageVariationsTest extends ListenerTests
     #[AllowMockObjectsWithoutExpectations]
     public function testUpdatesResponseAndImageModelOnSuccess(): void
     {
-        $width               = 1024;
-        $height              = 768;
+        $width = 1024;
+        $height = 768;
         $transformationWidth = 512;
-        $variationWidth      = 800;
-        $variationHeight     = 600;
-        $variationBlob       = 'blob';
-        $lastModified        = new DateTime('now');
-        $transformations     = [
+        $variationWidth = 800;
+        $variationHeight = 600;
+        $variationBlob = 'blob';
+        $lastModified = new DateTime('now');
+        $transformations = [
             [
-                'name'   => 'desaturate',
+                'name' => 'desaturate',
                 'params' => [],
             ],
             [
-                'name'   => 'maxSize',
+                'name' => 'maxSize',
                 'params' => ['width' => $transformationWidth],
             ],
         ];
@@ -497,7 +502,7 @@ class ImageVariationsTest extends ListenerTests
                 $transformationWidth,
             )
             ->willReturn([
-                'width'  => $variationWidth,
+                'width' => $variationWidth,
                 'height' => $variationHeight,
             ]);
 
@@ -508,13 +513,14 @@ class ImageVariationsTest extends ListenerTests
                 static function (string $transformation, array $params = []) use ($manager, $width, $variationWidth): EventManager&MockObject {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $transformation, $params]) {
                         [
                             0,
                             'image.transformations.adjust',
                             [
                                 'transformationIndex' => 1,
-                                'ratio'               => $width / $variationWidth,
+                                'ratio' => $width / $variationWidth,
                             ],
                         ],
                         [1, 'image.loaded', []] => $manager,
@@ -662,7 +668,7 @@ class ImageVariationsTest extends ListenerTests
              * but as we have turned autoScale off, it should only remove the last width,
              * which is larger than our original.
              */
-            'widths'    => [25, 100, 400, 800, 1024, 1700, 3000],
+            'widths' => [25, 100, 400, 800, 1024, 1700, 3000],
             'autoScale' => false,
         ]);
 
@@ -692,6 +698,7 @@ class ImageVariationsTest extends ListenerTests
                 static function (string $user, string $imageIdentifier, string $contents, int $width): bool {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $user, $imageIdentifier, $contents, $width]) {
                         [0, 'user', 'imgid', 'some blob', 25],
                         [1, 'user', 'imgid', 'some blob', 100],
@@ -717,6 +724,7 @@ class ImageVariationsTest extends ListenerTests
                 static function (array $params): bool {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $params['width']]) {
                         [0, 25],
                         [1, 100],
@@ -750,11 +758,11 @@ class ImageVariationsTest extends ListenerTests
     public function testGenerateVariationsWithLosslessParamTriggersPngConversion(): void
     {
         $listener = new ImageVariations([
-            'database'  => ['adapter' => $this->db],
-            'storage'   => ['adapter' => $this->storage],
-            'widths'    => [500],
+            'database' => ['adapter' => $this->db],
+            'storage' => ['adapter' => $this->storage],
+            'widths' => [500],
             'autoScale' => false,
-            'lossless'  => true,
+            'lossless' => true,
         ]);
 
         $convertTransformation = $this->createMock(Convert::class);
@@ -788,6 +796,7 @@ class ImageVariationsTest extends ListenerTests
                 static function (string $transformation) use ($convertTransformation, $resizeTransformation) {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $transformation]) {
                         [0, 'convert'] => $convertTransformation,
                         [1, 'resize'] => $resizeTransformation,
@@ -814,11 +823,11 @@ class ImageVariationsTest extends ListenerTests
     public function testGenerateVariationsAutoScalesRespectingMaxMinWidth(): void
     {
         $listener = new ImageVariations([
-            'database'    => ['adapter' => $this->db],
-            'storage'     => ['adapter' => $this->storage],
-            'minDiff'     => 100,
-            'minWidth'    => 320,
-            'maxWidth'    => 1300,
+            'database' => ['adapter' => $this->db],
+            'storage' => ['adapter' => $this->storage],
+            'minDiff' => 100,
+            'minWidth' => 320,
+            'maxWidth' => 1300,
             'scaleFactor' => .65,
         ]);
 
@@ -851,6 +860,7 @@ class ImageVariationsTest extends ListenerTests
                 static function (string $user, string $imageIdentifier, string $contents, int $width): bool {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $user, $imageIdentifier, $contents, $width]) {
                         [0, 'user', 'imgid', 'image data', 865],
                         [1, 'user', 'imgid', 'image data', 562],
@@ -866,9 +876,9 @@ class ImageVariationsTest extends ListenerTests
     public function testGenerateVariationsIncludesSpecifiedWidths(): void
     {
         $listener = new ImageVariations([
-            'database'    => ['adapter' => $this->db],
-            'storage'     => ['adapter' => $this->storage],
-            'widths'      => [1337],
+            'database' => ['adapter' => $this->db],
+            'storage' => ['adapter' => $this->storage],
+            'widths' => [1337],
             'scaleFactor' => .2,
         ]);
 
@@ -900,6 +910,7 @@ class ImageVariationsTest extends ListenerTests
                 static function (string $user, string $imageIdentifier, string $contents, int $width): bool {
                     /** @var int */
                     static $i = 0;
+
                     return match ([$i++, $user, $imageIdentifier, $contents, $width]) {
                         [0, 'user', 'imgid', 'image data', 1337],
                         [1, 'user', 'imgid', 'image data', 410] => true,
@@ -934,7 +945,6 @@ class ImageVariationsTest extends ListenerTests
             ->expects($this->once())
             ->method('transform')
             ->willThrowException(new TransformationException());
-
 
         $this->transformationManager
             ->expects($this->once())
@@ -1035,9 +1045,9 @@ class ImageVariationsTest extends ListenerTests
     public function testTriggersDeletionOfImageVariationsWhenUnableToStoreMetadata(): void
     {
         $listener = new ImageVariations([
-            'database'  => ['adapter' => $this->db],
-            'storage'   => ['adapter' => $this->storage],
-            'widths'    => [1000],
+            'database' => ['adapter' => $this->db],
+            'storage' => ['adapter' => $this->storage],
+            'widths' => [1000],
             'autoScale' => false,
         ]);
 
@@ -1056,7 +1066,7 @@ class ImageVariationsTest extends ListenerTests
         $this->db
             ->expects($this->once())
             ->method('storeImageVariationMetadata')
-            ->with($this->user, )
+            ->with($this->user)
             ->willThrowException(new DatabaseException());
 
         $transformation = $this->createConfiguredMock(Transformation::class, [

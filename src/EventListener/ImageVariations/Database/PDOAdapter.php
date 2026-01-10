@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener\ImageVariations\Database;
 
 use Imbo\Exception\DatabaseException;
@@ -7,7 +8,7 @@ use PDO;
 use PDOException;
 
 /**
- * PDO adapter for the image variations
+ * PDO adapter for the image variations.
  */
 abstract class PDOAdapter implements DatabaseInterface
 {
@@ -28,12 +29,12 @@ abstract class PDOAdapter implements DatabaseInterface
     }
 
     /**
-     * Class constructor
+     * Class constructor.
      *
-     * @param string $dsn Database DSN
-     * @param string $username Username for the DSN string
-     * @param string $password Password for the DSN string
-     * @param array<mixed> $options Driver specific options
+     * @param string       $dsn      Database DSN
+     * @param string       $username Username for the DSN string
+     * @param string       $password Password for the DSN string
+     * @param array<mixed> $options  Driver specific options
      */
     public function __construct(string $dsn, ?string $username = null, ?string $password = null, array $options = [])
     {
@@ -52,7 +53,7 @@ abstract class PDOAdapter implements DatabaseInterface
                     // Forced options
                     [
                         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     ],
                 ),
             );
@@ -82,11 +83,11 @@ abstract class PDOAdapter implements DatabaseInterface
         return $this->pdo
             ->prepare($sql)
             ->execute([
-                'added'           => time(),
-                'user'            => $user,
+                'added' => time(),
+                'user' => $user,
                 'imageIdentifier' => $imageIdentifier,
-                'width'           => $width,
-                'height'          => $height,
+                'width' => $width,
+                'height' => $height,
             ]);
     }
 
@@ -109,9 +110,9 @@ abstract class PDOAdapter implements DatabaseInterface
         SQL;
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            ':user'            => $user,
+            ':user' => $user,
             ':imageIdentifier' => $imageIdentifier,
-            ':width'           => $width,
+            ':width' => $width,
         ]);
 
         /** @var false|array{width:string,height:string} */

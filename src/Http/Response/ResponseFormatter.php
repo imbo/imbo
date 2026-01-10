@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Http\Response;
 
 use Imbo\EventListener\ListenerInterface;
@@ -9,28 +10,31 @@ use Imbo\Http\Request\Request;
 use Imbo\Model;
 use Symfony\Component\HttpFoundation\AcceptHeader;
 
+use function sprintf;
+use function strlen;
+
 /**
  * This event listener will correctly format the response body based on the Accept headers in the
- * request
+ * request.
  */
 class ResponseFormatter implements ListenerInterface
 {
     /**
-     * Content formatters
+     * Content formatters.
      *
      * @var array
      */
     private $formatters;
 
     /**
-     * The default mime type to use when formatting a response
+     * The default mime type to use when formatting a response.
      *
      * @var string
      */
     private $defaultMimeType = 'application/json';
 
     /**
-     * Mapping from extensions to mime types
+     * Mapping from extensions to mime types.
      *
      * @var array
      */
@@ -42,7 +46,7 @@ class ResponseFormatter implements ListenerInterface
 
     /**
      * Supported content types and the associated formatter class name or instance, or in the
-     * case of an image model, the resulting image type
+     * case of an image model, the resulting image type.
      *
      * @var array
      */
@@ -53,7 +57,7 @@ class ResponseFormatter implements ListenerInterface
     ];
 
     /**
-     * The default types that models support, in a prioritized order
+     * The default types that models support, in a prioritized order.
      *
      * @var array
      */
@@ -82,16 +86,14 @@ class ResponseFormatter implements ListenerInterface
     private ContentNegotiation $contentNegotiation;
 
     /**
-     * The formatter to use
+     * The formatter to use.
      *
      * @var string
      */
     private $formatter;
 
     /**
-     * Class constructor
-     *
-     * @param array $param Parameters for the event listener
+     * Class constructor.
      */
     public function __construct(array $params)
     {
@@ -108,9 +110,10 @@ class ResponseFormatter implements ListenerInterface
     }
 
     /**
-     * Set the formatter
+     * Set the formatter.
      *
      * @param string $formatter The formatter to set
+     *
      * @return self
      */
     public function setFormatter($formatter)
@@ -121,7 +124,7 @@ class ResponseFormatter implements ListenerInterface
     }
 
     /**
-     * Get the formatter
+     * Get the formatter.
      *
      * @return string
      */
@@ -131,7 +134,7 @@ class ResponseFormatter implements ListenerInterface
     }
 
     /**
-     * Perform content negotiation by looking the the current URL and the Accept request header
+     * Perform content negotiation by looking the the current URL and the Accept request header.
      *
      * @param EventInterface $event The event instance
      */
@@ -157,7 +160,7 @@ class ResponseFormatter implements ListenerInterface
             // Configuration is telling us not to use content negotiation for images,
             // instead we want to use the original format of the image
             $formatter = $model->getExtension();
-        } elseif ($extension && !($model instanceof Model\Error && ($routeName === 'image' || $routeName === 'globalshorturl'))) {
+        } elseif ($extension && !($model instanceof Model\Error && ('image' === $routeName || 'globalshorturl' === $routeName))) {
             // The user agent wants a specific type. Skip content negotiation completely, but not
             // if the request is against the image resource (or the global short url resource), and
             // ended up as an error, because then Imbo would try to render the error as an image.
@@ -187,7 +190,7 @@ class ResponseFormatter implements ListenerInterface
 
             // Specify which types to check for since all models can't be formatted by all
             // formatters
-            $modelClass = get_class($model);
+            $modelClass = $model::class;
             $modelType = strtolower(substr($modelClass, strrpos($modelClass, '\\') + 1));
 
             $types = $this->defaultModelTypes;
@@ -211,8 +214,8 @@ class ResponseFormatter implements ListenerInterface
                     // if the current pipeline hasn't performed any transformations, we can output the original format, even if it's not supported as a output converter.
                     // otherwise, if we support the original format, we use it
                     if (
-                        !$event->getTransformationManager()->hasAppliedTransformations() ||
-                        $outputConverterManager->supportsExtension($model->getExtension())
+                        !$event->getTransformationManager()->hasAppliedTransformations()
+                        || $outputConverterManager->supportsExtension($model->getExtension())
                     ) {
                         array_unshift($types, $original);
                         $supportedTypes[$original] = $model->getExtension();
@@ -243,7 +246,7 @@ class ResponseFormatter implements ListenerInterface
     }
 
     /**
-     * Response send hook
+     * Response send hook.
      *
      * @param EventInterface $event The current event
      */
@@ -266,16 +269,16 @@ class ResponseFormatter implements ListenerInterface
             $eventManager = $event->getManager();
 
             if (
-                ($model->getExtension() !== $this->formatter) &&
-                ($outputConverterManager->getMimeTypeFromExtension($this->formatter) !== $model->getMimeType()) &&
-                $outputConverterManager->supportsExtension($this->formatter)
+                ($model->getExtension() !== $this->formatter)
+                && ($outputConverterManager->getMimeTypeFromExtension($this->formatter) !== $model->getMimeType())
+                && $outputConverterManager->supportsExtension($this->formatter)
             ) {
                 $outputConverterManager->convert($model, $this->formatter);
-                // for clarity - if we just have a requested compression / quality value, we still have to invoke the
-                // conversion / writer for the existing format
+            // for clarity - if we just have a requested compression / quality value, we still have to invoke the
+            // conversion / writer for the existing format
             } elseif (
-                $model->getOutputQualityCompression() &&
-                $outputConverterManager->supportsExtension($this->formatter)
+                $model->getOutputQualityCompression()
+                && $outputConverterManager->supportsExtension($this->formatter)
             ) {
                 $outputConverterManager->convert($model, $this->formatter);
             }
@@ -293,10 +296,10 @@ class ResponseFormatter implements ListenerInterface
             $contentType = $formatter->getContentType();
         }
 
-        if ($contentType === 'application/json') {
+        if ('application/json' === $contentType) {
             foreach (['callback', 'jsonp', 'json'] as $validParam) {
                 if ($request->query->has($validParam)) {
-                    $formattedData = sprintf("%s(%s)", $request->query->get($validParam), $formattedData);
+                    $formattedData = sprintf('%s(%s)', $request->query->get($validParam), $formattedData);
                     break;
                 }
             }

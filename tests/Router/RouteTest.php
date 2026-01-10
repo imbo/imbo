@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Router;
 
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -9,7 +10,7 @@ class RouteTest extends TestCase
 {
     private Route $route;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->route = new Route();
     }

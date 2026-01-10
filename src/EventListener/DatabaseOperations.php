@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\EventManager\EventInterface;
@@ -6,35 +7,34 @@ use Imbo\Model;
 use Imbo\Resource\Images\Query as ImagesQuery;
 
 /**
- * Database operations event listener
+ * Database operations event listener.
  */
 class DatabaseOperations implements ListenerInterface
 {
     /**
-     * An images query object
+     * An images query object.
      */
     private ?ImagesQuery $imagesQuery = null;
 
     public static function getSubscribedEvents(): array
     {
         return [
-            'db.image.insert'    => 'insertImage',
-            'db.image.delete'    => 'deleteImage',
-            'db.image.load'      => 'loadImage',
-            'db.images.load'     => 'loadImages',
+            'db.image.insert' => 'insertImage',
+            'db.image.delete' => 'deleteImage',
+            'db.image.load' => 'loadImage',
+            'db.images.load' => 'loadImages',
             'db.metadata.delete' => 'deleteMetadata',
             'db.metadata.update' => 'updateMetadata',
-            'db.metadata.load'   => 'loadMetadata',
-            'db.user.load'       => 'loadUser',
-            'db.stats.load'      => 'loadStats',
+            'db.metadata.load' => 'loadMetadata',
+            'db.user.load' => 'loadUser',
+            'db.stats.load' => 'loadStats',
         ];
     }
 
     /**
-     * Set the images query
+     * Set the images query.
      *
      * @param ImagesQuery $query The query object
-     * @return self
      */
     public function setImagesQuery(ImagesQuery $query): self
     {
@@ -44,9 +44,7 @@ class DatabaseOperations implements ListenerInterface
     }
 
     /**
-     * Get the images query
-     *
-     * @return ImagesQuery
+     * Get the images query.
      */
     public function getImagesQuery(): ImagesQuery
     {
@@ -58,11 +56,11 @@ class DatabaseOperations implements ListenerInterface
     }
 
     /**
-     * Insert an image
+     * Insert an image.
      *
-     * @param EventInterface $event An event instance
-     * @param array $params Optional arguments to the insert method
-     *                      - `updateIfDuplicate` controls whether an update will happen if the imageid already exists
+     * @param EventInterface $event  An event instance
+     * @param array          $params Optional arguments to the insert method
+     *                               - `updateIfDuplicate` controls whether an update will happen if the imageid already exists
      */
     public function insertImage(EventInterface $event, array $params = []): void
     {
@@ -79,7 +77,7 @@ class DatabaseOperations implements ListenerInterface
     }
 
     /**
-     * Delete an image
+     * Delete an image.
      *
      * @param EventInterface $event An event instance
      */
@@ -94,7 +92,7 @@ class DatabaseOperations implements ListenerInterface
     }
 
     /**
-     * Load an image
+     * Load an image.
      *
      * @param EventInterface $event An event instance
      */
@@ -111,7 +109,7 @@ class DatabaseOperations implements ListenerInterface
     }
 
     /**
-     * Delete metadata
+     * Delete metadata.
      *
      * @param EventInterface $event An event instance
      */
@@ -131,7 +129,7 @@ class DatabaseOperations implements ListenerInterface
     }
 
     /**
-     * Update metadata
+     * Update metadata.
      *
      * @param EventInterface $event An event instance
      */
@@ -152,7 +150,7 @@ class DatabaseOperations implements ListenerInterface
     }
 
     /**
-     * Load metadata
+     * Load metadata.
      *
      * @param EventInterface $event An event instance
      */
@@ -172,7 +170,7 @@ class DatabaseOperations implements ListenerInterface
     }
 
     /**
-     * Load images
+     * Load images.
      *
      * @param EventInterface $event An event instance
      */
@@ -276,7 +274,7 @@ class DatabaseOperations implements ListenerInterface
     }
 
     /**
-     * Load user data
+     * Load user data.
      *
      * @param EventInterface $event An event instance
      */
@@ -300,7 +298,7 @@ class DatabaseOperations implements ListenerInterface
     }
 
     /**
-     * Load stats
+     * Load stats.
      *
      * @param EventInterface $event An event instance
      */

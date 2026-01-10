@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use ImagickException;
@@ -6,7 +7,7 @@ use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 
 /**
- * Convert transformation
+ * Convert transformation.
  *
  * This transformation can be used to convert the image from one type to another.
  */

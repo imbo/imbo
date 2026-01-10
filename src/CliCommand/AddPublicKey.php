@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\CliCommand;
 
 use Imbo\Auth\AccessControl\Adapter\AdapterInterface;
@@ -12,6 +13,11 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
+use function count;
+use function is_callable;
+
+use const PHP_EOL;
+
 class AddPublicKey extends CliCommand
 {
     public const RESOURCES_READ_ONLY = 'Read-only on user resources';
@@ -20,9 +26,6 @@ class AddPublicKey extends CliCommand
     public const RESOURCES_CUSTOM = 'Custom resources';
     public const RESOURCES_ALL = 'All resources (master user)';
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct()
     {
         parent::__construct('add-public-key');
@@ -42,9 +45,6 @@ class AddPublicKey extends CliCommand
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $adapter = $this->getAclAdapter();
@@ -82,18 +82,16 @@ class AddPublicKey extends CliCommand
 
         // Write success information
         $output->writeln('Successfully added new key pair');
-        $output->writeln('Public key:  ' . $publicKey);
-        $output->writeln('Private key: ' . $privateKey);
-        $output->writeln('ACL rules added: ' . count($aclRules));
+        $output->writeln('Public key:  '.$publicKey);
+        $output->writeln('Private key: '.$privateKey);
+        $output->writeln('ACL rules added: '.count($aclRules));
 
         return self::SUCCESS;
     }
 
     /**
-     * Ask user which resources the public key should have access to
+     * Ask user which resources the public key should have access to.
      *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
      * @return array
      */
     private function askForResources(InputInterface $input, OutputInterface $output)
@@ -127,10 +125,8 @@ class AddPublicKey extends CliCommand
     }
 
     /**
-     * Ask user which specific resources the public key should have access to
+     * Ask user which specific resources the public key should have access to.
      *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
      * @return array
      */
     private function askForSpecificResources(InputInterface $input, OutputInterface $output)
@@ -148,16 +144,14 @@ class AddPublicKey extends CliCommand
     }
 
     /**
-     * Ask the user which custom resources the public key should have access to
+     * Ask the user which custom resources the public key should have access to.
      *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
      * @return array|string
      */
     private function askForCustomResources(InputInterface $input, OutputInterface $output)
     {
         $question = new Question(
-            'Which custom resources should the public key have access to?' . PHP_EOL .
+            'Which custom resources should the public key have access to?'.PHP_EOL.
             '(comma-separated) ',
         );
 
@@ -165,9 +159,7 @@ class AddPublicKey extends CliCommand
             $resources = array_filter(array_map('trim', explode(',', (string) $answer)));
 
             if (empty($resources)) {
-                throw new RuntimeException(
-                    'You must specify at least one resource',
-                );
+                throw new RuntimeException('You must specify at least one resource');
             }
 
             return $resources;
@@ -178,28 +170,24 @@ class AddPublicKey extends CliCommand
     }
 
     /**
-     * Ask the user which users the public key should have access to (for the current ACL-rule)
+     * Ask the user which users the public key should have access to (for the current ACL-rule).
      *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
      * @return array|string
      */
     private function askForUsers(InputInterface $input, OutputInterface $output)
     {
         $question = new Question(
-            'On which users should the public key have access to these resources?' . PHP_EOL .
+            'On which users should the public key have access to these resources?'.PHP_EOL.
             '(comma-separated, specify "*" for all users) ',
         );
         $question->setValidator(function (?string $answer) {
             $users = array_filter(array_map('trim', explode(',', (string) $answer)));
 
             if (empty($users)) {
-                throw new RuntimeException(
-                    'You must specify at least one user, alternatively a wildcard character (*)',
-                );
+                throw new RuntimeException('You must specify at least one user, alternatively a wildcard character (*)');
             }
 
-            return array_search('*', $users) === false ? $users : '*';
+            return false === array_search('*', $users) ? $users : '*';
         });
         $question->setMaxAttempts(1);
 
@@ -207,11 +195,9 @@ class AddPublicKey extends CliCommand
     }
 
     /**
-     * Ask the user if she wants to add more ACL-rules
+     * Ask the user if she wants to add more ACL-rules.
      *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
-     * @return boolean
+     * @return bool
      */
     private function askForAnotherAclRule(InputInterface $input, OutputInterface $output)
     {
@@ -222,10 +208,8 @@ class AddPublicKey extends CliCommand
     }
 
     /**
-     * Ask the user for a private key (or generate one if user does not specify)
+     * Ask the user for a private key (or generate one if user does not specify).
      *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
      * @return string
      */
     private function askForPrivateKey(InputInterface $input, OutputInterface $output)
@@ -242,7 +226,7 @@ class AddPublicKey extends CliCommand
     }
 
     /**
-     * Get the configured ACL adapter and ensure it is mutable
+     * Get the configured ACL adapter and ensure it is mutable.
      *
      * @return MutableAdapterInterface
      */

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource\Images;
 
 use Imbo\Exception\RuntimeException;
@@ -7,63 +8,60 @@ use Imbo\Http\Response\Response;
 class Query
 {
     /**
-     * The page to get
+     * The page to get.
      */
     private int $page = 1;
 
     /**
-     * Number of images to get
+     * Number of images to get.
      */
     private int $limit = 20;
 
     /**
-     * Return metadata or not
+     * Return metadata or not.
      */
     private bool $returnMetadata = false;
 
     /**
-     * Timestamp to start fetching from
+     * Timestamp to start fetching from.
      */
     private ?int $from = null;
 
     /**
-     * Timestamp to fetch to
+     * Timestamp to fetch to.
      */
     private ?int $to = null;
 
     /**
-     * Image identifiers filter
+     * Image identifiers filter.
      *
      * @var array<string>
      */
     private array $imageIdentifiers = [];
 
     /**
-     * Checksums filter
+     * Checksums filter.
      *
      * @var array<string>
      */
     private array $checksums = [];
 
     /**
-     * Original checksums filter
+     * Original checksums filter.
      *
      * @var array<string>
      */
     private array $originalChecksums = [];
 
     /**
-     * Sort
+     * Sort.
      *
      * @var array<int,array{field:string,sort:string}>
      */
     private $sort = [];
 
     /**
-     * Set the page property
-     *
-     * @param int $page
-     * @return self
+     * Set the page property.
      */
     public function setPage(int $page): self
     {
@@ -73,9 +71,7 @@ class Query
     }
 
     /**
-     * Get the page
-     *
-     * @return int
+     * Get the page.
      */
     public function getPage(): int
     {
@@ -83,10 +79,7 @@ class Query
     }
 
     /**
-     * Set the limit property
-     *
-     * @param int $limit
-     * @return self
+     * Set the limit property.
      */
     public function setLimit(int $limit): self
     {
@@ -96,9 +89,7 @@ class Query
     }
 
     /**
-     * Get the limit
-     *
-     * @return int
+     * Get the limit.
      */
     public function getLimit(): int
     {
@@ -106,10 +97,9 @@ class Query
     }
 
     /**
-     * Set the returnMetadata flag
+     * Set the returnMetadata flag.
      *
      * @param bool $returnMetadata
-     * @return self
      */
     public function setReturnMetadata($returnMetadata): self
     {
@@ -119,9 +109,7 @@ class Query
     }
 
     /**
-     * Get the returnMetadata flag
-     *
-     * @return bool
+     * Get the returnMetadata flag.
      */
     public function getReturnMetadata(): bool
     {
@@ -129,10 +117,7 @@ class Query
     }
 
     /**
-     * Set the from attribute
-     *
-     * @param int $from
-     * @return self
+     * Set the from attribute.
      */
     public function setFrom(int $from): self
     {
@@ -142,9 +127,7 @@ class Query
     }
 
     /**
-     * Get the from attribute
-     *
-     * @return ?int
+     * Get the from attribute.
      */
     public function getFrom(): ?int
     {
@@ -152,10 +135,7 @@ class Query
     }
 
     /**
-     * Set the to attribute
-     *
-     * @param int $to
-     * @return self
+     * Set the to attribute.
      */
     public function setTo(int $to): self
     {
@@ -165,9 +145,7 @@ class Query
     }
 
     /**
-     * Get the to attribute
-     *
-     * @return ?int
+     * Get the to attribute.
      */
     public function getTo(): ?int
     {
@@ -175,10 +153,9 @@ class Query
     }
 
     /**
-     * Set the imageIdentifiers filter
+     * Set the imageIdentifiers filter.
      *
      * @param array<string> $imageIdentifiers
-     * @return self
      */
     public function setImageIdentifiers(array $imageIdentifiers): self
     {
@@ -188,7 +165,7 @@ class Query
     }
 
     /**
-     * Get the imageIdentifiers filter
+     * Get the imageIdentifiers filter.
      *
      * @return array<string>
      */
@@ -198,10 +175,9 @@ class Query
     }
 
     /**
-     * Set the checksums filter
+     * Set the checksums filter.
      *
      * @param array<string> $checksums
-     * @return self
      */
     public function setChecksums(array $checksums): self
     {
@@ -211,7 +187,7 @@ class Query
     }
 
     /**
-     * Get the checksums filter
+     * Get the checksums filter.
      *
      * @return array<string>
      */
@@ -221,10 +197,9 @@ class Query
     }
 
     /**
-     * Set the original checksums filter
+     * Set the original checksums filter.
      *
      * @param array<string> $originalChecksums
-     * @return self
      */
     public function setOriginalChecksums(array $originalChecksums): self
     {
@@ -234,7 +209,7 @@ class Query
     }
 
     /**
-     * Get the original checksums filter
+     * Get the original checksums filter.
      *
      * @return array<string>
      */
@@ -244,10 +219,9 @@ class Query
     }
 
     /**
-     * Set the sort data
+     * Set the sort data.
      *
      * @param array<string> $sort
-     * @return self
      */
     public function setSort(array $sort): self
     {
@@ -261,11 +235,11 @@ class Query
                 throw new RuntimeException('Badly formatted sort', Response::HTTP_BAD_REQUEST);
             }
 
-            if (strpos($field, ':') !== false) {
+            if (str_contains($field, ':')) {
                 list($fieldName, $dir) = explode(':', $field);
 
-                if ($dir !== 'asc' && $dir !== 'desc') {
-                    throw new RuntimeException('Invalid sort value: ' . $field, Response::HTTP_BAD_REQUEST);
+                if ('asc' !== $dir && 'desc' !== $dir) {
+                    throw new RuntimeException('Invalid sort value: '.$field, Response::HTTP_BAD_REQUEST);
                 }
 
                 $field = $fieldName;
@@ -273,7 +247,7 @@ class Query
 
             $sortData[] = [
                 'field' => $field,
-                'sort'  => $dir,
+                'sort' => $dir,
             ];
         }
 
@@ -283,7 +257,7 @@ class Query
     }
 
     /**
-     * Get the sort data
+     * Get the sort data.
      *
      * @return array<int,array{field:string,sort:string}>
      */

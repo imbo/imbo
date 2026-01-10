@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventListener;
 
 use Imbo\Auth\AccessControl\GroupQuery;
@@ -8,8 +9,10 @@ use Imbo\Http\Response\Response;
 use Imbo\Model\Groups as GroupsModel;
 use Imbo\Resource;
 
+use function in_array;
+
 /**
- * Access control event listener
+ * Access control event listener.
  *
  * This event listener will listen to all access-controlled resources and check if the public key
  * has access to the requested resource. If the public key does not have access to the resource,
@@ -19,7 +22,7 @@ use Imbo\Resource;
 class AccessControl implements ListenerInterface
 {
     /**
-     * Parameters for the listener
+     * Parameters for the listener.
      *
      * @var array
      */
@@ -29,7 +32,7 @@ class AccessControl implements ListenerInterface
 
     /**
      * Certain resources should be allowed when the requested public key
-     * is the same as the public key used to sign the request
+     * is the same as the public key used to sign the request.
      *
      * @var array
      */
@@ -43,7 +46,7 @@ class AccessControl implements ListenerInterface
     ];
 
     /**
-     * The resources that concerns resource group lookups
+     * The resources that concerns resource group lookups.
      *
      * @var array
      */
@@ -54,7 +57,7 @@ class AccessControl implements ListenerInterface
     ];
 
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param array $params Parameters for the listener
      */
@@ -74,9 +77,7 @@ class AccessControl implements ListenerInterface
     }
 
     /**
-     * Figure out which resources we have available and subscribe to them
-     *
-     * @param EventInterface $event
+     * Figure out which resources we have available and subscribe to them.
      */
     public function subscribe(EventInterface $event): void
     {
@@ -96,15 +97,14 @@ class AccessControl implements ListenerInterface
     }
 
     /**
-     * Check if the public key used has access to this resource for this user
+     * Check if the public key used has access to this resource for this user.
      *
-     * @param EventInterface $event
      * @throws RuntimeException If public key does not have access to the resource
      */
     public function checkAccess(EventInterface $event): void
     {
-        if ($event->hasArgument('skipAccessControl') &&
-            $event->getArgument('skipAccessControl') === true) {
+        if ($event->hasArgument('skipAccessControl')
+            && true === $event->getArgument('skipAccessControl')) {
             return;
         }
 
@@ -152,7 +152,7 @@ class AccessControl implements ListenerInterface
     }
 
     /**
-     * Load groups from the configured access control adapter
+     * Load groups from the configured access control adapter.
      *
      * @param EventInterface $event An event instance
      */

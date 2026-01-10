@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Model;
 
 use DateTime;
@@ -10,7 +11,7 @@ class StatusTest extends TestCase
 {
     private Status $model;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->model = new Status();
     }

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Auth\AccessControl;
 
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -9,7 +10,7 @@ class GroupQueryTest extends TestCase
 {
     private GroupQuery $query;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->query = new GroupQuery();
     }

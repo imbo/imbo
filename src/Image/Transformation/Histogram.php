@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -10,7 +11,7 @@ use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 
 /**
- * Histogram transformation
+ * Histogram transformation.
  */
 class Histogram extends Transformation
 {
@@ -114,9 +115,9 @@ class Histogram extends Transformation
                 foreach ($counts[$val] as $x => $y) {
                     // draw one vertical line for each value in our bucket
                     // if we want to do a scale factor for AA, we repeat it horizontally
-                    $x = $x * $scale;
+                    $x *= $scale;
 
-                    for ($i = 0; $i < $scale; $i++) {
+                    for ($i = 0; $i < $scale; ++$i) {
                         $draw->line($x + $i, $height, $x + $i, $height - $y);
                     }
                 }

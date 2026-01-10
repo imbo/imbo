@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\Auth\AccessControl\Adapter\MutableAdapterInterface;
@@ -9,6 +10,10 @@ use Imbo\Exception\RuntimeException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\AccessRules as AccessRulesModel;
 use Imbo\Model\ArrayModel;
+
+use function count;
+use function is_array;
+use function is_string;
 
 class AccessRules implements ResourceInterface
 {
@@ -27,7 +32,7 @@ class AccessRules implements ResourceInterface
     }
 
     /**
-     * Get access rules for the specified public key
+     * Get access rules for the specified public key.
      *
      * @param EventInterface $event The current event
      */
@@ -62,7 +67,7 @@ class AccessRules implements ResourceInterface
     }
 
     /**
-     * Add access rules for the specified public key
+     * Add access rules for the specified public key.
      *
      * @param EventInterface $event The current event
      */
@@ -106,9 +111,10 @@ class AccessRules implements ResourceInterface
     }
 
     /**
-     * Checks if this is an array containing only strings
+     * Checks if this is an array containing only strings.
      *
      * @param mixed Values to test
+     *
      * @return bool True if all values are strings
      */
     private function isStringArray($values): bool
@@ -123,8 +129,8 @@ class AccessRules implements ResourceInterface
     /**
      * Validate the contents of an access rule.
      *
-     * @param EventInterface $event
      * @param array $rule Access rule to check
+     *
      * @throws RuntimeException
      */
     private function validateRule(EventInterface $event, array $rule): void
@@ -135,7 +141,7 @@ class AccessRules implements ResourceInterface
         $unknownProperties = array_diff(array_keys($rule), $allowedProperties);
 
         if (!empty($unknownProperties)) {
-            throw new RuntimeException('Found unknown properties in rule: [' . implode(', ', $unknownProperties) . ']', Response::HTTP_BAD_REQUEST);
+            throw new RuntimeException('Found unknown properties in rule: ['.implode(', ', $unknownProperties).']', Response::HTTP_BAD_REQUEST);
         }
 
         if (isset($rule['resources']) && isset($rule['group'])) {
@@ -156,7 +162,7 @@ class AccessRules implements ResourceInterface
             }
 
             if (!$acl->getGroup($rule['group'])) {
-                throw new RuntimeException('Group \'' . $rule['group'] . '\' does not exist', Response::HTTP_BAD_REQUEST);
+                throw new RuntimeException('Group \''.$rule['group'].'\' does not exist', Response::HTTP_BAD_REQUEST);
             }
         }
 
@@ -164,7 +170,7 @@ class AccessRules implements ResourceInterface
             throw new RuntimeException('Users not specified in rule', Response::HTTP_BAD_REQUEST);
         }
 
-        if ($rule['users'] !== '*' && !$this->isStringArray($rule['users'])) {
+        if ('*' !== $rule['users'] && !$this->isStringArray($rule['users'])) {
             throw new RuntimeException('Illegal value for users property. Allowed: \'*\' or array with users', Response::HTTP_BAD_REQUEST);
         }
     }

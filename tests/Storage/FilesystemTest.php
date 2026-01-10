@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Storage;
 
 use DateTimeImmutable;
@@ -8,10 +9,13 @@ use PHPUnit\Framework\TestCase;
 use TestFs\Device;
 use TestFs\StreamWrapper as TestFs;
 
+use function dirname;
+use function sprintf;
+
 #[CoversClass(Filesystem::class)]
 class FilesystemTest extends TestCase
 {
-    private string $user            = 'user';
+    private string $user = 'user';
     private string $imageIdentifier = 'image.png';
 
     protected function setUp(): void
@@ -37,7 +41,7 @@ class FilesystemTest extends TestCase
     {
         $adapter = new Filesystem(TestFs::url('basedir'));
 
-        $dir = TestFs::url(join('/', [
+        $dir = TestFs::url(implode('/', [
             'basedir',
             $this->user[0],
             $this->user[1],
@@ -72,7 +76,7 @@ class FilesystemTest extends TestCase
 
     public function testStore(): void
     {
-        $path = __DIR__ . '/../Fixtures/image.png';
+        $path = __DIR__.'/../Fixtures/image.png';
         $imageData = (string) file_get_contents($path);
 
         $baseDir = TestFs::url('someDir');
@@ -100,7 +104,7 @@ class FilesystemTest extends TestCase
         mkdir($dir);
         $adapter = new Filesystem($dir);
 
-        $filePath = TestFs::url(join('/', [
+        $filePath = TestFs::url(implode('/', [
             'basedir',
             $this->user[0],
             $this->user[1],
@@ -131,7 +135,7 @@ class FilesystemTest extends TestCase
         $adapter = new Filesystem($dir);
         $before = new DateTimeImmutable();
 
-        $filePath = TestFs::url(join('/', [
+        $filePath = TestFs::url(implode('/', [
             'basedir',
             $this->user[0],
             $this->user[1],
@@ -171,7 +175,7 @@ class FilesystemTest extends TestCase
 
     public function testStoreFileThatAlreadyExists(): void
     {
-        $path = __DIR__ . '/../Fixtures/image.png';
+        $path = __DIR__.'/../Fixtures/image.png';
         $imageData = (string) file_get_contents($path);
 
         $baseDir = TestFs::url('someDir');
@@ -196,7 +200,7 @@ class FilesystemTest extends TestCase
 
     public function testThrowsExceptionOnEmptyDisk(): void
     {
-        $path = __DIR__ . '/../Fixtures/image.png';
+        $path = __DIR__.'/../Fixtures/image.png';
         $imageData = (string) file_get_contents($path);
 
         $baseDir = TestFs::url('someDir');

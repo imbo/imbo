@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image;
 
 use Closure;
@@ -17,6 +18,8 @@ use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
+use function get_class;
+
 #[CoversClass(ImagePreparation::class)]
 class ImagePreparationTest extends TestCase
 {
@@ -27,7 +30,7 @@ class ImagePreparationTest extends TestCase
     private InputLoaderManager&Stub $inputLoaderManager;
     private Closure $imagickLoader;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->request = $this->createMock(Request::class);
         $response = $this->createStub(Response::class);
@@ -36,6 +39,7 @@ class ImagePreparationTest extends TestCase
         $this->imagickLoader = function (string $mime, string $data): Imagick {
             $imagick = new Imagick();
             $imagick->readImageBlob($data);
+
             return $imagick;
         };
         $this->config = ['imageIdentifierGenerator' => $this->createStub(GeneratorInterface::class)];
@@ -86,7 +90,7 @@ class ImagePreparationTest extends TestCase
 
     public function testThrowsExceptionWhenImageIsBroken(): void
     {
-        $filePath = FIXTURES_DIR . '/broken-image.jpg';
+        $filePath = FIXTURES_DIR.'/broken-image.jpg';
 
         $this->inputLoaderManager
             ->method('load')
@@ -108,7 +112,7 @@ class ImagePreparationTest extends TestCase
 
     public function testThrowsExceptionWhenImageIsSlightlyBroken(): void
     {
-        $filePath = FIXTURES_DIR . '/slightly-broken-image.png';
+        $filePath = FIXTURES_DIR.'/slightly-broken-image.png';
 
         $this->inputLoaderManager
             ->method('load')
@@ -123,10 +127,9 @@ class ImagePreparationTest extends TestCase
         $this->prepare->prepareImage($this->event);
     }
 
-
     public function testPopulatesRequestWhenImageIsValid(): void
     {
-        $imagePath = FIXTURES_DIR . '/image.png';
+        $imagePath = FIXTURES_DIR.'/image.png';
         $imageData = file_get_contents($imagePath);
 
         $this->inputLoaderManager

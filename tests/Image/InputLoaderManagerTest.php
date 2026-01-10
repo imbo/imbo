@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image;
 
 use Imagick;
@@ -15,7 +16,7 @@ class InputLoaderManagerTest extends TestCase
 {
     private InputLoaderManager $manager;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->manager = new InputLoaderManager();
     }

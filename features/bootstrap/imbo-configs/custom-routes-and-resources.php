@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Behat;
 
 use Imbo\EventManager\EventInterface;
@@ -31,7 +32,7 @@ class CustomResource implements ResourceInterface
 }
 
 /**
- * Attach a couple of custom resources
+ * Attach a couple of custom resources.
  */
 class CustomResource2 implements ResourceInterface
 {

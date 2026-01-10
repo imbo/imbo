@@ -1,18 +1,22 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\EventManager;
 
 use SplPriorityQueue;
+
+use function is_int;
+
+use const PHP_INT_MAX;
 
 class PriorityQueue extends SplPriorityQueue
 {
     private int $queueOrder = PHP_INT_MAX;
 
     /**
-     * Add an entry to the queue
+     * Add an entry to the queue.
      *
-     * @param mixed $datum The entry to add
-     * @param int $priority The priority of the entry in the queue
-     * @return true
+     * @param mixed $datum    The entry to add
+     * @param int   $priority The priority of the entry in the queue
      */
     public function insert($datum, $priority): true
     {

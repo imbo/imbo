@@ -1,17 +1,20 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Auth\AccessControl\Adapter;
 
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Response\Response;
 use Imbo\Resource;
 
+use function is_array;
+
 /**
- * Simple array-backed access control adapter
+ * Simple array-backed access control adapter.
  */
 class SimpleArrayAdapter extends ArrayAdapter implements AdapterInterface
 {
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param array $accessList Array defining the available public/private keys
      */
@@ -21,11 +24,9 @@ class SimpleArrayAdapter extends ArrayAdapter implements AdapterInterface
     }
 
     /**
-     * Converts public => private key pairs into the array format accepted by ArrayAdapter
+     * Converts public => private key pairs into the array format accepted by ArrayAdapter.
      *
-     * @param array $accessList
      * @throws InvalidArgumentException
-     * @return array
      */
     private function getExpandedAclList(array $accessList): array
     {
@@ -33,14 +34,11 @@ class SimpleArrayAdapter extends ArrayAdapter implements AdapterInterface
 
         foreach ($accessList as $publicKey => $privateKey) {
             if (is_array($privateKey)) {
-                throw new InvalidArgumentException(
-                    'A public key can only have a single private key (as of 2.0.0)',
-                    Response::HTTP_INTERNAL_SERVER_ERROR,
-                );
+                throw new InvalidArgumentException('A public key can only have a single private key (as of 2.0.0)', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
             $entries[] = [
-                'publicKey'  => $publicKey,
+                'publicKey' => $publicKey,
                 'privateKey' => $privateKey,
                 'acl' => [[
                     'resources' => Resource::getReadWriteResources(),

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Image\Transformation;
 
 use Imagick;
@@ -7,8 +8,11 @@ use Imbo\Exception\InvalidArgumentException;
 use Imbo\Exception\TransformationException;
 use Imbo\Http\Response\Response;
 
+use function in_array;
+use function is_array;
+
 /**
- * Clip transformation for making an image transparent outside of a clipping mask
+ * Clip transformation for making an image transparent outside of a clipping mask.
  */
 class Clip extends Transformation
 {
@@ -29,10 +33,7 @@ class Clip extends Transformation
                     return;
                 }
 
-                throw new InvalidArgumentException(
-                    'Selected clipping path "' . $pathName . '" was not found in the image. Add the ignoreUnknownPath argument if you want to ignore this error.',
-                    Response::HTTP_BAD_REQUEST,
-                );
+                throw new InvalidArgumentException('Selected clipping path "'.$pathName.'" was not found in the image. Add the ignoreUnknownPath argument if you want to ignore this error.', Response::HTTP_BAD_REQUEST);
             }
         }
 
@@ -53,7 +54,7 @@ class Clip extends Transformation
             $this->imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_OPAQUE);
         } catch (ImagickException $e) {
             // NoClipPathDefined - the image doesn't have a clipping path, but this isn't a fatal error.
-            if ($e->getCode() == 410) {
+            if (410 == $e->getCode()) {
                 // but we need to reset the alpha channel mode in case someone else is doing something with it
                 if ($currentAlphaChannelMode) {
                     $this->imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_ACTIVATE);

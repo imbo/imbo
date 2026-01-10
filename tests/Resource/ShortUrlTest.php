@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Imbo\Resource;
 
 use Imbo\Database\DatabaseInterface;
@@ -26,7 +27,7 @@ class ShortUrlTest extends ResourceTests
         return new ShortUrl();
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->route = $this->createMock(Route::class);
         $this->request = $this->createConfiguredStub(Request::class, [
