@@ -2,7 +2,6 @@
 
 namespace Imbo\CliCommand;
 
-use Imbo\Exception\RuntimeException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
@@ -27,13 +26,5 @@ class GeneratePrivateKeyTest extends TestCase
         $commandTester->execute(['command' => $this->command->getName()]);
 
         $this->assertMatchesRegularExpression('/^[a-zA-Z_\\-0-9]{8,}$/', trim($commandTester->getDisplay()));
-    }
-
-    public function testFailsWhenItCantGenerateAPrivateKey(): void
-    {
-        $this->command->maxTries = 0;
-        $commandTester = new CommandTester($this->command);
-        $this->expectExceptionObject(new RuntimeException('Could not generate private key'));
-        $commandTester->execute(['command' => $this->command->getName()]);
     }
 }

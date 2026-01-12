@@ -3,34 +3,26 @@
 namespace Imbo\Image\Identifier\Generator;
 
 use Imbo\Model\Image;
-
-use function strlen;
+use Random\Randomizer;
 
 class RandomString implements GeneratorInterface
 {
-    private int $stringLength;
-
     /**
      * Class constructor.
      *
      * @param int $length The length of the randomly generated string
      */
-    public function __construct(int $length = 12)
-    {
-        $this->stringLength = $length;
+    public function __construct(
+        private int $length = 12,
+    ) {
     }
 
     public function generate(Image $image): string
     {
-        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-';
-        $charsLen = strlen($chars);
-        $key = '';
-
-        for ($i = 0; $i < $this->stringLength; ++$i) {
-            $key .= $chars[mt_rand(0, $charsLen - 1)];
-        }
-
-        return $key;
+        return (new Randomizer())->getBytesFromString(
+            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-',
+            $this->length,
+        );
     }
 
     public function isDeterministic(): bool

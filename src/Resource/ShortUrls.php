@@ -6,11 +6,19 @@ use Imbo\EventManager\EventInterface;
 use Imbo\Exception\InvalidArgumentException;
 use Imbo\Http\Response\Response;
 use Imbo\Model\ArrayModel;
+use Random\Randomizer;
 
 use const JSON_ERROR_NONE;
 
 class ShortUrls implements ResourceInterface
 {
+    private Randomizer $randomizer;
+
+    public function __construct()
+    {
+        $this->randomizer = new Randomizer();
+    }
+
     public function getAllowedMethods(): array
     {
         return ['POST', 'DELETE'];
@@ -134,14 +142,9 @@ class ShortUrls implements ResourceInterface
      */
     private function getShortUrlId(int $len = 7): string
     {
-        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-        $charsLen = 62;
-        $key = '';
-
-        for ($i = 0; $i < $len; ++$i) {
-            $key .= $chars[mt_rand() % $charsLen];
-        }
-
-        return $key;
+        return $this->randomizer->getBytesFromString(
+            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890',
+            $len,
+        );
     }
 }
