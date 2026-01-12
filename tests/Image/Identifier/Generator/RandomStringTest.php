@@ -22,7 +22,6 @@ class RandomStringTest extends TestCase
         for ($i = 0; $i < 100; ++$i) {
             $imageIdentifier = $generator->generate($image);
 
-            // Does it have the right format?
             $this->assertMatchesRegularExpression(
                 '/^[A-Za-z0-9_-]{'.$stringLength.'}$/',
                 $imageIdentifier,
