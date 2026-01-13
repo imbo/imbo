@@ -14,19 +14,19 @@ class Filesystem implements AdapterTest
 {
     public static function setUp(array $config): array
     {
-        $dataDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'imbo_behat_test_storage';
-        self::clearPath($dataDir);
-        mkdir($dataDir);
+        $baseDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'imbo_behat_test_storage';
+        self::clearPath($baseDir);
+        mkdir($baseDir);
 
         return [
-            'dataDir' => $dataDir,
+            'baseDir' => $baseDir,
         ];
     }
 
     public static function tearDown(array $config): void
     {
-        if (!empty($config['dataDir']) && is_dir($config['dataDir'])) {
-            self::clearPath($config['dataDir']);
+        if (!empty($config['baseDir']) && is_dir($config['baseDir'])) {
+            self::clearPath($config['baseDir']);
         }
     }
 
@@ -64,6 +64,6 @@ class Filesystem implements AdapterTest
 
     public static function getAdapter(array $config): StorageAdapter
     {
-        return new StorageAdapter($config['dataDir']);
+        return new StorageAdapter($config['baseDir']);
     }
 }

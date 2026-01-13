@@ -16,7 +16,7 @@ class SimpleArrayAdapter extends ArrayAdapter implements AdapterInterface
     /**
      * Class constructor.
      *
-     * @param array $accessList Array defining the available public/private keys
+     * @param array<string,string> $accessList Array defining the available public/private keys
      */
     public function __construct(array $accessList = [])
     {
@@ -25,6 +25,8 @@ class SimpleArrayAdapter extends ArrayAdapter implements AdapterInterface
 
     /**
      * Converts public => private key pairs into the array format accepted by ArrayAdapter.
+     *
+     * @param array<string,string> $accessList
      *
      * @throws InvalidArgumentException
      */

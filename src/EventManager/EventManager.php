@@ -97,16 +97,18 @@ class EventManager
             $className = $this->eventHandlers[$name]['handler'];
             $params = $this->eventHandlers[$name]['params'];
             $handler = new $className($params ?: null);
-
-            // Run initializers
-            foreach ($this->initializers as $initializer) {
-                $initializer->initialize($handler);
-            }
-
+            $this->initializeHandler($handler);
             $this->eventHandlers[$name] = $handler;
         }
 
         return $this->eventHandlers[$name];
+    }
+
+    public function initializeHandler(ListenerInterface $handler): void
+    {
+        foreach ($this->initializers as $initializer) {
+            $initializer->initialize($handler);
+        }
     }
 
     public function addInitializer(InitializerInterface $initializer): self

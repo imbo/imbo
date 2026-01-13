@@ -1,7 +1,7 @@
 Imbo's API
 ==========
 
-In this chapter you will learn more about how Imbo's API works, and how you as a user are able to read from and write to Imbo. Most examples listed in this chapter will use `cURL <http://curl.haxx.se/>`_, so while playing around with the API it's encouraged to have cURL easily available. For the sake of simplicity the access tokens and authentication information is not used in the examples. See the :ref:`access-tokens` and :ref:`signing-write-requests` sections for more information regarding this.
+In this chapter you will learn more about how Imbo's API works, and how you as a user are able to read from and write to Imbo. Most examples listed in this chapter will use `cURL <https://curl.se/>`_, so while playing around with the API it's encouraged to have cURL easily available. For the sake of simplicity the access tokens and authentication information is not used in the examples. See the :ref:`access-tokens` and :ref:`signing-write-requests` sections for more information regarding this.
 
 Resources/endpoints
 -------------------
@@ -28,10 +28,10 @@ results in:
 .. code-block:: javascript
 
     {
-      "site": "http://imbo.io",
+      "site": "https://imbo.io",
       "source": "https://github.com/imbo/imbo",
       "issues": "https://github.com/imbo/imbo/issues",
-      "docs": "http://docs.imbo.io"
+      "docs": "https://docs.imbo.io"
     }
 
 The index resource does not require any authentication per default.
@@ -179,7 +179,7 @@ Global short URL resource - ``/s/<id>``
 
 Images in Imbo can have short URLs associated with them, which are generated on demand when interacting with the :ref:`short URLs resource <shorturls-resource>`. These URLs can be used in place of the rather long original URLs which includes both access tokens and transformations.
 
-The format of the random ID part of the short URL can be matched with the following `regular expression <http://en.wikipedia.org/wiki/Regular_expression>`_::
+The format of the random ID part of the short URL can be matched with the following `regular expression <https://en.wikipedia.org/wiki/Regular_expression>`_::
 
     /^[a-zA-Z0-9]{7}$/
 
@@ -272,7 +272,7 @@ The images resource can also be used to gather information on which images a use
     Whether or not to include metadata in the output. Defaults to ``0``, set to ``1`` to enable.
 
 ``from``
-    Fetch images starting from this `Unix timestamp <http://en.wikipedia.org/wiki/Unix_timestamp>`_.
+    Fetch images starting from this `Unix timestamp <https://en.wikipedia.org/wiki/Unix_timestamp>`_.
 
 ``to``
     Fetch images up until this timestamp.
@@ -652,7 +652,7 @@ Public key resource - ``/keys/<publicKey>``
 
 The public key resource provides a way for clients to dynamically add, remove and update public keys to be used as part of the access control routines. Not all access control adapters implement this functionality - in this case the configuration is done through configuration files.
 
-A private key does not have any specific requirements, while a public key must match the following `regular expression <http://en.wikipedia.org/wiki/Regular_expression>`_::
+A private key does not have any specific requirements, while a public key must match the following `regular expression <https://en.wikipedia.org/wiki/Regular_expression>`_::
 
     /^[a-zA-Z0-9_-]{1,}$/
 
@@ -929,9 +929,9 @@ Requests using HTTP DELETE on this resource removes the access control rule, giv
 Access tokens
 -------------
 
-Access tokens are enforced by an event listener that is enabled in the default configuration file. The access tokens are used to prevent `DoS <http://en.wikipedia.org/wiki/Denial-of-service_attack>`_ attacks so think twice before you disable the event listener.
+Access tokens are enforced by an event listener that is enabled in the default configuration file. The access tokens are used to prevent `DoS <https://en.wikipedia.org/wiki/Denial-of-service_attack>`_ attacks so think twice before you disable the event listener.
 
-An access token, when enforced by the event listener, must be supplied in the URI using the ``accessToken`` query parameter and without it, most ``GET`` and ``HEAD`` requests will result in a ``400 Bad request`` response. The value of the ``accessToken`` parameter is a `Hash-based Message Authentication Code <http://en.wikipedia.org/wiki/HMAC>`_ (HMAC). The code is a `SHA-256 <http://en.wikipedia.org/wiki/SHA-2>`_ hash of the URI itself using the private key of the user as the secret key. It is very important that the URI is **not** URL-encoded when generating the hash. Below is an example on how to generate a valid access token for a specific image using PHP:
+An access token, when enforced by the event listener, must be supplied in the URI using the ``accessToken`` query parameter and without it, most ``GET`` and ``HEAD`` requests will result in a ``400 Bad request`` response. The value of the ``accessToken`` parameter is a `Hash-based Message Authentication Code <https://en.wikipedia.org/wiki/HMAC>`_ (HMAC). The code is a `SHA-256 <https://en.wikipedia.org/wiki/SHA-2>`_ hash of the URI itself using the private key of the user as the secret key. It is very important that the URI is **not** URL-encoded when generating the hash. Below is an example on how to generate a valid access token for a specific image using PHP:
 
 .. literalinclude:: ../examples/generateAccessToken.php
     :language: php
@@ -975,7 +975,7 @@ These elements are concatenated in the above order with ``|`` as a delimiter cha
     :language: php
     :linenos:
 
-and Python (using the `Requests <http://docs.python-requests.org>`_ library):
+and Python (using the `Requests <https://docs.python-requests.org>`_ library):
 
 .. literalinclude:: ../examples/generateSignatureForDelete.py
     :language: python
@@ -996,11 +996,11 @@ If you want to implement your own authentication paradigm you can do this by cre
 Supported content types
 -----------------------
 
-Imbo currently responds with images (jpg, gif and png) and `JSON <http://en.wikipedia.org/wiki/JSON>`_ and accepts images (jpg, gif and png) and JSON as input.
+Imbo currently responds with images (jpg, gif and png) and `JSON <https://en.wikipedia.org/wiki/JSON>`_ and accepts images (jpg, gif and png) and JSON as input.
 
-Imbo will do content negotiation using the `Accept <http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html>`_ header found in the request, unless you specify a file extension, in which case Imbo will deliver the type requested without looking at the ``Accept`` header.
+Imbo will do content negotiation using the `Accept <https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html>`_ header found in the request, unless you specify a file extension, in which case Imbo will deliver the type requested without looking at the ``Accept`` header.
 
-The only supported content type for non-image responses is JSON. Theses responses can be wrapped in a function (`JSONP <http://en.wikipedia.org/wiki/JSONP>`_) by using one of the following query parameters:
+The only supported content type for non-image responses is JSON. Theses responses can be wrapped in a function (`JSONP <https://en.wikipedia.org/wiki/JSONP>`_) by using one of the following query parameters:
 
 * ``callback``
 * ``jsonp``
@@ -1045,7 +1045,7 @@ All other resources will include ``Cache-Control: public``. The :ref:`image <ima
 ETag
 ++++
 
-Imbo provides `entity tags <http://en.wikipedia.org/wiki/HTTP_ETag>`_ for cache validation mechanisms. User agents can use the ``ETag`` response header to do conditional requests further down the road (by specifying the original ``ETag`` value in the ``If-None-Match`` request header). This results in saved bandwidth as web caches and Imbo servers no longer need to send the response body, as the one cached by the user agent can be re-used. This is achieved by sending ``304 Not Modified`` back to the user agent, instead of ``200 OK``.
+Imbo provides `entity tags <https://en.wikipedia.org/wiki/HTTP_ETag>`_ for cache validation mechanisms. User agents can use the ``ETag`` response header to do conditional requests further down the road (by specifying the original ``ETag`` value in the ``If-None-Match`` request header). This results in saved bandwidth as web caches and Imbo servers no longer need to send the response body, as the one cached by the user agent can be re-used. This is achieved by sending ``304 Not Modified`` back to the user agent, instead of ``200 OK``.
 
 The following resources in Imbo will include an ETag:
 
@@ -1068,7 +1068,7 @@ Imbo also includes a ``Last-Modified`` response header for resources that has a 
 * :ref:`metadata-resource`: The date of when the metadata of the image was last modified.
 * :ref:`global-shorturl-resource`: Same as the date of the original image.
 
-User agents can use the value of the ``Last-Modified`` header in the ``If-Modified-Since`` request header to make a conditional request. The value of the ``Last-Modified`` header is an `HTTP-date <http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.3.1>`_, for instance ``Last-Modified: Wed, 12 Feb 2014 09:46:02 GMT``.
+User agents can use the value of the ``Last-Modified`` header in the ``If-Modified-Since`` request header to make a conditional request. The value of the ``Last-Modified`` header is an `HTTP-date <https://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.3.1>`_, for instance ``Last-Modified: Wed, 12 Feb 2014 09:46:02 GMT``.
 
 Errors
 ------

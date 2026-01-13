@@ -37,6 +37,5 @@ Extending/customizing Imbo
     :maxdepth: 2
 
     develop/event_listeners
-    develop/custom_adapters
     develop/image_transformations
     develop/contributing

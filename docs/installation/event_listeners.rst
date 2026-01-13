@@ -7,6 +7,28 @@ Imbo ships with a collection of event listeners for you to use. Some of them are
     :local:
     :depth: 1
 
+.. _access-control-event-listener:
+
+Access control
+++++++++++++++
+
+This event listener will listen to all access-controlled resources and check if the public key has access to the requested resource. If the public key does not have access to the resource, the listener will throw an exception resulting in a HTTP response with 400 Bad Request. It will also handle loading of ACL-related resources such as resource groups.
+
+This event listener is included in the default configuration:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'eventListeners' => [
+            'accessControl' => EventListener\AccessControl::class,
+        ],
+
+        // ...
+    ];
+
 .. _access-token-event-listener:
 
 Access token
@@ -70,23 +92,24 @@ This event listener is included in the default configuration file without specif
         // ...
     ];
 
-Disable this event listener with care. Installations with no access token check is open for `DoS <http://en.wikipedia.org/wiki/Denial-of-service_attack>`_ attacks.
+.. warning::
+    Disable this event listener with care. Installations with no access token check is open for `DoS <https://en.wikipedia.org/wiki/Denial-of-service_attack>`_ attacks.
 
 .. _custom-access-token-generators:
 
 Custom Access Token Generators
 ------------------------------
 
-You can customize how the access token is generated and which URL parameter that contain the access token. The default implementation uses a SHA256 HMAC generated from the private key and the URL of the request.
+You can customize how the access token is generated and which URL parameter that contain the access token. The default implementation uses a `SHA-256 HMAC <https://en.wikipedia.org/wiki/HMAC>`__ generated from the private key and the URL of the request.
 
-To switch to a different access token generator provide a new generator in the ``accessTokenGenerator`` parameter. This generator must implement the ``AccessTokenInterface`` interface, available under ``EventListener\AccessToken\AccessTokenInterface``. An abstract class (``AccessTokenGenerator``) is included that you can subclass to quickly implement an alternative signature algorithm.
+To switch to a different access token generator provide a new generator in the ``accessTokenGenerator`` parameter. This generator must implement the ``Imbo\EventListener\AccessToken\AccessTokenInterface`` interface. An abstract class, ``Imbo\EventListener\AccessToken\AccessTokenGenerator``, is included that you can subclass to quickly implement an alternative signature algorithm.
 
 To use a different algorithm, provide it as a key in the parameter array when creating the access token event listener:
 
 .. code-block:: php
 
     [
-        'accessTokenGenerator' => new AccessToken\SHA256(),
+        'accessTokenGenerator' => new Imbo\EventListener\AccessToken\SHA256(),
     ]
 
 You can also provide a list of URL argument names for the access token, if it's not available through the regular ``accessToken`` argument.
@@ -94,21 +117,21 @@ You can also provide a list of URL argument names for the access token, if it's 
 .. code-block:: php
 
     [
-        'accessTokenGenerator' => new AccessToken\SHA256(['argumentKeys' => ['foo', 'accessToken']]),
+        'accessTokenGenerator' => new Imbo\EventListener\AccessToken\SHA256(['argumentKeys' => ['foo', 'accessToken']]),
     ]
 
 which would allow the token to be present under either ``foo`` or ``accessToken`` in the URL arguments.
 
-Imbo uses a SHA256 HMAC as the default signature generation algorithm, available under ``EventListener\AccessToken\SHA256``.
+Imbo uses a SHA256 HMAC as the default signature generation algorithm, available under ``Imbo\EventListener\AccessToken\SHA256``.
 
-If you want to use multiple access token generators, you can use the bundled ``MultipleAccessTokensGenerators`` generator, which will pick a generator based on the available URL parameters (in sequence, the first match will be used).
+If you want to use multiple access token generators, you can use the bundled ``Imbo\EventListener\AccessToken\MultipleAccessTokenGenerators`` generator, which will pick a generator based on the available URL parameters (in sequence, the first match will be used).
 
 .. code-block:: php
 
     [
-        'accessTokenGenerator' => new AccessToken\MultipleAccessTokenGenerators([
+        'accessTokenGenerator' => new Imbo\EventListener\AccessToken\MultipleAccessTokenGenerators([
             'generators' => [
-                'accessToken' => new AccessToken\SHA256(),
+                'accessToken' => new Imbo\EventListener\AccessToken\SHA256(),
                 'dummy' => new DummyImplementation(),
                 ...
             ],
@@ -154,7 +177,7 @@ Disable this event listener with care. User agents can delete all your images an
 Auto rotate image
 +++++++++++++++++
 
-This event listener will auto rotate new images based on metadata embedded in the image itself (`EXIF <http://en.wikipedia.org/wiki/Exchangeable_image_file_format>`_).
+This event listener will auto rotate new images based on metadata embedded in the image itself (`EXIF <https://en.wikipedia.org/wiki/Exchangeable_image_file_format>`_).
 
 The listener does not support any parameters and can be enabled like this:
 
@@ -178,7 +201,7 @@ If you enable this listener all new images added to Imbo will be auto rotated ba
 CORS (Cross-Origin Resource Sharing)
 ++++++++++++++++++++++++++++++++++++
 
-This event listener can be used to allow clients such as web browsers to use Imbo when the client is located on a different origin/domain than the Imbo server is. This is implemented by sending a set of `CORS <http://en.wikipedia.org/wiki/Cross-origin_resource_sharing>`_-headers on specific requests, if the origin of the request matches a configured domain.
+This event listener can be used to allow clients such as web browsers to use Imbo when the client is located on a different origin/domain than the Imbo server is. This is implemented by sending a set of `CORS <https://en.wikipedia.org/wiki/Cross-origin_resource_sharing>`_-headers on specific requests, if the origin of the request matches a configured domain.
 
 The event listener can be configured on a per-resource and per-method basis, and will therefore listen to any related events. If enabled without any specific configuration, the listener will allow and respond to the **GET**, **HEAD** and **OPTIONS** methods on all resources. Note however that no origins are allowed by default and that a client will still need to provide a valid access token, unless the :ref:`Access token listener <access-token-event-listener>` is disabled.
 
@@ -303,7 +326,7 @@ and is enabled like this:
 
         $ find /path/to/cache -ctime +7 -type f -delete
 
-    The above command will delete all files in ``/path/to/cache`` older than 7 days and can be used with for instance `crontab <http://en.wikipedia.org/wiki/Cron>`_.
+    The above command will delete all files in ``/path/to/cache`` older than 7 days and can be used with for instance `crontab <https://en.wikipedia.org/wiki/Cron>`_.
 
 
 Image transformation limiter
@@ -501,7 +524,7 @@ The event listener supports for following configuration parameters:
             // ...
         ];
 
-    .. note:: When using the Filesystem adapter, the ``dataDir`` **must** be specified, and **must** be writable by the web server.
+    .. note:: When using the Filesystem adapter, the ``baseDir`` **must** be specified, and **must** be writable by the web server.
 
 .. _imagick-event-listener:
 
@@ -552,12 +575,19 @@ and is enabled like this:
 
 which would effectively downsize all images exceeding a ``width`` of ``1024`` or a ``height`` of ``768``. The aspect ratio will be kept.
 
+.. _output-converter-event-listener:
+
+Output converter
+++++++++++++++++
+
+This is an internal event listener and needs no further documentation.
+
 .. _stats-access-event-listener:
 
 Stats access
 ++++++++++++
 
-This event listener controls the access to the :ref:`stats resource <stats-resource>` by using white listing of IPv4 and/or IPv6 addresses. `CIDR-notations <http://en.wikipedia.org/wiki/CIDR#CIDR_notation>`_ are also supported.
+This event listener controls the access to the :ref:`stats resource <stats-resource>` by using white listing of IPv4 and/or IPv6 addresses. `CIDR-notations <https://en.wikipedia.org/wiki/CIDR#CIDR_notation>`_ are also supported.
 
 This listener is enabled per default, and only allows ``127.0.0.1`` and ``::1`` to access the statistics:
 
