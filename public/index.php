@@ -33,7 +33,9 @@ if (defined('IMBO_CONFIG_PATH') && is_file(IMBO_CONFIG_PATH)) {
         return is_array($config) ? $config : [];
     };
 
-    foreach (glob($appDirectory.'/config/*.php') as $file) {
+    $configs = glob($appDirectory.'/config/*.php');
+    sort($configs);
+    foreach ($configs as $file) {
         if ('config.default.php' === basename($file)) {
             continue;
         }

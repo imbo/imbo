@@ -35,6 +35,7 @@
   },
   "require-dev": {
     "ext-mongodb": "^2.0",
+    "ext-pdo": "*",
     "christeredvartsen/testfs": "^0.8.0",
     "friendsofphp/php-cs-fixer": "^3.92",
     "imbo/behat-api-extension": "^6.0",

@@ -198,33 +198,6 @@ Below you will find documentation on the different database adapters Imbo ships 
     :local:
     :depth: 1
 
-.. _doctrine-database-adapter:
-
-Doctrine
-++++++++
-
-This adapter uses the `Doctrine Database Abstraction Layer`_. The options you pass to the constructor of this adapter is passed to the underlying classes, so have a look at the documentation for Doctrine DBAL. When using this adapter you need to create the required tables in the RDBMS first, as specified in the :ref:`database-setup` section.
-
-Example
-^^^^^^^
-
-.. code-block:: php
-
-    <?php
-    return [
-        // ...
-
-        'database' => new Imbo\Database\Doctrine([
-            'dbname' => 'database',
-            'user' => 'username',
-            'password' => 'password',
-            'host' => 'hostname',
-            'driver' => 'pdo_mysql'
-        ]),
-
-        // ...
-    ];
-
 .. _mongodb-database-adapter:
 .. _default-database-adapter:
 
@@ -234,13 +207,19 @@ MongoDB
 This adapter use the `MongoDB PECL extension`_ and the `MongoDB PHP library`_ to store data in `MongoDB`_. The following parameters are supported:
 
 ``databaseName``
-    Name of the database to use. Defaults to ``imbo``.
+    The name of the database to store the images in. Defaults to ``imbo``.
 
-``server``
-    The server string to use when connecting. Defaults to ``mongodb://localhost:27017``.
+``uri``
+    The URI to use when connecting to the MongoDB server. Defaults to ``mongodb://localhost:27017``.
 
-``options``
-    Options passed to the underlying adapter. Defaults to ``['connect' => true, 'timeout' => 1000]``. See the manual for the `MongoDB PHP library`_ for more information.
+``uriOptions``
+    Options passed to the underlying adapter. Refer to the manual for the `MongoDB PHP library`_ for available options.
+
+``driverOptions``
+    Options passed to the underlying adapter. Refer to the manual for the `MongoDB PHP library`_ for available options.
+
+``bucketOptions``
+    Options passed to the underlying adapter. Refer to the manual for the `MongoDB PHP library`_ for available options.
 
 Examples
 ^^^^^^^^
@@ -266,9 +245,108 @@ Examples
     return [
         // ...
 
-        'database' => new Imbo\Database\MongoDB([
-            'server' => 'mongodb://server1,server2,server3/?replicaSet=nameOfReplicaSet',
-        ]),
+        'database' => new Imbo\Database\MongoDB(
+            uri: 'mongodb://server1,server2,server3/?replicaSet=nameOfReplicaSet',
+        ),
+
+        // ...
+    ];
+
+MySQL
++++++
+
+This adapter stores information in a MySQL database using the PDO extension. The following parameters are supported:
+
+``dsn``
+    The database DSN.
+
+``username``
+    The username to use when connecting.
+
+``password``
+    The password to use when connecting.
+
+``options``
+    Options passed to the underlying adapter.
+
+Examples
+^^^^^^^^
+
+1) Connect to a local instance:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'database' => new Imbo\Database\MySQL(
+            'mysql:host=localhost;dbname=imbo',
+            'imbo',
+            'super-secret-password',
+        ),
+        // ...
+    ];
+
+PostgreSQL
+++++++++++
+
+This adapter stores information in a PostgreSQL database using the PDO extension. The following parameters are supported:
+
+``dsn``
+    The database DSN.
+
+``username``
+    The username to use when connecting.
+
+``password``
+    The password to use when connecting.
+
+``options``
+    Options passed to the underlying adapter.
+
+Examples
+^^^^^^^^
+
+1) Connect to a local instance:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'database' => new Imbo\Database\PostgreSQL(
+            'pgsql:host=localhost;dbname=imbo',
+            'imbo',
+            'super-secret-password',
+        ),
+        // ...
+    ];
+
+SQLite
+++++++
+
+This adapter stores information in a SQLite database using the PDO extension. The following parameters are supported:
+
+``dsn``
+    The database DSN.
+
+``options``
+    Options passed to the underlying adapter.
+
+Examples
+^^^^^^^^
+
+1) Connect to a SQLite database:
+
+.. code-block:: php
+
+    <?php
+    return [
+        // ...
+
+        'database' => new Imbo\Database\SQLite('sqlite:/opt/databases/imbo.sq3'),
 
         // ...
     ];
@@ -284,7 +362,9 @@ If you need to create your own database adapter you need to create a class that 
     return [
         // ...
 
-        'database' => new My\Custom\DatabaseAdapter(),
+        'database' => new class implements Imbo\Database\DatabaseInterface {
+            // ...
+        },
 
         // ...
     ];
@@ -306,94 +386,16 @@ In the default configuration file the :ref:`default-storage-adapter` storage ada
     return [
         // ...
 
-        'storage' => new Imbo\Storage\Filesystem([
-            'dataDir' => '/path/to/images',
-        ]),
+        'storage' => new Imbo\Storage\Filesystem('/path/to/images'),
 
         // ...
     ];
 
-Below you will find documentation on the different storage adapters Imbo ships with.
+Below you will find documentation on the different storage adapters for Imbo.
 
 .. contents::
     :local:
     :depth: 1
-
-.. _s3-storage-adapter:
-
-Amazon Simple Storage Service
-+++++++++++++++++++++++++++++
-
-This adapter stores your images in a bucket in `Amazon S3`_. The parameters are:
-
-``key``
-    Your AWS access key.
-
-``secret``
-    Your AWS secret key.
-
-``bucket``
-    The name of the bucket you want to store your images in. Imbo will **not** create this for you automatically.
-
-``region``
-    The name of the region your bucket resides in.
-
-This adapter creates subdirectories in the bucket in the same fashion as the :ref:`Filesystem storage adapter <filesystem-storage-adapter>` stores the files on the local filesystem.
-
-Examples
-^^^^^^^^
-
-.. code-block:: php
-
-    <?php
-    return [
-        // ...
-
-        'storage' => new Imbo\Storage\S3([
-            'key' => '<aws access key>',
-            'secret' => '<aws secret key>',
-            'bucket' => 'my-imbo-bucket',
-            'region' => 'eu-central-1',
-        ]),
-
-        // ...
-    ];
-
-Backblaze B2 Cloud Storage
-++++++++++++++++++++++++++
-
-This adapter stores your images in a bucket in the `Backblaze B2 Cloud Storage`_. The parameters are:
-
-``accountId``
-    Your B2 account ID.
-
-``applicationKey``
-    Your B2 application key.
-
-``bucket``
-    The name of the bucket you want to store your images in.
-
-``bucketId``
-    The ID of the bucket.
-
-Examples
-^^^^^^^^
-
-.. code-block:: php
-
-    <?php
-    return [
-        // ...
-
-        'storage' => new Imbo\Storage\B2([
-            'accountId' => '<b2 account ID>',
-            'applicationKey' => '<b2 application key>',
-            'bucket' => 'my-imbo-bucket',
-            'bucketId' => '<bucket ID>',
-        ]),
-
-        // ...
-    ];
 
 .. _filesystem-storage-adapter:
 
@@ -405,7 +407,7 @@ This adapter simply stores all images on the file system. It has a single parame
 ``dataDir``
     The base path where the images are stored.
 
-This adapter is configured to create subdirectories inside of ``dataDir`` based on the user and the checksum of the images added to Imbo. The algorithm that generates the path simply takes the three first characters of the user and creates directories for each of them, then the complete user, then a directory of each of the first characters in the image identifier, and lastly it stores the image in a file with a filename equal to the image identifier itself. For instance, an image stored under the user ``foobar`` with the image identifier ``5c01e554-9fca-4231-bb95-a6eabf259b64`` would be stored as ``<dataDir>/f/o/o/foobar/5/c/0/5c01e554-9fca-4231-bb95-a6eabf259b64``.
+This adapter is configured to create subdirectories inside of ``dataDir`` based on the user and the identifier of the images added to Imbo. The algorithm that generates the path simply takes the three first characters of the user and creates directories for each of them, then the complete user, then a directory of each of the first characters in the image identifier, and lastly it stores the image in a file with a filename equal to the image identifier itself. For instance, an image stored under the user ``foobar`` with the image identifier ``5c01e554-9fca-4231-bb95-a6eabf259b64`` would be stored as ``<dataDir>/f/o/o/foobar/5/c/0/5c01e554-9fca-4231-bb95-a6eabf259b64``.
 
 Examples
 ^^^^^^^^
@@ -418,9 +420,7 @@ Examples
     return [
         // ...
 
-        'storage' => new Imbo\Storage\Filesystem([
-            'dataDir' => '/path/to/images',
-        ]),
+        'storage' => new Imbo\Storage\Filesystem('/path/to/images'),
 
         // ...
     ];
@@ -436,11 +436,17 @@ The GridFS adapter is used to store the images in MongoDB using `GridFS`_. This 
 ``databaseName``
     The name of the database to store the images in. Defaults to ``imbo_storage``.
 
-``server``
-    The server string to use when connecting to MongoDB. Defaults to ``mongodb://localhost:27017``.
+``uri``
+    The URI to use when connecting to the MongoDB server. Defaults to ``mongodb://localhost:27017``.
 
-``options``
-    Options passed to the underlying adapter. Defaults to ``['connect' => true, 'timeout' => 1000]``. See the manual for the `MongoDB PHP library`_ for available options.
+``uriOptions``
+    Options passed to the underlying adapter. Refer to the manual for the `MongoDB PHP library`_ for available options.
+
+``driverOptions``
+    Options passed to the underlying adapter. Refer to the manual for the `MongoDB PHP library`_ for available options.
+
+``bucketOptions``
+    Options passed to the underlying adapter. Refer to the manual for the `MongoDB PHP library`_ for available options.
 
 Examples
 ^^^^^^^^
@@ -466,17 +472,27 @@ Examples
     return [
         // ...
 
-        'storage' => new Imbo\Storage\GridFS([
-            'server' => 'mongodb://server1,server2,server3/?replicaSet=nameOfReplicaSet',
-        ]),
+        'storage' => new Imbo\Storage\GridFS(
+            uri: 'mongodb://server1,server2,server3/?replicaSet=nameOfReplicaSet',
+        ),
 
         // ...
     ];
 
+Amazon S3
++++++++++
+
+This adapter is available as a `separate package <imbo/imbo-s3-adapters_>`_. Please refer to the documentation for configuration and installation.
+
+Backblaze B2
+++++++++++++
+
+This adapter is available as a `separate package <imbo/imbo-b2-adapters_>`_. Please refer to the documentation for configuration and installation.
+
 Custom storage adapter
 ++++++++++++++++++++++
 
-If you need to create your own storage adapter you need to create a class that implements the ``Imbo\Storage\StorageInterface`` interface, and then specify that adapter in the configuration:
+If you need to create your own storage adapter you can implement the the ``Imbo\Storage\StorageInterface`` interface and specify that adapter in the configuration:
 
 .. code-block:: php
 
@@ -484,7 +500,9 @@ If you need to create your own storage adapter you need to create a class that i
     return [
         // ...
 
-        'storage' => new My\Custom\StorageAdapter(),
+        'storage' => new class implements Imbo\Storage\StorageInterface {
+            // ...
+        },
 
         // ...
     ];
@@ -1172,10 +1190,11 @@ The keys in the array are not used for anything in Imbo, but enables you to over
 .. _openssl_random_pseudo_bytes: https://php.net/openssl_random_pseudo_bytes
 .. _MongoDB PECL extension: https://pecl.php.net/package/mongodb
 .. _MongoDB PHP library: https://docs.mongodb.com/php-library
-.. _Doctrine Database Abstraction Layer: http://www.doctrine-project.org/projects/dbal.html
 .. _MongoDB: https://www.mongodb.org/
 .. _MongoDB replica set: https://docs.mongodb.com/manual/replication/
 .. _Backblaze B2 Cloud Storage: https://www.backblaze.com/b2/cloud-storage.html
 .. _GridFS: https://docs.mongodb.com/manual/core/gridfs/
 .. _Amazon S3: https://aws.amazon.com/s3/
 .. _UUID: https://en.wikipedia.org/wiki/Universally_unique_identifier
+.. _imbo/imbo-s3-adapters: https://github.com/imbo/imbo-s3-adapters
+.. _imbo/imbo-b2-adapters: https://github.com/imbo/imbo-b2-adapters

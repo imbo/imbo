@@ -161,7 +161,7 @@ results in:
 
 where ``timestamp`` is the current timestamp on the server, and ``database`` and ``storage`` are boolean values informing of the status of the current database and storage adapters respectively. If both are ``true`` the HTTP status code is ``200 OK``, and if one or both are ``false`` the status code is ``503``. When the status code is ``503`` the reason phrase will inform you whether it's the database or the storage adapter (or both) that is having issues. As soon as the status code does not equal ``200`` Imbo will no longer work as expected.
 
-The reason for adapter failures depends on what kind of adapter you are using. The :ref:`file system storage adapter <filesystem-storage-adapter>` will for instance return a failure if it can no longer write to the storage directory. The :ref:`MongoDB <mongodb-database-adapter>` and :ref:`Doctrine <doctrine-database-adapter>` database adapters will fail if they can no longer connect to the server they are configured to communicate with.
+The reason for adapter failures depends on what kind of adapter you are using. The :ref:`file system storage adapter <filesystem-storage-adapter>` will for instance return a failure if it can no longer write to the storage directory. The :ref:`MongoDB <mongodb-database-adapter>` database adapters will fail if they can no longer connect to the server they are configured to communicate with.
 
 **Typical response codes:**
 
@@ -530,13 +530,11 @@ results in:
       "style": "Imperial Stout"
     }
 
-.. note:: When using the :ref:`Doctrine database adapter <doctrine-database-adapter>`, metadata keys can not contain ``::``.
-
 **Typical response codes:**
 
 * 200 OK
 * 400 Bad request
-* 400 Invalid metadata (when using the :ref:`Doctrine <doctrine-database-adapter>` adapter, and keys contain ``::``)
+* 400 Invalid metadata
 * 404 Image not found
 
 Partially updating metadata
@@ -565,13 +563,11 @@ results in:
 
 if the image already included the first three keys as metadata.
 
-.. note:: When using the :ref:`Doctrine database adapter <doctrine-database-adapter>`, metadata keys can not contain ``::``.
-
 **Typical response codes:**
 
 * 200 OK
 * 400 Bad request
-* 400 Invalid metadata (when using the :ref:`Doctrine <doctrine-database-adapter>` adapter, and keys contain ``::``)
+* 400 Invalid metadata
 * 404 Image not found
 
 Fetch metadata

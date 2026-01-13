@@ -60,22 +60,16 @@ Imbo-3 no longer supports XML output. The only supported response format is JSON
 
 Imbo-3 no longer provides support for using the ``auth`` part of the configuration file. You will need to use the :ref:`Access Control adapters <access-control-configuration>` from now on.
 
-S3 Library Upgraded
-+++++++++++++++++++
+S3 adapters moved
++++++++++++++++++
 
-The dependency on ``aws-sdk-php`` has been upgraded to the most recent version at the time of release. The updated library requires the ``region`` parameter to be supplied when connecting to S3. This also applies to the Image Variations support if you're storing the variations in S3.
+The S3 storage adapters have been moved to a `separate package <imbo/imbo-s3-adapters_>`_. If you want to use the adapters you need to require the new package in your ``composer.json`` file. You can add this by running the following:
 
-Example
-^^^^^^^
+.. code-block:: console
 
-.. code-block:: php
+    composer require imbo/imbo-s3-adapters
 
-    new Imbo\Storage\S3([
-        'key' => '<aws access key>'
-        'secret' => '<aws secret key>',
-        'bucket' => 'my-imbo-bucket',
-        'region' => 'eu-central-1',
-    ]);
+Please refer to the documentation in the new package for more information on how to configure and use the adapters.
 
 Imbo-2.0.0
 ----------
@@ -98,7 +92,7 @@ Prior to 2.0.0, both the database and HTTP endpoints used a field name of ``publ
 Doctrine
 ++++++++
 
-If you use the :ref:`Doctrine database adapter <doctrine-database-adapter>` you'll need to rename the ``publicKey`` fields to ``user``. The field has been updated in the :ref:`database-setup` section. The field should be renamed while there are no write operations pending, as a write could fail before upgrading Imbo itself.
+If you use the Doctrine database adapter you'll need to rename the ``publicKey`` fields to ``user``. The field has been updated in the :ref:`database-setup` section. The field should be renamed while there are no write operations pending, as a write could fail before upgrading Imbo itself.
 
 Postgres/Other
 ^^^^^^^^^^^^^^
@@ -164,7 +158,7 @@ Image identifiers are no longer MD5-sums
 
 Previously, Imbo used the MD5 algorithm to generate the image identifier for an image. In Imbo 2.0.0 and onwards, image identifiers are simply randomly generated strings. This means that the same image can exist multiple times within the same user. If this is not what you want, you can check if the image already exists by querying the :ref:`images resource <images-resource>` and specifying the MD5-sum of the image as an ``originalChecksum``-filter. Most Imbo-clients implement this already, as ``imageExists()`` or similar.
 
-To accommodate the new image identifiers and the possibility of future changes in how they are represented, databases should be able to store an image identifier of up to 255 characters. If you are using the :ref:`Doctrine database adapter <doctrine-database-adapter>` with the suggested schema on a MySQL database, this will require some changes:
+To accommodate the new image identifiers and the possibility of future changes in how they are represented, databases should be able to store an image identifier of up to 255 characters. If you are using the Doctrine database adapter with the suggested schema on a MySQL database, this will require some changes:
 
 .. code-block:: sql
 
@@ -208,7 +202,7 @@ Imbo-1.2.0 includes a new feature that lets you filter images based on the origi
 Doctrine
 ++++++++
 
-If you use the :ref:`Doctrine database adapter <doctrine-database-adapter>` you'll need to add the new ``originalChecksum`` field to the table. The field has also been added to the :ref:`database-setup` section. The field should be added while there are no write operations pending, as a write could fail before upgrading Imbo itself.
+If you use the Doctrine database adapter you'll need to add the new ``originalChecksum`` field to the table. The field has also been added to the :ref:`database-setup` section. The field should be added while there are no write operations pending, as a write could fail before upgrading Imbo itself.
 
 .. code-block:: sql
 
@@ -245,3 +239,4 @@ In versions prior to Imbo-1.2.0 short image URLs were created automatically when
 
 .. _MongoDB PECL extension: https://pecl.php.net/package/mongodb
 .. _MongoDB PHP library: https://packagist.org/packages/mongodb/mongodb
+.. _imbo/imbo-s3-adapters: https://github.com/imbo/imbo-s3-adapters

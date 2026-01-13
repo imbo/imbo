@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e07b96afe115d6c101aea2c3e16c6b23",
+    "content-hash": "698963324e4e3bf143c245d82a423680",
     "packages": [
         {
             "name": "brick/math",
@@ -2460,16 +2460,16 @@
         },
         {
             "name": "imbo/imbo-coding-standard",
-            "version": "v3.0.1",
+            "version": "v3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-coding-standard.git",
-                "reference": "c692bf7c76dd4ce35a78fd1a91f7be16b238e86c"
+                "reference": "2964710bef2781ee1ce1d4519c7ecfda62f5494a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-coding-standard/zipball/c692bf7c76dd4ce35a78fd1a91f7be16b238e86c",
-                "reference": "c692bf7c76dd4ce35a78fd1a91f7be16b238e86c",
+                "url": "https://api.github.com/repos/imbo/imbo-coding-standard/zipball/2964710bef2781ee1ce1d4519c7ecfda62f5494a",
+                "reference": "2964710bef2781ee1ce1d4519c7ecfda62f5494a",
                 "shasum": ""
             },
             "require": {
@@ -2506,9 +2506,9 @@
             ],
             "support": {
                 "issues": "https://github.com/imbo/imbo-coding-standard/issues",
-                "source": "https://github.com/imbo/imbo-coding-standard/tree/v3.0.1"
+                "source": "https://github.com/imbo/imbo-coding-standard/tree/v3.0.2"
             },
-            "time": "2026-01-10T20:35:48+00:00"
+            "time": "2026-01-10T21:08:25+00:00"
         },
         {
             "name": "kubawerlos/php-cs-fixer-custom-fixers",
@@ -6617,7 +6617,8 @@
         "ext-imagick": "^3.7"
     },
     "platform-dev": {
-        "ext-mongodb": "^2.0"
+        "ext-mongodb": "^2.0",
+        "ext-pdo": "*"
     },
     "plugin-api-version": "2.9.0"
 }
