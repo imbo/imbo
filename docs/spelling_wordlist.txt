@@ -16,6 +16,7 @@ SHA
 DBAL
 PHP
 backend
+backends
 gif
 jpg
 png
@@ -34,7 +35,6 @@ IPv
 Gmagick
 Imagick
 Behat
-Lighttpd
 ETag
 Uuid
 gaussian
