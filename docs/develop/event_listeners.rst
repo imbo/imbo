@@ -57,7 +57,7 @@ When writing an event listener for Imbo you can choose one of the following appr
 
 1) Implement the ``Imbo\EventListener\ListenerInterface`` interface that comes with Imbo
 2) Implement a callable piece of code, for instance a class with an ``__invoke`` method
-3) Use a `Closure <http://www.php.net/closure>`_
+3) Use a `Closure <https://www.php.net/closure>`_
 
 Below you will find examples on the approaches mentioned above.
 
@@ -129,7 +129,7 @@ where the ``$event`` object is the same as the one passed to the ``authenticate`
 Use a Closure
 +++++++++++++
 
-For testing and/or debugging purposes you can also write the event listener directly in the configuration, by using a `Closure <http://www.php.net/closure>`_:
+For testing and/or debugging purposes you can also write the event listener directly in the configuration, by using a `Closure <https://www.php.net/closure>`_:
 
 .. code-block:: php
 

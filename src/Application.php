@@ -231,7 +231,8 @@ class Application
 
             if ($definition instanceof ListenerInterface) {
                 $eventManager->addEventHandler($name, $definition)
-                             ->addCallbacks($name, $definition::getSubscribedEvents());
+                             ->addCallbacks($name, $definition::getSubscribedEvents())
+                             ->initializeHandler($definition);
                 continue;
             }
 
@@ -250,6 +251,10 @@ class Application
 
                 $eventManager->addEventHandler($name, $listener, $params)
                              ->addCallbacks($name, $listener::getSubscribedEvents(), $users);
+
+                if ($listener instanceof ListenerInterface) {
+                    $eventManager->initializeHandler($listener);
+                }
             } elseif (is_array($definition) && !empty($definition['callback']) && !empty($definition['events'])) {
                 $priority = 0;
                 $events = [];
@@ -274,6 +279,10 @@ class Application
 
                 $eventManager->addEventHandler($name, $definition['callback'])
                              ->addCallbacks($name, $events, $users);
+
+                if ($definition['callback'] instanceof ListenerInterface) {
+                    $eventManager->initializeHandler($definition['callback']);
+                }
             } else {
                 throw new InvalidArgumentException('Invalid event listener definition', Response::HTTP_INTERNAL_SERVER_ERROR);
             }

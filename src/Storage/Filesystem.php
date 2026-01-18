@@ -13,21 +13,18 @@ use const STR_PAD_LEFT;
 
 class Filesystem implements StorageInterface
 {
-    private string $dataDir;
-
     /**
      * Class constructor.
      *
-     * @param string $dataDir Directory to store the files in
+     * @param string $baseDir Directory to store the files in
      */
-    public function __construct(string $dataDir)
+    public function __construct(private string $baseDir)
     {
-        $this->dataDir = $dataDir;
     }
 
     public function store(string $user, string $imageIdentifier, string $imageData): bool
     {
-        if (!is_writable($this->dataDir)) {
+        if (!is_writable($this->baseDir)) {
             throw new StorageException('Could not store image', 500);
         }
 
@@ -96,7 +93,7 @@ class Filesystem implements StorageInterface
 
     public function getStatus(): bool
     {
-        return is_writable($this->dataDir);
+        return is_writable($this->baseDir);
     }
 
     public function imageExists(string $user, string $imageIdentifier): bool
@@ -116,7 +113,7 @@ class Filesystem implements StorageInterface
     {
         $userPath = str_pad($user, 3, '0', STR_PAD_LEFT);
         $parts = [
-            $this->dataDir,
+            $this->baseDir,
             $userPath[0],
             $userPath[1],
             $userPath[2],

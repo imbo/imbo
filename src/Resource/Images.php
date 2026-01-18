@@ -68,7 +68,7 @@ class Images implements ResourceInterface
 
         if (is_callable($imageIdentifierGenerator)
             && !($imageIdentifierGenerator instanceof GeneratorInterface)) {
-            $imageIdentifierGenerator = $imageIdentifierGenerator();
+            $imageIdentifierGenerator = $imageIdentifierGenerator($request);
         }
 
         for ($attempt = 0; $attempt < $maxAttempts; ++$attempt) {

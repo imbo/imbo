@@ -16,9 +16,7 @@ use function in_array;
  */
 class ArrayAdapter extends AbstractAdapter implements AdapterInterface
 {
-    protected array $accessList = [];
     private array $keys = [];
-    private array $groups = [];
 
     /**
      * Class constructor.
@@ -27,12 +25,9 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface
      *                          associated ACL rules for each public key
      * @param array $groups     Array of group => resources combinations
      */
-    public function __construct(array $accessList = [], array $groups = [])
+    public function __construct(protected array $accessList = [], private array $groups = [])
     {
-        $this->accessList = $accessList;
-        $this->groups = $groups;
         $this->keys = $this->getKeysFromAcl();
-
         $this->validateAccessList();
     }
 

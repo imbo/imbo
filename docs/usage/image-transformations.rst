@@ -120,6 +120,13 @@ This transformation can be used to change the canvas of the original image.
 * ``t[]=canvas:width=200,height=200,x=10,mode=center-y``
 * ``t[]=canvas:width=200,height=200,y=10,mode=center-x``
 
+.. _clip-transformation:
+
+Clip the image - ``t[]=clip``
+-----------------------------
+
+TODO: Write me!
+
 .. _compress-transformation:
 
 Compress the image - ``t[]=compress``
@@ -274,6 +281,13 @@ This transformation flips the image vertically.
 
 * ``t[]=flipVertically``
 
+.. _level-transformation:
+
+Adjust RGB/CMYK levels in an image - ``t[]=level``
+--------------------------------------------------
+
+TODO: Write me!
+
 .. _histogram-transformation:
 
 Generate a histogram of the image - ``t[]=histogram``
@@ -335,7 +349,7 @@ To enable the transformation add it in your local configuration file:
 
 The profile given under the key ``default`` will be applied if no specific profile is requested (i.e. if ``icc`` is added without a ``name`` argument.)
 
-The most common ICC profiles can be downloaded directly from `the ICC's page for sRGB profiles <http://www.color.org/srgbprofiles.xalter>`_, or from `Adobe and their ICC profiles download page <https://www.adobe.com/support/downloads/iccprofiles/iccprofiles_win.html>`_.
+The most common ICC profiles can be downloaded directly from `the ICC's page for sRGB profiles <https://www.color.org/srgbprofiles.xalter>`_, or from `Adobe and their ICC profiles download page <https://www.adobe.com/support/downloads/iccprofiles/iccprofiles_win.html>`_.
 
 **Parameters:**
 
