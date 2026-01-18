@@ -189,11 +189,4 @@ return [
     'optimizations' => [
         'jpegSizeHint' => true,
     ],
-
-    /**
-     * Custom routes for Imbo.
-     *
-     * TODO: remove
-     */
-    'routes' => [],
 ];

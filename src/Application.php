@@ -90,10 +90,8 @@ class Application
             throw new InvalidArgumentException('Invalid access control adapter', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        // Create a router based on the routes in the configuration and internal routes
-        $router = new Router($this->config['routes']);
+        $router = new Router();
 
-        // Create a new image transformation manager
         $transformationManager = new TransformationManager();
 
         if (isset($this->config['transformations']) && !is_array($this->config['transformations'])) {

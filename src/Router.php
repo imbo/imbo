@@ -55,16 +55,6 @@ class Router
     ];
 
     /**
-     * Class constructor.
-     *
-     * @param array<string,string> $extraRoutes Extra routes passed in from configuration
-     */
-    public function __construct(array $extraRoutes = [])
-    {
-        $this->routes = array_merge($this->routes, $extraRoutes);
-    }
-
-    /**
      * Route the current request.
      *
      * @param Request $request The current request

@@ -47,7 +47,6 @@ class ApplicationTest extends TestCase
         $this->runImbo([
             'database' => $this->createStub(DatabaseInterface::class),
             'storage' => $this->createStub(StorageInterface::class),
-            'routes' => [],
             'trustedProxies' => [],
             'accessControl' => fn () => new stdClass(),
         ]);
@@ -65,7 +64,6 @@ class ApplicationTest extends TestCase
             'eventListenerInitializers' => [],
             'eventListeners' => [],
             'contentNegotiateImages' => false,
-            'routes' => [],
             'trustedProxies' => ['10.0.0.77'],
             'indexRedirect' => null,
         ]);
