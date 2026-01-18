@@ -191,13 +191,6 @@ return [
     ],
 
     /**
-     * Custom resources for Imbo.
-     *
-     * TODO: remove
-     */
-    'resources' => [],
-
-    /**
      * Custom routes for Imbo.
      *
      * TODO: remove
