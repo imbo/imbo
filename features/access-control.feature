@@ -65,31 +65,6 @@ Feature: Imbo provides a way to access control resources on a per-public key bas
         When I request "/users/user/images/9c554794f784778cd436064faa2ea24a"
         Then the response status line is "400 Permission denied (public key)"
 
-    Scenario: Request custom access-controlled resource with insufficient privileges
-        Given I use "public" and "private" for public and private keys
-        And I include an access token in the query string
-        And Imbo uses the "access-control.php" configuration
-        When I request "/foobar"
-        Then the response status line is "400 Permission denied (public key)"
-
-    Scenario: Request custom access-controlled resource that a different public key has access to
-        Given I use "valid-group-pubkey" and "private" for public and private keys
-        And I include an access token in the query string
-        And Imbo uses the "access-control.php" configuration
-        When I request "/foobar"
-        Then the response status line is "400 Permission denied (public key)"
-
-    Scenario: Request custom access-controlled resource with sufficient privileges specified using wildcard
-        Given I use "valid-pubkey-with-wildcard" and "private" for public and private keys
-        And I include an access token in the query string
-        And Imbo uses the "access-control.php" configuration
-        When I request "/foobar"
-        Then the response status line is "200 OK"
-        And the response body is:
-            """
-            {"foo":[1,2,3]}
-            """
-
     Scenario: Request user information when Imbo uses an alternative access control adapter
         Given I use "public" and "private" for public and private keys
         And I include an access token in the query string

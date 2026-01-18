@@ -288,16 +288,6 @@ class Application
             }
         }
 
-        // Custom resources
-        foreach ($this->config['resources'] as $name => $resource) {
-            if (is_callable($resource)) {
-                $resource = $resource($this->request, $this->response);
-            }
-
-            $eventManager->addEventHandler($name, $resource)
-                         ->addCallbacks($name, $resource::getSubscribedEvents());
-        }
-
         $eventManager->trigger('imbo.initialized');
 
         try {

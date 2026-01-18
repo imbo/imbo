@@ -65,7 +65,6 @@ class ApplicationTest extends TestCase
             'eventListenerInitializers' => [],
             'eventListeners' => [],
             'contentNegotiateImages' => false,
-            'resources' => [],
             'routes' => [],
             'trustedProxies' => ['10.0.0.77'],
             'indexRedirect' => null,
@@ -89,9 +88,6 @@ class ApplicationTest extends TestCase
                 'testSubelement' => [
                     'listener' => fn (Request $request, Response $response): TestListener => new TestListener(),
                 ],
-            ],
-            'resources' => [
-                'test' => fn (Request $request, Response $response): TestResource => new TestResource(),
             ],
         ];
 

@@ -4,30 +4,7 @@ namespace Imbo\Behat;
 
 use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
 use Imbo\EventListener\AccessControl;
-use Imbo\EventManager\EventInterface;
-use Imbo\Model\ArrayModel;
 use Imbo\Resource;
-use Imbo\Resource\ResourceInterface;
-
-class Foobar implements ResourceInterface
-{
-    public function getAllowedMethods(): array
-    {
-        return ['GET'];
-    }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            'foobar.get' => 'get',
-        ];
-    }
-
-    public function get(EventInterface $event): void
-    {
-        $event->getResponse()->setModel((new ArrayModel())->setData(['foo' => [1, 2, 3]]));
-    }
-}
 
 return [
     'accessControl' => new ArrayAdapter([
@@ -37,8 +14,6 @@ return [
             'acl' => [[
                 'users' => ['user1', 'some-user'],
                 'resources' => [
-                    'foobar.get',
-
                     Resource::USER_GET,
                     Resource::KEYS_POST,
                     Resource::KEY_PUT,
@@ -60,7 +35,6 @@ return [
             'acl' => [[
                 'resources' => [
                     Resource::USER_GET,
-                    'foobar.get',
                 ],
                 'users' => '*',
             ]],
@@ -108,18 +82,7 @@ return [
         ],
     ]),
 
-    'resources' => [
-        'foobar' => new Foobar(),
-    ],
-    'routes' => [
-        'foobar' => '#^/foobar$#',
-    ],
     'eventListeners' => [
-        'accessControl' => [
-            'listener' => AccessControl::class,
-            'params' => [
-                'additionalResources' => ['foobar.get'],
-            ],
-        ],
+        'accessControl' => AccessControl::class,
     ],
 ];
