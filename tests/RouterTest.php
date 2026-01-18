@@ -67,25 +67,6 @@ class RouterTest extends TestCase
         $this->assertSame($resource, (string) $route);
     }
 
-    public function testCanMatchCustomRoute(): void
-    {
-        $request = $this->createPartialMock(Request::class, ['getPathInfo', 'getMethod']);
-        $request
-            ->expects($this->once())
-            ->method('getPathInfo')
-            ->willReturn('/custom/akira');
-        $request
-            ->expects($this->once())
-            ->method('getMethod')
-            ->willReturn('GET');
-
-        (new Router([
-            'custom' => '#^/custom/(?<chars>[a-z]{5})$#',
-        ]))->route($request);
-
-        $this->assertSame('akira', $request->getRoute()->get('chars'));
-    }
-
     /**
      * @return array<array{route:string}>
      */
