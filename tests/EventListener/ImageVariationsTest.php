@@ -83,7 +83,6 @@ class ImageVariationsTest extends ListenerTests
             'getImageIdentifier' => $this->imageIdentifier,
         ]);
         $this->imageModel
-            ->expects($this->any())
             ->method('setWidth')
             ->willReturnSelf();
         $this->imageModel

@@ -189,7 +189,6 @@ class JSONTest extends TestCase
         ]);
 
         $this->dateFormatter
-            ->expects($this->any())
             ->method('formatDate')
             ->with($this->isInstanceOf('DateTime'))
             ->willReturn($formattedDate);
