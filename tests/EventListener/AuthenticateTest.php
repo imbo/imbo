@@ -401,7 +401,6 @@ class AuthenticateTest extends ListenerTests
             ->willReturn('christer');
 
         $this->request
-            ->expects($this->any())
             ->method('getMethod')
             ->willReturn('PUT');
 

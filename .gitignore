@@ -4,7 +4,8 @@
 /vendor
 /docs/_build
 /public/.htaccess
-/behat.yml
+/behat.php
+/test.php
 /phpunit.xml
 /.phpunit.result.cache
 /.php-cs-fixer.cache

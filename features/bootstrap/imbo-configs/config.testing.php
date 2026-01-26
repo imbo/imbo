@@ -4,34 +4,25 @@ namespace Imbo\Behat;
 
 use Imbo\Auth\AccessControl\Adapter\ArrayAdapter;
 use Imbo\Resource;
-use InvalidArgumentException;
-use RuntimeException;
 
-use function is_array;
+use function assert;
 
-if (empty($_SERVER['HTTP_X_BEHAT_DATABASE_TEST'])) {
-    throw new RuntimeException('Missing X-Behat-Database-Test request header');
-} elseif (empty($_SERVER['HTTP_X_BEHAT_STORAGE_TEST'])) {
-    throw new RuntimeException('Missing X-Behat-Storage-Test request header');
-} elseif (empty($_SERVER['HTTP_X_BEHAT_DATABASE_TEST_CONFIG'])) {
-    throw new RuntimeException('Missing X-Behat-Database-Test-Config request header');
-} elseif (empty($_SERVER['HTTP_X_BEHAT_STORAGE_TEST_CONFIG'])) {
-    throw new RuntimeException('Missing X-Behat-Storage-Test-Config request header');
-}
+assert(!empty($_SERVER['HTTP_X_BEHAT_DATABASE_ADAPTER']));
+assert(!empty($_SERVER['HTTP_X_BEHAT_STORAGE_ADAPTER']));
 
-$databaseTest = $_SERVER['HTTP_X_BEHAT_DATABASE_TEST'];
-$storageTest = $_SERVER['HTTP_X_BEHAT_STORAGE_TEST'];
-$databaseConfig = json_decode(urldecode($_SERVER['HTTP_X_BEHAT_DATABASE_TEST_CONFIG']), true);
-$storageConfig = json_decode(urldecode($_SERVER['HTTP_X_BEHAT_STORAGE_TEST_CONFIG']), true);
+$databaseAdapter = unserialize(urldecode($_SERVER['HTTP_X_BEHAT_DATABASE_ADAPTER']));
+$storageAdapter = unserialize(urldecode($_SERVER['HTTP_X_BEHAT_STORAGE_ADAPTER']));
 
-if (!is_array($databaseConfig)) {
-    throw new InvalidArgumentException('Invalid value for X-Behat-Database-Test-Config request header');
-} elseif (!is_array($storageConfig)) {
-    throw new InvalidArgumentException('Invalid value for X-Behat-Storage-Test-Config request header');
+if (!empty($_SERVER['HTTP_X_BEHAT_BEFORE_SCENARIO'])) {
+    $databaseAdapter->setUp();
+    $storageAdapter->setUp();
+    exit;
 }
 
 // Default config for testing
 $testConfig = [
+    'database' => $databaseAdapter->getAdapter(),
+    'storage' => $storageAdapter->getAdapter(),
     'accessControl' => function () {
         return new ArrayAdapter([
             [
@@ -60,9 +51,6 @@ $testConfig = [
             ],
         ]);
     },
-
-    'database' => $databaseTest::getAdapter($databaseConfig),
-    'storage' => $storageTest::getAdapter($storageConfig),
 ];
 
 // Custom test config, if any, specified in the X-Imbo-Test-Config-File HTTP request header

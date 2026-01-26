@@ -57,19 +57,16 @@ class ResponseFormatterTest extends TestCase
             'getSupportedExtensions' => array_values($defaultSupported),
         ]);
         $this->outputConverterManager
-            ->expects($this->any())
             ->method('supportsExtension')
             ->willReturnCallback(
                 fn (?string $ext): bool => null !== $ext && in_array($ext, $defaultSupported),
             );
         $this->outputConverterManager
-            ->expects($this->any())
             ->method('getMimetypeFromExtension')
             ->willReturnCallback(
                 fn (string $ext): ?string => array_search($ext, $defaultSupported) ?: null,
             );
         $this->outputConverterManager
-            ->expects($this->any())
             ->method('getExtensionFromMimetype')
             ->willReturnCallback(
                 fn (string $ext): ?string => isset($defaultSupported[$ext]) ? $defaultSupported[$ext] : null,
@@ -276,7 +273,6 @@ class ResponseFormatterTest extends TestCase
     public function testThrowsAnExceptionInStrictModeWhenTheUserAgentDoesNotSupportAnyOfImbosMediaTypes(): void
     {
         $this->contentNegotiation
-            ->expects($this->any())
             ->method('isAcceptable')
             ->willReturn(false);
 
@@ -322,7 +318,6 @@ class ResponseFormatterTest extends TestCase
         $this->request->headers = $requestHeaders;
 
         $this->contentNegotiation
-            ->expects($this->any())
             ->method('isAcceptable')
             ->willReturn(false);
 
@@ -353,7 +348,6 @@ class ResponseFormatterTest extends TestCase
         $this->request->headers = $requestHeaders;
 
         $this->contentNegotiation
-            ->expects($this->any())
             ->method('isAcceptable')
             ->willReturn(1);
 
@@ -391,7 +385,6 @@ class ResponseFormatterTest extends TestCase
         $this->request->headers = $requestHeaders;
 
         $this->contentNegotiation
-            ->expects($this->any())
             ->method('isAcceptable')
             ->willReturn(1);
 
@@ -422,7 +415,6 @@ class ResponseFormatterTest extends TestCase
         $this->request->headers = $this->createStub(HeaderBag::class);
 
         $this->contentNegotiation
-            ->expects($this->any())
             ->method('isAcceptable')
             ->willReturn(1);
 
@@ -483,7 +475,6 @@ class ResponseFormatterTest extends TestCase
             ->willReturn($this->createStub(Error::class));
 
         $this->contentNegotiation
-            ->expects($this->any())
             ->method('isAcceptable')
             ->willReturn(1);
 

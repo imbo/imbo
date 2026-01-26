@@ -2,39 +2,29 @@
 
 namespace Imbo\Behat\DatabaseTest;
 
-use Imbo\Behat\AdapterTest;
+use Imbo\Behat\IntegrationTestAdapter;
 use Imbo\Database\MongoDB as DatabaseAdapter;
 use MongoDB\Client as MongoClient;
 
-class MongoDB implements AdapterTest
+class MongoDB implements IntegrationTestAdapter
 {
-    public static function setUp(array $config): array
-    {
-        $client = new MongoClient(
-            $config['database.uri'],
-            [
-                'username' => $config['database.username'],
-                'password' => $config['database.password'],
-            ],
-        );
-        $client->selectDatabase($config['database.name'])->drop();
-
-        return $config;
-    }
-
-    public static function tearDown(array $config): void
+    public function __construct(private string $databaseName, private string $uri, private string $username, private string $password)
     {
     }
 
-    public static function getAdapter(array $config): DatabaseAdapter
+    public function setUp(): void
     {
-        return new DatabaseAdapter(
-            $config['database.name'],
-            $config['database.uri'],
-            [
-                'username' => $config['database.username'],
-                'password' => $config['database.password'],
-            ],
-        );
+        (new MongoClient($this->uri, [
+            'username' => $this->username,
+            'password' => $this->password,
+        ]))->selectDatabase($this->databaseName)->drop();
+    }
+
+    public function getAdapter(): DatabaseAdapter
+    {
+        return new DatabaseAdapter($this->databaseName, $this->uri, [
+            'username' => $this->username,
+            'password' => $this->password,
+        ]);
     }
 }

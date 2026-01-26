@@ -29,7 +29,6 @@ class CorsTest extends ListenerTests
     {
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
-            ->expects($this->any())
             ->method('get')
             ->with('Origin')
             ->willReturn('http://imbo.io');
@@ -296,7 +295,6 @@ class CorsTest extends ListenerTests
 
         $requestHeaders = $this->createMock(HeaderBag::class);
         $requestHeaders
-            ->expects($this->any())
             ->method('get')
             ->with('Origin')
             ->willReturn('http://somehost');
@@ -360,14 +358,12 @@ class CorsTest extends ListenerTests
     public function testAddsVaryHeaderContainingOriginRegardlessOfAllowedStatus(): void
     {
         $this->request
-            ->expects($this->any())
             ->method('getMethod')
             ->willReturn('GET');
         $route = $this->createConfiguredStub(Route::class, [
             '__toString' => 'index',
         ]);
         $this->request
-            ->expects($this->any())
             ->method('getRoute')
             ->willReturn($route);
 

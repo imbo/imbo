@@ -93,7 +93,6 @@ class DatabaseOperationsTest extends ListenerTests
     public function testCanLoadImage(): void
     {
         $this->response
-            ->expects($this->any())
             ->method('getModel')
             ->willReturn($this->image);
 
