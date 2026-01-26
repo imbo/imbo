@@ -8,6 +8,9 @@ use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Hook\BeforeScenario;
 use Behat\Hook\BeforeSuite;
+use Behat\Step\Given;
+use Behat\Step\Then;
+use Behat\Step\When;
 use Behat\Testwork\Hook\Scope\BeforeSuiteScope;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -246,9 +249,8 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws InvalidArgumentException
-     *
-     * @Given Imbo uses the :configFile configuration
      */
+    #[Given('Imbo uses the :configFile configuration')]
     public function setImboConfigHeader($configFile)
     {
         $dir = __DIR__.'/imbo-configs';
@@ -269,9 +271,8 @@ class FeatureContext extends ApiContext
      * @param string $mask Specify which subnet mask who are allowed to view stats
      *
      * @return self
-     *
-     * @Given the stats are allowed by :mask
      */
+    #[Given('the stats are allowed by :mask')]
     public function statsAllowedBy($mask)
     {
         return $this->setRequestHeader('X-Imbo-Stats-Allowed-By', $mask);
@@ -285,9 +286,8 @@ class FeatureContext extends ApiContext
      * @param string $adapter Which adapter to take down
      *
      * @throws InvalidArgumentException
-     *
-     * @Given /^the (storage|database) is down$/
      */
+    #[Given('/^the (storage|database) is down$/')]
     public function forceAdapterFailure(string $adapter): static
     {
         if (!in_array($adapter, ['storage', 'database'])) {
@@ -307,9 +307,8 @@ class FeatureContext extends ApiContext
      * Sign the request using HTTP headers.
      *
      * @return self
-     *
-     * @Given I sign the request using HTTP headers
      */
+    #[Given('I sign the request using HTTP headers')]
     public function signRequestUsingHttpHeaders()
     {
         return $this->signRequest(true);
@@ -324,9 +323,8 @@ class FeatureContext extends ApiContext
      * @param bool $useHeaders Whether or not to put the signature in the request HTTP headers
      *
      * @return self
-     *
-     * @Given I sign the request
      */
+    #[Given('I sign the request')]
     public function signRequest($useHeaders = false)
     {
         if ($this->authenticationHandlerIsActive) {
@@ -407,9 +405,8 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws RuntimeException Method can not be called if the handler is still active
-     *
-     * @Given /^I include an access token in the query string( for all requests)?$/
      */
+    #[Given('/^I include an access token in the query string( for all requests)?$/')]
     public function appendAccessToken($allRequests = false)
     {
         if ($this->accessTokenHandlerIsActive) {
@@ -471,10 +468,9 @@ class FeatureContext extends ApiContext
      *
      * @throws InvalidArgumentException throws an exception if the user specified does not have a
      *                                  set of keys
-     *
-     * @Given :imagePath exists for user :user
-     * @Given :imagePath exists for user :user with the following metadata:
      */
+    #[Given(':imagePath exists for user :user')]
+    #[Given(':imagePath exists for user :user with the following metadata:')]
     public function addUserImageToImbo(string $imagePath, string $user, ?PyStringNode $metadata = null): static
     {
         if (!file_exists($imagePath)) {
@@ -547,9 +543,8 @@ class FeatureContext extends ApiContext
      * @param string $ip The IP address to set
      *
      * @return self
-     *
-     * @Given the client IP is :ip
      */
+    #[Given('the client IP is :ip')]
     public function setClientIp($ip)
     {
         return $this->setRequestHeader('X-Client-Ip', $ip);
@@ -561,9 +556,8 @@ class FeatureContext extends ApiContext
      * @param string $transformation The value of the transformation, for instance "border"
      *
      * @return self
-     *
-     * @Given I specify :transformation as transformation
      */
+    #[Given('I specify :transformation as transformation')]
     public function applyTransformation($transformation)
     {
         return $this->setRequestQueryParameter('t[]', $transformation);
@@ -573,9 +567,8 @@ class FeatureContext extends ApiContext
      * Add one or more transformations to the query parameter for the next request.
      *
      * @return self
-     *
-     * @Given I specify the following transformations:
      */
+    #[Given('I specify the following transformations:')]
     public function applyTransformations(PyStringNode $transformations)
     {
         foreach (explode("\n", (string) $transformations) as $transformation) {
@@ -597,9 +590,8 @@ class FeatureContext extends ApiContext
      *                                  does not return an array
      *
      * @codeCoverageIgnore
-     *
-     * @Given I prime the database with :fixture
      */
+    #[Given('I prime the database with :fixture')]
     public function primeDatabase($fixture)
     {
         $fixtureDir = realpath(implode(DIRECTORY_SEPARATOR, [
@@ -640,9 +632,8 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws InvalidArgumentException Throws an exception if an invalid method is used
-     *
-     * @Given I authenticate using :method
      */
+    #[Given('I authenticate using :method')]
     public function authenticateRequest($method)
     {
         if ('access-token' === $method) {
@@ -664,9 +655,8 @@ class FeatureContext extends ApiContext
      * @param string $privateKey The private key to set
      *
      * @return self
-     *
-     * @Given I use :publicKey and :privateKey for public and private keys
      */
+    #[Given('I use :publicKey and :privateKey for public and private keys')]
     public function setPublicAndPrivateKey($publicKey, $privateKey)
     {
         $this->publicKey = $publicKey;
@@ -685,9 +675,8 @@ class FeatureContext extends ApiContext
      * @param mixed  $value The value for the parameter
      *
      * @return self
-     *
-     * @Given the query string parameter :name is set to :value
      */
+    #[Given('the query string parameter :name is set to :value')]
     public function setRequestQueryParameter($name, $value)
     {
         if (empty($this->requestOptions['query'])) {
@@ -725,9 +714,8 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws InvalidArgumentException
-     *
-     * @Given the query string parameter :name is set to the image identifier of :path
      */
+    #[Given('the query string parameter :name is set to the image identifier of :path')]
     public function setRequestParameterToImageIdentifier($name, $path)
     {
         if (!isset($this->imageIdentifiers[$path])) {
@@ -745,9 +733,8 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws InvalidArgumentException
-     *
-     * @Given I generate a short URL for :path with the following parameters:
      */
+    #[Given('I generate a short URL for :path with the following parameters:')]
     public function generateShortImageUrl($path, PyStringNode $params)
     {
         if (!isset($this->imageIdentifiers[$path])) {
@@ -778,10 +765,9 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws InvalidArgumentException
-     *
-     * @Given I use :localPath as the watermark image
-     * @Given I use :localPath as the watermark image with :params as parameters
      */
+    #[Given('I use :localPath as the watermark image')]
+    #[Given('I use :localPath as the watermark image with :params as parameters')]
     public function specifyAsTheWatermarkImage($localPath, $params = null)
     {
         if (!isset($this->imageIdentifiers[$localPath])) {
@@ -803,10 +789,9 @@ class FeatureContext extends ApiContext
      * @param string $method The HTTP method to use
      *
      * @return self
-     *
-     * @When I request the previously added image
-     * @When I request the previously added image using HTTP :method
      */
+    #[When('I request the previously added image')]
+    #[When('I request the previously added image using HTTP :method')]
     public function requestPreviouslyAddedImage($method = 'GET')
     {
         $image = $this->getUserAndImageIdentifierOfPreviouslyAddedImage();
@@ -823,10 +808,9 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws InvalidArgumentException Throws an extension if the given extension is invalid
-     *
-     * @When I request the previously added image as a :extension
-     * @When I request the previously added image as a :extension using HTTP :method
      */
+    #[When('I request the previously added image as a :extension')]
+    #[When('I request the previously added image as a :extension using HTTP :method')]
     public function requestPreviouslyAddedImageAsType($extension, $method = 'GET')
     {
         $image = $this->getUserAndImageIdentifierOfPreviouslyAddedImage();
@@ -851,10 +835,9 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws RuntimeException throws an exception if no request have been made yet
-     *
-     * @When I replay the last request
-     * @When I replay the last request using HTTP :method
      */
+    #[When('I replay the last request')]
+    #[When('I replay the last request using HTTP :method')]
     public function makeSameRequest($method = null)
     {
         if (!$this->response) {
@@ -876,10 +859,9 @@ class FeatureContext extends ApiContext
      * @param string $method The HTTP method to use when fetching the metadata
      *
      * @return self
-     *
-     * @When I request the metadata of the previously added image
-     * @When I request the metadata of the previously added image using HTTP :method
      */
+    #[When('I request the metadata of the previously added image')]
+    #[When('I request the metadata of the previously added image using HTTP :method')]
     public function requestMetadataOfPreviouslyAddedImage($method = 'GET')
     {
         $image = $this->getUserAndImageIdentifierOfPreviouslyAddedImage();
@@ -901,9 +883,8 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws InvalidArgumentException
-     *
-     * @When /^I request the image resource for "([^"]*)"(?: as a "(png|gif|jpg)")?(?: using HTTP "([^"]*)")?$/
      */
+    #[When('/^I request the image resource for "([^"]*)"(?: as a "(png|gif|jpg)")?(?: using HTTP "([^"]*)")?$/')]
     public function requestImageResourceForLocalImage($localPath, $extension = null, $method = 'GET')
     {
         if (!isset($this->imageUrls[$localPath])) {
@@ -943,9 +924,8 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws InvalidArgumentException
-     *
-     * @When I request:
      */
+    #[When('I request:')]
     public function requestPaths(TableNode $table)
     {
         // Store these as they need to be reset bewteen each run for all requests to have the same
@@ -1010,9 +990,8 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws RuntimeException
-     *
-     * @When I request the image using the generated short URL
      */
+    #[When('I request the image using the generated short URL')]
     public function requestImageUsingShortUrl()
     {
         $this->requireResponse();
@@ -1033,9 +1012,8 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws RuntimeException
-     *
-     * @When I request the shorturl params using the generated short URL
      */
+    #[When('I request the shorturl params using the generated short URL')]
     public function requestShortUrlParameters()
     {
         $this->requireResponse();
@@ -1066,10 +1044,9 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws InvalidArgumentException
-     *
-     * @Then the Imbo error message is :message
-     * @Then the Imbo error message is :message and the error code is :code
      */
+    #[Then('the Imbo error message is :message')]
+    #[Then('the Imbo error message is :message and the error code is :code')]
     public function assertImboError($message, $code = null)
     {
         $this->requireResponse();
@@ -1108,9 +1085,8 @@ class FeatureContext extends ApiContext
      * @param int|string $width
      *
      * @return self
-     *
-     * @Then the image width is :width
      */
+    #[Then('the image width is :width')]
     public function assertImageWidth($width)
     {
         $this->requireResponse();
@@ -1127,9 +1103,8 @@ class FeatureContext extends ApiContext
      * @param int|string $height
      *
      * @return self
-     *
-     * @Then the image height is :height
      */
+    #[Then('the image height is :height')]
     public function assertImageHeight($height)
     {
         $this->requireResponse();
@@ -1148,9 +1123,8 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws InvalidArgumentException
-     *
-     * @Then the image dimension is :dimension
      */
+    #[Then('the image dimension is :dimension')]
     public function assertImageDimension($dimension)
     {
         $this->requireResponse();
@@ -1175,9 +1149,8 @@ class FeatureContext extends ApiContext
      * @param string $color       Hex color value
      *
      * @return self
-     *
-     * @Then the pixel at coordinate :coordinates has a color of :color
      */
+    #[Then('the pixel at coordinate :coordinates has a color of :color')]
     public function assertImagePixelColor($coordinates, $color)
     {
         $this->requireResponse();
@@ -1206,9 +1179,8 @@ class FeatureContext extends ApiContext
      * @param string $color       Hex color value
      *
      * @return self
-     *
-     * @Then the pixel at coordinate :coordinates has an approximate color of :color
      */
+    #[Then('the pixel at coordinate :coordinates has an approximate color of :color')]
     public function assertApproximateImagePixelColor($coordinates, $color)
     {
         $this->requireResponse();
@@ -1244,9 +1216,8 @@ class FeatureContext extends ApiContext
      * @param float  $alpha       Alpha value
      *
      * @return self
-     *
-     * @Then the pixel at coordinate :coordinates has an alpha of :alpha
      */
+    #[Then('the pixel at coordinate :coordinates has an alpha of :alpha')]
     public function assertImagePixelAlpha($coordinates, $alpha)
     {
         $this->requireResponse();
@@ -1275,9 +1246,8 @@ class FeatureContext extends ApiContext
      * @param string $aclId     The ACL ID to check
      *
      * @return self
-     *
-     * @Then the ACL rule under public key :publicKey with ID :aclId no longer exists
      */
+    #[Then('the ACL rule under public key :publicKey with ID :aclId no longer exists')]
     public function assertAclRuleWithIdDoesNotExist($publicKey, $aclId)
     {
         // Append an access token with the current public / private keys, and request the given
@@ -1314,9 +1284,8 @@ class FeatureContext extends ApiContext
      * @param string $publicKey The public key to check for
      *
      * @return self
-     *
-     * @Then the :publicKey public key no longer exists
      */
+    #[Then('the :publicKey public key no longer exists')]
     public function assertPublicKeyDoesNotExist($publicKey)
     {
         // Append an access token with the current public / private keys, and request the given
@@ -1373,9 +1342,8 @@ class FeatureContext extends ApiContext
      * @param bool $cacheable
      *
      * @return self
-     *
-     * @Then /^the response can (not )?be cached$/
      */
+    #[Then('/^the response can (not )?be cached$/')]
     public function assertCacheability($cacheable = true)
     {
         $this->requireResponse();
@@ -1403,9 +1371,8 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws RuntimeException
-     *
-     * @Then the response has a max-age of :max seconds
      */
+    #[Then('the response has a max-age of :max seconds')]
     public function assertMaxAge($expected)
     {
         $this->requireResponse();
@@ -1449,9 +1416,8 @@ class FeatureContext extends ApiContext
      *
      * @throws RuntimeException Throws an exception if the response does not have a cache-control
      *                          directive, or if the validation fails
-     *
-     * @Then the response has a :directive cache-control directive
      */
+    #[Then('the response has a :directive cache-control directive')]
     public function assertResponseHasCacheControlDirective($directive)
     {
         $this->requireResponse();
@@ -1484,9 +1450,8 @@ class FeatureContext extends ApiContext
      *
      * @throws RuntimeException Throws an exception if the response does not have a cache-control
      *                          directive, or if the validation fails
-     *
-     * @Then the response does not have a :directive cache-control directive
      */
+    #[Then('the response does not have a :directive cache-control directive')]
     public function assertResponseDoesNotHaveCacheControlDirective($directive)
     {
         $this->requireResponse();
@@ -1514,9 +1479,8 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws InvalidArgumentException|RuntimeException
-     *
-     * @Then /^the last ([\d]+) "([^"]+)" response headers are (not )?the same$/
      */
+    #[Then('/^the last ([\d]+) "([^"]+)" response headers are (not )?the same$/')]
     public function assertLastResponseHeaders($num, $header, $unique = false)
     {
         $num = (int) $num;
@@ -1571,7 +1535,7 @@ class FeatureContext extends ApiContext
     /**
      * Match a series of responses against a data set represented as a TableNode.
      *
-     * This step can be used to match requests typically made with the `@When I request:` step.
+     * This step can be used to match requests typically made with the `#[When('I request:')]` step.
      *
      * The $table parameter must be a table with the following columns:
      *
@@ -1589,9 +1553,8 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws RuntimeException|InvalidArgumentException
-     *
-     * @Then the last responses match:
      */
+    #[Then('the last responses match:')]
     public function assertLastResponsesMatch(TableNode $table)
     {
         $num = array_map(function ($num) {
@@ -1746,9 +1709,8 @@ class FeatureContext extends ApiContext
      * @return self
      *
      * @throws AssertionFailedException|RuntimeException
-     *
-     * @Then the image should not have any :prefix properties
      */
+    #[Then('the image should not have any :prefix properties')]
     public function assertImageProperties($prefix)
     {
         $imagick = new Imagick();
@@ -1774,9 +1736,8 @@ class FeatureContext extends ApiContext
      * @param int $expectedSize The size we are expecting
      *
      * @return self
-     *
-     * @Then the response body size is :expectedSize
      */
+    #[Then('the response body size is :expectedSize')]
     public function assertResponseBodySize($expectedSize)
     {
         $this->requireResponse();
