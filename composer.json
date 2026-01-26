@@ -78,6 +78,7 @@
       "mkdir -p build/logs",
       "php -S localhost:8080 -t ./public features/bootstrap/router.php"
     ],
+    "dev:sqlite": "sqlite3 /tmp/imbo-sqlite-integration-test.sq3 < ./scripts/sqlite/000-imbo.sql",
     "docs": [
       "cd docs; make spelling",
       "cd docs; make html"
@@ -107,7 +108,10 @@
     "test:integration:mongodb-gridfs": "vendor/bin/behat --strict --suite=mongodb-gridfs",
     "test:integration:mysql-filesystem": "vendor/bin/behat --strict --suite=mysql-filesystem",
     "test:integration:postgresql-filesystem": "vendor/bin/behat --strict --suite=postgresql-filesystem",
-    "test:integration:sqlite-filesystem": "vendor/bin/behat --strict --suite=sqlite-filesystem",
+    "test:integration:sqlite-filesystem": [
+      "@dev:sqlite",
+      "vendor/bin/behat --strict --suite=sqlite-filesystem"
+    ],
     "test:unit": "vendor/bin/phpunit",
     "test:unit:coverage": [
       "rm -rf build/coverage",

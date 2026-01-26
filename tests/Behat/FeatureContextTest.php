@@ -3,13 +3,8 @@
 namespace Imbo\Behat;
 
 use Assert;
-use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Gherkin\Node\FeatureNode;
 use Behat\Gherkin\Node\PyStringNode;
-use Behat\Gherkin\Node\ScenarioInterface;
 use Behat\Gherkin\Node\TableNode;
-use Behat\Testwork\Environment\Environment;
-use Behat\Testwork\Suite\Suite;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -1789,20 +1784,6 @@ class FeatureContextTest extends TestCase
             'Image properties have not been properly stripped. Did not expect properties that starts with "png", found: "png:',
         ));
         $this->context->assertImageProperties('png');
-    }
-
-    #[DataProvider('getSuiteSettings')]
-    public function testSetupAdaptersThrowsExceptionOnInvalidClassNames(array $settings, string $expectedExceptionMessage): void
-    {
-        $suite = $this->createConfiguredStub(Suite::class, ['getSettings' => $settings]);
-        $environment = $this->createConfiguredStub(Environment::class, ['getSuite' => $suite]);
-
-        $this->expectExceptionObject(new InvalidArgumentException($expectedExceptionMessage));
-        FeatureContext::setUpAdapters(new BeforeScenarioScope(
-            $environment,
-            $this->createStub(FeatureNode::class),
-            $this->createStub(ScenarioInterface::class),
-        ));
     }
 
     #[DataProvider('getCoordsAndColorsForFailures')]

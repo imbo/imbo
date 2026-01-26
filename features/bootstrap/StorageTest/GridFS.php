@@ -2,39 +2,29 @@
 
 namespace Imbo\Behat\StorageTest;
 
-use Imbo\Behat\AdapterTest;
+use Imbo\Behat\IntegrationTestAdapter;
 use Imbo\Storage\GridFS as StorageAdapter;
 use MongoDB\Client as MongoClient;
 
-class GridFS implements AdapterTest
+class GridFS implements IntegrationTestAdapter
 {
-    public static function setUp(array $config): array
-    {
-        $client = new MongoClient(
-            $config['database.uri'],
-            [
-                'username' => $config['database.username'],
-                'password' => $config['database.password'],
-            ],
-        );
-        $client->selectDatabase($config['database.name'])->drop();
-
-        return $config;
-    }
-
-    public static function tearDown(array $config): void
+    public function __construct(private string $databaseName, private string $databaseUri, private string $username, private string $password)
     {
     }
 
-    public static function getAdapter(array $config): StorageAdapter
+    public function setUp(): void
     {
-        return new StorageAdapter(
-            $config['database.name'],
-            $config['database.uri'],
-            [
-                'username' => $config['database.username'],
-                'password' => $config['database.password'],
-            ],
-        );
+        (new MongoClient($this->databaseUri, [
+            'username' => $this->username,
+            'password' => $this->password,
+        ]))->selectDatabase($this->databaseName)->drop();
+    }
+
+    public function getAdapter(): StorageAdapter
+    {
+        return new StorageAdapter($this->databaseName, $this->databaseUri, [
+            'username' => $this->username,
+            'password' => $this->password,
+        ]);
     }
 }

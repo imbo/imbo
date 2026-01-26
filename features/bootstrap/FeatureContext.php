@@ -3,10 +3,12 @@
 namespace Imbo\Behat;
 
 use Assert\Assertion;
-use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Hook\BeforeScenario;
+use Behat\Hook\BeforeSuite;
+use Behat\Testwork\Hook\Scope\BeforeSuiteScope;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Header;
@@ -112,79 +114,59 @@ class FeatureContext extends ApiContext
     private $authenticationHandlerIsActive = false;
 
     /**
-     * FQCN of the database adapter test class.
-     *
-     * @var string
+     * Database adapter to use in the integration tests.
      */
-    private static $databaseTest;
+    private static ?IntegrationTestAdapter $databaseAdapter = null;
 
     /**
-     * FQCN of the storage adapter test class.
-     *
-     * @var string
+     * Storage adapter to use in the integration tests.
      */
-    private static $storageTest;
-
-    /**
-     * Configuration for the database adapter test.
-     *
-     * @var array
-     */
-    private static $databaseTestConfig;
-
-    /**
-     * Configuration for the storage adapter test.
-     *
-     * @var array
-     */
-    private static $storageTestConfig;
+    private static ?IntegrationTestAdapter $storageAdapter = null;
 
     /**
      * Handler stack for the internal Guzzle client.
      */
     private HandlerStack $handlerStack;
 
-    /**
-     * Set up adapters for the suite.
-     *
-     * @BeforeScenario
-     *
-     * @throws InvalidArgumentException
-     */
-    public static function setUpAdapters(BeforeScenarioScope $scope)
+    #[BeforeSuite]
+    public static function prepare(BeforeSuiteScope $scope)
     {
-        // Fetch settings for the suite as defined in behat.yml[.dist]
-        $suiteSettings = $scope->getSuite()->getSettings();
-
-        // Generate FQCNs for the adapter tests
-        $database = sprintf('Imbo\Behat\DatabaseTest\%s', $suiteSettings['database']);
-        $storage = sprintf('Imbo\Behat\StorageTest\%s', $suiteSettings['storage']);
-
-        if (!class_exists($database)) {
-            throw new InvalidArgumentException(sprintf('Database test class "%s" does not exist.', $database));
-        } elseif (!class_exists($storage)) {
-            throw new InvalidArgumentException(sprintf('Storage test class "%s" does not exist.', $storage));
-        }
-
-        self::$databaseTest = $database;
-        self::$storageTest = $storage;
-
-        self::$databaseTestConfig = $database::setUp($suiteSettings) ?: [];
-        self::$storageTestConfig = $storage::setUp($suiteSettings) ?: [];
+        self::$databaseAdapter = $scope->getSuite()->getSettings()['database'];
+        self::$storageAdapter = $scope->getSuite()->getSettings()['storage'];
     }
 
-    /**
-     * Tear down adapters for the suite.
-     *
-     * @AfterScenario
-     */
-    public static function tearDownAdapters(AfterScenarioScope $scope)
+    #[BeforeScenario]
+    public function beforeScenario(BeforeScenarioScope $scope)
     {
-        $database = self::$databaseTest;
-        $storage = self::$storageTest;
+        $this->client->request('HEAD', '/', ['headers' => ['X-Behat-Before-Scenario' => true]]);
 
-        $database::tearDown(self::$databaseTestConfig);
-        $storage::tearDown(self::$storageTestConfig);
+        $cachePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'imbo-behat-image-transformation-cache';
+
+        if (is_dir($cachePath)) {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($cachePath),
+                RecursiveIteratorIterator::CHILD_FIRST,
+            );
+
+            foreach ($iterator as $file) {
+                $name = $file->getPathname();
+
+                if ('.' === substr($name, -1)) {
+                    continue;
+                }
+
+                if ($file->isDir()) {
+                    // Remove dir
+                    rmdir($name);
+                } else {
+                    // Remove file
+                    unlink($name);
+                }
+            }
+
+            // Remove the directory itself
+            rmdir($cachePath);
+        }
     }
 
     /**
@@ -193,8 +175,6 @@ class FeatureContext extends ApiContext
      * - Add the history middleware to record all request / responses in the $this->history array
      * - Set the request header that informs Imbo which class is responsible for configuring the
      *   database and storage adapters in the test
-     *
-     * @throws RuntimeException
      */
     public function initializeClient(array $config): static
     {
@@ -203,10 +183,8 @@ class FeatureContext extends ApiContext
         $this->handlerStack->push(
             Middleware::mapRequest(
                 fn (RequestInterface $request): RequestInterface => $request
-                        ->withHeader('X-Behat-Database-Test', self::$databaseTest)
-                        ->withHeader('X-Behat-Storage-Test', self::$storageTest)
-                        ->withHeader('X-Behat-Database-Test-Config', urlencode(json_encode(self::$databaseTestConfig)))
-                        ->withHeader('X-Behat-Storage-Test-Config', urlencode(json_encode(self::$storageTestConfig))),
+                        ->withHeader('X-Behat-Database-Adapter', urlencode(serialize(self::$databaseAdapter)))
+                        ->withHeader('X-Behat-Storage-Adapter', urlencode(serialize(self::$storageAdapter))),
             ),
             self::MIDDLEWARE_BEHAT_CONTEXT_CLASS,
         );
@@ -256,44 +234,6 @@ class FeatureContext extends ApiContext
     {
         if (!preg_match('/^[A-Z][a-z]{2}, [\d]{2} [A-Z][a-z]{2} [\d]{4} [\d]{2}:[\d]{2}:[\d]{2} GMT$/', $date)) {
             throw new InvalidArgumentException(sprintf('Date is not properly formatted: "%s".', $date));
-        }
-    }
-
-    /**
-     * Empty the image transformation cache directory along with the test database (mongodb).
-     *
-     * @BeforeScenario
-     *
-     * @codeCoverageIgnore
-     */
-    public static function removeImageTransformationCache(BeforeScenarioScope $scope)
-    {
-        $cachePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'imbo-behat-image-transformation-cache';
-
-        if (is_dir($cachePath)) {
-            $iterator = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($cachePath),
-                RecursiveIteratorIterator::CHILD_FIRST,
-            );
-
-            foreach ($iterator as $file) {
-                $name = $file->getPathname();
-
-                if ('.' === substr($name, -1)) {
-                    continue;
-                }
-
-                if ($file->isDir()) {
-                    // Remove dir
-                    rmdir($name);
-                } else {
-                    // Remove file
-                    unlink($name);
-                }
-            }
-
-            // Remove the directory itself
-            rmdir($cachePath);
         }
     }
 
