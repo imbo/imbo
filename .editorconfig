@@ -1,4 +1,4 @@
-# editorconfig.org
+# https://editorconfig.org
 root = true
 
 [*]
@@ -9,8 +9,8 @@ charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 
-[*.markdown]
+[*.md]
 trim_trailing_whitespace = false
 
-[*.yml]
+[*.{yml,yaml,json,xml}]
 indent_size = 2
