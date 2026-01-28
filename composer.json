@@ -92,7 +92,7 @@
     "sa:adapter-sdk": "vendor/bin/phpstan analyse --level 8 adapter-sdk",
     "sa:features": "vendor/bin/phpstan analyse --level 5 features",
     "sa:src": "vendor/bin/phpstan analyse --level 1 src",
-    "sa:tests": "vendor/bin/phpstan analyse --level 2 tests",
+    "sa:tests": "vendor/bin/phpstan analyse --level 3 tests",
     "test": [
       "@test:integration",
       "@test:unit"
