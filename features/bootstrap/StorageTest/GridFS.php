@@ -8,23 +8,18 @@ use MongoDB\Client as MongoClient;
 
 class GridFS implements IntegrationTestAdapter
 {
-    public function __construct(private string $databaseName, private string $databaseUri, private string $username, private string $password)
+    public function __construct(private string $databaseName, private string $databaseUri)
     {
     }
 
     public function setUp(): void
     {
-        (new MongoClient($this->databaseUri, [
-            'username' => $this->username,
-            'password' => $this->password,
-        ]))->selectDatabase($this->databaseName)->drop();
+        $client = new MongoClient($this->databaseUri);
+        $client->selectDatabase($this->databaseName)->drop();
     }
 
     public function getAdapter(): StorageAdapter
     {
-        return new StorageAdapter($this->databaseName, $this->databaseUri, [
-            'username' => $this->username,
-            'password' => $this->password,
-        ]);
+        return new StorageAdapter($this->databaseName, $this->databaseUri);
     }
 }

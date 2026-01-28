@@ -16,9 +16,7 @@ use Imbo\BehatApiExtension\ServiceContainer\BehatApiExtension;
 $imboBaseUri = 'http://localhost:8080';
 
 $mongodbDatabaseName = 'imbo_behat_test_database';
-$mongodbUri = 'mongodb://localhost:27017';
-$mongodbUsername = 'admin';
-$mongodbPassword = 'password';
+$mongodbUri = 'mongodb://admin:password@localhost:27017';
 
 $sqliteDsn = 'sqlite:/tmp/imbo-sqlite-integration-test.sq3';
 
@@ -44,11 +42,11 @@ return $config->withProfile(
     $profile
         ->withExtension($apiExtension)
         ->withSuite(new Suite('mongodb-gridfs', $suiteSettings([
-            'database' => new MongoDB($mongodbDatabaseName, $mongodbUri, $mongodbUsername, $mongodbPassword),
-            'storage' => new GridFS($mongodbDatabaseName, $mongodbUri, $mongodbUsername, $mongodbPassword),
+            'database' => new MongoDB($mongodbDatabaseName, $mongodbUri),
+            'storage' => new GridFS($mongodbDatabaseName, $mongodbUri),
         ])))
         ->withSuite(new Suite('mongodb-filesystem', $suiteSettings([
-            'database' => new MongoDB($mongodbDatabaseName, $mongodbUri, $mongodbUsername, $mongodbPassword),
+            'database' => new MongoDB($mongodbDatabaseName, $mongodbUri),
             'storage' => new Filesystem(),
         ])))
         ->withSuite(new Suite('sqlite-filesystem', $suiteSettings([

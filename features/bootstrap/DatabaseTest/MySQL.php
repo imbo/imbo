@@ -6,6 +6,8 @@ use Imbo\Behat\IntegrationTestAdapter;
 use Imbo\Database\MySQL as DatabaseAdapter;
 use PDO;
 
+use function sprintf;
+
 class MySQL implements IntegrationTestAdapter
 {
     public function __construct(private string $dsn, private string $username, private string $password)
@@ -14,12 +16,10 @@ class MySQL implements IntegrationTestAdapter
 
     public function setUp(): void
     {
-        $pdo = new PDO($this->dsn, $this->username, $this->password, [
-            PDO::ATTR_PERSISTENT => true,
-        ]);
+        $pdo = new PDO($this->dsn, $this->username, $this->password, [PDO::ATTR_PERSISTENT => true]);
 
         foreach ([DatabaseAdapter::SHORTURL_TABLE, DatabaseAdapter::IMAGEINFO_TABLE] as $table) {
-            $pdo->query("DELETE FROM `{$table}`");
+            $pdo->query(sprintf('DELETE FROM `%s`', $table));
         }
     }
 
