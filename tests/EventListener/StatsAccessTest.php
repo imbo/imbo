@@ -89,11 +89,11 @@ class StatsAccessTest extends ListenerTests
             ->setEventTemplate($this->createConfiguredStub(EventInterface::class, [
                 'getRequest' => $this->createStub(Request::class),
             ]))
-            ->addEventHandler('statsAccess', function () {
+            ->addEventHandler('statsAccess', static function () {
                 echo 'stats access';
             })
             ->addCallbacks('statsAccess', StatsAccess::getSubscribedEvents())
-            ->addEventHandler('statsResource', function () {
+            ->addEventHandler('statsResource', static function () {
                 echo 'stats resource';
             })
             ->addCallbacks('statsResource', StatsResource::getSubscribedEvents());

@@ -23,34 +23,32 @@ if (!empty($_SERVER['HTTP_X_BEHAT_BEFORE_SCENARIO'])) {
 $testConfig = [
     'database' => $databaseAdapter->getAdapter(),
     'storage' => $storageAdapter->getAdapter(),
-    'accessControl' => function () {
-        return new ArrayAdapter([
-            [
-                'publicKey' => 'publicKey',
-                'privateKey' => 'privateKey',
-                'acl' => [[
-                    'resources' => Resource::getReadWriteResources(),
-                    'users' => ['user', 'other-user'],
-                ]],
-            ],
-            [
-                'publicKey' => 'unpriviledged',
-                'privateKey' => 'privateKey',
-                'acl' => [[
-                    'resources' => Resource::getReadWriteResources(),
-                    'users' => ['user'],
-                ]],
-            ],
-            [
-                'publicKey' => 'wildcard',
-                'privateKey' => '*',
-                'acl' => [[
-                    'resources' => Resource::getReadWriteResources(),
-                    'users' => '*',
-                ]],
-            ],
-        ]);
-    },
+    'accessControl' => static fn () => new ArrayAdapter([
+        [
+            'publicKey' => 'publicKey',
+            'privateKey' => 'privateKey',
+            'acl' => [[
+                'resources' => Resource::getReadWriteResources(),
+                'users' => ['user', 'other-user'],
+            ]],
+        ],
+        [
+            'publicKey' => 'unpriviledged',
+            'privateKey' => 'privateKey',
+            'acl' => [[
+                'resources' => Resource::getReadWriteResources(),
+                'users' => ['user'],
+            ]],
+        ],
+        [
+            'publicKey' => 'wildcard',
+            'privateKey' => '*',
+            'acl' => [[
+                'resources' => Resource::getReadWriteResources(),
+                'users' => '*',
+            ]],
+        ],
+    ]),
 ];
 
 // Custom test config, if any, specified in the X-Imbo-Test-Config-File HTTP request header

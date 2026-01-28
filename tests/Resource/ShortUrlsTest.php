@@ -40,7 +40,7 @@ class ShortUrlsTest extends ResourceTests
         $this->outputConverterManager
             ->method('supportsExtension')
             ->willReturnCallback(
-                fn (string $ext): bool => 'gif' === $ext,
+                static fn (string $ext): bool => 'gif' === $ext,
             );
 
         $this->event = $this->createConfiguredMock(EventInterface::class, [

@@ -199,7 +199,7 @@ class AddPublicKeyTest extends TestCase
                 /**
                  * @param array{users:string,resources:array} $rule
                  */
-                fn (array $rule): bool => '*' === $rule['users']
+                static fn (array $rule): bool => '*' === $rule['users']
                     && $rule['resources'][0] === $allResources[0]
                     && $rule['resources'][1] === $allResources[5],
             ));
@@ -267,7 +267,7 @@ class AddPublicKeyTest extends TestCase
                 'errorMessage' => 'Invalid access control adapter',
             ],
             [
-                'config' => ['accessControl' => fn (): Exception => new Exception()],
+                'config' => ['accessControl' => static fn (): Exception => new Exception()],
                 'errorMessage' => 'Invalid access control adapter',
             ],
             [

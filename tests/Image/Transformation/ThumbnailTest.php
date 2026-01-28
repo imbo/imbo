@@ -23,14 +23,14 @@ class ThumbnailTest extends TransformationTests
             ->expects($this->once())
             ->method('setWidth')
             ->with($this->callback(
-                fn (int $setWidth): bool => $setWidth <= ($width + $diff) && $setWidth >= ($width - $diff),
+                static fn (int $setWidth): bool => $setWidth <= ($width + $diff) && $setWidth >= ($width - $diff),
             ))
             ->willReturn($image);
 
         $image
             ->expects($this->once())
             ->method('setHeight')
-            ->with($this->callback(fn (int $setHeight): bool => $setHeight <= ($height + $diff) && $setHeight >= ($height - $diff)))
+            ->with($this->callback(static fn (int $setHeight): bool => $setHeight <= ($height + $diff) && $setHeight >= ($height - $diff)))
             ->willReturn($image);
 
         $image

@@ -33,13 +33,13 @@ class EventManagerTest extends TestCase
     #[AllowMockObjectsWithoutExpectations]
     public function testCanRegisterAndExecuteRegularCallbacksInAPrioritizedFashion(): void
     {
-        $callback1 = function (EventInterface $event): void {
+        $callback1 = static function (EventInterface $event): void {
             echo 1;
         };
-        $callback2 = function (EventInterface $event): void {
+        $callback2 = static function (EventInterface $event): void {
             echo 2;
         };
-        $callback3 = function (EventInterface $event): void {
+        $callback3 = static function (EventInterface $event): void {
             echo 3;
         };
 
@@ -74,16 +74,16 @@ class EventManagerTest extends TestCase
     #[AllowMockObjectsWithoutExpectations]
     public function testLetsListenerStopPropagation(): void
     {
-        $callback1 = function (EventInterface $event): void {
+        $callback1 = static function (EventInterface $event): void {
             echo 1;
         };
-        $callback2 = function (EventInterface $event): void {
+        $callback2 = static function (EventInterface $event): void {
             echo 2;
         };
-        $callback3 = function (EventInterface $event): void {
+        $callback3 = static function (EventInterface $event): void {
             echo 3;
         };
-        $stopper = function (EventInterface $event): void {
+        $stopper = static function (EventInterface $event): void {
             $event->stopPropagation();
         };
 
@@ -114,8 +114,7 @@ class EventManagerTest extends TestCase
     public function testCanCheckIfTheManagerHasListenersForSpecificEvents(): void
     {
         $this->manager
-            ->addEventHandler('handler', function (EventInterface $event): void {
-            })
+            ->addEventHandler('handler', static function (EventInterface $event): void {})
             ->addCallbacks('handler', ['event' => 0]);
 
         $this->assertFalse($this->manager->hasListenersForEvent('some.event'));
@@ -129,7 +128,7 @@ class EventManagerTest extends TestCase
         $check = new stdClass();
         $check->triggered = false;
 
-        $callback = function (EventInterface $event) use ($check): void {
+        $callback = static function (EventInterface $event) use ($check): void {
             $check->triggered = true;
         };
 
@@ -151,7 +150,7 @@ class EventManagerTest extends TestCase
     #[AllowMockObjectsWithoutExpectations]
     public function testCanAddExtraParametersToTheEvent(): void
     {
-        $this->manager->addEventHandler('handler', function (EventInterface $event): void {
+        $this->manager->addEventHandler('handler', static function (EventInterface $event): void {
             echo (string) $event->getArgument('foo');
             echo (string) $event->getArgument('bar');
         })->addCallbacks('handler', ['event' => 0]);
@@ -184,8 +183,7 @@ class EventManagerTest extends TestCase
             'Invalid event definition for listener: someName',
             Response::HTTP_INTERNAL_SERVER_ERROR,
         ));
-        $callback = function (EventInterface $event): void {
-        };
+        $callback = static function (EventInterface $event): void {};
         $this->manager->addCallbacks('someName', ['event' => $callback]);
     }
 
@@ -234,7 +232,7 @@ class EventManagerTest extends TestCase
         $this->expectOutputString('bar');
         (new EventManager())
             ->setEventTemplate(new Event(['foo' => 'bar', 'request' => $this->createStub(Request::class)]))
-            ->addEventHandler('handler', function (EventInterface $event): void {
+            ->addEventHandler('handler', static function (EventInterface $event): void {
                 echo (string) $event->getArgument('foo');
             })
             ->addCallbacks('handler', ['event' => 0])
@@ -285,13 +283,13 @@ class EventManagerTest extends TestCase
      */
     public static function getWildcardListeners(): array
     {
-        $callback1 = function (EventInterface $event): void {
+        $callback1 = static function (EventInterface $event): void {
             echo '1:'.(string) $event->getName().' ';
         };
-        $callback2 = function (EventInterface $event): void {
+        $callback2 = static function (EventInterface $event): void {
             echo '2:'.(string) $event->getName().' ';
         };
-        $callback3 = function (EventInterface $event): void {
+        $callback3 = static function (EventInterface $event): void {
             echo '3:'.(string) $event->getName().' ';
         };
 

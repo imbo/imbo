@@ -430,7 +430,7 @@ class AuthenticateTest extends ListenerTests
              *
              * @return array{serverUrl:string,protocol:string,authHeader:string,shouldMatch:bool,signature:string,timestamp:string}
              */
-            function (array $dataSet): array {
+            static function (array $dataSet): array {
                 $httpMethod = 'PUT';
                 $publicKey = 'christer';
                 $privateKey = 'key';

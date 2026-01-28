@@ -59,17 +59,17 @@ class ResponseFormatterTest extends TestCase
         $this->outputConverterManager
             ->method('supportsExtension')
             ->willReturnCallback(
-                fn (?string $ext): bool => null !== $ext && in_array($ext, $defaultSupported),
+                static fn (?string $ext): bool => null !== $ext && in_array($ext, $defaultSupported),
             );
         $this->outputConverterManager
             ->method('getMimetypeFromExtension')
             ->willReturnCallback(
-                fn (string $ext): ?string => array_search($ext, $defaultSupported) ?: null,
+                static fn (string $ext): ?string => array_search($ext, $defaultSupported) ?: null,
             );
         $this->outputConverterManager
             ->method('getExtensionFromMimetype')
             ->willReturnCallback(
-                fn (string $ext): ?string => isset($defaultSupported[$ext]) ? $defaultSupported[$ext] : null,
+                static fn (string $ext): ?string => isset($defaultSupported[$ext]) ? $defaultSupported[$ext] : null,
             );
 
         $this->transformationManager = $this->createConfiguredStub(TransformationManager::class, [

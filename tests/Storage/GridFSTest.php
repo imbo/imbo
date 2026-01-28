@@ -103,7 +103,7 @@ class GridFSTest extends TestCase
                     'metadata.imageIdentifier' => $this->imageId,
                 ],
                 $this->callback(
-                    fn (array $data): bool => is_int($data['$set']['metadata.updated'] ?? null),
+                    static fn (array $data): bool => is_int($data['$set']['metadata.updated'] ?? null),
                 ),
             );
 

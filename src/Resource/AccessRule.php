@@ -78,7 +78,7 @@ class AccessRule implements ResourceInterface
     {
         $acl = $event->getAccessControl();
 
-        if (!($acl instanceof MutableAdapterInterface)) {
+        if (!$acl instanceof MutableAdapterInterface) {
             throw new ResourceException('Access control adapter is immutable', Response::HTTP_METHOD_NOT_ALLOWED);
         }
 

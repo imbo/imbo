@@ -12,7 +12,7 @@ use PHPUnit\Framework\MockObject\MockObject;
  * Set a database and storage adapter that has some behaviour determined via request headers.
  */
 return [
-    'database' => function (Request $request): DatabaseInterface {
+    'database' => static function (Request $request): DatabaseInterface {
         /** @var DatabaseInterface&MockObject */
         $adapter = (new Generator())->testDouble(
             DatabaseInterface::class,
@@ -30,7 +30,7 @@ return [
         return $adapter;
     },
 
-    'storage' => function (Request $request): StorageInterface {
+    'storage' => static function (Request $request): StorageInterface {
         /** @var StorageInterface&MockObject */
         $adapter = (new Generator())->testDouble(
             StorageInterface::class,

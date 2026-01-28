@@ -61,7 +61,6 @@ try {
 
     if (true === $config['rethrowFinalException']) {
         throw $e;
-    } else {
-        trigger_error('Uncaught Exception ('.$e::class.') with message: '.$e->getMessage(), E_USER_ERROR);
     }
+    trigger_error('Uncaught Exception ('.$e::class.') with message: '.$e->getMessage(), E_USER_ERROR);
 }

@@ -124,10 +124,9 @@ class ImageTransformationCache implements ListenerInterface
                 $this->setCacheHit(true);
 
                 return;
-            } else {
-                // Invalid data in the cache, delete the file
-                unlink($path);
             }
+            // Invalid data in the cache, delete the file
+            unlink($path);
         }
 
         // Mark as cache miss
@@ -303,22 +302,22 @@ class ImageTransformationCache implements ListenerInterface
         $imageIdentifier = $request->getImageIdentifier();
         $accept = explode(',', $request->headers->get('Accept', '*/*'));
 
-        $accept = array_filter(array_map(function ($value) {
-            // Trim whitespace
-            $value = trim($value);
+        $accept = array_filter(
+            array_map(
+                static function ($value) {
+                    $value = trim($value);
+                    $pos = strpos($value, ';');
 
-            // Remove optional params
-            $pos = strpos($value, ';');
+                    if (false !== $pos) {
+                        $value = substr($value, 0, $pos);
+                    }
 
-            if (false !== $pos) {
-                $value = substr($value, 0, $pos);
-            }
-
-            return $value;
-        }, $accept), function ($value) {
-            // Keep values starting with "*/" or "image/"
-            return ('*' === $value[0] && '/' === $value[1]) || 'image/' === substr($value, 0, 6);
-        });
+                    return $value;
+                },
+                $accept,
+            ),
+            static fn ($value) => ('*' === $value[0] && '/' === $value[1]) || 'image/' === substr($value, 0, 6),
+        );
 
         // Sort the remaining values
         sort($accept);

@@ -69,7 +69,7 @@ class ImageVariationsTest extends ListenerTests
     protected function setUp(): void
     {
         set_error_handler(
-            function (int $errno, string $errstr) {
+            static function (int $errno, string $errstr) {
                 if (0 !== error_reporting()) {
                     throw new ErrorException($errstr, $errno);
                 }
@@ -160,9 +160,7 @@ class ImageVariationsTest extends ListenerTests
         ));
         new ImageVariations([
             'database' => [
-                'adapter' => function () {
-                    return null;
-                },
+                'adapter' => static fn () => null,
             ],
             'storage' => [
                 'adapter' => $this->storage,
@@ -210,9 +208,7 @@ class ImageVariationsTest extends ListenerTests
         ));
         new ImageVariations([
             'storage' => [
-                'adapter' => function () {
-                    return null;
-                },
+                'adapter' => static fn () => null,
             ],
             'database' => [
                 'adapter' => $this->db,

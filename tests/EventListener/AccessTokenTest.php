@@ -512,7 +512,7 @@ class AccessTokenTest extends ListenerTests
      */
     public static function getRewrittenAccessTokenData(): array
     {
-        $getAccessToken = fn (string $url): string => hash_hmac('sha256', $url, 'foobar');
+        $getAccessToken = static fn (string $url): string => hash_hmac('sha256', $url, 'foobar');
 
         return [
             [

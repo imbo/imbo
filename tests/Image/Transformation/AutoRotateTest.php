@@ -47,11 +47,7 @@ class AutoRotateTest extends TransformationTests
         ]);
 
         $image = $this->createMock(Image::class);
-
-        /** @var Closure */
-        $new = $expectations->bindTo($this);
-        $new($imagick, $image);
-
+        $expectations($imagick, $image);
         $imagick
             ->expects($this->once())
             ->method('setImageOrientation')
@@ -109,7 +105,7 @@ class AutoRotateTest extends TransformationTests
             [
                 'imageOrientation' => Imagick::ORIENTATION_TOPRIGHT,
                 'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
-                'expectations' => function (Imagick&MockObject $imagick): void {
+                'expectations' => static function (Imagick&MockObject $imagick): void {
                     $imagick
                         ->expects(new InvokedCount(1))
                         ->method('flopImage');
@@ -121,7 +117,7 @@ class AutoRotateTest extends TransformationTests
             [
                 'imageOrientation' => Imagick::ORIENTATION_BOTTOMRIGHT,
                 'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
-                'expectations' => function (Imagick&MockObject $imagick): void {
+                'expectations' => static function (Imagick&MockObject $imagick): void {
                     $imagick
                         ->expects(new InvokedCount(0))
                         ->method('flopImage');
@@ -133,7 +129,7 @@ class AutoRotateTest extends TransformationTests
             [
                 'imageOrientation' => Imagick::ORIENTATION_BOTTOMLEFT,
                 'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
-                'expectations' => function (Imagick&MockObject $imagick): void {
+                'expectations' => static function (Imagick&MockObject $imagick): void {
                     $imagick
                         ->expects(new InvokedCount(0))
                         ->method('flopImage');
@@ -145,7 +141,7 @@ class AutoRotateTest extends TransformationTests
             [
                 'imageOrientation' => Imagick::ORIENTATION_LEFTTOP,
                 'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
-                'expectations' => function (Imagick&MockObject $imagick, Image&MockObject $image): void {
+                'expectations' => static function (Imagick&MockObject $imagick, Image&MockObject $image): void {
                     $imagick
                         ->expects(new InvokedCount(1))
                         ->method('flopImage');
@@ -172,7 +168,7 @@ class AutoRotateTest extends TransformationTests
             [
                 'imageOrientation' => Imagick::ORIENTATION_RIGHTTOP,
                 'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
-                'expectations' => function (Imagick&MockObject $imagick, Image&MockObject $image): void {
+                'expectations' => static function (Imagick&MockObject $imagick, Image&MockObject $image): void {
                     $imagick
                         ->expects(new InvokedCount(0))
                         ->method('flopImage');
@@ -199,7 +195,7 @@ class AutoRotateTest extends TransformationTests
             [
                 'imageOrientation' => Imagick::ORIENTATION_RIGHTBOTTOM,
                 'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
-                'expectations' => function (Imagick&MockObject $imagick, Image&MockObject $image): void {
+                'expectations' => static function (Imagick&MockObject $imagick, Image&MockObject $image): void {
                     $imagick
                         ->expects(new InvokedCount(0))
                         ->method('flopImage');
@@ -226,7 +222,7 @@ class AutoRotateTest extends TransformationTests
             [
                 'imageOrientation' => Imagick::ORIENTATION_LEFTBOTTOM,
                 'newOrientation' => Imagick::ORIENTATION_TOPLEFT,
-                'expectations' => function (Imagick&MockObject $imagick, Image&MockObject $image): void {
+                'expectations' => static function (Imagick&MockObject $imagick, Image&MockObject $image): void {
                     $imagick
                         ->expects(new InvokedCount(0))
                         ->method('flopImage');
