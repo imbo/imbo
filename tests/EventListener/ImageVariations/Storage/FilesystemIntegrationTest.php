@@ -2,57 +2,28 @@
 
 namespace Imbo\EventListener\ImageVariations\Storage;
 
+use Imbo\Helpers\Filesystem as FilesystemHelper;
 use ImboSDK\EventListener\ImageVariations\Storage\StorageTests;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 #[CoversClass(Filesystem::class)]
+#[Group('integration')]
 class FilesystemIntegrationTest extends StorageTests
 {
-    private string $path;
+    private string $baseDir;
 
     protected function getAdapter(): StorageInterface
     {
-        return new Filesystem($this->path);
-    }
+        $this->baseDir = sys_get_temp_dir().'/imbo-eventlistener-imagevariations-storage-filesystem-integration-test-'.uniqid();
+        FilesystemHelper::removeDir($this->baseDir, true);
 
-    protected function setUp(): void
-    {
-        $this->path = sys_get_temp_dir().'/imbo-eventlistener-imagevariations-storage-filesystem-integration-test-'.uniqid();
-
-        if (is_dir($this->path)) {
-            $this->rmdir($this->path);
-        }
-
-        mkdir($this->path);
-
-        parent::setUp();
+        return new Filesystem($this->baseDir);
     }
 
     protected function tearDown(): void
     {
-        if (is_dir($this->path)) {
-            $this->rmdir($this->path);
-        }
-
+        FilesystemHelper::removeDir($this->baseDir);
         parent::tearDown();
-    }
-
-    private function rmdir(string $path): void
-    {
-        $paths = glob($path.'/*');
-
-        if (false === $paths) {
-            return;
-        }
-
-        foreach ($paths as $file) {
-            if (is_dir($file)) {
-                $this->rmdir($file);
-            } else {
-                unlink($file);
-            }
-        }
-
-        rmdir($path);
     }
 }

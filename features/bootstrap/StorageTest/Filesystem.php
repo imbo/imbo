@@ -3,10 +3,8 @@
 namespace Imbo\Behat\StorageTest;
 
 use Imbo\Behat\IntegrationTestAdapter;
+use Imbo\Helpers\Filesystem as FilesystemHelper;
 use Imbo\Storage\Filesystem as StorageAdapter;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use SplFileInfo;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -21,31 +19,7 @@ class Filesystem implements IntegrationTestAdapter
 
     public function setUp(): void
     {
-        if (!is_dir($this->baseDir)) {
-            mkdir($this->baseDir);
-
-            return;
-        }
-
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($this->baseDir),
-            RecursiveIteratorIterator::CHILD_FIRST,
-        );
-
-        /** @var SplFileInfo $file */
-        foreach ($iterator as $file) {
-            $name = $file->getPathname();
-
-            if ('.' === substr($name, -1)) {
-                continue;
-            }
-
-            if ($file->isDir()) {
-                rmdir($name);
-            } else {
-                unlink($name);
-            }
-        }
+        FilesystemHelper::removeDir($this->baseDir, true);
     }
 
     public function getAdapter(): StorageAdapter
