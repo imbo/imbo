@@ -2,39 +2,35 @@
 
 namespace Imbo\EventListener\ImageVariations\Database;
 
-use Imbo\Exception\DatabaseException;
 use ImboSDK\EventListener\ImageVariations\Database\DatabaseTests;
 use PDO;
+use PDOException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 
 use function sprintf;
 
 #[CoversClass(PostgreSQL::class)]
+#[Group('integration')]
+#[RequiresEnvironmentVariable('POSTGRESQL_DSN')]
+#[RequiresEnvironmentVariable('POSTGRESQL_USERNAME')]
+#[RequiresEnvironmentVariable('POSTGRESQL_PASSWORD')]
 class PostgreSQLIntegrationTest extends DatabaseTests
 {
     protected function getAdapter(): PostgreSQL
     {
+        $dsn = (string) getenv('POSTGRESQL_DSN');
+        $username = (string) getenv('POSTGRESQL_USERNAME');
+        $password = (string) getenv('POSTGRESQL_PASSWORD');
+
         try {
-            return new PostgreSQL(
-                (string) getenv('POSTGRESQL_DSN'),
-                (string) getenv('POSTGRESQL_USERNAME'),
-                (string) getenv('POSTGRESQL_PASSWORD'),
-            );
-        } catch (DatabaseException $e) {
-            $this->markTestSkipped('Unable to connect to PostgreSQL database: '.$e->getMessage());
+            $pdo = new PDO($dsn, $username, $password, [PDO::ATTR_PERSISTENT => true]);
+            $pdo->exec(sprintf('DELETE FROM "%s"', PostgreSQL::IMAGEVARIATIONS_TABLE));
+        } catch (PDOException) {
+            $this->markTestSkipped('PostgreSQL database is not available.');
         }
-    }
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $pdo = new PDO(
-            (string) getenv('POSTGRESQL_DSN'),
-            (string) getenv('POSTGRESQL_USERNAME'),
-            (string) getenv('POSTGRESQL_PASSWORD'),
-        );
-
-        $pdo->exec(sprintf('DELETE FROM "%s"', PostgreSQL::IMAGEVARIATIONS_TABLE));
+        return new PostgreSQL($dsn, $username, $password);
     }
 }

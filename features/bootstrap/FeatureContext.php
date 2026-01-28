@@ -21,13 +21,12 @@ use ImagickException;
 use Imbo\BehatApiExtension\ArrayContainsComparator;
 use Imbo\BehatApiExtension\Context\ApiContext;
 use Imbo\BehatApiExtension\Exception\AssertionFailedException;
+use Imbo\Helpers\Filesystem as FilesystemHelper;
 use ImboSDK\Constraint\MultidimensionalArrayIsEqual;
 use InvalidArgumentException;
 use MongoDB\Client as MongoClient;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use RuntimeException;
 
 use function array_key_exists;
@@ -145,31 +144,7 @@ class FeatureContext extends ApiContext
 
         $cachePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'imbo-behat-image-transformation-cache';
 
-        if (is_dir($cachePath)) {
-            $iterator = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($cachePath),
-                RecursiveIteratorIterator::CHILD_FIRST,
-            );
-
-            foreach ($iterator as $file) {
-                $name = $file->getPathname();
-
-                if ('.' === substr($name, -1)) {
-                    continue;
-                }
-
-                if ($file->isDir()) {
-                    // Remove dir
-                    rmdir($name);
-                } else {
-                    // Remove file
-                    unlink($name);
-                }
-            }
-
-            // Remove the directory itself
-            rmdir($cachePath);
-        }
+        FilesystemHelper::removeDir($cachePath);
     }
 
     /**

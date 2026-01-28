@@ -8,23 +8,18 @@ use MongoDB\Client as MongoClient;
 
 class MongoDB implements IntegrationTestAdapter
 {
-    public function __construct(private string $databaseName, private string $uri, private string $username, private string $password)
+    public function __construct(private string $databaseName, private string $uri)
     {
     }
 
     public function setUp(): void
     {
-        (new MongoClient($this->uri, [
-            'username' => $this->username,
-            'password' => $this->password,
-        ]))->selectDatabase($this->databaseName)->drop();
+        $client = new MongoClient($this->uri);
+        $client->selectDatabase($this->databaseName)->drop();
     }
 
     public function getAdapter(): DatabaseAdapter
     {
-        return new DatabaseAdapter($this->databaseName, $this->uri, [
-            'username' => $this->username,
-            'password' => $this->password,
-        ]);
+        return new DatabaseAdapter($this->databaseName, $this->uri);
     }
 }

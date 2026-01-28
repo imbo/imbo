@@ -4,44 +4,29 @@ namespace Imbo\Auth\AccessControl\Adapter;
 
 use ImboSDK\Auth\AccessControl\Adapter\MutableAdapterTests;
 use MongoDB\Client;
-use MongoDB\Driver\Exception\RuntimeException;
+use MongoDB\Driver\Exception\Exception;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 
 #[CoversClass(MongoDB::class)]
+#[Group('integration')]
+#[RequiresEnvironmentVariable('MONGODB_URI')]
 class MongoDBIntegrationTest extends MutableAdapterTests
 {
-    private string $databaseName = 'imbo-auth-accesscontrol-adapter-mongodb-integration-test';
+    private const DATABASE_NAME = 'imbo-auth-accesscontrol-adapter-mongodb-integration-test';
 
     protected function getAdapter(): MongoDB
     {
-        return new MongoDB(
-            $this->databaseName,
-            (string) getenv('MONGODB_URI'),
-            array_filter([
-                'username' => (string) getenv('MONGODB_USERNAME'),
-                'password' => (string) getenv('MONGODB_PASSWORD'),
-            ]),
-        );
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $uriOptions = array_filter([
-            'username' => (string) getenv('MONGODB_USERNAME'),
-            'password' => (string) getenv('MONGODB_PASSWORD'),
-        ]);
-
         $uri = (string) getenv('MONGODB_URI');
-        $client = new Client($uri, $uriOptions);
 
         try {
-            $client->getDatabase($this->databaseName)->command(['ping' => 1]);
-        } catch (RuntimeException) {
-            $this->markTestSkipped('MongoDB is not running, start it with `docker compose up -d`');
+            $client = new Client($uri);
+            $client->dropDatabase(self::DATABASE_NAME);
+        } catch (Exception) {
+            $this->markTestSkipped('MongoDB database is not available.');
         }
 
-        $client->dropDatabase($this->databaseName);
+        return new MongoDB(self::DATABASE_NAME, $uri);
     }
 }

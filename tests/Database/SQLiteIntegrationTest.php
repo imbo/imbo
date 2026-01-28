@@ -6,37 +6,35 @@ use ImboSDK\Database\DatabaseTests;
 use PDO;
 use PDOException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
+
+use function sprintf;
 
 #[CoversClass(SQLite::class)]
+#[Group('integration')]
+#[RequiresEnvironmentVariable('SQLITE_DSN')]
 class SQLiteIntegrationTest extends DatabaseTests
 {
-    private PDO $pdo;
-
     protected function getAdapter(): SQLite
     {
-        return new SQLite((string) getenv('SQLITE_DSN'));
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->pdo = new PDO(
-            dsn: (string) getenv('SQLITE_DSN'),
-            options: [PDO::ATTR_PERSISTENT => true],
-        );
-
         $tables = [
             SQLite::IMAGEINFO_TABLE,
             SQLite::SHORTURL_TABLE,
         ];
 
-        foreach ($tables as $table) {
-            try {
-                $this->pdo->exec("DELETE FROM `{$table}`");
-            } catch (PDOException $e) {
-                $this->markTestSkipped('SQLite database have not been initialized: '.$e->getMessage());
+        $dsn = (string) getenv('SQLITE_DSN');
+
+        try {
+            $pdo = new PDO($dsn, options: [PDO::ATTR_PERSISTENT => true]);
+
+            foreach ($tables as $table) {
+                $pdo->exec(sprintf('DELETE FROM `%s`', $table));
             }
+        } catch (PDOException) {
+            $this->markTestSkipped('SQLite database is not available.');
         }
+
+        return new SQLite($dsn);
     }
 }
