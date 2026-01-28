@@ -155,7 +155,7 @@ class AddPublicKey extends CliCommand
             '(comma-separated) ',
         );
 
-        $question->setValidator(function ($answer) {
+        $question->setValidator(static function ($answer) {
             $resources = array_filter(array_map('trim', explode(',', (string) $answer)));
 
             if (empty($resources)) {
@@ -180,7 +180,7 @@ class AddPublicKey extends CliCommand
             'On which users should the public key have access to these resources?'.PHP_EOL.
             '(comma-separated, specify "*" for all users) ',
         );
-        $question->setValidator(function (?string $answer) {
+        $question->setValidator(static function (?string $answer) {
             $users = array_filter(array_map('trim', explode(',', (string) $answer)));
 
             if (empty($users)) {

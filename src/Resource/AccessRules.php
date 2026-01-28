@@ -75,7 +75,7 @@ class AccessRules implements ResourceInterface
     {
         $accessControl = $event->getAccessControl();
 
-        if (!($accessControl instanceof MutableAdapterInterface)) {
+        if (!$accessControl instanceof MutableAdapterInterface) {
             throw new ResourceException('Access control adapter is immutable', Response::HTTP_METHOD_NOT_ALLOWED);
         }
 
@@ -123,7 +123,7 @@ class AccessRules implements ResourceInterface
             return false;
         }
 
-        return array_reduce($values, fn (bool $res, $value): bool => $res && is_string($value), true);
+        return array_reduce($values, static fn (bool $res, $value): bool => $res && is_string($value), true);
     }
 
     /**

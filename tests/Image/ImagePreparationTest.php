@@ -36,7 +36,7 @@ class ImagePreparationTest extends TestCase
         $response = $this->createStub(Response::class);
         $response->headers = $this->createStub(ResponseHeaderBag::class);
         $this->inputLoaderManager = $this->createStub(InputLoaderManager::class);
-        $this->imagickLoader = function (string $mime, string $data): Imagick {
+        $this->imagickLoader = static function (string $mime, string $data): Imagick {
             $imagick = new Imagick();
             $imagick->readImageBlob($data);
 

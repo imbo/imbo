@@ -62,7 +62,7 @@ class Group implements ResourceInterface
     public function updateGroup(EventInterface $event): void
     {
         $accessControl = $event->getAccessControl();
-        if (!($accessControl instanceof MutableAdapterInterface)) {
+        if (!$accessControl instanceof MutableAdapterInterface) {
             throw new ResourceException('Access control adapter is immutable', Response::HTTP_METHOD_NOT_ALLOWED);
         }
 
@@ -109,7 +109,7 @@ class Group implements ResourceInterface
     public function deleteGroup(EventInterface $event): void
     {
         $accessControl = $event->getAccessControl();
-        if (!($accessControl instanceof MutableAdapterInterface)) {
+        if (!$accessControl instanceof MutableAdapterInterface) {
             throw new ResourceException('Access control adapter is immutable', Response::HTTP_METHOD_NOT_ALLOWED);
         }
 

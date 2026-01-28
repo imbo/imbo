@@ -26,7 +26,7 @@ class ApplicationTest extends TestCase
     {
         $this->expectExceptionObject(new InvalidArgumentException('Invalid database adapter', Response::HTTP_INTERNAL_SERVER_ERROR));
         $this->runImbo([
-            'database' => fn () => new stdClass(),
+            'database' => static fn () => new stdClass(),
             'trustedProxies' => [],
         ]);
     }
@@ -36,7 +36,7 @@ class ApplicationTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException('Invalid storage adapter', Response::HTTP_INTERNAL_SERVER_ERROR));
         $this->runImbo([
             'database' => $this->createStub(DatabaseInterface::class),
-            'storage' => fn () => new stdClass(),
+            'storage' => static fn () => new stdClass(),
             'trustedProxies' => [],
         ]);
     }
@@ -48,7 +48,7 @@ class ApplicationTest extends TestCase
             'database' => $this->createStub(DatabaseInterface::class),
             'storage' => $this->createStub(StorageInterface::class),
             'trustedProxies' => [],
-            'accessControl' => fn () => new stdClass(),
+            'accessControl' => static fn () => new stdClass(),
         ]);
     }
 
@@ -82,9 +82,9 @@ class ApplicationTest extends TestCase
             'storage' => fn (Request $request, Response $response): StorageInterface => $this->createStub(StorageInterface::class),
             'accessControl' => fn (Request $request, Response $response): AdapterInterface => $this->createStub(AdapterInterface::class),
             'eventListeners' => [
-                'test' => fn (Request $request, Response $response): TestListener => new TestListener(),
+                'test' => static fn (Request $request, Response $response): TestListener => new TestListener(),
                 'testSubelement' => [
-                    'listener' => fn (Request $request, Response $response): TestListener => new TestListener(),
+                    'listener' => static fn (Request $request, Response $response): TestListener => new TestListener(),
                 ],
             ],
         ];
@@ -101,7 +101,7 @@ class ApplicationTest extends TestCase
     public function testThrowsExceptionIfTransformationsIsSetAndIsNotAnArray(): void
     {
         $config = $this->getDefaultConfig();
-        $config['transformations'] = function (): void {
+        $config['transformations'] = static function (): void {
         };
         $this->expectExceptionObject(new InvalidArgumentException(
             'The "transformations" configuration key must be specified as an array',

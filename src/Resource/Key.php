@@ -45,7 +45,7 @@ class Key implements ResourceInterface
     {
         $acl = $event->getAccessControl();
 
-        if (!($acl instanceof MutableAdapterInterface)) {
+        if (!$acl instanceof MutableAdapterInterface) {
             throw new ResourceException('Access control adapter is immutable', Response::HTTP_METHOD_NOT_ALLOWED);
         }
 
@@ -54,12 +54,12 @@ class Key implements ResourceInterface
 
         if (empty($body)) {
             throw new InvalidArgumentException('Missing JSON data', Response::HTTP_BAD_REQUEST);
-        } else {
-            $body = json_decode($body, true);
+        }
 
-            if (null === $body || JSON_ERROR_NONE !== json_last_error()) {
-                throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
-            }
+        $body = json_decode($body, true);
+
+        if (null === $body || JSON_ERROR_NONE !== json_last_error()) {
+            throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
         }
 
         $privateKey = $body['privateKey'] ?? null;
@@ -83,7 +83,7 @@ class Key implements ResourceInterface
     {
         $acl = $event->getAccessControl();
 
-        if (!($acl instanceof MutableAdapterInterface)) {
+        if (!$acl instanceof MutableAdapterInterface) {
             throw new ResourceException('Access control adapter is immutable', Response::HTTP_METHOD_NOT_ALLOWED);
         }
 

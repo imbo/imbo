@@ -35,7 +35,7 @@ $apiExtension = new Extension(BehatApiExtension::class, [
     'apiClient' => ['base_uri' => $imboBaseUri],
 ]);
 $profile = new Profile('default');
-$suiteSettings = fn (array $c): array => [
+$suiteSettings = static fn (array $c): array => [
     'project_root' => '%paths.base%',
     'contexts' => [FeatureContext::class],
 ] + $c;

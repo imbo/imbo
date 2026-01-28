@@ -57,10 +57,10 @@ class Cors implements ListenerInterface
             $this->params = array_replace($this->params, $params);
 
             // Clean up all origins for easier matching
-            array_walk($this->params['allowedOrigins'], function (&$origin) {
-                $origin = strtolower($origin);
-                $origin = rtrim($origin, '/');
-            });
+            $this->params['allowedOrigins'] = array_map(
+                static fn ($origin) => rtrim(strtolower($origin), '/'),
+                $this->params['allowedOrigins'],
+            );
         }
     }
 

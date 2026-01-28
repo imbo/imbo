@@ -63,8 +63,6 @@ class GridFS implements StorageInterface
         } catch (MongoDBException $e) {
             throw new StorageException('Unable to store image variation', 500, $e);
         }
-
-        return;
     }
 
     public function getImageVariation(string $user, string $imageIdentifier, int $width): string
@@ -109,8 +107,6 @@ class GridFS implements StorageInterface
                 throw new StorageException('Unable to delete image variations', 500, $e);
             }
         }
-
-        return;
     }
 
     /**

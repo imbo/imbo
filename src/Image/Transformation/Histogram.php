@@ -99,7 +99,7 @@ class Histogram extends Transformation
 
             // scale each count to the max value and the height of the resulting image
             foreach ($vals as $val) {
-                $counts[$val] = array_map(function ($a) use ($max, $height) {
+                $counts[$val] = array_map(static function ($a) use ($max, $height) {
                     return (int) ($height * $a / $max);
                 }, $counts[$val]);
             }

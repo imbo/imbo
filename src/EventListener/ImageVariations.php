@@ -197,7 +197,7 @@ class ImageVariations implements ListenerInterface
         $scaleFactor = $this->params['scaleFactor'];
 
         // Remove widths which are larger than the original image
-        $widths = array_filter($this->params['widths'], function ($value) use ($originalWidth) {
+        $widths = array_filter($this->params['widths'], static function ($value) use ($originalWidth) {
             return $value < $originalWidth;
         });
 
@@ -333,7 +333,7 @@ class ImageVariations implements ListenerInterface
             $databaseAdapter = $config['adapter'];
         }
 
-        if (!($databaseAdapter instanceof DatabaseInterface)) {
+        if (!$databaseAdapter instanceof DatabaseInterface) {
             throw new InvalidArgumentException('Invalid database adapter for the image variations event listener', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
@@ -363,7 +363,7 @@ class ImageVariations implements ListenerInterface
             $storageAdapter = $config['adapter'];
         }
 
-        if (!($storageAdapter instanceof StorageInterface)) {
+        if (!$storageAdapter instanceof StorageInterface) {
             throw new InvalidArgumentException('Invalid storage adapter for the image variations event listener', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 

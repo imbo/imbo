@@ -45,7 +45,7 @@ class Groups implements ResourceInterface
     public function addGroup(EventInterface $event): void
     {
         $accessControl = $event->getAccessControl();
-        if (!($accessControl instanceof MutableAdapterInterface)) {
+        if (!$accessControl instanceof MutableAdapterInterface) {
             throw new ResourceException('Access control adapter is immutable', Response::HTTP_METHOD_NOT_ALLOWED);
         }
 
@@ -54,19 +54,23 @@ class Groups implements ResourceInterface
 
         if (empty($body)) {
             throw new InvalidArgumentException('Missing JSON data', Response::HTTP_BAD_REQUEST);
-        } else {
-            $body = json_decode($body, true);
+        }
 
-            if (null === $body || JSON_ERROR_NONE !== json_last_error()) {
-                throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
-            }
+        $body = json_decode($body, true);
+
+        if (null === $body || JSON_ERROR_NONE !== json_last_error()) {
+            throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
         }
 
         if (!array_key_exists('name', $body) || '' === trim((string) $body['name'])) {
             throw new InvalidArgumentException('Group name missing', Response::HTTP_BAD_REQUEST);
-        } elseif (!array_key_exists('resources', $body) || !is_array($body['resources'])) {
+        }
+
+        if (!array_key_exists('resources', $body) || !is_array($body['resources'])) {
             throw new InvalidArgumentException('Resource list missing', Response::HTTP_BAD_REQUEST);
-        } elseif (!preg_match('/^[a-z0-9_-]{1,}$/', $body['name'])) {
+        }
+
+        if (!preg_match('/^[a-z0-9_-]{1,}$/', $body['name'])) {
             throw new InvalidArgumentException('Invalid group name', Response::HTTP_BAD_REQUEST);
         }
 

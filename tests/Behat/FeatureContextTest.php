@@ -1820,7 +1820,7 @@ class FeatureContextTest extends TestCase
     public static function getImboConfigFiles(): array
     {
         return array_map(
-            fn (string $file): array => [basename($file)],
+            static fn (string $file): array => [basename($file)],
             glob(__DIR__.'/../../features/bootstrap/imbo-configs/*.php'),
         );
     }

@@ -207,7 +207,7 @@ class ResponseFormatter implements ListenerInterface
                 $original = $model->getMimeType();
 
                 if ($types[0] !== $original) {
-                    $types = array_filter($types, function ($type) use ($original) {
+                    $types = array_filter($types, static function ($type) use ($original) {
                         return $type !== $original;
                     });
 

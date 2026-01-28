@@ -124,7 +124,7 @@ class ImageTest extends ResourceTests
             ->expects($this->once())
             ->method('add')
             ->with($this->callback(
-                fn (array $headers): bool => array_key_exists('X-Imbo-OriginalMimeType', $headers)
+                static fn (array $headers): bool => array_key_exists('X-Imbo-OriginalMimeType', $headers)
                     && array_key_exists('X-Imbo-OriginalWidth', $headers)
                     && array_key_exists('X-Imbo-OriginalHeight', $headers)
                     && array_key_exists('X-Imbo-OriginalFileSize', $headers)

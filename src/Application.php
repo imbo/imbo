@@ -200,7 +200,7 @@ class Application
                 $initializer = new $initializer();
             }
 
-            if (!($initializer instanceof InitializerInterface)) {
+            if (!$initializer instanceof InitializerInterface) {
                 throw new InvalidArgumentException('Invalid event listener initializer: '.$name, Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 

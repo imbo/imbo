@@ -66,7 +66,7 @@ abstract class AbstractAdapter implements AdapterInterface
         /** @var array<int,string> */
         $userLists = array_filter(
             array_map(
-                fn (array $acl): mixed => $acl['users'] ?? false,
+                static fn (array $acl): mixed => $acl['users'] ?? false,
                 $accessList,
             ),
         );

@@ -41,8 +41,6 @@ class Filesystem implements StorageInterface
         if (false === $result) {
             throw new StorageException('Could not store image variation (write failed)', 500);
         }
-
-        return;
     }
 
     public function getImageVariation(string $user, string $imageIdentifier, int $width): string
@@ -89,8 +87,6 @@ class Filesystem implements StorageInterface
         if ($this->isDirectoryEmpty($dir)) {
             rmdir($dir);
         }
-
-        return;
     }
 
     private function getImagePath(string $user, string $imageIdentifier, ?int $width = null): string

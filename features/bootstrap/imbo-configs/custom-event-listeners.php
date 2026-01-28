@@ -44,7 +44,7 @@ return [
             'events' => [
                 'index.get' => 1000,
             ],
-            'callback' => function (EventInterface $event) {
+            'callback' => static function (EventInterface $event) {
                 $event->getResponse()->headers->set('X-Imbo-SomeHandler', (string) microtime(true));
             },
         ],
@@ -53,7 +53,7 @@ return [
                 'index.get',
                 'index.head',
             ],
-            'callback' => function (EventInterface $event) {
+            'callback' => static function (EventInterface $event) {
                 $event->getResponse()->headers->set('X-Imbo-SomeOtherHandler', (string) microtime(true));
             },
             'priority' => 10,

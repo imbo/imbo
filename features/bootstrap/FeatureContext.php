@@ -185,7 +185,7 @@ class FeatureContext extends ApiContext
         $this->handlerStack->push(Middleware::history($this->history), self::MIDDLEWARE_HISTORY);
         $this->handlerStack->push(
             Middleware::mapRequest(
-                fn (RequestInterface $request): RequestInterface => $request
+                static fn (RequestInterface $request): RequestInterface => $request
                         ->withHeader('X-Behat-Database-Adapter', urlencode(serialize(self::$databaseAdapter)))
                         ->withHeader('X-Behat-Storage-Adapter', urlencode(serialize(self::$storageAdapter))),
             ),
@@ -1557,9 +1557,7 @@ class FeatureContext extends ApiContext
     #[Then('the last responses match:')]
     public function assertLastResponsesMatch(TableNode $table)
     {
-        $num = array_map(function ($num) {
-            return (int) $num;
-        }, array_column($table->getColumnsHash(), 'response'));
+        $num = array_map('intval', array_column($table->getColumnsHash(), 'response'));
 
         if (!$num) {
             throw new InvalidArgumentException('Missing response column');
@@ -1782,9 +1780,7 @@ class FeatureContext extends ApiContext
         $pixel = $imagick->getImagePixelColor($x, $y);
         $color = $pixel->getColor();
 
-        $toHex = function ($col) {
-            return str_pad(dechex($col), 2, '0', STR_PAD_LEFT);
-        };
+        $toHex = static fn ($col) => str_pad(dechex($col), 2, '0', STR_PAD_LEFT);
 
         $hexColor = $toHex($color['r']).$toHex($color['g']).$toHex($color['b']);
 

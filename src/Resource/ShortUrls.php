@@ -46,12 +46,12 @@ class ShortUrls implements ResourceInterface
 
         if (empty($image)) {
             throw new InvalidArgumentException('Missing JSON data', Response::HTTP_BAD_REQUEST);
-        } else {
-            $image = json_decode($image, true);
+        }
 
-            if (null === $image || JSON_ERROR_NONE !== json_last_error()) {
-                throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
-            }
+        $image = json_decode($image, true);
+
+        if (null === $image || JSON_ERROR_NONE !== json_last_error()) {
+            throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
         }
 
         if (!isset($image['user']) || $image['user'] !== $request->getUser()) {

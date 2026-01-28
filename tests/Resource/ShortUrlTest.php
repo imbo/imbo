@@ -177,7 +177,7 @@ class ShortUrlTest extends ResourceTests
         $this->response
             ->expects($this->once())
             ->method('setModel')
-            ->with($this->callback(fn (ArrayModel $model): bool => $model->getData() === $params));
+            ->with($this->callback(static fn (ArrayModel $model): bool => $model->getData() === $params));
 
         $this->getNewResource()->getShortUrl($this->event);
     }

@@ -21,7 +21,7 @@ if (isset($_SERVER['HTTP_X_CLIENT_IP'])) {
 
 return [
     'eventListeners' => [
-        'statsAccess' => function (Request $request): StatsAccess {
+        'statsAccess' => static function (Request $request): StatsAccess {
             $statsAllow = [];
 
             if ($request->headers->has('x-imbo-stats-allowed-by')) {
@@ -34,7 +34,7 @@ return [
         },
         'customStats' => [
             'events' => ['stats.get'],
-            'callback' => function (EventInterface $event): void {
+            'callback' => static function (EventInterface $event): void {
                 // Fetch the model from the response
                 $model = $event->getResponse()->getModel();
 

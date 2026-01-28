@@ -117,9 +117,7 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface
     private function validateAccessList()
     {
         // Get all user lists
-        $declaredPublicKeys = array_map(function ($acl) {
-            return $acl['publicKey'];
-        }, $this->accessList);
+        $declaredPublicKeys = array_map(static fn ($acl) => $acl['publicKey'], $this->accessList);
 
         $publicKeys = [];
         foreach ($declaredPublicKeys as $key) {

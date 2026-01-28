@@ -110,20 +110,20 @@ class Metadata implements ResourceInterface
 
         if (empty($metadata)) {
             throw new InvalidArgumentException('Missing JSON data', Response::HTTP_BAD_REQUEST);
-        } else {
-            $metadata = json_decode($metadata, true);
+        }
 
-            if (null === $metadata) {
-                throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
+        $metadata = json_decode($metadata, true);
+
+        if (null === $metadata) {
+            throw new InvalidArgumentException('Invalid JSON data', Response::HTTP_BAD_REQUEST);
+        }
+
+        foreach (array_keys($metadata) as $key) {
+            if (!str_contains($key, '.')) {
+                continue;
             }
 
-            foreach (array_keys($metadata) as $key) {
-                if (!str_contains($key, '.')) {
-                    continue;
-                }
-
-                throw new InvalidArgumentException('Invalid metadata. Dot characters (\'.\') are not allowed in metadata keys', Response::HTTP_BAD_REQUEST);
-            }
+            throw new InvalidArgumentException('Invalid metadata. Dot characters (\'.\') are not allowed in metadata keys', Response::HTTP_BAD_REQUEST);
         }
     }
 }
