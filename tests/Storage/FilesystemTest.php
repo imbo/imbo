@@ -190,9 +190,9 @@ class FilesystemTest extends TestCase
             'Expected file to exist',
         );
 
-        touch($imagePath, 1476937431);
+        touch($imagePath, 1_476_937_431);
         clearstatcache();
-        $this->assertSame(1476937431, $adapter->getLastModified($this->user, $this->imageIdentifier)->getTimestamp());
+        $this->assertSame(1_476_937_431, $adapter->getLastModified($this->user, $this->imageIdentifier)->getTimestamp());
         $this->assertTrue($adapter->store($this->user, $this->imageIdentifier, $imageData));
         clearstatcache();
         $this->assertEqualsWithDelta(time(), $adapter->getLastModified($this->user, $this->imageIdentifier)->getTimestamp(), 1);

@@ -42,7 +42,7 @@ return [
     'eventListeners' => [
         'someHandler' => [
             'events' => [
-                'index.get' => 1000,
+                'index.get' => 1_000,
             ],
             'callback' => static function (EventInterface $event) {
                 $event->getResponse()->headers->set('X-Imbo-SomeHandler', (string) microtime(true));

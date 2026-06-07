@@ -45,7 +45,7 @@ class ImageVariations implements ListenerInterface
         'minWidth' => 100,
 
         // Don't start resizing until the size falls below this limit
-        'maxWidth' => 1024,
+        'maxWidth' => 1_024,
 
         // Specific widths to generate, in addition to the auto scaling
         'widths' => [],

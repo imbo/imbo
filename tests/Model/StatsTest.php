@@ -69,14 +69,14 @@ class StatsTest extends TestCase
     {
         $this->model
             ->setNumUsers(100)
-            ->setNumBytes(1000)
-            ->setNumImages(10000);
+            ->setNumBytes(1_000)
+            ->setNumImages(10_000);
         $this->model['some'] = 'value';
 
         $this->assertSame([
             'numUsers' => 100,
-            'numBytes' => 1000,
-            'numImages' => 10000,
+            'numBytes' => 1_000,
+            'numImages' => 10_000,
             'customStats' => ['some' => 'value'],
         ], $this->model->getData());
     }
@@ -114,9 +114,9 @@ class StatsTest extends TestCase
     {
         return [
             ['bytes' => 0],
-            ['bytes' => 1349],
-            ['bytes' => 100114],
-            ['bytes' => 1000],
+            ['bytes' => 1_349],
+            ['bytes' => 100_114],
+            ['bytes' => 1_000],
         ];
     }
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "db1d7104d77e88cf108e2b3a6607ca2c",
+    "content-hash": "ff21b0b29484a1c564f018c91127054b",
     "packages": [
         {
             "name": "brick/math",
@@ -2628,16 +2628,16 @@
         },
         {
             "name": "imbo/imbo-coding-standard",
-            "version": "v3.0.8",
+            "version": "v3.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-coding-standard.git",
-                "reference": "f2e2de0fa178b733e6f18e0b49a7bdcc7328520e"
+                "reference": "085afbeea228970d2b4d73ee462717f83642be64"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-coding-standard/zipball/f2e2de0fa178b733e6f18e0b49a7bdcc7328520e",
-                "reference": "f2e2de0fa178b733e6f18e0b49a7bdcc7328520e",
+                "url": "https://api.github.com/repos/imbo/imbo-coding-standard/zipball/085afbeea228970d2b4d73ee462717f83642be64",
+                "reference": "085afbeea228970d2b4d73ee462717f83642be64",
                 "shasum": ""
             },
             "require": {
@@ -2674,9 +2674,9 @@
             ],
             "support": {
                 "issues": "https://github.com/imbo/imbo-coding-standard/issues",
-                "source": "https://github.com/imbo/imbo-coding-standard/tree/v3.0.8"
+                "source": "https://github.com/imbo/imbo-coding-standard/tree/v3.0.10"
             },
-            "time": "2026-06-04T06:59:03+00:00"
+            "time": "2026-06-07T12:23:48+00:00"
         },
         {
             "name": "jimtools/basic-auth",

@@ -250,7 +250,7 @@ class ImageVariationsTest extends ListenerTests
     #[AllowMockObjectsWithoutExpectations]
     public function testFallsBackIfNoRelevantTransformationsApplied(): void
     {
-        $width = 1024;
+        $width = 1_024;
         $height = 768;
         $transformations = [
             [
@@ -286,12 +286,12 @@ class ImageVariationsTest extends ListenerTests
     #[AllowMockObjectsWithoutExpectations]
     public function testFallsBackIfSizeIsLargerThanOriginal(): void
     {
-        $width = 1024;
+        $width = 1_024;
         $height = 768;
         $transformations = [
             [
                 'name' => 'maxSize',
-                'params' => ['width' => 2048],
+                'params' => ['width' => 2_048],
             ],
         ];
 
@@ -312,7 +312,7 @@ class ImageVariationsTest extends ListenerTests
             ->method('getMinimumImageInputSize')
             ->willReturn([
                 'index' => 0,
-                'width' => 2048,
+                'width' => 2_048,
             ]);
 
         $this->eventManager
@@ -325,7 +325,7 @@ class ImageVariationsTest extends ListenerTests
     #[AllowMockObjectsWithoutExpectations]
     public function testFallsBackIfDatabaseDoesNotReturnAnyVariation(): void
     {
-        $width = 1024;
+        $width = 1_024;
         $height = 768;
         $transformations = [
             [
@@ -374,7 +374,7 @@ class ImageVariationsTest extends ListenerTests
     #[AllowMockObjectsWithoutExpectations]
     public function testTriggersWarningIfVariationFoundInDbButNotStorage(): void
     {
-        $width = 1024;
+        $width = 1_024;
         $height = 768;
         $transformationWidth = 512;
         $variationWidth = 800;
@@ -459,7 +459,7 @@ class ImageVariationsTest extends ListenerTests
     #[AllowMockObjectsWithoutExpectations]
     public function testUpdatesResponseAndImageModelOnSuccess(): void
     {
-        $width = 1024;
+        $width = 1_024;
         $height = 768;
         $transformationWidth = 512;
         $variationWidth = 800;
@@ -663,17 +663,17 @@ class ImageVariationsTest extends ListenerTests
              * but as we have turned autoScale off, it should only remove the last width,
              * which is larger than our original.
              */
-            'widths' => [25, 100, 400, 800, 1024, 1700, 3000],
+            'widths' => [25, 100, 400, 800, 1_024, 1_700, 3_000],
             'autoScale' => false,
         ]);
 
         $this->imageModel
             ->method('getWidth')
-            ->willReturn(2048);
+            ->willReturn(2_048);
 
         $this->imageModel
             ->method('getHeight')
-            ->willReturn(1536);
+            ->willReturn(1_536);
 
         $this->imageModel
             ->method('getBlob')
@@ -699,8 +699,8 @@ class ImageVariationsTest extends ListenerTests
                         [1, 'user', 'imgid', 'some blob', 100],
                         [2, 'user', 'imgid', 'some blob', 400],
                         [3, 'user', 'imgid', 'some blob', 800],
-                        [4, 'user', 'imgid', 'some blob', 1024],
-                        [5, 'user', 'imgid', 'some blob', 1700] => true,
+                        [4, 'user', 'imgid', 'some blob', 1_024],
+                        [5, 'user', 'imgid', 'some blob', 1_700] => true,
                     };
                 },
             );
@@ -725,8 +725,8 @@ class ImageVariationsTest extends ListenerTests
                         [1, 100],
                         [2, 400],
                         [3, 800],
-                        [4, 1024],
-                        [5, 1700] => true,
+                        [4, 1_024],
+                        [5, 1_700] => true,
                     };
                 },
             ));
@@ -801,11 +801,11 @@ class ImageVariationsTest extends ListenerTests
 
         $this->imageModel
             ->method('getWidth')
-            ->willReturn(2048);
+            ->willReturn(2_048);
 
         $this->imageModel
             ->method('getHeight')
-            ->willReturn(1536);
+            ->willReturn(1_536);
 
         $this->imageModel
             ->method('getBlob')
@@ -822,7 +822,7 @@ class ImageVariationsTest extends ListenerTests
             'storage' => ['adapter' => $this->storage],
             'minDiff' => 100,
             'minWidth' => 320,
-            'maxWidth' => 1300,
+            'maxWidth' => 1_300,
             'scaleFactor' => .65,
         ]);
 
@@ -839,11 +839,11 @@ class ImageVariationsTest extends ListenerTests
 
         $this->imageModel
             ->method('getWidth')
-            ->willReturn(2048);
+            ->willReturn(2_048);
 
         $this->imageModel
             ->method('getHeight')
-            ->willReturn(1536);
+            ->willReturn(1_536);
 
         $this->imageModel
             ->method('getBlob')
@@ -873,7 +873,7 @@ class ImageVariationsTest extends ListenerTests
         $listener = new ImageVariations([
             'database' => ['adapter' => $this->db],
             'storage' => ['adapter' => $this->storage],
-            'widths' => [1337],
+            'widths' => [1_337],
             'scaleFactor' => .2,
         ]);
 
@@ -889,11 +889,11 @@ class ImageVariationsTest extends ListenerTests
 
         $this->imageModel
             ->method('getWidth')
-            ->willReturn(2048);
+            ->willReturn(2_048);
 
         $this->imageModel
             ->method('getHeight')
-            ->willReturn(1536);
+            ->willReturn(1_536);
 
         $this->imageModel
             ->method('getBlob')
@@ -907,7 +907,7 @@ class ImageVariationsTest extends ListenerTests
                     static $i = 0;
 
                     return match ([$i++, $user, $imageIdentifier, $contents, $width]) {
-                        [0, 'user', 'imgid', 'image data', 1337],
+                        [0, 'user', 'imgid', 'image data', 1_337],
                         [1, 'user', 'imgid', 'image data', 410] => true,
                     };
                 },
@@ -921,7 +921,7 @@ class ImageVariationsTest extends ListenerTests
     {
         $this->imageModel
             ->method('getWidth')
-            ->willReturn(1024);
+            ->willReturn(1_024);
 
         $this->imageModel
             ->method('getHeight')
@@ -959,7 +959,7 @@ class ImageVariationsTest extends ListenerTests
     {
         $this->imageModel
             ->method('getWidth')
-            ->willReturn(1024);
+            ->willReturn(1_024);
 
         $this->imageModel
             ->method('getHeight')
@@ -1000,7 +1000,7 @@ class ImageVariationsTest extends ListenerTests
     {
         $this->imageModel
             ->method('getWidth')
-            ->willReturn(1024);
+            ->willReturn(1_024);
 
         $this->imageModel
             ->method('getHeight')
@@ -1042,13 +1042,13 @@ class ImageVariationsTest extends ListenerTests
         $listener = new ImageVariations([
             'database' => ['adapter' => $this->db],
             'storage' => ['adapter' => $this->storage],
-            'widths' => [1000],
+            'widths' => [1_000],
             'autoScale' => false,
         ]);
 
         $this->imageModel
             ->method('getWidth')
-            ->willReturn(1024);
+            ->willReturn(1_024);
 
         $this->imageModel
             ->method('getHeight')
@@ -1081,7 +1081,7 @@ class ImageVariationsTest extends ListenerTests
         $this->storage
             ->expects($this->once())
             ->method('deleteImageVariations')
-            ->with($this->user, $this->imageIdentifier, 1000);
+            ->with($this->user, $this->imageIdentifier, 1_000);
 
         // Need to suppress the warning, otherwise PHPUnit will stop executing the code
         $level = error_reporting(0);

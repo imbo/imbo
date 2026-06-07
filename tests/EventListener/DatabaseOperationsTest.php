@@ -225,8 +225,8 @@ class DatabaseOperationsTest extends ListenerTests
         $this->request->query = new InputBag([
             'page' => 1,
             'limit' => 5,
-            'from' => 1355156488,
-            'to' => 1355176488,
+            'from' => 1_355_156_488,
+            'to' => 1_355_176_488,
             'sort' => ['size:desc'],
             'ids' => ['identifier1', 'identifier2', 'identifier3'],
             'checksums' => ['checksum1', 'checksum2', 'checksum3'],

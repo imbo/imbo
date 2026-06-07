@@ -43,7 +43,7 @@ class QueryTest extends TestCase
 
     public function testFrom(): void
     {
-        $value = 123123123;
+        $value = 123_123_123;
         $this->assertNull($this->query->getFrom());
         $this->assertSame($this->query, $this->query->setFrom($value));
         $this->assertSame($value, $this->query->getFrom());
@@ -51,7 +51,7 @@ class QueryTest extends TestCase
 
     public function testTo(): void
     {
-        $value = 123123123;
+        $value = 123_123_123;
         $this->assertNull($this->query->getTo());
         $this->assertSame($this->query, $this->query->setTo($value));
         $this->assertSame($value, $this->query->getTo());
