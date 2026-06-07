@@ -33,7 +33,7 @@ class TransformationManagerTest extends TestCase
         $this->request->query = $this->query;
 
         $this->image = $this->createConfiguredStub(Image::class, [
-            'getWidth' => 1600,
+            'getWidth' => 1_600,
             'getHeight' => 900,
         ]);
 
@@ -52,7 +52,7 @@ class TransformationManagerTest extends TestCase
         $this->query->set('t', ['maxSize:width=1024']);
         $minimum = $this->manager->getMinimumImageInputSize($this->event);
         $this->assertIsArray($minimum);
-        $this->assertSame(1024, $minimum['width']);
+        $this->assertSame(1_024, $minimum['width']);
         $this->assertSame(576, $minimum['height']);
     }
 
@@ -61,14 +61,14 @@ class TransformationManagerTest extends TestCase
         $this->query->set('t', ['maxSize:width=1024', 'maxSize:height=620']);
         $minimum = $this->manager->getMinimumImageInputSize($this->event);
         $this->assertIsArray($minimum);
-        $this->assertSame(1024, $minimum['width']);
+        $this->assertSame(1_024, $minimum['width']);
         $this->assertSame(576, $minimum['height']);
 
         // Regardless of order
         $this->query->set('t', ['maxSize:height=620', 'maxSize:width=1024']);
         $minimum = $this->manager->getMinimumImageInputSize($this->event);
         $this->assertIsArray($minimum);
-        $this->assertSame(1024, $minimum['width']);
+        $this->assertSame(1_024, $minimum['width']);
         $this->assertSame(576, $minimum['height']);
     }
 
@@ -77,7 +77,7 @@ class TransformationManagerTest extends TestCase
         $this->query->set('t', ['rotate:angle=90', 'maxSize:width=600']);
         $minimum = $this->manager->getMinimumImageInputSize($this->event);
         $this->assertIsArray($minimum);
-        $this->assertSame(1067, $minimum['width']);
+        $this->assertSame(1_067, $minimum['width']);
         $this->assertSame(600, $minimum['height']);
     }
 

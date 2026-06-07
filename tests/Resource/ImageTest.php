@@ -116,7 +116,7 @@ class ImageTest extends ResourceTests
         $this->response
             ->expects($this->once())
             ->method('setMaxAge')
-            ->with(31536000)
+            ->with(31_536_000)
             ->willReturnSelf();
 
         $responseHeaders

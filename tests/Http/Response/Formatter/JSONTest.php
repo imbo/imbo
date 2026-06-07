@@ -157,7 +157,7 @@ class JSONTest extends TestCase
         $checksum = 'checksum';
         $extension = 'png';
         $mimeType = 'image/png';
-        $filesize = 123123;
+        $filesize = 123_123;
         $width = 800;
         $height = 600;
         $metadata = [

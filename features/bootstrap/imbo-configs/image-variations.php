@@ -22,7 +22,7 @@ return [
                 ],
                 'widths' => [320],
                 'minWidth' => 100,
-                'maxWidth' => 2048,
+                'maxWidth' => 2_048,
                 'minDiff' => 100,
                 'autoScale' => true,
                 'lossless' => false,

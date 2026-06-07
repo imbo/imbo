@@ -121,7 +121,7 @@ class MongoDB implements DatabaseInterface
         try {
             $this->imageCollection->insertOne($data);
         } catch (BulkWriteException $e) {
-            if (11000 === $e->getCode()) {
+            if (11_000 === $e->getCode()) {
                 throw new DuplicateImageIdentifierException('Duplicate image identifier when attempting to insert image into DB.', 503);
             }
 

@@ -25,6 +25,6 @@ class SQLite extends PDOAdapter
 
     protected function getUniqueConstraintExceptionCode(): int
     {
-        return 23000;
+        return 23_000;
     }
 }

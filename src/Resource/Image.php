@@ -63,7 +63,7 @@ class Image implements ResourceInterface
         $eventManager->trigger('db.image.load');
 
         // Set a long max age as the image itself won't change
-        $response->setMaxAge(31536000);
+        $response->setMaxAge(31_536_000);
 
         // Custom Imbo headers, based on original
         $response->headers->add([

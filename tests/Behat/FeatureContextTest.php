@@ -2535,8 +2535,8 @@ class FeatureContextTest extends TestCase
                 ],
                 'match' => new TableNode([
                     ['response', 'image width', 'image height'],
-                    ['1',        1024,          256],
-                    ['2',        256,           1024],
+                    ['1',        1_024,          256],
+                    ['2',        256,           1_024],
                 ]),
             ],
             'body is' => [
@@ -2606,8 +2606,8 @@ class FeatureContextTest extends TestCase
                 ],
                 'match' => new TableNode([
                     ['response', 'image width', 'image height'],
-                    ['1',        1024,          256],
-                    ['2',        255,           1024],
+                    ['1',        1_024,          256],
+                    ['2',        255,           1_024],
                 ]),
                 'exceptionMessage' => 'Expected image in response 2 to be 255 pixel(s) wide, actual: 256.',
             ],
@@ -2618,8 +2618,8 @@ class FeatureContextTest extends TestCase
                 ],
                 'match' => new TableNode([
                     ['response', 'image width', 'image height'],
-                    ['1',        1024,          256],
-                    ['2',        256,           1023],
+                    ['1',        1_024,          256],
+                    ['2',        256,           1_023],
                 ]),
                 'exceptionMessage' => 'Expected image in response 2 to be 1023 pixel(s) high, actual: 1024.',
             ],

@@ -70,11 +70,11 @@ class HistogramTest extends TransformationTests
             ],
             [
                 'scale' => 4,
-                'resultingWidth' => 1024,
+                'resultingWidth' => 1_024,
             ],
             [
                 'scale' => 8,
-                'resultingWidth' => 2048,
+                'resultingWidth' => 2_048,
             ],
         ];
     }

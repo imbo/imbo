@@ -20,7 +20,7 @@ return [
                     'user' => ['GET', 'HEAD'],
                     'shorturl' => ['GET', 'HEAD'],
                 ],
-                'maxAge' => 1349,
+                'maxAge' => 1_349,
             ],
         ],
     ],

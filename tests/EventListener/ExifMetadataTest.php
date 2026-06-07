@@ -180,8 +180,8 @@ class ExifMetadataTest extends ListenerTests
         /** @var array{"gps:location":array<float>,"gps:altitude":float} */
         $properties = $listener->populate($event);
 
-        $this->assertEqualsWithDelta(9.0841802, $properties['gps:location'][0], 0.05);
-        $this->assertEqualsWithDelta(63.680437300003, $properties['gps:location'][1], 0.05);
+        $this->assertEqualsWithDelta(9.084_180_2, $properties['gps:location'][0], 0.05);
+        $this->assertEqualsWithDelta(63.680_437_300_003, $properties['gps:location'][1], 0.05);
         $this->assertEqualsWithDelta(50.8, $properties['gps:altitude'], 0.05);
     }
 
@@ -265,7 +265,7 @@ class ExifMetadataTest extends ListenerTests
                 'data' => $data,
                 'tags' => ['*'],
                 'expectedData' => array_merge($data, [
-                    'gps:location' => [9.0841802, 63.68043730000316],
+                    'gps:location' => [9.084_180_2, 63.680_437_300_003_16],
                     'gps:altitude' => 50.8,
                 ]),
             ],
@@ -294,7 +294,7 @@ class ExifMetadataTest extends ListenerTests
                     'exif:GPSVersionID' => '2, 2, 0, 0',
                     'exif:Make' => 'SAMSUNG',
                     'exif:Model' => 'GT-I9100',
-                    'gps:location' => [9.0841802, 63.68043730000316],
+                    'gps:location' => [9.084_180_2, 63.680_437_300_003_16],
                     'gps:altitude' => 50.8,
                 ],
             ],
