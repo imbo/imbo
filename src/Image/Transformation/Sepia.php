@@ -18,7 +18,7 @@ class Sepia extends Transformation
      */
     private $threshold = 80;
 
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         $threshold = !empty($params['threshold']) ? (float) $params['threshold'] : $this->threshold;
 

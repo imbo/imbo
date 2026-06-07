@@ -35,7 +35,7 @@ class Thumbnail extends Transformation implements InputSizeConstraint
      */
     private $fit = 'outbound';
 
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         $width = !empty($params['width']) ? (int) $params['width'] : $this->width;
         $height = !empty($params['height']) ? (int) $params['height'] : $this->height;

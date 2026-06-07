@@ -11,7 +11,7 @@ use Imbo\Http\Response\Response;
  */
 class Sharpen extends Transformation
 {
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         $preset = isset($params['preset']) ? $params['preset'] : null;
         $radius = 2;

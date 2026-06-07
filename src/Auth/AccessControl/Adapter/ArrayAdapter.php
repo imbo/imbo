@@ -114,7 +114,7 @@ class ArrayAdapter extends AbstractAdapter implements AdapterInterface
      *
      * @throws InvalidArgumentException
      */
-    private function validateAccessList()
+    private function validateAccessList(): void
     {
         // Get all user lists
         $declaredPublicKeys = array_map(static fn ($acl) => $acl['publicKey'], $this->accessList);

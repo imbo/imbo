@@ -46,7 +46,7 @@ class ConvertTest extends TransformationTests
         $imagick = new Imagick();
         $imagick->readImageBlob(file_get_contents(FIXTURES_DIR.'/image.png'));
 
-        $outputConverterManager = $this->createStub(OutputConverterManager::class);
+        $outputConverterManager = $this->createMock(OutputConverterManager::class);
         $outputConverterManager
             ->method('getMimetypeFromExtension')
             ->with('gif')

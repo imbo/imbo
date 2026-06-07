@@ -12,7 +12,7 @@ use Imbo\Image\InputSizeConstraint;
  */
 class Resize extends Transformation implements InputSizeConstraint
 {
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         $size = $this->calculateSize($params, [
             'width' => $this->image->getWidth(),

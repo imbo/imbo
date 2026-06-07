@@ -49,12 +49,12 @@ class Watermark extends Transformation implements InputSizeConstraint
     /**
      * Set default image identifier to use if no identifier has been specified.
      */
-    public function setDefaultImage(string $imageIdentifier)
+    public function setDefaultImage(string $imageIdentifier): void
     {
         $this->defaultImage = $imageIdentifier;
     }
 
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         $width = !empty($params['width']) ? (int) $params['width'] : 0;
         $height = !empty($params['height']) ? (int) $params['height'] : 0;

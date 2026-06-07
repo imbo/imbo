@@ -15,7 +15,7 @@ use Imbo\Image\InputSizeConstraint;
  */
 class AutoRotate extends Transformation implements InputSizeConstraint
 {
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         try {
             // Get orientation from exif data

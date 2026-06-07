@@ -24,7 +24,7 @@ class CustomEventListener implements ListenerInterface
         ];
     }
 
-    public function getIndex(EventInterface $event)
+    public function getIndex(EventInterface $event): void
     {
         $event->getResponse()->headers->add([
             'X-Imbo-Value1' => $this->value1,
@@ -32,7 +32,7 @@ class CustomEventListener implements ListenerInterface
         ]);
     }
 
-    public function getUser(EventInterface $event)
+    public function getUser(EventInterface $event): void
     {
         $event->getResponse()->headers->set('X-Imbo-CurrentUser', $event->getRequest()->getUser());
     }

@@ -11,7 +11,7 @@ use Imbo\Http\Response\Response;
  */
 class Transverse extends Transformation
 {
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         try {
             $this->imagick->transverseImage();

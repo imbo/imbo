@@ -11,7 +11,7 @@ use Imbo\Http\Response\Response;
  */
 class Desaturate extends Transformation
 {
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         try {
             $this->imagick->modulateImage(100, 0, 100);

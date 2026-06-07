@@ -17,7 +17,7 @@ class SmartSizeTest extends TestCase
     #[DataProvider('getSmartSizeArguments')]
     public function testSmartSize(array $imageDimensions, array $params, array $cropParams): void
     {
-        $imagick = $this->createStub(Imagick::class);
+        $imagick = $this->createMock(Imagick::class);
         $imagick
             ->method('cropImage')
             ->with(

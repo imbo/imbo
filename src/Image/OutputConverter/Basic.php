@@ -22,7 +22,7 @@ class Basic implements OutputConverterInterface
         ];
     }
 
-    public function convert(Imagick $imagick, Image $image, string $extension, ?string $mimeType = null)
+    public function convert(Imagick $imagick, Image $image, string $extension, ?string $mimeType = null): void
     {
         try {
             $imagick->setImageFormat($extension);

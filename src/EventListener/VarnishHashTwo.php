@@ -46,7 +46,7 @@ class VarnishHashTwo implements ListenerInterface
      *
      * @param EventInterface $event The current event
      */
-    public function addHeader(EventInterface $event)
+    public function addHeader(EventInterface $event): void
     {
         $request = $event->getRequest();
         $response = $event->getResponse();

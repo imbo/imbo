@@ -12,7 +12,7 @@ use Imbo\Http\Response\Response;
  */
 class Vignette extends Transformation
 {
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         $inner = $this->formatColor(isset($params['inner']) ? $params['inner'] : 'none');
         $outer = $this->formatColor(isset($params['outer']) ? $params['outer'] : '000');

@@ -21,7 +21,7 @@ class Text implements InputLoaderInterface
         ];
     }
 
-    public function load(Imagick $imagick, string $blob, string $mimeType)
+    public function load(Imagick $imagick, string $blob, string $mimeType): void
     {
         $draw = new ImagickDraw();
         $draw->setFillColor(new ImagickPixel('black'));
