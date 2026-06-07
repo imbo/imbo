@@ -32,7 +32,7 @@ abstract class CliCommand extends Command
      *
      * @param array $config The configuration to set
      */
-    public function setConfig(array $config)
+    public function setConfig(array $config): void
     {
         $this->config = $config;
     }

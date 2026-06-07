@@ -131,14 +131,14 @@ class FeatureContext extends ApiContext
     private HandlerStack $handlerStack;
 
     #[BeforeSuite]
-    public static function prepare(BeforeSuiteScope $scope)
+    public static function prepare(BeforeSuiteScope $scope): void
     {
         self::$databaseAdapter = $scope->getSuite()->getSettings()['database'];
         self::$storageAdapter = $scope->getSuite()->getSettings()['storage'];
     }
 
     #[BeforeScenario]
-    public function beforeScenario(BeforeScenarioScope $scope)
+    public function beforeScenario(BeforeScenarioScope $scope): void
     {
         $this->client->request('HEAD', '/', ['headers' => ['X-Behat-Before-Scenario' => true]]);
 
@@ -204,11 +204,9 @@ class FeatureContext extends ApiContext
      *
      * @param string $date The string to validate
      *
-     * @return void
-     *
      * @throws InvalidArgumentException
      */
-    public function isDate($date)
+    public function isDate($date): void
     {
         if (!preg_match('/^[A-Z][a-z]{2}, [\d]{2} [A-Z][a-z]{2} [\d]{4} [\d]{2}:[\d]{2}:[\d]{2} GMT$/', $date)) {
             throw new InvalidArgumentException(sprintf('Date is not properly formatted: "%s".', $date));
@@ -1807,7 +1805,7 @@ class FeatureContext extends ApiContext
      * @param int|string $expectedWidth  Expected width of the image
      * @param int|string $expectedHeight Expected height of the image
      */
-    private function validateImageDimensions($actualWidth = null, $actualHeight = null, $expectedWidth = null, $expectedHeight = null)
+    private function validateImageDimensions($actualWidth = null, $actualHeight = null, $expectedWidth = null, $expectedHeight = null): void
     {
         $actualWidth = (int) $actualWidth;
         $actualHeight = (int) $actualHeight;

@@ -16,7 +16,7 @@ use function is_array;
  */
 class Clip extends Transformation
 {
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         $pathName = null;
 

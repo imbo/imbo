@@ -138,7 +138,7 @@ class ResponseFormatter implements ListenerInterface
      *
      * @param EventInterface $event The event instance
      */
-    public function negotiate(EventInterface $event)
+    public function negotiate(EventInterface $event): void
     {
         $request = $event->getRequest();
         $response = $event->getResponse();
@@ -250,7 +250,7 @@ class ResponseFormatter implements ListenerInterface
      *
      * @param EventInterface $event The current event
      */
-    public function format(EventInterface $event)
+    public function format(EventInterface $event): void
     {
         $response = $event->getResponse();
         $model = $response->getModel();

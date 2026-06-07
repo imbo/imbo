@@ -14,7 +14,7 @@ use Imbo\Http\Response\Response;
  */
 class Level extends Transformation
 {
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         $channel = isset($params['channel']) ? $params['channel'] : 'all';
         $amount = isset($params['amount']) ? (int) $params['amount'] : 1;

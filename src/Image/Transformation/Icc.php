@@ -46,7 +46,7 @@ class Icc extends Transformation
         $this->profiles = $profiles;
     }
 
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         if (empty($params['profile']) && empty($this->profiles['default'])) {
             throw new InvalidArgumentException('No profile name given for which ICC profile to use and no profile is assigned to the "default" name.', Response::HTTP_BAD_REQUEST);

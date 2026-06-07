@@ -14,7 +14,6 @@ use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
@@ -27,7 +26,7 @@ class ImagePreparationTest extends TestCase
     private Request&MockObject $request;
     private EventInterface $event;
     private array $config;
-    private InputLoaderManager&Stub $inputLoaderManager;
+    private InputLoaderManager&MockObject $inputLoaderManager;
     private Closure $imagickLoader;
 
     protected function setUp(): void
@@ -35,7 +34,7 @@ class ImagePreparationTest extends TestCase
         $this->request = $this->createMock(Request::class);
         $response = $this->createStub(Response::class);
         $response->headers = $this->createStub(ResponseHeaderBag::class);
-        $this->inputLoaderManager = $this->createStub(InputLoaderManager::class);
+        $this->inputLoaderManager = $this->createMock(InputLoaderManager::class);
         $this->imagickLoader = static function (string $mime, string $data): Imagick {
             $imagick = new Imagick();
             $imagick->readImageBlob($data);
@@ -62,6 +61,7 @@ class ImagePreparationTest extends TestCase
         $this->assertIsArray($class::getSubscribedEvents());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsExceptionWhenNoImageIsAttached(): void
     {
         $this->request
@@ -73,6 +73,7 @@ class ImagePreparationTest extends TestCase
         $this->prepare->prepareImage($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsExceptionWhenImageTypeIsNotSupported(): void
     {
         $this->request
@@ -110,6 +111,7 @@ class ImagePreparationTest extends TestCase
         $this->prepare->prepareImage($this->event);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testThrowsExceptionWhenImageIsSlightlyBroken(): void
     {
         $filePath = FIXTURES_DIR.'/slightly-broken-image.png';

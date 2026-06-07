@@ -59,7 +59,7 @@ class Authenticate implements ListenerInterface
         return $callbacks;
     }
 
-    public function authenticate(EventInterface $event)
+    public function authenticate(EventInterface $event): void
     {
         $response = $event->getResponse();
         $request = $event->getRequest();

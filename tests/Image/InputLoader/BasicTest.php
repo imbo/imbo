@@ -35,6 +35,6 @@ class BasicTest extends TestCase
             ->method('readImageBlob')
             ->with($blob);
 
-        $this->assertNull($this->loader->load($imagick, $blob, 'image/png'));
+        $this->loader->load($imagick, $blob, 'image/png');
     }
 }

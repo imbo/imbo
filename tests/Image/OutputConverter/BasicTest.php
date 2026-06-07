@@ -45,7 +45,7 @@ class BasicTest extends TestCase
             ->method('setHasBeenTransformed')
             ->with(true);
 
-        $this->assertNull($this->converter->convert($imagick, $image, $extension, $mimeType));
+        $this->converter->convert($imagick, $image, $extension, $mimeType);
     }
 
     public function testThrowsExceptionOnImagickFailure(): void

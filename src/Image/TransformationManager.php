@@ -334,7 +334,7 @@ class TransformationManager implements ListenerInterface
      *
      * @throws TransformationException If the transformation fails or is not registered
      */
-    protected function triggerTransformation(string $name, array $params, EventInterface $event)
+    protected function triggerTransformation(string $name, array $params, EventInterface $event): void
     {
         $transformation = $this->getTransformation($name);
 

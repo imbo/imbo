@@ -41,7 +41,7 @@ class MaxImageSize implements ListenerInterface
         ];
     }
 
-    public function enforceMaxSize(EventInterface $event)
+    public function enforceMaxSize(EventInterface $event): void
     {
         $image = $event->getRequest()->getImage();
 

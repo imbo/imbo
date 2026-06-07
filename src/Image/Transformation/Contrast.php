@@ -11,7 +11,7 @@ use Imbo\Http\Response\Response;
  */
 class Contrast extends Transformation
 {
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         $alpha = isset($params['sharpen']) ? (float) $params['sharpen'] : 1;
         $alpha = isset($params['alpha']) ? (float) $params['alpha'] : $alpha;

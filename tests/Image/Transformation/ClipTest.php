@@ -35,7 +35,7 @@ class ClipTest extends TestCase
             'getUser' => $user,
         ]);
 
-        $database = $this->createStub(DatabaseInterface::class);
+        $database = $this->createMock(DatabaseInterface::class);
         $database
             ->method('getMetadata')
             ->with($user, $imageIdentifier)
@@ -67,13 +67,10 @@ class ClipTest extends TestCase
     #[AllowMockObjectsWithoutExpectations]
     public function testNoExceptionIfMissingNamedPathButIgnoreSet(): void
     {
-        $this->assertNull(
-            $this->transformation->transform([
-                'path' => 'foo',
-                'ignoreUnknownPath' => '',
-            ]),
-            'Expected transform method to not return anything',
-        );
+        $this->transformation->transform([
+            'path' => 'foo',
+            'ignoreUnknownPath' => '',
+        ]);
     }
 
     public function testTransformationHappensWithMatchingPath(): void

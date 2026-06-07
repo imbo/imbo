@@ -12,7 +12,7 @@ class Compress extends Transformation
 {
     private int $level;
 
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         if (empty($params['level'])) {
             throw new TransformationException('Missing required parameter: level', Response::HTTP_BAD_REQUEST);

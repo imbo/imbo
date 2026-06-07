@@ -20,7 +20,7 @@ class Rotate extends Transformation implements InputSizeConstraint
      */
     private $bg = '#000';
 
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         if (empty($params['angle'])) {
             throw new TransformationException('Missing required parameter: angle', Response::HTTP_BAD_REQUEST);

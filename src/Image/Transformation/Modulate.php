@@ -11,7 +11,7 @@ use Imbo\Http\Response\Response;
  */
 class Modulate extends Transformation
 {
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         $brightness = isset($params['b']) ? (int) $params['b'] : 100;
         $saturation = isset($params['s']) ? (int) $params['s'] : 100;

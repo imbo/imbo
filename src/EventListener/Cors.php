@@ -77,7 +77,7 @@ class Cors implements ListenerInterface
      *
      * @param EventInterface $event The event instance
      */
-    public function subscribe(EventInterface $event)
+    public function subscribe(EventInterface $event): void
     {
         $events = [];
 
@@ -106,7 +106,7 @@ class Cors implements ListenerInterface
      *
      * @param EventInterface $event The event instance
      */
-    public function setExposedHeaders(EventInterface $event)
+    public function setExposedHeaders(EventInterface $event): void
     {
         // If this request was disallowed, don't expose any headers
         if (!$this->requestAllowed) {
@@ -135,7 +135,7 @@ class Cors implements ListenerInterface
      *
      * @param EventInterface $event The event instance
      */
-    public function options(EventInterface $event)
+    public function options(EventInterface $event): void
     {
         $request = $event->getRequest();
         $response = $event->getResponse();
@@ -187,7 +187,7 @@ class Cors implements ListenerInterface
      *
      * @param EventInterface $event The event instance
      */
-    public function invoke(EventInterface $event)
+    public function invoke(EventInterface $event): void
     {
         $request = $event->getRequest();
         $resource = (string) $request->getRoute();

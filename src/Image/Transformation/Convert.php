@@ -13,7 +13,7 @@ use Imbo\Http\Response\Response;
  */
 class Convert extends Transformation
 {
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         if (empty($params['type'])) {
             throw new TransformationException('Missing required parameter: type', Response::HTTP_BAD_REQUEST);

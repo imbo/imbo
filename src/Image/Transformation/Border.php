@@ -78,7 +78,7 @@ class Border extends Transformation implements InputSizeConstraint
      * @param int    $borderWidth
      * @param int    $borderHeight
      */
-    private function expandImage($color, $borderWidth, $borderHeight)
+    private function expandImage($color, $borderWidth, $borderHeight): void
     {
         $imageWidth = $this->image->getWidth();
         $imageHeight = $this->image->getHeight();
@@ -111,7 +111,7 @@ class Border extends Transformation implements InputSizeConstraint
      * @param int    $borderWidth
      * @param int    $borderHeight
      */
-    private function drawBorderInside($color, $borderWidth, $borderHeight)
+    private function drawBorderInside($color, $borderWidth, $borderHeight): void
     {
         $imageWidth = $this->image->getWidth();
         $imageHeight = $this->image->getHeight();

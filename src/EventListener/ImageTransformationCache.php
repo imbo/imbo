@@ -90,7 +90,7 @@ class ImageTransformationCache implements ListenerInterface
      *
      * @param EventInterface $event The current event
      */
-    public function loadFromCache(EventInterface $event)
+    public function loadFromCache(EventInterface $event): void
     {
         $request = $event->getRequest();
         $response = $event->getResponse();
@@ -138,7 +138,7 @@ class ImageTransformationCache implements ListenerInterface
      *
      * @param EventInterface $event The current event
      */
-    public function storeInCache(EventInterface $event)
+    public function storeInCache(EventInterface $event): void
     {
         $request = $event->getRequest();
         $response = $event->getResponse();
@@ -191,7 +191,7 @@ class ImageTransformationCache implements ListenerInterface
      *
      * @param EventInterface $event The current event
      */
-    public function deleteFromCache(EventInterface $event)
+    public function deleteFromCache(EventInterface $event): void
     {
         $request = $event->getRequest();
         $cacheDir = $this->getCacheDir($request->getUser(), $request->getImageIdentifier());
@@ -206,7 +206,7 @@ class ImageTransformationCache implements ListenerInterface
      *
      * @param bool $cacheHit Whether the request has already triggered a cache hit
      */
-    protected function setCacheHit($cacheHit)
+    protected function setCacheHit($cacheHit): void
     {
         $this->cacheHit = (bool) $cacheHit;
     }
@@ -236,7 +236,7 @@ class ImageTransformationCache implements ListenerInterface
      *
      * @param string $path
      */
-    protected function setPath($path)
+    protected function setPath($path): void
     {
         $this->path = $path;
     }
@@ -336,7 +336,7 @@ class ImageTransformationCache implements ListenerInterface
      *
      * @param string $dir Name of a directory
      */
-    protected function rmdir($dir)
+    protected function rmdir($dir): void
     {
         $iterator = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($dir),

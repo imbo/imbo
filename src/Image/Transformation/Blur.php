@@ -13,7 +13,7 @@ use function in_array;
  */
 class Blur extends Transformation
 {
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         $type = isset($params['type']) ? $params['type'] : 'gaussian';
 
@@ -25,17 +25,21 @@ class Blur extends Transformation
 
         switch ($type) {
             case 'motion':
-                return $this->motionBlur($params);
+                $this->motionBlur($params);
+                break;
 
             case 'rotational':
             case 'radial':
-                return $this->rotationalBlur($params);
+                $this->rotationalBlur($params);
+                break;
 
             case 'adaptive':
-                return $this->blur($params, true);
+                $this->blur($params, true);
+                break;
 
             default:
-                return $this->blur($params);
+                $this->blur($params);
+                break;
         }
     }
 
@@ -47,7 +51,7 @@ class Blur extends Transformation
      *
      * @throws TransformationException
      */
-    private function checkRequiredParams(array $params, array $required)
+    private function checkRequiredParams(array $params, array $required): void
     {
         foreach ($required as $param) {
             if (!isset($params[$param])) {
@@ -62,7 +66,7 @@ class Blur extends Transformation
      * @param array $params   The transformation parameters
      * @param bool  $adaptive Perform adaptive blur or not
      */
-    private function blur(array $params, $adaptive = false)
+    private function blur(array $params, $adaptive = false): void
     {
         $this->checkRequiredParams($params, ['radius', 'sigma']);
 
@@ -87,7 +91,7 @@ class Blur extends Transformation
      *
      * @param array $params The transformation parameters
      */
-    private function motionBlur(array $params)
+    private function motionBlur(array $params): void
     {
         $this->checkRequiredParams($params, ['radius', 'sigma', 'angle']);
 
@@ -109,7 +113,7 @@ class Blur extends Transformation
      *
      * @param array $params The transformation parameters
      */
-    private function rotationalBlur(array $params)
+    private function rotationalBlur(array $params): void
     {
         $this->checkRequiredParams($params, ['angle']);
 

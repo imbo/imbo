@@ -12,7 +12,6 @@ use Imbo\Model\Image as ImageModel;
 use Imbo\Storage\StorageInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 use function array_key_exists;
@@ -23,7 +22,7 @@ class ImageTest extends ResourceTests
     private Image $resource;
     private Request&MockObject $request;
     private Response&MockObject $response;
-    private EventManager&Stub $manager;
+    private EventManager&MockObject $manager;
     private EventInterface $event;
 
     protected function getNewResource(): Image
@@ -35,7 +34,7 @@ class ImageTest extends ResourceTests
     {
         $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
-        $this->manager = $this->createStub(EventManager::class);
+        $this->manager = $this->createMock(EventManager::class);
         $this->event = $this->createConfiguredStub(EventInterface::class, [
             'getRequest' => $this->request,
             'getResponse' => $this->response,

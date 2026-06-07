@@ -15,7 +15,7 @@ class OverrideJpegDummyLoader implements InputLoaderInterface
         ];
     }
 
-    public function load(Imagick $imagick, string $blob, string $mimeType)
+    public function load(Imagick $imagick, string $blob, string $mimeType): void
     {
         $im = new Imagick();
         $im->newImage(300, 300, new ImagickPixel('white'));

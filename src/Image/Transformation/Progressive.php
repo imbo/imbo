@@ -12,7 +12,7 @@ use Imbo\Http\Response\Response;
  */
 class Progressive extends Transformation
 {
-    public function transform(array $params)
+    public function transform(array $params): void
     {
         try {
             $this->imagick->setInterlaceScheme(Imagick::INTERLACE_PLANE);
