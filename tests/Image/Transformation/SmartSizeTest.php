@@ -59,7 +59,7 @@ class SmartSizeTest extends TestCase
         return [
             'Square, close crop, (800,300) poi on landscape image' => [
                 'imageDimensions' => [
-                    'width' => 1200,
+                    'width' => 1_200,
                     'height' => 700,
                 ],
                 'params' => [
@@ -79,7 +79,7 @@ class SmartSizeTest extends TestCase
             'Square, close crop, (0,0) poi on portrait image' => [
                 'imageDimensions' => [
                     'width' => 700,
-                    'height' => 1200,
+                    'height' => 1_200,
                 ],
                 'params' => [
                     'width' => 400,
@@ -98,7 +98,7 @@ class SmartSizeTest extends TestCase
             'Square, close crop, (0,700) poi on portrait image' => [
                 'imageDimensions' => [
                     'width' => 700,
-                    'height' => 1200,
+                    'height' => 1_200,
                 ],
                 'params' => [
                     'width' => 400,
@@ -116,8 +116,8 @@ class SmartSizeTest extends TestCase
 
             'Square, close crop, (500,500) poi on square image' => [
                 'imageDimensions' => [
-                    'width' => 1200,
-                    'height' => 1200,
+                    'width' => 1_200,
+                    'height' => 1_200,
                 ],
                 'params' => [
                     'width' => 400,
@@ -135,7 +135,7 @@ class SmartSizeTest extends TestCase
 
             'Portrait, close crop, (600,300) poi on landscape image' => [
                 'imageDimensions' => [
-                    'width' => 1200,
+                    'width' => 1_200,
                     'height' => 600,
                 ],
                 'params' => [
@@ -155,7 +155,7 @@ class SmartSizeTest extends TestCase
             'Panorama, close crop, (100,700) poi on portrait image' => [
                 'imageDimensions' => [
                     'width' => 800,
-                    'height' => 1800,
+                    'height' => 1_800,
                 ],
                 'params' => [
                     'width' => 80,
@@ -173,7 +173,7 @@ class SmartSizeTest extends TestCase
 
             'Square, medium crop, (800,300) poi on landscape image' => [
                 'imageDimensions' => [
-                    'width' => 1200,
+                    'width' => 1_200,
                     'height' => 700,
                 ],
                 'params' => [
@@ -193,7 +193,7 @@ class SmartSizeTest extends TestCase
             'Square, medium crop, (0,0) poi on portrait image' => [
                 'imageDimensions' => [
                     'width' => 700,
-                    'height' => 1200,
+                    'height' => 1_200,
                 ],
                 'params' => [
                     'width' => 400,
@@ -212,7 +212,7 @@ class SmartSizeTest extends TestCase
             'Square, medium crop, (0,700) poi on portrait image' => [
                 'imageDimensions' => [
                     'width' => 700,
-                    'height' => 1200,
+                    'height' => 1_200,
                 ],
                 'params' => [
                     'width' => 400,
@@ -230,8 +230,8 @@ class SmartSizeTest extends TestCase
 
             'Square, medium crop, (500,500) poi on square image' => [
                 'imageDimensions' => [
-                    'width' => 1200,
-                    'height' => 1200,
+                    'width' => 1_200,
+                    'height' => 1_200,
                 ],
                 'params' => [
                     'width' => 400,
@@ -249,7 +249,7 @@ class SmartSizeTest extends TestCase
 
             'Portrait, medium crop, (600,300) poi on landscape image' => [
                 'imageDimensions' => [
-                    'width' => 1200,
+                    'width' => 1_200,
                     'height' => 600,
                 ],
                 'params' => [
@@ -269,7 +269,7 @@ class SmartSizeTest extends TestCase
             'Panorama, medium crop, (100,700) poi on portrait image' => [
                 'imageDimensions' => [
                     'width' => 800,
-                    'height' => 1800,
+                    'height' => 1_800,
                 ],
                 'params' => [
                     'width' => 800,
@@ -287,7 +287,7 @@ class SmartSizeTest extends TestCase
 
             'Square, wide crop, (800,300) poi on landscape image' => [
                 'imageDimensions' => [
-                    'width' => 1200,
+                    'width' => 1_200,
                     'height' => 700,
                 ],
                 'params' => [
@@ -307,7 +307,7 @@ class SmartSizeTest extends TestCase
             'Square, wide crop, (0,0) poi on portrait image' => [
                 'imageDimensions' => [
                     'width' => 700,
-                    'height' => 1200,
+                    'height' => 1_200,
                 ],
                 'params' => [
                     'width' => 400,
@@ -326,7 +326,7 @@ class SmartSizeTest extends TestCase
             'Square, wide crop, (0,700) poi on portrait image' => [
                 'imageDimensions' => [
                     'width' => 700,
-                    'height' => 1200,
+                    'height' => 1_200,
                 ],
                 'params' => [
                     'width' => 400,
@@ -344,8 +344,8 @@ class SmartSizeTest extends TestCase
 
             'Square, wide crop, (500,500) poi on square image' => [
                 'imageDimensions' => [
-                    'width' => 1200,
-                    'height' => 1200,
+                    'width' => 1_200,
+                    'height' => 1_200,
                 ],
                 'params' => [
                     'width' => 400,
@@ -363,7 +363,7 @@ class SmartSizeTest extends TestCase
 
             'Portrait, wide crop, (600,300) poi on landscape image' => [
                 'imageDimensions' => [
-                    'width' => 1200,
+                    'width' => 1_200,
                     'height' => 600,
                 ],
                 'params' => [
@@ -383,7 +383,7 @@ class SmartSizeTest extends TestCase
             'Panorama, wide crop, (100,700) poi on portrait image' => [
                 'imageDimensions' => [
                     'width' => 800,
-                    'height' => 1800,
+                    'height' => 1_800,
                 ],
                 'params' => [
                     'width' => 800,
@@ -401,7 +401,7 @@ class SmartSizeTest extends TestCase
 
             'Square, full crop, (800,300) poi on landscape image' => [
                 'imageDimensions' => [
-                    'width' => 1200,
+                    'width' => 1_200,
                     'height' => 700,
                 ],
                 'params' => [
@@ -421,7 +421,7 @@ class SmartSizeTest extends TestCase
             'Square, full crop, (0,0) poi on portrait image' => [
                 'imageDimensions' => [
                     'width' => 700,
-                    'height' => 1200,
+                    'height' => 1_200,
                 ],
                 'params' => [
                     'width' => 400,
@@ -440,7 +440,7 @@ class SmartSizeTest extends TestCase
             'Square, full crop, (0,700) poi on portrait image' => [
                 'imageDimensions' => [
                     'width' => 700,
-                    'height' => 1200,
+                    'height' => 1_200,
                 ],
                 'params' => [
                     'width' => 400,
@@ -458,8 +458,8 @@ class SmartSizeTest extends TestCase
 
             'Square, full crop, (500,500) poi on square image' => [
                 'imageDimensions' => [
-                    'width' => 1200,
-                    'height' => 1200,
+                    'width' => 1_200,
+                    'height' => 1_200,
                 ],
                 'params' => [
                     'width' => 400,
@@ -468,8 +468,8 @@ class SmartSizeTest extends TestCase
                     'crop' => 'full',
                 ],
                 'cropParams' => [
-                    'width' => 1200,
-                    'height' => 1200,
+                    'width' => 1_200,
+                    'height' => 1_200,
                     'x' => 0,
                     'y' => 0,
                 ],
@@ -477,7 +477,7 @@ class SmartSizeTest extends TestCase
 
             'Portrait, full crop, (600,300) poi on landscape image' => [
                 'imageDimensions' => [
-                    'width' => 1200,
+                    'width' => 1_200,
                     'height' => 600,
                 ],
                 'params' => [
@@ -497,7 +497,7 @@ class SmartSizeTest extends TestCase
             'Panorama, full crop, (100,700) poi on portrait image' => [
                 'imageDimensions' => [
                     'width' => 800,
-                    'height' => 1800,
+                    'height' => 1_800,
                 ],
                 'params' => [
                     'width' => 800,

@@ -36,7 +36,7 @@ class Cors implements ListenerInterface
             'shorturl' => ['GET', 'HEAD'],
             'shorturls' => ['GET', 'HEAD'],
         ],
-        'maxAge' => 3600,
+        'maxAge' => 3_600,
     ];
 
     /**
@@ -85,7 +85,7 @@ class Cors implements ListenerInterface
         foreach ($this->params['allowedMethods'] as $resource => $methods) {
             foreach ($methods as $method) {
                 $eventName = $resource.'.'.strtolower($method);
-                $events[$eventName] = ['invoke' => 1000];
+                $events[$eventName] = ['invoke' => 1_000];
             }
 
             // Always enable the listener for the OPTIONS method

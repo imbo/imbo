@@ -96,7 +96,7 @@ abstract class DatabaseTests extends TestCase
         $this->assertSame(665, $image->getWidth(), 'Image width is incorrect');
         $this->assertSame(463, $image->getHeight(), 'Image height is incorrect');
         $this->assertSame('image/jpeg', $image->getMimeType(), 'Image mime type is incorrect');
-        $this->assertSame(64828, $image->getFilesize(), 'Image filesize is incorrect');
+        $this->assertSame(64_828, $image->getFilesize(), 'Image filesize is incorrect');
         $this->assertSame('jpg', $image->getExtension(), 'Image extension is incorrect');
 
         $properties = $this->adapter->getImageProperties($user, $imageIdentifier);
@@ -112,7 +112,7 @@ abstract class DatabaseTests extends TestCase
             );
         }
 
-        $this->assertSame(64828, $properties['size'], 'Incorrect size in image properties');
+        $this->assertSame(64_828, $properties['size'], 'Incorrect size in image properties');
         $this->assertSame('jpg', $properties['extension'], 'Incorrect extension in image properties');
         $this->assertSame('image/jpeg', $properties['mime'], 'Incorrect mime in image properties');
         $this->assertEqualsWithDelta(time(), $properties['added'], 2, 'Incorrect added timestamp in image properties');
@@ -211,7 +211,7 @@ abstract class DatabaseTests extends TestCase
      */
     public static function getDataForLastModificationTest(): array
     {
-        $image = self::getImageModel('test-image.png', 1499234238, 1499234238)
+        $image = self::getImageModel('test-image.png', 1_499_234_238, 1_499_234_238)
             ->setUser('user')
             ->setImageIdentifier(uniqid());
         $image2 = clone $image;
@@ -1515,7 +1515,7 @@ abstract class DatabaseTests extends TestCase
         $num = $this->adapter->getNumBytes('user');
 
         $this->assertSame(
-            1402,
+            1_402,
             $num,
             sprintf('Expected 1402 bytes, got %d', $num),
         );
@@ -1528,7 +1528,7 @@ abstract class DatabaseTests extends TestCase
         $num = $this->adapter->getNumBytes('user2');
 
         $this->assertSame(
-            1402,
+            1_402,
             $num,
             sprintf('Expected 1402 bytes, got %d', $num),
         );
@@ -1536,7 +1536,7 @@ abstract class DatabaseTests extends TestCase
         $num = $this->adapter->getNumBytes();
 
         $this->assertSame(
-            2804,
+            2_804,
             $num,
             sprintf('Expected 2804 bytes, got %d', $num),
         );
@@ -1593,36 +1593,36 @@ abstract class DatabaseTests extends TestCase
                 'sort' => ['size'],
                 'field' => 'size',
                 'values' => [
-                    41423,
-                    64828,
-                    74337,
-                    84988,
-                    92795,
-                    95576,
+                    41_423,
+                    64_828,
+                    74_337,
+                    84_988,
+                    92_795,
+                    95_576,
                 ],
             ],
             'desc sort on size' => [
                 'sort' => ['size:desc'],
                 'field' => 'size',
                 'values' => [
-                    95576,
-                    92795,
-                    84988,
-                    74337,
-                    64828,
-                    41423,
+                    95_576,
+                    92_795,
+                    84_988,
+                    74_337,
+                    64_828,
+                    41_423,
                 ],
             ],
             'sort on multiple fields' => [
                 'sort' => ['width:asc', 'size:desc'],
                 'field' => 'size',
                 'values' => [
-                    74337,
-                    84988,
-                    92795,
-                    95576,
-                    64828,
-                    41423,
+                    74_337,
+                    84_988,
+                    92_795,
+                    95_576,
+                    64_828,
+                    41_423,
                 ],
             ],
         ];

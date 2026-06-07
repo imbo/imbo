@@ -96,7 +96,7 @@ class MaxSizeTest extends TransformationTests
             ],
             'landscape image smaller than width and height params' => [
                 'file' => FIXTURES_DIR.'/image.png',
-                'params' => ['width' => 1000, 'height' => 1000],
+                'params' => ['width' => 1_000, 'height' => 1_000],
                 'width' => 665,
                 'height' => 463,
                 'transformedWidth' => null,
@@ -129,7 +129,7 @@ class MaxSizeTest extends TransformationTests
             ],
             'portrait image smaller than width and height params' => [
                 'file' => FIXTURES_DIR.'/tall-image.png',
-                'params' => ['width' => 1000, 'height' => 1000],
+                'params' => ['width' => 1_000, 'height' => 1_000],
                 'width' => 463,
                 'height' => 665,
                 'transformedWidth' => null,

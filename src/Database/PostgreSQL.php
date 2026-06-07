@@ -14,6 +14,6 @@ class PostgreSQL extends PDOAdapter
 
     protected function getUniqueConstraintExceptionCode(): int
     {
-        return 23505;
+        return 23_505;
     }
 }

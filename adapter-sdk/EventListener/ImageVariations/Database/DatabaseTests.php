@@ -110,7 +110,7 @@ abstract class DatabaseTests extends TestCase
     {
         return [
             'image larger than all variations' => [
-                'imageWidth' => 1000,
+                'imageWidth' => 1_000,
                 'bestMatch' => null,
             ],
             'pick the largest variation' => [

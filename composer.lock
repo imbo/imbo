@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "698963324e4e3bf143c245d82a423680",
+    "content-hash": "3bc02b3cd7628fefa80904a9541c5f1e",
     "packages": [
         {
             "name": "brick/math",
@@ -2460,16 +2460,16 @@
         },
         {
             "name": "imbo/imbo-coding-standard",
-            "version": "v3.0.6",
+            "version": "v3.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/imbo/imbo-coding-standard.git",
-                "reference": "78edf46865aa25d2331e8823da43746c3bd2b8d2"
+                "reference": "129b229f4da0dd9283f6e6a7f0baf8ec3038de2e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/imbo/imbo-coding-standard/zipball/78edf46865aa25d2331e8823da43746c3bd2b8d2",
-                "reference": "78edf46865aa25d2331e8823da43746c3bd2b8d2",
+                "url": "https://api.github.com/repos/imbo/imbo-coding-standard/zipball/129b229f4da0dd9283f6e6a7f0baf8ec3038de2e",
+                "reference": "129b229f4da0dd9283f6e6a7f0baf8ec3038de2e",
                 "shasum": ""
             },
             "require": {
@@ -2506,9 +2506,9 @@
             ],
             "support": {
                 "issues": "https://github.com/imbo/imbo-coding-standard/issues",
-                "source": "https://github.com/imbo/imbo-coding-standard/tree/v3.0.6"
+                "source": "https://github.com/imbo/imbo-coding-standard/tree/v3.0.9"
             },
-            "time": "2026-01-27T07:20:33+00:00"
+            "time": "2026-06-07T10:14:47+00:00"
         },
         {
             "name": "kubawerlos/php-cs-fixer-custom-fixers",

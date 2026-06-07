@@ -195,7 +195,7 @@ class ExifMetadata implements ListenerInterface
         }
 
         $sign = ('W' === $hemisphere || 'S' === $hemisphere) ? -1 : 1;
-        $degrees = ($coordinates[0] + ($coordinates[1] / 60) + ($coordinates[2] / 3600));
+        $degrees = ($coordinates[0] + ($coordinates[1] / 60) + ($coordinates[2] / 3_600));
 
         return $sign * $degrees;
     }

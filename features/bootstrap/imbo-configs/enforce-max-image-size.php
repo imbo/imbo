@@ -9,7 +9,7 @@ return [
         'maxImageSize' => [
             'listener' => MaxImageSize::class,
             'params' => [
-                'width' => 1000,
+                'width' => 1_000,
                 'height' => 600,
             ],
         ],

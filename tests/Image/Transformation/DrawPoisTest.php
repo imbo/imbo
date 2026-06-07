@@ -132,7 +132,7 @@ class DrawPoisTest extends TestCase
         ]);
 
         $image = $this->createConfiguredMock(Image::class, [
-            'getWidth' => 1000,
+            'getWidth' => 1_000,
             'getHeight' => 800,
             'getUser' => 'user',
             'getImageIdentifier' => 'image-id',
@@ -170,7 +170,7 @@ class DrawPoisTest extends TestCase
         $image = $this->createConfiguredStub(Image::class, [
             'getUser' => 'user',
             'getImageIdentifier' => 'image identifier',
-            'getWidth' => 1000,
+            'getWidth' => 1_000,
             'getHeight' => 800,
         ]);
 
