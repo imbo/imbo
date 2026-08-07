@@ -18,8 +18,15 @@ class AutoRotate extends Transformation implements InputSizeConstraint
     public function transform(array $params): void
     {
         try {
-            // Get orientation from exif data
             $orientation = $this->imagick->getImageOrientation();
+
+            // Fall back to reading from the raw image blob if Imagick returns 0, which can happen
+            // when ImageMagick is configured with a restrictive security policy that blocks the
+            // EXIF coder.
+            if (0 === $orientation && isset($this->image) && 'image/jpeg' === $this->image->getMimeType()) {
+                $exif = exif_read_data('data://image/jpeg;base64,'.base64_encode($this->image->getBlob()));
+                $orientation = (int) ($exif['Orientation'] ?? 0);
+            }
 
             /**
              * Transform image if orientation is set and greater than 1

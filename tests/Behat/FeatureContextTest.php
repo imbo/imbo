@@ -8,7 +8,6 @@ use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
-use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Imbo\BehatApiExtension\ArrayContainsComparator;
 use Imbo\BehatApiExtension\Exception\AssertionFailedException;
@@ -18,6 +17,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 
@@ -29,7 +29,7 @@ class FeatureContextTest extends TestCase
 {
     private FeatureContext $context;
     /**
-     * @var array<array{request:Request,response:Response}>
+     * @var array<array{request:RequestInterface,response:?ResponseInterface}>
      */
     private array $history;
     private MockHandler $mockHandler;
@@ -56,7 +56,7 @@ class FeatureContextTest extends TestCase
     /**
      * Convenience method to make a single request and return the request instance.
      */
-    private function makeRequest(string $path = '/somepath'): Request
+    private function makeRequest(string $path = '/somepath'): RequestInterface
     {
         $this->mockHandler->append(new Response(200));
         $this->context->requestPath($path);

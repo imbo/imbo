@@ -93,7 +93,7 @@ class Watermark extends Transformation implements InputSizeConstraint
         if ($opacity < 1) {
             // if there's no alpha channel already, we have to enable it before calculating transparency
             if (!$watermark->getImageAlphaChannel()) {
-                $watermark->setImageAlphaChannel(Imagick::ALPHACHANNEL_ACTIVATE);
+                $watermark->setImageAlphaChannel(Imagick::ALPHACHANNEL_OPAQUE);
             }
 
             $watermark->evaluateImage(Imagick::EVALUATE_MULTIPLY, $opacity, Imagick::CHANNEL_ALPHA);
