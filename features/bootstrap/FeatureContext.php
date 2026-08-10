@@ -140,7 +140,7 @@ class FeatureContext extends ApiContext
     #[BeforeScenario]
     public function beforeScenario(BeforeScenarioScope $scope): void
     {
-        $this->client->request('HEAD', '/', ['headers' => ['X-Behat-Before-Scenario' => true]]);
+        $this->client->request('HEAD', '/', ['headers' => ['X-Behat-Before-Scenario' => 'true']]);
 
         $cachePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'imbo-behat-image-transformation-cache';
 

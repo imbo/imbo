@@ -28,7 +28,7 @@
   "require": {
     "php": ">=8.3",
     "ext-imagick": "^3.7",
-    "guzzlehttp/psr7": "^2.8",
+    "guzzlehttp/psr7": "^3.0",
     "ramsey/uuid": "^4.9",
     "symfony/console": "^7.4",
     "symfony/http-foundation": "^7.4"
