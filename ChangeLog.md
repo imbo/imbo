@@ -1,9 +1,15 @@
 Changelog for Imbo
 ==================
 
+Imbo-3.1.0
+----------
+__2026-08-18__
+
+* #677: Fix for AutoRotate / Watermark image transformations
+
 Imbo-3.0.0
 ----------
-__N/A__
+__2026-01-28__
 
 * #637: Add mimeType in images response that will replace mime at some point
 * #635: Remove ListModel
