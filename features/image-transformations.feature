@@ -179,6 +179,14 @@ Feature: Imbo enables dynamic transformations of images
             | compress:level=200                | 400 level must be between 0 and 100                                         |
             | compress:level=-10                | 400 level must be between 0 and 100                                         |
             | crop:width=100                    | 400 Missing required parameter: height                                      |
+            | crop:width=0,height=100           | 400 Crop width and height must be greater than zero                         |
+            | crop:width=100,height=0           | 400 Crop width and height must be greater than zero                         |
+            | crop:width=-1,height=100          | 400 Crop width and height must be greater than zero                         |
+            | crop:width=100,height=-1          | 400 Crop width and height must be greater than zero                         |
+            | crop:width=0.5,height=100         | 400 Crop width and height must be greater than zero                         |
+            | crop:width=100,height=0.5         | 400 Crop width and height must be greater than zero                         |
+            | crop:width=abc,height=100         | 400 Crop width and height must be greater than zero                         |
+            | crop:width=100,height=abc         | 400 Crop width and height must be greater than zero                         |
             | resize                            | 400 Missing both width and height. You need to specify at least one of them |
             | rotate                            | 400 Missing required parameter: angle                                       |
             | smartSize                         | 400 Both width and height needs to be specified                             |
