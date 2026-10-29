@@ -38,7 +38,7 @@
     "ext-pdo": "*",
     "christeredvartsen/testfs": "^0.8.0",
     "friendsofphp/php-cs-fixer": "^3.95",
-    "imbo/behat-api-extension": "^6.1",
+    "imbo/behat-api-extension": "^7.0",
     "imbo/imbo-coding-standard": "^3.0",
     "mongodb/mongodb": "^2.4",
     "phpstan/extension-installer": "^1.4",
