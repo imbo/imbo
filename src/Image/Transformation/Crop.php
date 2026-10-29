@@ -72,6 +72,10 @@ class Crop extends Transformation implements RegionExtractor, InputSizeConstrain
         $width = (int) $params['width'];
         $height = (int) $params['height'];
 
+        if ($width <= 0 || $height <= 0) {
+            throw new TransformationException('Crop width and height must be greater than zero', Response::HTTP_BAD_REQUEST);
+        }
+
         // Set correct x and/or y values based on the crop mode
         if ('center' === $mode || 'center-x' === $mode) {
             $x = (int) (($imageSize['width'] - $width) / 2);

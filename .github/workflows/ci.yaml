@@ -12,7 +12,7 @@ permissions:
 jobs:
   tests-and-qa:
     name: composer run ${{ matrix.composer-script }} / PHP ${{ matrix.php }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
@@ -56,7 +56,7 @@ jobs:
           POSTGRES_USER: imbo_test
           POSTGRES_PASSWORD: imbo_test
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
@@ -64,7 +64,7 @@ jobs:
       - id: composer-cache-dir
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - id: composer-cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
@@ -76,7 +76,7 @@ jobs:
       - run: composer run ${{ matrix.composer-script }}
   integration-tests:
     name: Integration tests (${{ matrix.test-suite }} / PHP ${{ matrix.php }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
@@ -122,7 +122,7 @@ jobs:
           POSTGRES_USER: imbo_test
           POSTGRES_PASSWORD: imbo_test
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
@@ -130,7 +130,7 @@ jobs:
       - id: composer-cache-dir
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - id: composer-cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ steps.composer-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
@@ -142,7 +142,7 @@ jobs:
           mkdir -p build/logs
           php -S localhost:8080 -t ./public features/bootstrap/router.php > build/logs/httpd.log 2>&1 &
       - run: vendor/bin/behat --strict --suite=${{ matrix.test-suite }}
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: httpd-logs-${{ matrix.test-suite }}-php-${{ matrix.php }}
           path: build/logs/
@@ -151,7 +151,7 @@ jobs:
       - tests-and-qa
       - integration-tests
     if: ${{ always() }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     name: Branch protection
     steps:
       - if: ${{ needs.tests-and-qa.result != 'success' || needs.integration-tests.result != 'success' }}

@@ -3,10 +3,13 @@
 namespace Imbo\Image;
 
 use Imbo\EventManager\EventInterface;
+use Imbo\Exception\TransformationException;
 use Imbo\Http\Request\Request;
 use Imbo\Http\Response\Response;
+use Imbo\Image\Transformation\Crop;
 use Imbo\Model\Image;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\InputBag;
 
@@ -135,5 +138,39 @@ class TransformationManagerTest extends TestCase
         $this->assertIsArray($minimum);
         $this->assertSame(654, $minimum['width']);
         $this->assertSame(368, $minimum['height']);
+    }
+
+    public function testRejectsZeroWidthCropWhenResolvingMinimumInputSize(): void
+    {
+        $this->query->set('t', ['crop:width=0,height=100']);
+
+        $this->expectException(TransformationException::class);
+        $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
+        $this->expectExceptionMessage('Crop width and height must be greater than zero');
+
+        $this->manager->getMinimumImageInputSize($this->event);
+    }
+
+    #[DataProvider('getInvalidRegions')]
+    public function testSkipsInputSizeOptimizationForInvalidRegions(int $width, int $height): void
+    {
+        $handler = $this->createConfiguredStub(Crop::class, [
+            'getExtractedRegion' => ['width' => $width, 'height' => $height, 'x' => 0, 'y' => 0],
+        ]);
+        $handler->method('setImage')->willReturnSelf();
+        $this->manager->addTransformation('customCrop', $handler);
+        $this->query->set('t', ['customCrop']);
+
+        $this->assertFalse($this->manager->getMinimumImageInputSize($this->event));
+    }
+
+    public static function getInvalidRegions(): array
+    {
+        return [
+            'zero width' => [0, 100],
+            'zero height' => [100, 0],
+            'negative width' => [-1, 100],
+            'negative height' => [100, -1],
+        ];
     }
 }

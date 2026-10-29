@@ -80,6 +80,39 @@ class CropTest extends TransformationTests
         $transformation->transform(['width' => 123]);
     }
 
+    #[DataProvider('getNonPositiveCropDimensions')]
+    public function testRejectsNonPositiveCropDimensions(array $params): void
+    {
+        $imagick = $this->createMock(Imagick::class);
+        $imagick->expects($this->never())->method('cropImage');
+
+        $this->expectExceptionObject(new TransformationException(
+            'Crop width and height must be greater than zero',
+            Response::HTTP_BAD_REQUEST,
+        ));
+
+        (new Crop())
+            ->setImagick($imagick)
+            ->setImage((new Image())->setWidth(200)->setHeight(200))
+            ->transform($params);
+    }
+
+    public static function getNonPositiveCropDimensions(): array
+    {
+        return [
+            'zero width' => [['width' => 0, 'height' => 100]],
+            'zero height' => [['width' => 100, 'height' => 0]],
+            'negative width' => [['width' => -1, 'height' => 100]],
+            'negative height' => [['width' => 100, 'height' => -1]],
+            'zero width string' => [['width' => '0', 'height' => 100]],
+            'zero height string' => [['width' => 100, 'height' => '0']],
+            'fractional width' => [['width' => '0.5', 'height' => 100]],
+            'fractional height' => [['width' => 100, 'height' => '0.5']],
+            'non-numeric width' => [['width' => 'abc', 'height' => 100]],
+            'non-numeric height' => [['width' => 100, 'height' => 'abc']],
+        ];
+    }
+
     #[DataProvider('getImageParams')]
     #[AllowMockObjectsWithoutExpectations]
     public function testUsesAllParams(array $params, int $originalWidth, int $originalHeight, int $width, int $height, int $x, int $y, bool $shouldCrop): void

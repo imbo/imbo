@@ -216,6 +216,11 @@ class TransformationManager implements ListenerInterface
 
                 // RegionExtractors return false if no region is extracted
                 if ($region) {
+                    // Invalid regions cannot be used to calculate a safe input size.
+                    if ($region['width'] <= 0 || $region['height'] <= 0) {
+                        return false;
+                    }
+
                     $minimum['index'] = $i;
                 }
             }
